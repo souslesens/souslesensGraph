@@ -66,6 +66,6 @@ logs/classifierManager.log
 config/search/elasticSchema.json
 *.log
 logs/classifierManager.log
-.git
-.idea
+.git/*
+.idea/*
 *.log
