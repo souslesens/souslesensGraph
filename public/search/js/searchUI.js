@@ -5,7 +5,7 @@ var searchUI = (function () {
     self.doLogin = function (group) {
         var login=$("#loginInput").val();
         var password=$("#passwordInput").val();
-       // var match=password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
+        // var match=password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
 
         if(!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
             $("#loginMessage").html("invalid  login : Minimum eight characters, at least one uppercase letter, one lowercase letter and one number");
@@ -15,22 +15,23 @@ var searchUI = (function () {
             login: login,
             password: password
 
-    }
+        }
         $.ajax({
             type: "POST",
             url: self.authenticationUrl,
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
-                if(group){
-                    if(!$.isArray(data))
-                        data=[data];
-                    if(data.indexOf(group)<0){
-                        $("#loginMessage").html("invalid  login or password");
-                        return;
-                    }
+
+                if(!$.isArray(data))
+                    return $("#loginMessage").html("invalid  login or password");
+
+                else if(data.length==0){
+                    return $("#loginMessage").html("invalid  login or password");
 
                 }
+
+
 
                 $("#loginDiv").css("visibility", "hidden");
                 $("#panels").css("visibility", "visible");
@@ -79,9 +80,9 @@ var searchUI = (function () {
     }
 
     self.search = function (options, callback) {
-if(!options){
-    options={}
-}
+        if(!options){
+            options={}
+        }
 
         var from;
         if (!options.start) {
@@ -134,11 +135,11 @@ if(!options){
         oldWord = word;
         var slop = $("#slopInput").val();
 
-     /*   if (slop != "" && word.indexOf(" ") > 0 && word.indexOf("*") > 0) {
+        /*   if (slop != "" && word.indexOf(" ") > 0 && word.indexOf("*") > 0) {
 
-            $("#resultDiv").html("Impossible to have a query with this pattern : xxx* yyy and a distance between the two words. remove * or set distance to 0");
-            return;
-        }*/
+               $("#resultDiv").html("Impossible to have a query with this pattern : xxx* yyy and a distance between the two words. remove * or set distance to 0");
+               return;
+           }*/
 
 
 
@@ -211,7 +212,7 @@ if(!options){
 
     }
 
-   self.processSearchResults=function(data, callback) {
+    self.processSearchResults=function(data, callback) {
         $("#infos").css("visibility", "visible");
         $(".rightPanelTd").css("visibility", "visible");
         $("#clearSearchInputsImg").css("visibility", "visible");
@@ -385,7 +386,7 @@ if(!options){
 
     self.addAssociatedWord = function (word, dontSearch) {
         if(associatedWords.indexOf(word)<0)
-        associatedWords.push(word);
+            associatedWords.push(word);
         self.showAssociatedWordsBreadcrumb();
         if (!dontSearch)
             self.search();
@@ -477,7 +478,7 @@ if(!options){
             findDocumentsById: 1,
             indexName: index,
             ids: [id],
-           words: words
+            words: words
         };
 
         console.log(JSON.stringify(payload, null, 2))
@@ -910,19 +911,19 @@ if(!options){
     }
 
     self.showIndexesStats = function (data) {
-for(var i=0;i<self.userIndexes.length;i++){
-    $("#indexCbxSpan_" + self.userIndexes[i]).html(" (0)");
-}
-      //  $("#sourcesDiv").html(indexesCxbs)
+        for(var i=0;i<self.userIndexes.length;i++){
+            $("#indexCbxSpan_" + self.userIndexes[i]).html(" (0)");
+        }
+        //  $("#sourcesDiv").html(indexesCxbs)
         for (var i = 0; i < data.length; i++) {
-           // var str = + data[i].key
+            // var str = + data[i].key
             $("#indexCbxSpan_" + data[i].key).html(" (" + data[i].count + ")");
             $("[name=indexCbxSpan] [value="+data[i].key+"]").prop("checked",true);
 
-          //  indexesCxbs += "<li><input type='checkbox' checked='checked' name='indexesCbxes' value='" + data[i].key + "'>" + data[i].key+" ("+ data[i].count+")</li>"
+            //  indexesCxbs += "<li><input type='checkbox' checked='checked' name='indexesCbxes' value='" + data[i].key + "'>" + data[i].key+" ("+ data[i].count+")</li>"
         }
-         //  indexesCxbs += "<ul>";
-       // $("#sourcesDiv").html(indexesCxbs);
+        //  indexesCxbs += "<ul>";
+        // $("#sourcesDiv").html(indexesCxbs);
 
     }
 
