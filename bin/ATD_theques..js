@@ -15,6 +15,15 @@ var ATD_theques = {
 
 
         },
+        "artotheque": {
+            type: "mySQL",
+            schema: "phototheque",
+            settings: "ATD",
+            connOptions: {host: "localhost", user: "root", password: "vi0lon", database: 'artotheque'},
+            sqlQuery: "select * from artotheque",
+
+
+        },
         "audiotheque": {
             type: "mySQL",
             schema: "default",
@@ -22,11 +31,18 @@ var ATD_theques = {
             connOptions: {host: "localhost", user: "root", password: "vi0lon", database: 'audiotheque'},
             sqlQuery: "select * from audiotheque"
         },
+        "videotheque": {
+            type: "mySQL",
+            schema: "default",
+            settings: "ATD",
+            connOptions: {host: "localhost", user: "root", password: "vi0lon", database: 'videotheque'},
+            sqlQuery: "select * from videotheque"
+        },
         "bordereaux": {
             type: "fs",
             settings: "ATD",
             dir: "H:\\ATD\\Instruments_de_RECHERCHE",
-            schema: "officeDocument",
+            schema: "officeDocument"
         },
         "ocr": {
             type: "fs",
@@ -34,56 +50,66 @@ var ATD_theques = {
             dir: "H:\\ATD\\ATD_QUART_MONDE_Cde2017_2128_Cde01_BP10_PDF",
             schema: "officeDocument",
 
+        },
+        "testatd": {
+            type: "fs",
+            settings: "ATD",
+            dir: "C:\\Users\\claud\\Downloads\\test",
+            schema: "officeDocument",
+
         }
 
 
     },
 
-    indexTheques: function (indexes, remoteUrl) {
+    indexTheques: function (indexes) {
 
         async.eachSeries(indexes, function (index, callbackEachIndex) {
-            var schema = elasticProxy.getIndexMappings(index);
-          if (remoteUrl)
-                elasticProxy.setElasticServerUrl(remoteUrl);
-            var description = ATD_theques.indexDescriptions[index];
+                console.log("processing " + index)
+                var schema = elasticProxy.getIndexMappings(index);
+
+                var description = ATD_theques.indexDescriptions[index];
 
 
-            elasticProxy.initIndex(index, description.settings, function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        return callbackEachIndex(err);
-                    }
-
-
-                    var callbackAfterIndexation = function (err, result) {
-                        if (err)
+                elasticProxy.initIndex(index, description.settings, function (err, result) {
+                        if (err) {
                             console.log(err);
-                        console.log("done");
-                        callbackEachIndex()
+                            return callbackEachIndex(err);
+                        }
+
+
+                        var callbackAfterIndexation = function (err, result) {
+                            if (err)
+                                console.log(err);
+                            console.log("done");
+                            callbackEachIndex()
+                        }
+
+                        if (description.type == "mySQL") {
+                            elasticProxy.indexSqlTable(description.connOptions, description.sqlQuery, index, index, callbackAfterIndexation);
+                        }
+                        else if (description.type == "mongoDB") {
+
+                        }
+                        else if (description.type == "webPage") {
+
+                        }
+                        else if (description.type == "fs") {
+                            elasticProxy.indexDocDirInNewIndex(index, "officeDocument", description.dir, false, "ATD", callbackAfterIndexation)
+
+
+                        }
+
                     }
+                )
 
-                    if (description.type == "mySQL") {
-                        elasticProxy.indexSqlTable(description.connOptions, description.sqlQuery, index, index, callbackAfterIndexation);
-                    }
-                    else if (description.type == "mongoDB") {
+            },
+            function (err) {
+                if (err)
+                    console.log(err);
+                console.log("all done !!!!");
 
-                    }
-                    else if (description.type == "webPage") {
-
-                    }
-                    else if (description.type == "fs") {
-                        elasticProxy.indexDocDirInNewIndex(index, "officeDocument", description.dir, false, "ATD", callbackAfterIndexation)
-
-
-                    }
-
-                },
-                function (err) {
-
-                }
-            )
-
-        })
+            })
     }
 
 
@@ -92,10 +118,25 @@ var ATD_theques = {
 module.exports = ATD_theques
 
 
-//iptables -D INPUT -p tcp --dport 9200 -j DROP
-// iptables -A INPUT -p tcp --dport 9200 -j DROP
+ATD_theques.indexTheques(["testatd"]);
 
-//ATD_theques.indexTheques(["phototheque"]);//,"http://92.222.116.179:9200");
-//ATD_theques.indexTheques(["phototheque"],"http://92.222.116.179:9200");
-ATD_theques.indexTheques([ "bordereaux"]);//,"http://92.222.116.179:9200");
-//ATD_theques.indexTheques(["phototheque", "audiotheque"], "http://92.222.116.179:9200/");
+
+const args = process.argv;
+console.log(args.length)
+if (args.length > 2) {
+
+    if (args[2] == "indexTheques") {
+        console.log(2);
+        var str = args[3];
+        var theques = str.split(",");
+
+        ATD_theques.indexTheques(theques);
+
+    }
+    ;
+
+
+} else {
+    console.log("Usage :  indexTheques + index1,index2...");
+}
+

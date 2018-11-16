@@ -159,7 +159,7 @@ var elasticProxy = {
 
         }
         if (contentField)
-           fields.fieldObjs["content"] = contentField;
+            fields.fieldObjs["content"] = contentField;
         fields.push("content");
 
 
@@ -1370,25 +1370,24 @@ var elasticProxy = {
 
 
             subArray.push(array[i]);
-            if (subArray.length >= serverParams.elasticFethSize || i == array.length - 1) {
+            if (subArray.length >= serverParams.elasticFethSize) {
                 partitions.push(subArray);
                 subArray = [];
             }
         }
+        partitions.push(subArray);
 
 
         var partitionIndex = 0;
-
+        var result = [];
+        var id = null;
         async.eachSeries(partitions, function (array, callbackSeries) {
-                var id = null;
+
+                elasticPayload = [];
                 for (var i = 0; i < array.length; i++) {
-                    if (!options.id_attr)
-                        id = startId++;
-                    else {
-                        id = array[i][id_attr];
-                        if (!id)
-                            id = startId++;
-                    }
+
+                    id = startId++;
+
 
                     elasticPayload.push({index: {_index: indexName, _type: type, _id: "_" + id}})
                     // var payload = {"content": array[i]};
@@ -1407,10 +1406,19 @@ var elasticProxy = {
 
                     } else {
                         if (resp.errors) {
+                            resp.items.forEach(function (item, index) {
+                                if (item.index.result != "created") {
+                                    console.log(JSON.stringify(array[index]))
+                                    console.log(JSON.stringify(item))
+                                }
+                            })
                             return callback(resp.errors);
                         }
                         console.log("partition " + (partitionIndex++))
-                        return callbackSeries();
+                        result.push(resp)
+
+
+                        return callbackSeries(null);
 
                     }
                 });
@@ -1418,7 +1426,7 @@ var elasticProxy = {
             function (err) {
                 if (err)
                     return callback(err);
-                callback(null, "done");
+                callback(null, result);
 
             }
         )
@@ -1465,7 +1473,7 @@ var elasticProxy = {
                     }
 
                     if (contentValue.length > 0)
-                        payload["content"]= contentValue;
+                        payload["content"] = contentValue;
                     elasticPayload.push(payload);
 
                 }
@@ -1477,9 +1485,16 @@ var elasticProxy = {
                         console.log("ERROR " + err)
                         //  console.log(JSON.stringify(elasticPayload, null, 2))
                         return callback(err);
-
-                    } else {
-                        return callback(null, "done");
+                    } else if (resp.errors) {
+                        resp.items.forEach(function (item, index) {
+                            if (item.index.result != "created") {
+                                console.log(JSON.stringify(jsonData[index]))
+                                console.log(JSON.stringify(item))
+                            }
+                        })
+                        return callback(resp.errors);
+                    }else{
+                    return callback(null, "done");
                     }
                 });
 
@@ -1569,6 +1584,14 @@ var elasticProxy = {
                             console.log("ERROR " + err)
                             console.log(JSON.stringify(elasticPayload, null, 2))
 
+                        } else if (resp.errors) {
+                            resp.items.forEach(function (item, index) {
+                                if (item.index.result != "created") {
+                                    console.log(JSON.stringify(result[index]))
+                                    console.log(JSON.stringify(item))
+                                }
+                            })
+                            return callback(resp.errors);
                         } else {
                             return callbackWhilst(null);
                         }
@@ -1641,7 +1664,7 @@ var elasticProxy = {
 
                 var sqlFetch = sql + " limit " + serverParams.mongoFetchSize + " offset " + offset;
                 offset += serverParams.mongoFetchSize;
-                mySQLproxy.find(connection, sqlFetch, function (err, result) {
+                mySQLproxy.exec(connection, sqlFetch, function (err, result) {
                         if (err) {
                             callback(err);
                             return;
@@ -1678,15 +1701,6 @@ var elasticProxy = {
 
                         }
 
-                        /*   if(true) {
-                               postStr = JSON.stringify(elasticPayload)
-                            //console.log(JSON.stringify(elasticPayload));
-                               fs.writeFileSync("./post_"+offset+".json",postStr);
-
-                               return callbackWhilst();
-                           }*/
-
-
                         getClient().bulk({
                             body: elasticPayload
                         }, function (err, resp) {
@@ -1694,45 +1708,20 @@ var elasticProxy = {
                                 console.log("ERROR " + err)
                                 //  console.log(JSON.stringify(elasticPayload, null, 2))
                                 return callbackWhilst(null);
-
-                            } else {
+                            } else if (resp.errors) {
+                                resp.items.forEach(function (item, index) {
+                                    if (item.index.result != "created") {
+                                        console.log(JSON.stringify(result[index]))
+                                        console.log(JSON.stringify(item))
+                                    }
+                                })
+                                return callback(resp.errors);
+                            }
+                            else {
                                 return callbackWhilst(null);
                             }
                         });
 
-
-                        /*  var options = {
-                              method: 'POST',
-                              url: baseUrl + index + "/_bulk",
-                              encoding: null,
-                             // json: elasticPayload
-                              body:JSON.stringify(elasticPayload,null,2)
-                          }
-
-                          console.log(JSON.stringify(options,null,2))
-                          request(options, function (error, response, body) {
-                              if (error) {
-
-                                  console.log(JSON.stringify(elasticPayload, null, 2))
-                                  return callbackWhilst(err);
-                                  // return callback(file+" : "+error);
-                              }
-
-                              else {
-                                  if (body.errors == true) {
-                                      for (var i = 0; i < body.items.length; i++) {
-                                          if (body.items[i].index.status != 201) {
-                                              if (body.items[i].index.error && body.items[i].index.error.caused_by)
-                                                  console.log(JSON.stringify(body.items[i].index.error.caused_by))
-                                          }
-                                      }
-
-                                  }
-                                  console.log(" totalIndexed " + totalIndexed)
-                                  return callbackWhilst(null);
-                              }
-
-                          });*/
 
                     }
 
@@ -1943,11 +1932,12 @@ var elasticProxy = {
         //  var file = "./search/testPDF.pdf";
         var fileContent;
         var file = path.resolve(_file);
+
         var p = file.lastIndexOf(path.sep);
         var title = file;
         if (p > -1)
             title = file.substring(p + 1);
-
+        logger.info("-----indexing  " + title);
         var options;
         if (base64) {
             index = index + "temp"
@@ -2374,8 +2364,8 @@ function getClient() {
         return client;
     return new elasticsearch.Client({
         host: serverParams.elasticUrl,
-
-        log: ['error', 'warning']
+        log: (['error']),
+        //  log: ['error', 'warning']
     });
 }
 
@@ -2536,8 +2526,65 @@ if (false) {
 }
 
 if (false) {
+    var str = "" + fs.readFileSync("D:\\Total\\docs\\nlp\\thesaurusRefTotal.json")
+    var json = JSON.parse(str);
+    elasticProxy.indexJsonArray("totalref_thesaurus", "concept", json, {}, function (err, result) {
+        var x = result;
+    })
 
 
+}
+
+
+if (false) {
+    var str = "" + fs.readFileSync("D:\\GitHub\\betterCallBot\\bin\\nlp\\totalRefNouns.json")
+    var json = JSON.parse(str);
+    var array = [];
+    for (var key in json) {
+        array.push(json[key]);
+
+    }
+    // indexJsonArray: function (indexName, type, _array, options, callback) {
+    elasticProxy.indexJsonArray("totalref_nouns", "corpusnouns", array, {}, function (err, result) {
+        var x = result;
+    })
+
+
+}
+
+
+if (false) {
+    var str = "" + fs.readFileSync("D:\\Total\\docs\\GM MEC Word\\documents\\elasticAllParagraphs.json")
+    var json = JSON.parse(str);
+    json.forEach(function (line, index) {
+        json[index].tables = ""
+    })
+    // indexJsonArray: function (indexName, type, _array, options, callback) {
+    elasticProxy.indexJsonArray("totalreferentiel5", "totalrefparagraphs", json, {}, function (err, result) {
+        var x = result;
+    })
+
+
+}
+if (false) {
+    var str = "" + fs.readFileSync("D:\\Total\\docs\\GM MEC Word\\documents\\elasticAllDocuments.json")
+    var json = JSON.parse(str);
+    json.forEach(function (line, index) {
+        json[index].tables = ""
+    })
+    // indexJsonArray: function (indexName, type, _array, options, callback) {
+    elasticProxy.indexJsonArray("totalreferentieldocuments5", "totalrefdocuments", json, {}, function (err, result) {
+        var x = result;
+    })
+
+
+}
+
+if (false) {
+
+    elasticProxy.indexSqlTable({name: "phototheque"}, "select * from phototheque ", "phototheque2", "phototheque", function (err, result) {
+        var x = result;
+    })
 }
 
 

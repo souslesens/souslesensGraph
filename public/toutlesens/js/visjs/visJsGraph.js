@@ -272,7 +272,7 @@ var visjsGraph = (function () {
                     var point = params.pointer.DOM;
 
                     if (toutlesensController) {
-                        toutlesensController.dispatchAction("nodeInfos", nodeId);
+                        toutlesensController.dispatchAction("onNodeClick", nodeId);
                         toutlesensController.showPopupMenu(point.x, point.y, "nodeInfo");
                     }
                     else if (admin) {
@@ -807,6 +807,22 @@ var visjsGraph = (function () {
             // pretty print node data
             //  var exportValue = JSON.stringify(nodes, undefined, 2);
             //  console.log(exportValue)
+
+
+        }
+
+        self.getNodesNeoIdsByLabelNeo=function(labelNeo){
+            var ids=[];
+           for(var key in self.nodes._data){
+               var node=self.nodes._data[key];
+                if(!labelNeo){
+                    ids.push(node.id)
+                }else if(node.labelNeo==labelNeo)
+                    ids.push(node.id)
+
+
+            }
+            return ids;
 
 
         }

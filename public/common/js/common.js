@@ -377,8 +377,10 @@ var common = (function () {
 
     }
 
-    self.fillSelectOptionsWithStringArray = function (select, data) {
+    self.fillSelectOptionsWithStringArray = function (select, data,withEmptyOption) {
         select.options.length = 0;
+        if(withEmptyOption)
+            data.splice(0,0,"");
         $.each(data, function (i, item) {
             $(select).append($('<option>', {
                 value: item,
@@ -387,12 +389,14 @@ var common = (function () {
         });
     }
 
-    self.fillSelectOptions=function(select, data, textfield, valueField) {
+    self.fillSelectOptions=function(select, data, textfield, valueField,withEmptyOption) {
         select.options.length = 0;
         if (!textfield ) {
             fillSelectOptionsWithStringArray(select, data);
             return;
         }
+        if(withEmptyOption)
+        data.splice(0,0,"");
         if(!valueField)
             valueField=textfield;
         $.each(data, function(i, item) {

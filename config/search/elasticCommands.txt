@@ -1,0 +1,26 @@
+curl -XGET  http://92.222.116.179:7201/_cat/indices
+curl -XDELETE http://92.222.116.179:7201/bordereaux
+
+curl -d '{"settings":{"analysis":{"analyzer":{"ATD":{"tokenizer":"standard","filter":["lowercase","asciifolding","stemmer_filter_fr"]}},"filter":{"stemmer_filter_fr":{"type":"stemmer","name":"french"}}}},"mappings":{"officeDocument":{"properties":{"author":{"type":"text"},"content":{"type":"text","index_options":"offsets","analyzer":"ATD","fields":{"contentKeyWords":{"type":"keyword","ignore_above":256}},"fielddata":true},"date":{"type":"date"},"path":{"type":"text"},"title":{"type":"text"}}}}}' -H "Content-Type: application/json" -X PUT http://92.222.116.179:7201/bordereaux
+
+
+{
+  "settings": {
+    "analysis" : {
+      "analyzer" : {
+        "ATD" : {
+          "tokenizer" : "standard",
+          "filter" : [ "lowercase",
+            "asciifolding",
+            "stemmer_filter_fr"]
+        }
+      },
+      "filter" : {
+        "stemmer_filter_fr" : {
+          "type" : "stemmer",
+          "name" : "french"
+        }
+      }
+    }
+  }
+}

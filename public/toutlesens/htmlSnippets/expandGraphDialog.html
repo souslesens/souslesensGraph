@@ -1,0 +1,45 @@
+
+<script>
+
+var expandGraph=(function(){
+    var self={};
+self.setSourceLabel=function(label){
+
+    $('#expand_labelsSelectSource').val(label);
+    var targetLabels=Schema.getPermittedLabels(label,true,true);
+    common.fillSelectOptionsWithStringArray(expand_labelsSelectTarget,targetLabels,true);
+
+}
+
+self.onOK=function(){
+    toutlesensController.dispatchAction('expandGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())
+   self.setSourceLabel($('#expand_labelsSelectTarget').val());
+}
+
+
+
+    return self;
+
+})()
+
+
+
+
+</script>
+
+
+
+
+
+
+from <select id="expand_labelsSelectSource" onchange="expandGraph.setSourceLabel($(this.val()))"></select>
+<br>
+to <select id="expand_labelsSelectTarget" ></select>
+
+<button onclick="expandGraph.onOK()">expand</button>
+<!--<button onclick="toutlesensController.dispatchAction('collapseGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())">collapse</button>-->
+<script>
+    common.fillSelectOptionsWithStringArray(expand_labelsSelectSource, Schema.getAllLabelNames(),true);
+
+
+</script>

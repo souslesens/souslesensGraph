@@ -115,7 +115,26 @@ var advancedSearch = (function () {
 
     }
 
-    self.onChangeObjectName = function (value) {
+
+    self.resetQueryClauses = function () {
+
+
+
+
+        // self.setPermittedLabelsCbxs(value);
+        //$("#searchDialog_NodeLabelInput").val(value);
+        $("#searchDialog_valueInput").val();
+        $('#searchDialog_valueInput').focus();
+        //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
+        $("#searchDialog_NextPanelButton").css('visibility', 'visible');
+        self.clearClauses();
+        $("#searchDialog_propertySelect").val(Schema.getNameProperty(value))
+    }
+    self.onChangeObjectName = function (value,div) {
+
+        $(".selectLabelDiv").removeClass("selectLabelDivSelected");
+        $(div).addClass("selectLabelDivSelected");
+
         // self.setPermittedLabelsCbxs(value);
         $("#searchDialog_NodeLabelInput").val(value);
         $("#searchDialog_valueInput").val();
@@ -127,6 +146,8 @@ var advancedSearch = (function () {
         filters.initProperty(null, value, searchDialog_propertySelect);
         $("#searchDialog_propertySelect").val(Schema.getNameProperty(value))
     }
+
+
     self.setPermittedLabelsCbxs = function (label, selectId) {
         var labelsCxbs = "<br><table style='text-align: left;background-color: #eee; width: 300px;margin-bottom: 15px;'>";
         var labels = Schema.getPermittedLabels(label, true, true);

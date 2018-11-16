@@ -181,7 +181,7 @@ var toutlesensController = (function () {
                 self.setRightPanelAppearance(false);
 
                 if (callback) {
-                   callback(err, data);
+                    callback(err, data);
                 }
                 return;
             }
@@ -214,7 +214,7 @@ var toutlesensController = (function () {
                 $("#mainButtons").css("visibility", "visible");
                 $("#waitImg").css("visibility", "hidden");
                 $(".graphDisplayed").css("visibility", "visible");
-                $( "#tabs-analyzePanel" ).tabs( "option", "active", 2 );//highlight
+                $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
 
                 if (toutlesensData && toutlesensData.queriesIds.length > 1)
                     options.dragConnectedNodes = true;
@@ -262,9 +262,9 @@ var toutlesensController = (function () {
                 //  options.showRelationsType = false,
                 options.smooth = true;
             }
-            if(json.length==0){
-                $("#waitImg").css("visibility","hidden")
-                $("#graphDiv").html( "< span class ='graphMessage'>No Results</span>")
+            if (json.length == 0) {
+                $("#waitImg").css("visibility", "hidden")
+                $("#graphDiv").html("< span class ='graphMessage'>No Results</span>")
             }
             if (!json)
                 json = connectors.neoResultsToVisjs(toutlesensData.cachedResultArray, options);
@@ -546,6 +546,11 @@ var toutlesensController = (function () {
             currentObject.label = currentObject.nodeType;
         }
 
+        if (action == "onNodeClick") {
+            toutlesensController.dispatchAction("nodeInfos", id);
+            expandGraph.setSourceLabel(currentObject.labelNeo)
+
+        }
 
         if (action == "nodeInfos") {
             if (id) {
@@ -577,20 +582,20 @@ var toutlesensController = (function () {
                     str += "<tr><td><a href='javascript:paint.dispatchAction(\"openCluster\")'>open cluster</a>"
                     str += "<tr><td><a href='javascript:paint.dispatchAction(\"listClusterNodes\")'>list nodes of cluster</a>"
                     str += "<tr><td><a href='javascript:paint.dispatchAction(\"graphClusterNodes\")'>Graph  neighbours nodes of cluster</a>"
-                   // str += "<tr><td><a href='javascript:paint.dispatchAction(\"queryClusterNodes\")'>query cluster</a>"
+                    // str += "<tr><td><a href='javascript:paint.dispatchAction(\"queryClusterNodes\")'>query cluster</a>"
 
 
                     $("#graphPopup").html(str);
                     $("#nodeInfoMenuDiv").css("visibility", "visible");
-                   // $("#nodeInfoMenuDiv").html(str);
+                    // $("#nodeInfoMenuDiv").html(str);
 
 
                     return;
                 }
                 toutlesensData.getNodeInfos(id, function (obj) {
-                    currentObject=obj[0].n.properties;
-                    currentObject.id=obj[0].n._id;
-                    currentObject.label=obj[0].n.labels[0];
+                    currentObject = obj[0].n.properties;
+                    currentObject.id = obj[0].n._id;
+                    currentObject.label = obj[0].n.labels[0];
                     var $currentObj = currentObject;
                     if (self.hasRightPanel) {
                         var str = "<input type='image' src='images/back.png' height='15px' title='back' onclick='toutlesensController.restorePopupMenuNodeInfo()' ><br>"
@@ -658,6 +663,30 @@ var toutlesensController = (function () {
                 currentLabel = null;
             });
         }
+        else if (action == 'expandGraphWithLabelExecute') {
+            var sourceLabel = "";
+            if (objectId != "" && objectId != "ALL")
+                sourceLabel = objectId;
+            else
+                sourceLabel = null;
+            var ids = visjsGraph.getNodesNeoIdsByLabelNeo(currentLabel)
+            var targetLabel = "";
+            if (targetObjectId != "" && targetObjectId != "ALL")
+                currentLabel = targetObjectId;
+            else
+                currentLabel = null;
+            toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
+                toutlesensController.generateGraph(null, {
+                    applyFilters: false,
+                    addToPreviousQuery: true
+                }, function (err, result) {
+                    currentLabel = null;
+                });
+            })
+
+
+        }
+
 
         else if (action == 'closeNode') {
 
@@ -1106,9 +1135,12 @@ var toutlesensController = (function () {
         });
         $("#filterDiv").load("htmlSnippets/filterDialog.html", function () {
 
-          //  searchMenu.init(Schema);
+            //  searchMenu.init(Schema);
         });
+        $("#expandDiv").load("htmlSnippets/expandGraphDialog.html", function () {
 
+            //  searchMenu.init(Schema);
+        });
 
 
         $("#tabs-analyzePanel").tabs("option", "disabled", tabsanalyzePanelDisabledOptions);
@@ -1229,11 +1261,8 @@ var toutlesensController = (function () {
         $("#graphInfosDiv").css("visibility", "hidden")
 
 
-
-
         $("#treeContainer").width(rightPanelWidth - 15);
-      $("#tagCloudIframe").height(totalHeight);
-
+        $("#tagCloudIframe").height(totalHeight);
 
 
         // $("#graphLegendDiv").width(rightPanelWidth - 50).height(totalHeight)

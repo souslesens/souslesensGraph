@@ -6,6 +6,7 @@ var searchMenu = (function () {
         self.selectedQuery = null;
         self.pathQuery = null;
         self.previousAction;
+        self.dataTable=null;
 
         var previousAction = "";
         self.init = function (schema) {
@@ -40,7 +41,7 @@ var searchMenu = (function () {
             var str = "";
             labels.forEach(function (label) {
                 var color = nodeColors[label];
-                str += ' <div class="selectLabelDiv" style="background-color: ' + color + '" onclick="advancedSearch.onChangeObjectName(\'' + label + '\')">' + label + '</div>'
+                str += ' <div class="selectLabelDiv" style="background-color: ' + color + '" onclick="advancedSearch.onChangeObjectName(\'' + label + '\',this)">' + label + '</div>'
             })
             $("#advancedSearchNodeLabelsDiv").html(str).promise().done(function () {
 
@@ -206,10 +207,14 @@ var searchMenu = (function () {
         self.previousPanel = function () {
             currentPanelIndex += -1;
             self.showCurrentPanel();
-            if (currentPanelIndex == 1)
+            if (currentPanelIndex == 1) {
                 $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
-            $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
-            $("#searchDialog_NextPanelButton").css('visibility', 'visible');
+                //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
+                $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
+                advancedSearch.resetQueryClauses()
+            }else {
+                $("#searchDialog_NextPanelButton").css('visibility', 'visible');
+            }
         }
 
         self.nextPanel = function () {
@@ -295,7 +300,10 @@ var searchMenu = (function () {
                 advancedSearch.searchNodes('matchStr', null, function (err, query) {
                     if (err)
                         return console.log(err);
-                    dataTable.loadNodes(query, {});
+                    if( ! self.dataTable){
+                        self.dataTable=new dataTable();
+                    }
+                    self.dataTable.loadNodes(self.dataTable,"graphDiv",query, {});
 
 
                 })
@@ -385,6 +393,7 @@ var searchMenu = (function () {
 
                         self.previousAction = null;
                         $("#searchDialog_PreviousPanelButton").css('visibility', 'visible');
+                        $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
                     })
 
@@ -546,6 +555,7 @@ var searchMenu = (function () {
             var state = $(cbx).prop("checked");
             if (state) {
                 state = "checked";
+                searchMenu.onSearchAction('execute')
             }
             $('.advancedSearchDialog_LabelsCbx').each(function () {
                 $(this).prop("checked", state);

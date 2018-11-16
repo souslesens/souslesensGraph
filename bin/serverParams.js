@@ -36,7 +36,24 @@ var serverParams={
     elasticPort:9200,
     uploadMaxSize:100*1000*1000, //100M
     elasticsaerchMaxDocSizeForIndexing:10*1000*1000 ,//1Mo
-    elasticMaxFetch:10*1000
+    elasticMaxFetch:10*1000,
+    mysqlConnections:{
+        bailletarchives: {
+            "host": "localhost",
+            "user": "root",
+            "password": "vi0lon",
+            "database": 'bailletarchives'
+        },
+        phototheque: {
+            "host": "localhost",
+            "user": "root",
+            "password": "vi0lon",
+            "database": 'phototheque'
+        }
+
+
+    }
+
 }
 
 module.exports = serverParams;

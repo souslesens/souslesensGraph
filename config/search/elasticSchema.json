@@ -785,6 +785,21 @@
     },
     "totalreferentiel3": {
       "mappings": {
+        "total_paragraph": {
+          "properties": {
+            "text": {
+              "type": "text",
+              "isSearched":true
+            },
+            "title": {
+              "type": "text"
+            },
+            "table": {
+              "type": "text",
+              "isSearched":true
+            }
+          }
+        },
         "rules_total3": {
           "properties": {
             "id": {
