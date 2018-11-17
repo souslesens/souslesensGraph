@@ -14,11 +14,9 @@
         visibility: visible;
         padding: 2px;
         height: 200px;
-
         margin: auto;
         text-align: center;
-    / / top: 450 px;
-    / / position: absolute;
+
 
     }
 
@@ -79,18 +77,18 @@
 
     #searchCriteriaTextDiv {
 
-        width: 250px;
-    / / height: 30 px;
-
+        width: 350px;
         visibility: visible;
-    / / background-color: #9ca7b3;
-    / / border: 3 px solid green;
-        padding: 10px;
+        padding: 2px;
         position: inherit;
         margin: auto;
         text-align: center;
     }
-
+.searchDialog_CriteriaDiv{
+    background-color:#7f9f7f;
+    border-radius: 6px;
+    width:200px;
+}
 </style>
 
 
@@ -157,14 +155,7 @@
                                onclick="advancedSearch.onChangeObjectName($(this).val())"></select>-->
                 </div>
                 <!--  -->
-                <div id="searchDialog_Criteriatext"
-                     style="  visibility: hidden; overflow: auto;height: 70px">
-                    <select id="searchCriteriatextSelect" size="4"
-                            onclick="advancedSearch.clearClause(this)"
-                            style=" overflow-y: hidden;    border: none;"></select>
-                    <input type="image" height="20px" src="images/erase.png"
-                           onclick="advancedSearch.clearClauses()">
-                </div>
+
             </div>
             <div id="searchActionDiv" style="display: table-row" class="searchPanel">
                 <b>Ouput type</b>
@@ -254,7 +245,7 @@
                 </table>
 
             </div>
-            <div id="searchNavDiv"  style=" position: fixed;  top: 350px; width: 350px; ">
+            <div id="searchNavDiv"  style=" position: fixed;  top: 300px; width: 350px; ">
                 <div style="background-color: #eee; border-style: solid; border-width: thin;margin-bottom: 20px">
                     <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
                     </button>
@@ -272,6 +263,12 @@
                     <button style="visibility:hidden" id="searchDialog_ExecuteButton"
                             onclick="searchMenu.onSearchAction('execute')">OK
                     </button>
+                </div>
+                <div id="searchDialog_Criteriatext"  style="  visibility: visible; overflow: auto;height: 70px">
+
+                    <input type="image" height="20px" src="images/erase.png"
+
+
                 </div>
 
             </div>

@@ -558,16 +558,18 @@ var toutlesensController = (function () {
 
                 if (currentObject.type && currentObject.type == "schema") {
                     var str = "Label " + currentObject.label + "<br><table>"
-                    if (currentObject.count < Gparams.jsTreeMaxChildNodes)
-                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"list\")'>List all nodes</a></td></tr>"
-                    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"search\")'>Search nodes...</a>"
-                    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"graph\")'>Graph  all neighbours</a>"
+                    if (false) {
+                        if (currentObject.count < Gparams.jsTreeMaxChildNodes)
+                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"list\")'>List all nodes</a></td></tr>"
+                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"search\")'>Search nodes...</a>"
+                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"graph\")'>Graph  all neighbours</a>"
 
 
-                    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-start-exec\")'>Graph from...</a></td></tr>"
-                    if (graphicController.startLabel) {
-                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-end-exec\")'>Graph to...</a></td></tr>"
-                        //    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"shortestPath\")'>Shortest Path</a></td></tr>"
+                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-start-exec\")'>Graph from...</a></td></tr>"
+                        if (graphicController.startLabel) {
+                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-end-exec\")'>Graph to...</a></td></tr>"
+                            //    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"shortestPath\")'>Shortest Path</a></td></tr>"
+                        }
                     }
                     $("#graphPopup").html(str);
                     $("#nodeInfoMenuDiv").css("visibility", "visible");

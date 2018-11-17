@@ -24,96 +24,7 @@ var advancedSearch = (function () {
     }
 
 
-    self.showDialogOld = function (options) {
 
-        filters.setLabelsOrTypes("node");
-        $("#word").val("");
-
-
-        if (!options)
-            options = {};
-        var initialLabel = options.initialLabel;
-        if (self.context && self.context.pathType) {
-            self.searchClauses = [];
-            $("#searchCriteriatextSelect").find('option').remove();
-            $("#searchCriteriaTextDiv").css("visibility", "hidden");
-        }
-
-
-        if (options.multipleClauses) {
-            $("#searchCriteriaAddButton").css("visibility", "visible");
-            if (self.searchClauses.length > 0) {
-                $("#searchCriteriaTextDiv").css("visibility", "visible");
-            }
-        }
-
-
-        else
-            $("#searchCriteriaAddButton").css("visibility", "hidden");
-        var filterMovableDiv = $("#filterMovableDiv").detach();
-        $("#dialog").html(filterMovableDiv);
-        $("#BIlegendDiv").html("");
-        advancedSearch.onChangeObjectName(currentObject.name);
-
-        var str = "";
-
-        //str += labelsCxbs;
-
-        if (self.context.pathType == "allTransitivePaths") {
-            if (self.context.target == "source")
-                str += " <button id=\"advancedSearchDialog_searchButton\" onclick=\"traversalController.setStartLabelQuery()\">OK</button>";
-            else if (self.context.target == "target") {
-                str += " <button id=\"advancedSearchDialog_searchButton\" onclick=\"traversalController.setEndLabelQuery()\">OK</button>";
-
-
-            }
-
-        }
-
-        else if (false) {
-            str += "<b>Graph</b>"
-            str += " <button id=\"advancedSearchDialog_searchAndGraphButton\"  onclick=\"advancedSearch.searchNodes('matchStr',null,advancedSearch.graphNodesAndDirectRelations);$('#dialog').dialog('close')\">Neighbours</button>&nbsp;";
-            str += " <button id=\"advancedSearchDialog_searchAndGraphButton\"  onclick=\"advancedSearch.graphOnly();$('#dialog').dialog('close')\">Only</button>&nbsp;";
-            str += "<br><b></b>"
-            str += " <button id=\"advancedSearchDialog_searchButton\" onclick=\"advancedSearch.searchNodes('matchStr',null,treeController.loadSearchResultIntree);$('#dialog').dialog('close'); $('#findTabs').tabs({active:0});\">List</button>";
-        }
-
-
-        else {
-            str += "<select id='advancedSearchAction'   onchange='searchMenu.onSearchAction($(this).val())'><option value=''>Choose...</option><option value='listNodes'>list nodes</option><option value='graphNodes'>graph nodes</option><option value='graphNeighbours'>graph all neigbours</option><option value='graphSomeNeighbours'>graph some neigbours...</option><option value='graphSimilars'>graph similars </option></select>";
-        }
-
-
-        $("#filterActionDiv").html(str);
-
-        $("#advancedSearchDialog_searchAndGraphButton").css("background-color", "#5F5F5F");
-
-        /*  $("#dialog").load("htmlSnippets/advancedSearchDialog.html", function () {*/
-        $("#dialog").dialog("option", "title", "Advanced search");
-        $("#dialog").dialog({modal: false});
-        $("#dialog").dialog("open");
-        var objectNameInput = $("#searchDialog_NodeLabelInput").val();
-        if (!objectNameInput || objectNameInput == "") {
-            filters.init();
-
-        }
-        $("#searchDialog_valueInput").val("")
-        $("#searchDialog_valueInput").focus();
-        if (initialLabel) {
-            $("#searchDialog_NodeLabelInput").val(initialLabel)
-        }
-
-        $("#filterOptionsDiv").html("");
-
-        if (options.setValueInput)
-            $("#searchDialog_valueInput").val(options.setValueInput)
-        if (options.addClauses) {
-            for (var i = 0; i < options.addClauses.length; i++) {
-                self.addClause(options.addClauses[i]);
-            }
-        }
-
-    }
 
 
     self.resetQueryClauses = function () {
@@ -197,21 +108,17 @@ var advancedSearch = (function () {
             return;
         if (clause.where == "" && self.searchClauses.length > 0)
             return;
-        $("#searchCriteriatextSelect option").each(function () {
-            if ($(this).val() == clauseText)
-                return; // already present
-        })
+
+        $("#searchDialog_Criteriatext").append(' <div   class="searchDialog_CriteriaDiv" onclick="advancedSearch.clearClause(\"'+clauseText+'\"))">'+clauseText+'</div>')
+
 
         var clauseTextHuman = clauseText.replace("=~'(?i).*", " contains '")
         var clauseTextHuman = clauseTextHuman.replace("*'", "'")
         clause.title = clauseTextHuman;
 
         self.searchClauses.push(clause);
-        $("#searchCriteriatextSelect").append($('<option>', {
-            value: clauseText,
-            text: clauseTextHuman
-        }));
-        //  $("#searchCriteriatextSelect").attr("size", self.searchClauses.length);
+
+
         $("#clearAllCreteriaButton").css("visibility", "visible");
         $("#searchDialog_SaveQueryButton").css("visibility", "visible")
         $("#searchDialog_Criteriatext").css("visibility", "visible");
@@ -220,20 +127,25 @@ var advancedSearch = (function () {
     }
 
     self.clearClauses = function () {
+
+
         self.searchClauses = [];
-        $('#searchCriteriatextSelect option').each(function () {
-            $(this).remove();
-        });
+
+         $(".searchDialog_CriteriaDiv").remove();
 
     }
-    self.clearClause = function (select) {
-        var value = $(select).val();
-        self.searchClauses.splice(select.selectedIndex, 1);
-        $('#searchCriteriatextSelect option').each(function () {
-            if ($(this).val() == value) {
+    self.clearClause = function (text) {
+
+
+
+        $(".searchDialog_CriteriaDiv").each(function(div,index){
+            if(div==$(this)) {
                 $(this).remove();
+                self.searchClauses.splice(index,1);
             }
-        });
+        })
+
+
 
 
     }
