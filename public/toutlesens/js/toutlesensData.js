@@ -148,7 +148,7 @@ var toutlesensData = (function () {
             //*******************************************************where***********************************************
             var subGraphWhere;
             if (subGraph)
-                subGraphWhere = "  n.subGraph=\"" + subGraph + "\" "
+                subGraphWhere = "  n.subGraph='" + subGraph + "' and m.subGraph='" + subGraph + "' ";
 
             var whereStatement = "";
             if (id && self.whereFilter.indexOf("ID(n)") < 0) {
@@ -1288,9 +1288,9 @@ var toutlesensData = (function () {
 
                 if (subGraph) {
                     if (whereStr.length == 0)
-                        subGraphWhere += " where  n.subGraph='" + subGraph + "' ";
+                        subGraphWhere += " where  n.subGraph='" + subGraph + "' and m.subGraph='" + subGraph + "' ";
                     else
-                        subGraphWhere += " and  n.subGraph='" + subGraph + "' ";
+                        subGraphWhere += " and  n.subGraph='" + subGraph + "' and m.subGraph='" + subGraph + "' ";
                 }
             }
 

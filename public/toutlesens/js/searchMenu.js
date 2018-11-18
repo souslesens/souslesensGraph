@@ -1,7 +1,7 @@
 var searchMenu = (function () {
         var self = {};
         var savedQueries = {}
-        var currentPanelIndex = 1;
+        self.currentPanelIndex = 1;
         self.currentAction = null;
         self.selectedQuery = null;
         self.pathQuery = null;
@@ -10,13 +10,13 @@ var searchMenu = (function () {
 
         var previousAction = "";
         self.init = function (schema) {
-            currentPanelIndex = 1;
+            self.currentPanelIndex = 1;
             //   toutlesensController.initLabels(searchDialog_NodeLabelInput, true);
             $("#searchDialog_NodeLabelInput").val("");
             //  $("#searchDialog_NodeLabelInput").attr("size", 8);
             $("#searchDialog_propertySelect").append("<option></option><option selected='selected'>" + Schema.getNameProperty() + "</option>");
             $("#searchDialog_valueInput").keypress(function (event) {
-                if (event.which == 13) {
+                if (event.which == 13 || event.which == 9) {
                     advancedSearch.addClauseUI()
                 }
             })
@@ -45,6 +45,10 @@ var searchMenu = (function () {
             })
             $("#advancedSearchNodeLabelsDiv").html(str).promise().done(function () {
 
+                $( ".selectLabelDiv" ).click(function( event ) {
+                    event.stopPropagation();
+                    // Do something
+                });
                 var parentWidth = $("#advancedSearchNodeLabelsDiv").width() - 10;
                 var x = 10;
                 var y =10;
@@ -66,6 +70,13 @@ var searchMenu = (function () {
                     x+=xOffset + 10;
                 })
             })
+
+        }
+
+        self.clearCurrentLabel=function(){
+            $(".selectLabelDiv").removeClass("selectLabelDivSelected");
+            $("#searchDialog_propertySelect").val("")
+            currentLabel = null;
 
         }
 
@@ -197,7 +208,7 @@ var searchMenu = (function () {
             $(".searchPanel").each(function (index, value) {
                 if (value.id == id) {
                     visibility = "visible";
-                    currentPanelIndex = index
+                    self.currentPanelIndex = index
                 }
                 else
                     visibility = "hidden";
@@ -205,13 +216,13 @@ var searchMenu = (function () {
             });
         }
         self.previousPanel = function () {
-            currentPanelIndex += -1;
+            self.currentPanelIndex += -1;
             self.showCurrentPanel();
-            if (currentPanelIndex == 1) {
+            if (self.currentPanelIndex == 1) {
                 $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
                 //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
                 $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
-                advancedSearch.resetQueryClauses()
+            // advancedSearch.resetQueryClauses()
             }else {
                 $("#searchDialog_NextPanelButton").css('visibility', 'visible');
             }
@@ -233,9 +244,9 @@ var searchMenu = (function () {
 
             }
             else {
-                if (currentPanelIndex == 1)
+                if (self.currentPanelIndex == 1)
                     advancedSearch.addClauseUI();
-                currentPanelIndex += 1;
+                self.currentPanelIndex += 1;
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
 
 
@@ -247,7 +258,7 @@ var searchMenu = (function () {
             var visibility = "visible";
 
             $(".searchPanel").each(function (index, value) {
-                if (index == currentPanelIndex)
+                if (index == self.currentPanelIndex)
                     visibility = "visible";
                 else
                     visibility = "hidden";
@@ -256,6 +267,8 @@ var searchMenu = (function () {
 
 
         }
+
+
 
         self.onPropertyKeyPressed = function (input) {
             var ddd = "aaa"

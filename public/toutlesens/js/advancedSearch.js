@@ -39,7 +39,7 @@ var advancedSearch = (function () {
         //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
         $("#searchDialog_NextPanelButton").css('visibility', 'visible');
         self.clearClauses();
-        $("#searchDialog_propertySelect").val(Schema.getNameProperty(value))
+        $("#searchDialog_propertySelect").val("")
     }
     self.onChangeObjectName = function (value,div) {
 
@@ -53,6 +53,7 @@ var advancedSearch = (function () {
         //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
         $("#searchDialog_NextPanelButton").css('visibility', 'visible');
         self.clearClauses();
+        self.resetQueryClauses()
         if (searchDialog_propertySelect) ;
         filters.initProperty(null, value, searchDialog_propertySelect);
         $("#searchDialog_propertySelect").val(Schema.getNameProperty(value))
@@ -109,14 +110,13 @@ var advancedSearch = (function () {
         if (clause.where == "" && self.searchClauses.length > 0)
             return;
 
-        $("#searchDialog_Criteriatext").append(' <div   class="searchDialog_CriteriaDiv" onclick="advancedSearch.clearClause(\"'+clauseText+'\"))">'+clauseText+'</div>')
-
 
         var clauseTextHuman = clauseText.replace("=~'(?i).*", " contains '")
         var clauseTextHuman = clauseTextHuman.replace("*'", "'")
         clause.title = clauseTextHuman;
 
         self.searchClauses.push(clause);
+        $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' onclick=advancedSearch.clearClause("+(self.searchClauses.length-1)+")>"+clauseText+"</div>")
 
 
         $("#clearAllCreteriaButton").css("visibility", "visible");
@@ -134,12 +134,13 @@ var advancedSearch = (function () {
          $(".searchDialog_CriteriaDiv").remove();
 
     }
-    self.clearClause = function (text) {
+    self.clearClause = function (_index) {
 
+        if(searchMenu.currentPanelIndex>1)
+            return;
 
-
-        $(".searchDialog_CriteriaDiv").each(function(div,index){
-            if(div==$(this)) {
+        $(".searchDialog_CriteriaDiv").each(function(index,div){
+          if( _index==index) {
                 $(this).remove();
                 self.searchClauses.splice(index,1);
             }

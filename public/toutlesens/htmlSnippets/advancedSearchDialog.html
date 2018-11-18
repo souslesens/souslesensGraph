@@ -32,8 +32,8 @@
 
     #advancedSearchNodeLabelsDiv {
         display: inline;
-        width: 250px;
-        height: 70px;
+        width: 350px;
+        height: 100px;
         overflow: auto;
 
     }
@@ -70,9 +70,12 @@
     }
 
     .selectLabelDivSelected {
-        border-width: 5px;
+        border-width: 3px;
         border-color: #0000cc;
+        color: #0000cc;
         border-style: solid;
+      padding:5px;
+        z-index: 20;
     }
 
     #searchCriteriaTextDiv {
@@ -119,10 +122,14 @@
                  <option>relation</option>
              </select>-->
 
-                <div id="advancedSearchNodeLabelsDiv" style="display: table-row;display: inline-block" ></div>
+                <div id="advancedSearchNodeLabelsDiv" style="display: table-row;display: inline-block" onclick="searchMenu.clearCurrentLabel()"></div>
 
 
-                <div style="display: table-row;display: inline-block">
+
+
+
+               <!-- <div style="display: table-row;display: inline-block">-->
+                    <div style="position: fixed;  top: 260px;align-self: center">
                     <table>
                         <tr>
                             <td colspan="3">
@@ -141,7 +148,7 @@
                                        onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_NextPanelButton').css('visibility', 'visible');">
 
 
-                                <input type="image" height="20px" src="images/erase.png"
+                              <input type="image" height="20px" src="images/erase.png"
                                        onclick="$('#searchDialog_valueInput').val('')">
                             </td>
                         </tr>
@@ -151,6 +158,7 @@
 
                     <input type="hidden" id="searchDialog_ObjectTypeInput" value="node">
                     <input type="hidden" id="searchDialog_NodeLabelInput" value="">
+                    <input type="hidden" id="searchDialog_NodeLabelInut" value="">
                     <!--   <select id="searchDialog_NodeLabelInput"
                                onclick="advancedSearch.onChangeObjectName($(this).val())"></select>-->
                 </div>
@@ -201,7 +209,7 @@
                 <br>
                 <input type="checkbox" id="graphNeighboursAllOptionsCbx"
                        onchange="searchMenu.onGraphNeighboursAllOptionsCbx(this)"> All
-                <div id='neighboursTypesDiv' style="max-height: 200px;overflow: auto"></div>
+                <div id='neighboursTypesDiv' style="max-height: 120px;width:320px;overflow: auto"></div>
 
 
             </div>
@@ -245,7 +253,7 @@
                 </table>
 
             </div>
-            <div id="searchNavDiv"  style=" position: fixed;  top: 300px; width: 350px; ">
+            <div id="searchNavDiv"  style=" position: fixed;  top: 330px; width: 320px; ">
                 <div style="background-color: #eee; border-style: solid; border-width: thin;margin-bottom: 20px">
                     <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
                     </button>
@@ -266,7 +274,7 @@
                 </div>
                 <div id="searchDialog_Criteriatext"  style="  visibility: visible; overflow: auto;height: 70px">
 
-                    <input type="image" height="20px" src="images/erase.png"
+                   <!-- <input type="image" height="20px" src="images/erase.png">-->
 
 
                 </div>
