@@ -332,11 +332,13 @@ var Schema = (function () {
             if (Schema && Schema.schema) {
                 var i = 0;
                 for (var key in Schema.schema.labels) {
-                    if (Schema.schema.labels[key].color)
+                    if (false && Schema.schema.labels[key].color)
                         nodeColors[key] = Schema.schema.labels[key].color;
                     else {
                         var index = (i++) % Gparams.palette.length;
+
                         nodeColors[key] = Gparams.palette[index];
+                        console.log(index+" " +nodeColors[key] +" "+key)
                     }
                     if (Schema.schema.labels[key].icon == "default.png")
                         delete Schema.schema.labels[key].icon;

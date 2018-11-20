@@ -69,11 +69,11 @@ var treeController = (function () {
 
                     var paletteColor = Gparams.palette[k % Gparams.palette.length];
                     Schema.schema.labels[label].color = paletteColor;
-                    nodeColors[label] = paletteColor;
+                //    nodeColors[label] = paletteColor;
                     k++;
                 }
                 else {
-                    nodeColors[label] = Schema.schema.labels[label].color;
+                   ;// nodeColors[label] = Schema.schema.labels[label].color;
                 }
 
                 //  toutlesensController.setLinkColors();
