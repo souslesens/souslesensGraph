@@ -1288,9 +1288,9 @@ var toutlesensData = (function () {
 
                 if (subGraph) {
                     if (whereStr.length == 0)
-                        subGraphWhere += " where  n.subGraph='" + subGraph + "' and m.subGraph='" + subGraph + "' ";
+                        subGraphWhere += " where  n.subGraph='" + subGraph + "'";
                     else
-                        subGraphWhere += " and  n.subGraph='" + subGraph + "' and m.subGraph='" + subGraph + "' ";
+                        subGraphWhere += " and  n.subGraph='" + subGraph + "'";
                 }
             }
 

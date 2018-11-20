@@ -1970,6 +1970,9 @@ var elasticProxy = {
 
 
         request(options, function (error, response, body) {
+
+         //   console.log(file+"  "+JSON.stringify(body));
+
             if (error) {
                 logger.error(file + " : " + error);
                 console.error(file + " : " + error);

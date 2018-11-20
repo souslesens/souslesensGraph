@@ -6,7 +6,7 @@ var advancedSearch = (function () {
     self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
     self.context = {}
     self.searchClauses = [];
-
+self.currentQueryNodeIds=[];
     self.showDialog = function (options) {
         self.filterLabelWhere = "";
 
@@ -39,7 +39,7 @@ var advancedSearch = (function () {
         //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
         $("#searchDialog_NextPanelButton").css('visibility', 'visible');
         self.clearClauses();
-        $("#searchDialog_propertySelect").val("")
+        $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
     }
     self.onChangeObjectName = function (value,div) {
 
@@ -56,7 +56,7 @@ var advancedSearch = (function () {
         self.resetQueryClauses()
         if (searchDialog_propertySelect) ;
         filters.initProperty(null, value, searchDialog_propertySelect);
-        $("#searchDialog_propertySelect").val(Schema.getNameProperty(value))
+        $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
     }
 
 
@@ -83,28 +83,39 @@ var advancedSearch = (function () {
 
     self.addClauseUI = function (operator) {
 
-        ;
-        var clauseText = $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
-        self.searchNodes("matchSearchClause", null, function (err, clause) {
-            if (err)
+        var clauseText="";
+           self.searchNodes("matchSearchClause", null, function (err, clause) {
+               clauseText =(clause.nodeLabel?clause.nodeLabel:"")+" "+ $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
+
+               if (err)
                 return;
             $("#searchDialog_valueInput").val("");
             for (var i = 0; i < self.searchClauses.length; i++) {
                 if (clause.nodeLabel != "" && self.searchClauses[i].nodeLabel != "" && clause.nodeLabel != self.searchClauses[i].nodeLabel)
                     return alert("you cannot add criteria on different labels :" + clause.nodeLabel != "" && self.searchClauses[i].nodeLabel)
             }
+               self.searchNodes("", {where:clause.where}, function (err, result) {
+                   self.currentQueryNodeIds=[];
+                   result.forEach(function(line){
+                       self.currentQueryNodeIds.push(line._id);
+                   });
+                   clause.foundIds=self.currentQueryNodeIds.length;
+                   clauseText+= ": <b> "+clause.foundIds+ "nodes </b>"
+                   self.addClause(clause,clauseText);
+
+               });
 
 
-            self.addClause(clause);
+
             // clause.operator=operator;
 
         })
     }
 
-    self.addClause = function (clause) {
+    self.addClause = function (clause,clauseText) {
 
         $("#searchDialog_NextPanelButton").css('visibility', 'visible');
-        var clauseText = clause.nodeLabel + " ? " + clause.where;
+     /*   var clauseText = clause.nodeLabel + " ? " + clause.where;
         if (clauseText == " ? ")
             return;
         if (clause.where == "" && self.searchClauses.length > 0)
@@ -113,7 +124,7 @@ var advancedSearch = (function () {
 
         var clauseTextHuman = clauseText.replace("=~'(?i).*", " contains '")
         var clauseTextHuman = clauseTextHuman.replace("*'", "'")
-        clause.title = clauseTextHuman;
+        clause.title = clauseTextHuman;*/
 
         self.searchClauses.push(clause);
         $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' onclick=advancedSearch.clearClause("+(self.searchClauses.length-1)+")>"+clauseText+"</div>")
@@ -335,7 +346,7 @@ var advancedSearch = (function () {
             searchObj.property = "";
 
 
-        if (searchObj.property == "") {
+        if (true || searchObj.property == "") {
             if (searchObj.value == "") {// only  search on label or type
                 var options = {
                     subGraph: subGraph,
@@ -344,10 +355,13 @@ var advancedSearch = (function () {
                     resultType: resultType,
                     limit: Gparams.jsTreeMaxChildNodes,
                     from: 0,
-                    resultType: resultType
+                    resultType: resultType,
+
                 }
                 if (_options.matchType)
                     options.matchType = _options.matchType;
+                if (_options.where)
+                    options.where = _options.where;
 
 
                 toutlesensData.searchNodesWithOption(options, function (err, result) {
@@ -366,74 +380,74 @@ var advancedSearch = (function () {
                 })
                 return;
 
-            }
 
-            /*  if(false) {
-                  var data = [];// stack all results and then draw tree
-                  var index = 0;
-                  var countOptions = $('#searchDialog_propertySelect').children('option').length - 1;
-                  $("#searchDialog_propertySelect option").each(function () {
-                      var property = $(this).val();
+                /*  if(false) {
+                      var data = [];// stack all results and then draw tree
+                      var index = 0;
+                      var countOptions = $('#searchDialog_propertySelect').children('option').length - 1;
+                      $("#searchDialog_propertySelect option").each(function () {
+                          var property = $(this).val();
 
-                      if (property != "") {
-                          var value = property + ":~ " + searchObj.value;
-                          var options = {
-                              subGraph: subGraph,
-                              label: searchObj.label,
-                              word: value,
-                              resultType: "list",
-                              limit: Gparams.jsTreeMaxChildNodes,
-                              from: 0
-                          }
-                          toutlesensData.searchNodesWithOption(options, function (err, result) {
-                              //  toutlesensData.searchNodes(subGraph, searchObj.label, value, "list", Gparams.jsTreeMaxChildNodes, 0, function (err, result) {
-                              index += 1;
-                              for (var i = 0; i < result.length; i++) {
-                                  data.push(result[i])
+                          if (property != "") {
+                              var value = property + ":~ " + searchObj.value;
+                              var options = {
+                                  subGraph: subGraph,
+                                  label: searchObj.label,
+                                  word: value,
+                                  resultType: "list",
+                                  limit: Gparams.jsTreeMaxChildNodes,
+                                  from: 0
                               }
-                              if (index >= countOptions) {
-                                  if (callback) {
-                                      return callback(data);
+                              toutlesensData.searchNodesWithOption(options, function (err, result) {
+                                  //  toutlesensData.searchNodes(subGraph, searchObj.label, value, "list", Gparams.jsTreeMaxChildNodes, 0, function (err, result) {
+                                  index += 1;
+                                  for (var i = 0; i < result.length; i++) {
+                                      data.push(result[i])
                                   }
-                                  treeController.loadTreeFromNeoResult("#", data);
-                              }
-                              setTimeout(function () {
+                                  if (index >= countOptions) {
+                                      if (callback) {
+                                          return callback(data);
+                                      }
+                                      treeController.loadTreeFromNeoResult("#", data);
+                                  }
+                                  setTimeout(function () {
 
-                                  toutlesensController.setRightPanelAppearance(true);
-                                  treeController.expandAll("treeContainer");
-                              }, 500)
+                                      toutlesensController.setRightPanelAppearance(true);
+                                      treeController.expandAll("treeContainer");
+                                  }, 500)
 
-                          })
-                      }
-                  });
-              }*/
+                              })
+                          }
+                      });
+                  }*/
 
-        } else {
-            if (searchObj.operator == "contains")
-                searchObj.operator = "~";
-            var value = searchObj.property + ":" + searchObj.operator + " " + searchObj.value;
-            var options = {
-                subGraph: subGraph,
-                label: searchObj.label,
-                word: value,
-                resultType: resultType,
-                limit: Gparams.jsTreeMaxChildNodes,
-                from: 0
-            }
-            toutlesensData.searchNodesWithOption(options, function (err, result) {
-                // toutlesensData.searchNodes(subGraph, searchObj.label, value, "matchStr", Gparams.jsTreeMaxChildNodes, 0, function (err, result) {
-                if (callback) {
-                    return callback(err, result);
+            } else {
+                if (searchObj.operator == "contains")
+                    searchObj.operator = "~";
+                var value = searchObj.property + ":" + searchObj.operator + " " + searchObj.value;
+                var options = {
+                    subGraph: subGraph,
+                    label: searchObj.label,
+                    word: value,
+                    resultType: resultType,
+                    limit: Gparams.jsTreeMaxChildNodes,
+                    from: 0
                 }
-                treeController.loadSearchResultIntree(err, result);
-                setTimeout(function () {
-                    toutlesensController.setRightPanelAppearance(true);
-                    treeController.expandAll("treeContainer");
-                }, 500)
-                $("#dialog").dialog("close");
+                toutlesensData.searchNodesWithOption(options, function (err, result) {
+                    // toutlesensData.searchNodes(subGraph, searchObj.label, value, "matchStr", Gparams.jsTreeMaxChildNodes, 0, function (err, result) {
+                    if (callback) {
+                        return callback(err, result);
+                    }
+                    treeController.loadSearchResultIntree(err, result);
+                    setTimeout(function () {
+                        toutlesensController.setRightPanelAppearance(true);
+                        treeController.expandAll("treeContainer");
+                    }, 500)
+                    $("#dialog").dialog("close");
 
 
-            })
+                })
+            }
         }
 
 
@@ -801,6 +815,10 @@ var advancedSearch = (function () {
             url: self.neo4jProxyUrl,
             data: payload,
             dataType: "json",
+            error:function(err){
+                console.log(err.responseText);
+
+            },
             success: function (data, textStatus, jqXHR) {
                 var ids = [];
                 for (var i = 0; i < data.length; i++) {
