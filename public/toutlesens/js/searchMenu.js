@@ -6,7 +6,7 @@ var searchMenu = (function () {
         self.selectedQuery = null;
         self.pathQuery = null;
         self.previousAction;
-        self.dataTable=null;
+        self.dataTable = null;
 
         var previousAction = "";
         self.init = function (schema) {
@@ -17,7 +17,7 @@ var searchMenu = (function () {
             $("#searchDialog_propertySelect").append("<option selected='selected'>" + Schema.getNameProperty() + "</option>");
             $("#searchDialog_valueInput").keypress(function (event) {
                 if (event.which == 13 || event.which == 9) {
-                  //  advancedSearch.addClauseUI()
+                    //  advancedSearch.addClauseUI()
                 }
             })
 
@@ -45,35 +45,35 @@ var searchMenu = (function () {
             })
             $("#advancedSearchNodeLabelsDiv").html(str).promise().done(function () {
 
-                $( ".selectLabelDiv" ).click(function( event ) {
+                $(".selectLabelDiv").click(function (event) {
                     event.stopPropagation();
                     // Do something
                 });
                 var parentWidth = $("#advancedSearchNodeLabelsDiv").width() - 10;
                 var x = 10;
-                var y =10;
+                var y = 10;
 
                 var yOffset;
 
                 $(".selectLabelDiv").each(function (div) {
 
                     var xOffset = $(this).width();
-                    if(!yOffset)
-                    yOffset = $(this).height()+10;
+                    if (!yOffset)
+                        yOffset = $(this).height() + 10;
 
-                    if ((x+xOffset + 10) > parentWidth) {
+                    if ((x + xOffset + 10) > parentWidth) {
                         x = 10;
                         y += yOffset
                     }
 
                     $(this).css("top", y).css("left", x);
-                    x+=xOffset + 10;
+                    x += xOffset + 10;
                 })
             })
 
         }
 
-        self.clearCurrentLabel=function(){
+        self.clearCurrentLabel = function () {
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
             currentLabel = null;
@@ -216,17 +216,31 @@ var searchMenu = (function () {
             });
         }
         self.previousPanel = function () {
+
             self.currentPanelIndex += -1;
-            self.showCurrentPanel();
-            if (self.currentPanelIndex == 1) {
-                self.previousAction=null;
+            if (self.currentPanelIndex == 0) {
+                self.pathQuery = {};
+                previousAction = null
+                self.currentPanelIndex = 1;
+            }
+
+            if (previousAction == 'path') {
+                self.currentPanelIndex = 1;
+
+            }
+            else if (self.currentPanelIndex == 1) {
+                self.previousAction = null;
                 $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
                 //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
                 $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
-             advancedSearch.resetQueryClauses()
-            }else {
+                advancedSearch.resetQueryClauses()
+            }
+            else {
                 $("#searchDialog_NextPanelButton").css('visibility', 'visible');
             }
+            self.showCurrentPanel();
+
+
         }
 
         self.nextPanel = function () {
@@ -268,7 +282,6 @@ var searchMenu = (function () {
 
 
         }
-
 
 
         self.onPropertyKeyPressed = function (input) {
@@ -314,11 +327,17 @@ var searchMenu = (function () {
                 advancedSearch.searchNodes('matchStr', null, function (err, query) {
                     if (err)
                         return console.log(err);
-                    if( ! self.dataTable){
-                        self.dataTable=new dataTable();
+                    if (!self.dataTable) {
+                        self.dataTable = new DataTable();
                     }
-                    self.dataTable.loadNodes(self.dataTable,"graphDiv",query, {});
+                //    self.dataTable.loadNodes(self.dataTable, "graphDiv", query, {});
+                    $("#dialogLarge").load("htmlSnippets/dataTable.html", function () {
+                        $('#dialogLarge').dialog("open");
+                        self.dataTable.loadNodes(self.dataTable, "dataTableDiv", query, {}, function (err, result) {
 
+                        })
+
+                    })
 
                 })
 
@@ -388,7 +407,8 @@ var searchMenu = (function () {
                 if (previousAction == 'path') {
                     var relationDistance = parseInt($("#searchDialog_pathDistanceInput").val());
                     var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
-                    toutlesensData.matchStatement = "(n:" + self.pathQuery.sourceQuery.nodeLabel + ")-[r*" + relationDistance + "]-(m:" + self.pathQuery.targetQuery.nodeLabel + ")";
+                    toutlesensData.matchStatement =  "allShortestPaths( (n:"+self.pathQuery.sourceQuery.nodeLabel+")-[*.."+relationDistance+"]-(m:" + self.pathQuery.targetQuery.nodeLabel +") ) "
+              //      toutlesensData.matchStatement = "(n:" + self.pathQuery.sourceQuery.nodeLabel + ")-[r*" + relationDistance + "]-(m:" + self.pathQuery.targetQuery.nodeLabel + ")";
                     var where = self.pathQuery.sourceQuery.where;
                     if (self.pathQuery.targetQuery.where != "") {
 
@@ -398,6 +418,7 @@ var searchMenu = (function () {
                     }
                     toutlesensData.whereFilter = where;
                     var options = {};
+                    options.hideNodesWithoutRelations = 1;
                     if (collapseGraph)
                         options.clusterIntermediateNodes = true;
                     toutlesensController.generateGraph(null, options, function (err, data) {
@@ -418,6 +439,7 @@ var searchMenu = (function () {
                 if (previousAction == 'graphSomeNeighboursListLabels') {
                     if ($("#graphNeighboursAllOptionsCbx").prop("checked")) {
                         advancedSearch.searchNodes('matchStr', null, self.graphNodesOnly);
+                        $("#searchDialog_ExecuteButton").css('visibility', 'visible');
                         return;
                     }
 

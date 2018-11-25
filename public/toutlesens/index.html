@@ -53,6 +53,12 @@
     <script src="../common/js/jquery/jquery-ui.min.js"></script>
 
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.js"></script>
+
+    <script src="js/dataTable.js"></script>
+
+
     <script src="resources/params.js"></script>
     <script src="../common/js/neo4jDataModel.js"></script>
 
@@ -166,9 +172,7 @@
 
 
 
-   <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"/>
-    <script src="js/dataTable.js"></script>
+
     <script src="js/writeDataController.js"></script>
 
     <script src="./js/schema.js"></script>
@@ -305,6 +309,11 @@
 
 
 
+
+
+
+
+
     </style>
 
     <script>
@@ -400,19 +409,19 @@
     <input type="image" title="<span id='lang_XX'>schema</span>" height="20px"
 
            id="schemaButton" src="images/cube.png"/>
-    <input type="image" title="<span id='lang_XX'>search</span>" height="20px" onclick="advancedSearch.showDialog({multipleClauses:true})"
-           id="searchButton2" src="images/advancedSearch2.png"/>
+    <!-- <input type="image" title="<span id='lang_XX'>search</span>" height="20px" onclick="advancedSearch.showDialog({multipleClauses:true})"
+           id="searchButton2" src="images/advancedSearch2.png"/>-->
     <input type="image" title="display settings" height="20px"
            onclick="toutlesensController.dispatchAction('displaySettings')"
            id="displaySettingButton" src="images/display.png"/></td>
-    &nbsp;<input type="image" title="Display all nodes" height="20px"
+   &nbsp;<input type="image" title="Display all nodes" height="20px"
                  onclick="toutlesensController.dispatchAction('showAll')"
                  id="searchAllButton" src="images/all.png"/></td>
     <input type="image" title="Graph menu" height="20px"
            onclick="toutlesensController.dispatchAction('showGlobalMenu');" id="parametersMenuButton"
            src="images/parameters.png"/>
     <input type="image" title="Export to text" height="20px"
-           onclick="toutlesensController.dispatchAction('showGraphText')" id="toTextMenuButton" src="images/text.png"
+           onclick="toutlesensController.dispatchAction('showGraphTable')" id="toTextMenuButton" src="images/text.png"
            class="graphDisplayed"/>
     <input type="image" title="Zoom on node" height="20px" onclick="toutlesensController.dispatchAction('zoomOnNode')"
            id="zoomOnNodeMenuButton"
@@ -520,9 +529,12 @@
 
 
             <div id="relationDiv">
-                type <select id="findRelationsSelect" onchange="toutlesensController.generateGraphFromRelType(this)">
+                type <select id="findRelationsSelect" onchange="toutlesensController.setRelationProperties(this)"></select>
+                <br>
+               property <select id="findRelationsPropertyKeySelect"></select>  <input id="findRelationsPropertyValueInput">
+                <button onclik="toutlesensController.generateGraphFromRelType()"> OK</button>
 
-            </select>
+            </input>
                 <div id="findRelationsCurrentType"></div>
 
             </div>

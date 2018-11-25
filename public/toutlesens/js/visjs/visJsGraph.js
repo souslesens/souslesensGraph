@@ -664,18 +664,6 @@ var visjsGraph = (function () {
         }
 
 
-        self.toList = function () {
-            var outputNodes = {};
-            var nodes = self.nodes._data;
-            for (var key in self.edges._data) {
-                var edge = self.edges._data[key];
-                if (!outputNodes[edge.from]) {
-                    var node = nodes[edge.from]
-                }
-                outputNodes[edge.from] = {name: "aaa"}
-
-            }
-        }
 
         self.changeLayout = function (select) {
             self.layout = $(select).val();
@@ -1021,6 +1009,46 @@ var visjsGraph = (function () {
             self.previousGraphs.index += 1
             self.previousGraphs.push(self.exportGraph());
             self.setPreviousNextButtons();
+
+        }
+
+        self.toList = function () {
+            var array=self.exportGraph();
+           // console.log()
+            var dataset=[]
+
+
+            var map= {};
+            array.forEach(function(node){
+                map[node.id]=node;
+            })
+          array.forEach(function(node){
+              var obj={
+
+                  label: node.labelNeo,
+                  name:node.label,
+
+              }
+
+
+
+
+              var str="";
+              node.connections.forEach(function(id,index){
+                  if( index>0)
+                      str+=","
+                  str+=map[id].label+"["+map[id].labelNeo+"]"
+              })
+              obj.connectedTo=str;
+              for(var key in node.neoAttrs){
+                  if(node.neoAttrs[key]!=null)
+                      obj[key]=node.neoAttrs[key]
+              }
+              obj.id=node.id,
+
+              dataset.push(obj);
+          })
+            return dataset;
 
         }
 

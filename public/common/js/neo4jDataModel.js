@@ -265,9 +265,32 @@ var dataModel = (function () {
 
 
                                 }
-
                                 callback(null, dataModel);
                             }
+                            /*    // get rel properties
+                                query = "match (n)-[r]-() where n.subGraph=\"" + subGraph + "\" return distinct type(r) relType, keys(r) as keys"
+                                payload = {match: query};
+                                $.ajax({
+                                    type: "POST",
+                                    url: self.neo4jProxyUrl,
+                                    data: payload,
+                                    dataType: "json",
+                                    success: function (data, textStatus, jqXHR) {
+                                        data.forEach(function (line) {
+                                            var x=dataModel.allRelations
+                                        })
+
+                                        callback(null, dataModel);
+                                    }
+                                    ,
+                                    error: function (xhr, err, msg) {
+                                        callback(null);
+                                        toutlesensController.onErrorInfo(xhr)
+                                    }
+                                })
+                            }*/
+
+
                             ,
                             error: function (xhr, err, msg) {
                                 callback(null);

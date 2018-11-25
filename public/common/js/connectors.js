@@ -69,7 +69,7 @@ if(!options)
                     }
 
 
-                    if (resultArray.length<Gparams.showLabelsMaxNumOfNodes || (options && options.showNodesLabel) || !options) {
+                    if (true || resultArray.length<Gparams.showLabelsMaxNumOfNodes ||  !options || !options.clusterIntermediateNodes || options.showNodesLabel) {
                         nodeObj.label = labelVisjs;
                         nodeObj.title = labelVisjs;
 

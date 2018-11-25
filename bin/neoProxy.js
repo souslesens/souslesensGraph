@@ -26,7 +26,7 @@
  ******************************************************************************/
 var neo4j = require('neo4j');
 //var neo4jD = require('neo4j-driver').v1;
-
+var async=require('async');
 var request = require("request");
 var serverParams = require("./serverParams.js");
 
@@ -116,7 +116,72 @@ neo4jProxy = {
             });
 
 
-    }
+    },
+    executeStatements: function (statements, callback) {
+            //   console.log(statements.length)
+            function execute(group) {
+                var payload = {
+                    "statements": group
+                }
+                var path = "/db/data/transaction/commit";
+                var neo4jUrl = serverParams.neo4jUrl;
+                request({
+                        url: neo4jUrl + path,
+                        json: payload,
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json',}
+                    },
+                    function (err, res) {
+
+                        if (err)
+                            callback(err)
+                        else if (res.body && res.body.errors && res.body.errors.length > 0) {
+                            console.log(JSON.stringify(res.body.errors))
+                            callback(res.body.errors)
+                        }
+                        else {
+
+
+                            callback(null, res.body)
+                        }
+                    })
+
+
+            }
+
+            var groups = [];
+            var currentGroup = [];
+
+            statements.forEach(function (statement, index) {
+
+                currentGroup.push(statement)
+                if (currentGroup.length > 100 || index >= statements.length - 1) {
+                    groups.push(currentGroup);
+                    currentGroup = [];
+                }
+
+            })
+        var allResults=[];
+            async.eachSeries(groups, function (group, callbackEach) {
+
+                execute(group, function (err, result) {
+
+                    if (err)
+                        return callbackEach(err);
+                    allResults.push.apply(allResults,result);
+                    return callbackEach();
+                })
+
+            }, function (err) {
+                if (err) {
+                    console.log(err);
+                    return callback(err);
+                }
+                return callback(allResults);
+            })
+        }
+
+
 }
 
 module.exports = neo4jProxy;

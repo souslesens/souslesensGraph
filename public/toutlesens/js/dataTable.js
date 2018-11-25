@@ -1,5 +1,5 @@
 
-var dataTable = function () {
+var DataTable = function () {
 
 
     dataSet = [];
@@ -9,6 +9,11 @@ var dataTable = function () {
     self.dateColumns = []
     this.pageLength = 10;
     this.colHeight = 80;
+
+
+    this.loadJsonInTable=function (table,containerDiv, json, options) {
+        loadJsonInTable  (table,containerDiv, json, options);
+    }
 
 
 
@@ -221,7 +226,7 @@ var dataTable = function () {
                     line.n.properties.id=line.n._id
                     tableJson.push(line.n.properties)
                 })
-                loadJsonInTable (table,containerDiv, tableJson, options) ;
+               loadJsonInTable (table,containerDiv, tableJson, options) ;
             },
             error: function (err) {
                 console.log(err);

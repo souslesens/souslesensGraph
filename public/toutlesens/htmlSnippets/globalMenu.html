@@ -25,6 +25,8 @@
 
             &nbsp;<br>  <button onclick=" toutlesensController.dispatchAction('showParamsConfigDialog');$('#dialog').dialog('close');">Parameters...</button>
             &nbsp;<input type="image" onclick='$("#souslesensGeneralInfosDiv").css("visibility","visible")' width="20px" src="images/infos.png">
+            &nbsp;<br>  <button onclick=" Schema.createIndex(Schema.schema.defaultNodeNameProperty)">Create Neo index on name</button>
+            &nbsp;<br>  <button onclick=" Schema.createIndex('subGraph')">Create Neo index on subGraph</button>
         </td>
     </tr>
 

@@ -170,7 +170,110 @@ var traversalController = (function () {
 
         }
 
+
+
+
+
         self.searchAllTransitiveNodes = function (options) {
+
+            var where = "";
+            if (self.context.start.queryObj) {//pathes with search query
+                self.context.start.label = self.context.start.queryObj.nodeLabel;
+                self.context.end.label = self.context.end.queryObj.nodeLabel;
+
+                where = self.context.start.queryObj.where;
+                if (self.context.end.queryObj.where != "") {
+
+                    if (where != "")
+                        where += " and ";
+                    where += self.context.end.queryObj.where.replace(/n\./, "m.");
+                }
+
+            } else {//pathes between two nodes
+                where = " ID(n)=" + self.context.start.id + " and ID(m)=" + self.context.end.id
+            }
+            toutlesensData.whereFilter = where;
+            var transitivityLevel;
+            if (options=="incrementTransitivityLevel") {
+                transitivityLevel =currentTransitivityLevel+1;
+            }
+            else if (options=="decrementTransitivityLevel") {
+                transitivityLevel =currentTransitivityLevel-1;
+            }
+            else {
+                transitivityLevel = Schema.getLabelsDistance(self.context.start.label, self.context.end.label);
+                transitivityLevel=3
+                if (!transitivityLevel)
+                    transitivityLevel = 1;
+
+            }
+            currentTransitivityLevel = transitivityLevel;
+
+            /*   if (relCardinality < 0)
+                   return console.log("no cardinality found between " + self.context.start.label + " and" + self.context.end.label)*/
+
+            var dataAsync = [];
+            var maxDistanceLimit = Gparams.shortestPathMaxDistanceTest;
+            async.doWhilst(function (callback) {
+
+                    var startLabelStr = "";
+                    if (self.context.start.label && self.context.start.label.length > 0)
+                        startLabelStr = ":" + self.context.start.label;
+                    var endLabelStr = "";
+                    if (self.context.end.label && self.context.end.label.length > 0)
+                        endLabelStr = ":" + self.context.end.label;
+
+                    toutlesensData.matchStatement =  "MATCH path = allShortestPaths( (n:"+startLabelStr+")-[*.."+transitivityLevel+"]-(m:" + endLabelStr +") ) "
+                  //  toutlesensData.matchStatement = "(n" + startLabelStr + ")-[r*" + transitivityLevel + "]-(m" + endLabelStr + ")";
+
+                    $("#cypherDialog_matchInput").val(toutlesensData.matchStatement);
+                    $("#cypherDialog_whereInput").val(toutlesensData.whereFilter);
+                    $("#shortestPathDistance").html("Transitivity level :" + transitivityLevel)
+
+
+                    var _options = {dragConnectedNodes: true};
+                    if (transitivityLevel > 1 && options.clusterIntermediateNodes || self.context.clusterIntermediateNodes==true) {
+                        _options.clusterIntermediateNodes = true;
+
+                    }
+
+
+                    toutlesensController.generateGraph(null, _options, function (err, data) {
+                        if (err)
+                            return err;
+                        dataAsync = data;
+                        return callback();
+
+                    })
+                }, function () {//test
+                    if (dataAsync.length == 0 && transitivityLevel >= maxDistanceLimit) {
+                        $("#shortestPathDistance").html("No relations found until Transitivity level :" + transitivityLevel);
+                        return true;
+                    } else {
+                        var str="";
+                        if(transitivityLevel>1)
+                            str += "&nbsp;<button onclick='traversalController.searchAllTransitiveNodes(\"decrementTransitivityLevel\")'>decrease</button>"
+                        str += "&nbsp;<button onclick='traversalController.searchAllTransitiveNodes(\"incrementTransitivityLevel\")'>increase</button>"
+
+                        $("#shortestPathDistance").html("Transitivity level :" + transitivityLevel+ str);
+                        return false;
+                    }
+
+
+                },
+                function (resp) {// at the end
+
+                    var nodeDivDetach = $("#nodeDivDetachable").detach();
+                    $("#nodeDiv").append(nodeDivDetach);
+                    toutlesensController.setRightPanelAppearance(false)
+                })
+
+
+        }
+
+
+
+        self.searchAllTransitiveNodesOld = function (options) {
 
             var where = "";
             if (self.context.start.queryObj) {//pathes with search query

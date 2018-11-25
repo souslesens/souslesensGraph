@@ -296,7 +296,7 @@ self.currentQueryNodeIds=[];
 
             toutlesensData.whereFilter += str;
 
-            self.filterLabelWhere = " labels(m) in " + str + " ";
+            self.filterLabelWhere = " labels(m)[0] in " + str + " ";
 
         }
         if (resultType != "matchObject" && resultType != "matchSearchClause" && self.searchClauses.length > 0) {// multiple clauses

@@ -187,6 +187,35 @@ var Schema = (function () {
             }
         }
 
+
+        self.createIndex = function (property, labels) {
+
+            if (!labels)
+                labels = self.getAllLabelNames();
+            var statements = [];
+            labels.forEach(function (label) {
+                statements.push({statement: "CREATE INDEX ON :" + label + "(" + property + ")"})
+            })
+            var payload = {
+                executeStatements: 1,
+                statements: statements
+
+            }
+            $.ajax(self.serverRootUrl + '/neo', {
+                data: payload,
+                dataType: "json",
+                type: 'POST',
+
+                error: function (error, ajaxOptions, thrownError) {
+                    return console.log("error while indexing :" + error);
+                },
+                success: function (result) {
+                    return console.log("indexes created");
+                }
+            })
+        }
+
+
         self.setDefaultNodeNameProperty = function () {
             var newName = $("#schemaConfig_defaultNodeNameProperty").val();
             if (newName !== "") {
@@ -338,7 +367,7 @@ var Schema = (function () {
                         var index = (i++) % Gparams.palette.length;
 
                         nodeColors[key] = Gparams.palette[index];
-                        console.log(index+" " +nodeColors[key] +" "+key)
+                        console.log(index + " " + nodeColors[key] + " " + key)
                     }
                     if (Schema.schema.labels[key].icon == "default.png")
                         delete Schema.schema.labels[key].icon;
@@ -423,11 +452,11 @@ var Schema = (function () {
                 var relation = relations[key];
 
 
-                if (relation.startLabel == startLabel || !startLabel || startLabel=="")
+                if (relation.startLabel == startLabel || !startLabel || startLabel == "")
                     if (labels.indexOf(relation.endLabel) < 0)
                         labels.push(relation.endLabel);
 
-                if (inverseRelAlso && (relation.endLabel == startLabel  || !startLabel || startLabel==""))
+                if (inverseRelAlso && (relation.endLabel == startLabel || !startLabel || startLabel == ""))
                     if (labels.indexOf(relation.startLabel) < 0) {
                         if (withoutInverseSign)
                             labels.push(relation.startLabel);
@@ -438,7 +467,6 @@ var Schema = (function () {
             }
             return labels;
         }
-
 
 
         self.getRelations = function (startLabel, endLabel, mongoCollection) {
@@ -476,9 +504,9 @@ var Schema = (function () {
         }
 
         self.getLabelsDistance = function (startNode, endNode) {
-            if(!startNode || !endNode || startNode.length==0 || endNode.length==0)
+            if (!startNode || !endNode || startNode.length == 0 || endNode.length == 0)
                 return null;
-            if(startNode == endNode) {
+            if (startNode == endNode) {
 
                 return 2;
             }
@@ -511,7 +539,7 @@ var Schema = (function () {
 
             var nodesSerie = []
 
-            var childrenDone={};
+            var childrenDone = {};
             //premier noeud
             nodesSerie.push({name: startNode, isVisited: true, level: 0})
 
@@ -520,27 +548,25 @@ var Schema = (function () {
             while (nodesSerie.length > 0 && (iterations++) < 1000) {
 
                 var node = nodesSerie[nodesSerie.length - 1];//take the last Node
-                childrenDone[node.name]=[]
+                childrenDone[node.name] = []
                 nodesSerie.splice(nodesSerie.length - 1, 1)//remove the last node;
 
                 for (var i = 0; i < nodesChildren[node.name].length; i++) {// for each related node
                     var child = nodesChildren[node.name][i];
 
-                    if( childrenDone[node.name].indexOf(child.name)<0)
+                    if (childrenDone[node.name].indexOf(child.name) < 0)
                         childrenDone[node.name].push(child.name);
 
-                    if(  childrenDone[child.name] && childrenDone[child.name].indexOf(node.name)>-1)// dans ce cas on remonte au parent et on tourne en rond
-                    continue;
+                    if (childrenDone[child.name] && childrenDone[child.name].indexOf(node.name) > -1)// dans ce cas on remonte au parent et on tourne en rond
+                        continue;
 
 
-
-                    if(child.name=="sentence"){
-                        var xx=1
+                    if (child.name == "sentence") {
+                        var xx = 1
                     }
-                    if (child.name == node.name){
+                    if (child.name == node.name) {
                         nodesSerie.push({name: child.name, isVisited: true, level: node.level + 1})
                     }
-
 
 
                     if (!child.isVisited) {
@@ -570,7 +596,6 @@ var Schema = (function () {
         }
 
 
-
         self.getNameProperty = function (label) {
             if (!self.schema)
                 return "name";
@@ -592,11 +617,15 @@ var Schema = (function () {
             if (oldRelations)
                 relations = oldRelations;
             for (var key in relations) {
-
+                var properties = [];
                 var relations2 = relations[key];
                 if (relations2) {
                     for (var i = 0; i < relations2.length; i++) {
                         var relation = relations2[i];
+                        relation.properties.forEach(function (property) {
+                            if (properties.indexOf(property) < 0)
+                                properties.push(property);
+                        })
                         if (relation.direction == "inverse")
                             continue;
                         delete relation.direction;
@@ -605,7 +634,8 @@ var Schema = (function () {
                             var name = key + "--" + (i);
                         relation.properties.subGraph
                         relation.type = key;
-                        relation.properties = []
+                        relation.properties = properties;
+
                         relationsNewModel[name] = relation;
 
                     }
@@ -633,7 +663,7 @@ var Schema = (function () {
                 for (var label in dataModel.labels) {
                     labels[label] = {icon: "default.png"};
                     if (Gparams && Gparams.palette) {
-                        var index=(k++) % Gparams.palette.length;
+                        var index = (k++) % Gparams.palette.length;
                         labels[label].color = Gparams.palette[index];
 
 

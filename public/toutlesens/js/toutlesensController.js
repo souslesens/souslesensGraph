@@ -40,6 +40,7 @@ var toutlesensController = (function () {
     self.appInitEnded = false;
     self.currentRelationData = {};
     self.hasRightPanel = true;
+    self.graphDataTable = null;
 
 
 // http://graphaware.com/neo4j/2015/01/16/neo4j-graph-model-design-labels-versus-indexed-properties.html
@@ -290,7 +291,13 @@ var toutlesensController = (function () {
 
     }
 
+    self.setRelationProperties = function (select) {
+        var type = $(select).val();
+        var properties=Schema.schema.relations[type].properties;
+        if(properties)
+        common.fillSelectOptionsWithStringArray(findRelationsPropertyKeySelect,properties,true)
 
+    }
     /**
      *  generate a graph with a specific relation type
      *
@@ -304,6 +311,7 @@ var toutlesensController = (function () {
             $("#findRelationsSelect").val("");
             //   var relation=Schema.getRelationsByType(type);
             toutlesensData.queryRelTypeFilters = ":" + type;
+            var x=Schema.schema;
             currentObject.id = null;
             currentDisplayType = "VISJS-NETWORK";
             self.generateGraph(null, {hideNodesWithoutRelations: true});
@@ -677,11 +685,18 @@ var toutlesensController = (function () {
                 currentLabel = targetObjectId;
             else
                 currentLabel = null;
+
+
+            var options = {
+                applyFilters: false,
+                addToPreviousQuery: true
+            }
+            var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
+            if (collapseGraph)
+                options.clusterIntermediateNodes = true;
+
             toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
-                toutlesensController.generateGraph(null, {
-                    applyFilters: false,
-                    addToPreviousQuery: true
-                }, function (err, result) {
+                toutlesensController.generateGraph(null, options, function (err, result) {
                     currentLabel = null;
                 });
             })
@@ -850,501 +865,519 @@ var toutlesensController = (function () {
             }
         }
 
+        else if (action == "showGraphTable") {
+            var dataset = visjsGraph.toList();
+            if (!self.graphDataTable) {
+                self.graphDataTable = new DataTable();
+                self.graphDataTable.pageLength = 30;
+            }
+           // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
+                $("#dialogLarge").load("htmlSnippets/dataTable.html", function () {
+                    $('#dialogLarge').dialog("open");
+                    self.graphDataTable.loadJsonInTable(null, "dataTableDiv", dataset, function (err, result) {
 
-        else if (action == "showGraphText") {
-            $("#dialogLarge").dialog({modal: true});
-            $("#dialogLarge").dialog("option", "title", "Graph text");
-            $("#dialogLarge").load("htmlSnippets/graphTextDialog.html", function () {
-                var text = visjsGraph.graph2Text();
-                $("#graphTextDiv").html(text);
-            })
-            $("#dialogLarge").dialog("open");
-        }
-        else if (action == "showGlobalMenu") {
-            $("#dialog").dialog({modal: true});
-            $("#dialog").dialog("option", "title", "SouslesensGraph main menu");
-            $("#dialog").load("htmlSnippets/globalMenu.html", function () {
-            })
-            $("#dialog").dialog("open");
-        }
+                    })
 
-        else if (action == "showSchemaConfigDialog") {
-
-            $("#dialogLarge").load("htmlSnippets/schemaConfig.html", function () {
-                if (options && options.create)
-                    $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
-                else
-                    $("#schemaConfig_configSchemaDiv").css("visibility", "visible");
+                })
 
 
-                $("#subGraph").val(subGraph);//  self.initLabelProperty(label);
+            }
+        else
+            if (action == "showGraphText") {
+                $("#dialogLarge").dialog({modal: true});
+                $("#dialogLarge").dialog("option", "title", "Graph text");
+                $("#dialogLarge").load("htmlSnippets/graphTextDialog.html", function () {
+                    var text = visjsGraph.graph2Text();
+                    $("#graphTextDiv").html(text);
+                })
+                $("#dialogLarge").dialog("open");
+            }
+            else if (action == "showGlobalMenu") {
+                $("#dialog").dialog({modal: true});
+                $("#dialog").dialog("option", "title", "SouslesensGraph main menu");
+                $("#dialog").load("htmlSnippets/globalMenu.html", function () {
+                })
+                $("#dialog").dialog("open");
+            }
+
+            else if (action == "showSchemaConfigDialog") {
+
+                $("#dialogLarge").load("htmlSnippets/schemaConfig.html", function () {
+                    if (options && options.create)
+                        $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
+                    else
+                        $("#schemaConfig_configSchemaDiv").css("visibility", "visible");
 
 
-            })
-            $("#dialogLarge").dialog("option", "title", "Souslesens schema configuration");
-            $("#dialogLarge").dialog("open");
-        }
-
-        else if (action == "showParamsConfigDialog") {
-
-            $("#dialogLarge").load("htmlSnippets/paramsConfig.html", function () {
-                if (options && options.create)
-                    $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
-                else
-                    $("#schemaConfig_configSchemaDiv").css("visibility", "visible");
+                    $("#subGraph").val(subGraph);//  self.initLabelProperty(label);
 
 
-                $("#subGraph").val(subGraph);//  self.initLabelProperty(label);
+                })
+                $("#dialogLarge").dialog("option", "title", "Souslesens schema configuration");
+                $("#dialogLarge").dialog("open");
+            }
+
+            else if (action == "showParamsConfigDialog") {
+
+                $("#dialogLarge").load("htmlSnippets/paramsConfig.html", function () {
+                    if (options && options.create)
+                        $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
+                    else
+                        $("#schemaConfig_configSchemaDiv").css("visibility", "visible");
 
 
-            })
-            $("#dialogLarge").dialog("option", "title", "Souslesens schema configuration");
-            $("#dialogLarge").dialog("open");
-        }
+                    $("#subGraph").val(subGraph);//  self.initLabelProperty(label);
 
-        else if (action == "showAll") {
-            currentObject.id = null;
-            currentLabel = null;
-            currentDisplayType = "VISJS-NETWORK";
-            // $("#showRelationTypesCbx").remove("checked");
-            //  visjsGraph.displayRelationNames({show:false})
-            Gparams.showRelationNames = false;
 
-            self.generateGraph(null, {applyFilters: true, hideNodesWithoutRelations: false});
-            self.setRightPanelAppearance(false);
-        }
+                })
+                $("#dialogLarge").dialog("option", "title", "Souslesens schema configuration");
+                $("#dialogLarge").dialog("open");
+            }
 
-        else if (action == "zoomOnNode") {
-            var expression = prompt("find node with name ?");
-            if (expression && expression.length > 0) {
-                visjsGraph.zoomOnNode(expression);
+            else if (action == "showAll") {
+                currentObject.id = null;
+                currentLabel = null;
+                currentDisplayType = "VISJS-NETWORK";
+                // $("#showRelationTypesCbx").remove("checked");
+                //  visjsGraph.displayRelationNames({show:false})
+                Gparams.showRelationNames = false;
+
+                self.generateGraph(null, {applyFilters: true, hideNodesWithoutRelations: false});
+                self.setRightPanelAppearance(false);
+            }
+
+            else if (action == "zoomOnNode") {
+                var expression = prompt("find node with name ?");
+                if (expression && expression.length > 0) {
+                    visjsGraph.zoomOnNode(expression);
+
+                }
 
             }
 
-        }
+            else if (action == "onLinkClick") {
+                self.generateGraph(objectId, {applyFilters: true}, function () {
 
-        else if (action == "onLinkClick") {
-            self.generateGraph(objectId, {applyFilters: true}, function () {
+                })
 
-            })
+            }
+            else if (action == "showSchema") {
+                var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
 
-        }
-        else if (action == "showSchema") {
-            var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
-
-            currentActionObj.graphType = "schema";
-            $("#dialogLarge").dialog("close");
+                currentActionObj.graphType = "schema";
+                $("#dialogLarge").dialog("close");
 
 
-            var graphOptions = {
-                fixed: true,
-                onEndDrag: function () {
-                    Schema.currentGraph = visjsGraph.exportGraph();
-                    localStorage.setItem("schemaGraph_" + subGraph, JSON.stringify(Schema.currentGraph, null, 2));
-                },
-                onClick: function (params) {
-                    $("#graphPopup").css("visibility", "hidden");
-                    if (params.nodes.length == 1) {
-                        var point = params.pointer.DOM;
-                        var nodeId = params.nodes[0];
-                        currentObject = visjsGraph.nodes._data[nodeId];
-                        toutlesensController.dispatchAction("nodeInfos", nodeId);
-                        toutlesensController.showPopupMenu(point.x, point.y, "nodeInfo");
+                var graphOptions = {
+                    fixed: true,
+                    onEndDrag: function () {
+                        Schema.currentGraph = visjsGraph.exportGraph();
+                        localStorage.setItem("schemaGraph_" + subGraph, JSON.stringify(Schema.currentGraph, null, 2));
+                    },
+                    onClick: function (params) {
+                        $("#graphPopup").css("visibility", "hidden");
+                        if (params.nodes.length == 1) {
+                            var point = params.pointer.DOM;
+                            var nodeId = params.nodes[0];
+                            currentObject = visjsGraph.nodes._data[nodeId];
+                            toutlesensController.dispatchAction("nodeInfos", nodeId);
+                            toutlesensController.showPopupMenu(point.x, point.y, "nodeInfo");
+                        }
+                    }
+                };
+
+
+                if (Schema.currentGraph) {
+
+                    visjsGraph.importGraph(Schema.currentGraph, graphOptions);
+
+                }
+                else {
+
+                    var graphStr = localStorage.getItem("schemaGraph_" + subGraph);
+                    if (graphStr) {
+                        Schema.currentGraph = JSON.parse(graphStr);
+                        dataModel.getDBstats(subGraph, function () {
+                            visjsGraph.importGraph(Schema.currentGraph, graphOptions);
+                        });
+                    }
+                    else {
+                        dataModel.getDBstats(subGraph, function () {
+                            var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
+                            self.setRightPanelAppearance(false);
+                            visjsGraph.draw("graphDiv", data, graphOptions, function () {
+                                Schema.currentGraph = visjsGraph.exportGraph();
+                                localStorage.setItem("schemaGraph_" + subGraph, JSON.stringify(Schema.currentGraph, null, 2));
+                            });
+                        });
                     }
                 }
-            };
+            }
+            else if (action == "clearLocalStorageSchema") {
+                localStorage.removeItem("schemaGraph_" + subGraph);
+                toutlesensController.dispatchAction('showSchema')
+            }
 
 
-            if (Schema.currentGraph) {
+            else if (action == "displaySettings") {
+                $("#dialog").load("htmlSnippets/visjsGraphDisplayMenu.html", function () {
+                    var layout = Gparams.graphDefaultLayout;
+                    if (layout.indexOf("hierarchical") > -1) {
+                        ($("#graphLayoutDirectionDir").css("visibility", "visible"));
+                    } else {
+                        ($("#graphLayoutDirectionDir").css("visibility", "hidden"));
+                    }
+                    $("#graphLayoutSelect").val(layout);
+                    $("#dialog").dialog({modal: false});
+                    $("#dialog").css("position", "absolute");
 
-                visjsGraph.importGraph(Schema.currentGraph, graphOptions);
+                    $("#dialog").dialog("option", "title", "display settings");
+                    $("#dialog").dialog("open");
+                });
+            }
+            else if (action == "searchCypher") {
+                toutlesensData.matchStatement = $("#cypherDialog_matchInput").val();
+                var where = $("#cypherDialog_whereInput").val();
+                toutlesensData.whereFilter = where;
+                currentObject.id = null;
+                self.generateGraph(null, {});
+            }
+
+
+        }
+
+
+        self.showImage = function (url) {
+            // $("#nodeDetailsDiv").prop("src", url);
+            var w = $("#nodeDetailsDiv").width();
+            $("#nodeDetailsDiv").html('<img id="largeImage" src="' + url + '" border="0" height="real_height" width="real_width" onload="resizeImg(this, null, ' + w + ');">')
+
+        }
+        self.restorePopupMenuNodeInfo = function () {
+            $("#nodeInfoMenuDiv").html(popupMenuNodeInfoCache);
+        }
+
+
+        /**
+         *
+         *
+         * to be modified
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         * @param value
+         */
+
+
+
+
+
+
+
+
+
+
+        self.showPopupMenu = function (x, y, type) {
+
+            $("#tabs-analyzePanel").tabs("option", "active", 0);
+            $("#graphPopup").css("visibility", "visible").css("top", y).css("left", x);
+
+
+        }
+        self.hidePopupMenu = function () {
+            $("#nodeInfoDiv").css("visibility", "hidden");
+
+        }
+
+
+        self.afterGraphInit = function () {
+
+            currentActionObj = {graphType: "schema"};
+            self.dispatchAction("showSchema");
+
+            //  paramsController.loadParams();
+            var tabsanalyzePanelDisabledOptions = [];
+            tabsanalyzePanelDisabledOptions.push(1);//filters
+            tabsanalyzePanelDisabledOptions.push(2);//highlight
+            var tabsFindPanelDisabledOptions = [];
+            // tabsFindPanelDisabledOptions.push(3)
+
+
+            $("#nextMenuButton").css("visibility", "hidden")
+            $("#previousMenuButton").css("visibility", "hidden")
+
+
+            if (Gparams.showRelationNames) {
+                $("#showRelationTypesCbx").prop("checked", "checked");
+            }
+
+
+            if (queryParams.write) {
+                Gparams.readOnly = false
+            }
+
+
+            if (Gparams.readOnly == false) {
+                $("#infosHeaderDiv").css("visibility", "visible");
+                treeController.userRole = "write";
+                cards.userRole = "write";
+
+
+                $("#createNodeButton").css("visibility", "visible");
+                $("#editSchemaButton").css("visibility", "visible");
+                $("#parametersMenuButton").css("visibility", "visible");
 
             }
             else {
-
-                var graphStr = localStorage.getItem("schemaGraph_" + subGraph);
-                if (graphStr) {
-                    Schema.currentGraph = JSON.parse(graphStr);
-                    dataModel.getDBstats(subGraph, function () {
-                        visjsGraph.importGraph(Schema.currentGraph, graphOptions);
-                    });
-                }
-                else {
-                    dataModel.getDBstats(subGraph, function () {
-                        var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
-                        self.setRightPanelAppearance(false);
-                        visjsGraph.draw("graphDiv", data, graphOptions, function () {
-                            Schema.currentGraph = visjsGraph.exportGraph();
-                            localStorage.setItem("schemaGraph_" + subGraph, JSON.stringify(Schema.currentGraph, null, 2));
-                        });
-                    });
-                }
+                tabsanalyzePanelDisabledOptions.push(3);
+                $("#infosHeaderDiv").css("visibility", "hidden");
+                treeController.userRole = "read"
+                cards.userRole = "read";
             }
-        }
-        else if (action == "clearLocalStorageSchema") {
-            localStorage.removeItem("schemaGraph_" + subGraph);
-            toutlesensController.dispatchAction('showSchema')
-        }
 
 
-        else if (action == "displaySettings") {
-            $("#dialog").load("htmlSnippets/visjsGraphDisplayMenu.html", function () {
-                var layout = Gparams.graphDefaultLayout;
-                if (layout.indexOf("hierarchical") > -1) {
-                    ($("#graphLayoutDirectionDir").css("visibility", "visible"));
-                } else {
-                    ($("#graphLayoutDirectionDir").css("visibility", "hidden"));
-                }
-                $("#graphLayoutSelect").val(layout);
-                $("#dialog").dialog({modal: false});
-                $("#dialog").css("position", "absolute");
-
-                $("#dialog").dialog("option", "title", "display settings");
-                $("#dialog").dialog("open");
+            $("#requestDiv").load("htmlSnippets/currentQueries.html", function () {
+                self.initLabels(currentQueriesDialogSourceLabelSelect);
+                self.initLabels(currentQueriesDialogTargetLabelSelect);
             });
-        }
-        else if (action == "searchCypher") {
-            toutlesensData.matchStatement = $("#cypherDialog_matchInput").val();
-            var where = $("#cypherDialog_whereInput").val();
-            toutlesensData.whereFilter = where;
-            currentObject.id = null;
-            self.generateGraph(null, {});
-        }
 
 
-    }
+            $("#similarsDiv").load("htmlSnippets/similarsDialog.html", function () {
+
+            });
+            $("#pivotsDiv").load("htmlSnippets/pivotsDialog.html", function () {
+                self.initLabels(pivotsDialogSourceLabelsSelect, true);
+
+            });
+            $("#transitiveRelationsDiv").load("htmlSnippets/transitiveRelationsDialog.html", function () {
+                toutlesensController.initLabels(transitiveRelations_labelsSelect, true);
+
+            });
+            $("#cypherQueryDiv").load("htmlSnippets/cypherDialog.html", function () {
 
 
-    self.showImage = function (url) {
-        // $("#nodeDetailsDiv").prop("src", url);
-        var w = $("#nodeDetailsDiv").width();
-        $("#nodeDetailsDiv").html('<img id="largeImage" src="' + url + '" border="0" height="real_height" width="real_width" onload="resizeImg(this, null, ' + w + ');">')
+            });
 
-    }
-    self.restorePopupMenuNodeInfo = function () {
-        $("#nodeInfoMenuDiv").html(popupMenuNodeInfoCache);
-    }
+            $("#queryDiv").load("htmlSnippets/advancedSearchDialog.html", function () {
 
+                searchMenu.init(Schema);
+            });
+            $("#filterDiv").load("htmlSnippets/filterDialog.html", function () {
 
-    /**
-     *
-     *
-     * to be modified
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * @param value
-     */
+                //  searchMenu.init(Schema);
+            });
+            $("#expandDiv").load("htmlSnippets/expandGraphDialog.html", function () {
+
+                //  searchMenu.init(Schema);
+            });
 
 
+            $("#tabs-analyzePanel").tabs("option", "disabled", tabsanalyzePanelDisabledOptions);
+            $("#findTabs").tabs("option", "disabled", tabsFindPanelDisabledOptions);
 
+            $(".graphDisplayed").css("visibility", "hidden");
 
+            if (treeController.userRole != "write")
+                $(".canModify").css("visibility", "hidden");
 
-
-
-
-
-
-    self.showPopupMenu = function (x, y, type) {
-
-        $("#tabs-analyzePanel").tabs("option", "active", 0);
-        $("#graphPopup").css("visibility", "visible").css("top", y).css("left", x);
-
-
-    }
-    self.hidePopupMenu = function () {
-        $("#nodeInfoDiv").css("visibility", "hidden");
-
-    }
-
-
-    self.afterGraphInit = function () {
-
-        currentActionObj = {graphType: "schema"};
-        self.dispatchAction("showSchema");
-
-        //  paramsController.loadParams();
-        var tabsanalyzePanelDisabledOptions = [];
-        tabsanalyzePanelDisabledOptions.push(1);//filters
-        tabsanalyzePanelDisabledOptions.push(2);//highlight
-        var tabsFindPanelDisabledOptions = [];
-        // tabsFindPanelDisabledOptions.push(3)
-
-
-        $("#nextMenuButton").css("visibility", "hidden")
-        $("#previousMenuButton").css("visibility", "hidden")
-
-
-        if (Gparams.showRelationNames) {
-            $("#showRelationTypesCbx").prop("checked", "checked");
-        }
-
-
-        if (queryParams.write) {
-            Gparams.readOnly = false
-        }
-
-
-        if (Gparams.readOnly == false) {
-            $("#infosHeaderDiv").css("visibility", "visible");
-            treeController.userRole = "write";
-            cards.userRole = "write";
-
-
-            $("#createNodeButton").css("visibility", "visible");
-            $("#editSchemaButton").css("visibility", "visible");
-            $("#parametersMenuButton").css("visibility", "visible");
-
-        }
-        else {
-            tabsanalyzePanelDisabledOptions.push(3);
-            $("#infosHeaderDiv").css("visibility", "hidden");
-            treeController.userRole = "read"
-            cards.userRole = "read";
-        }
-
-
-        $("#requestDiv").load("htmlSnippets/currentQueries.html", function () {
-            self.initLabels(currentQueriesDialogSourceLabelSelect);
-            self.initLabels(currentQueriesDialogTargetLabelSelect);
-        });
-
-
-        $("#similarsDiv").load("htmlSnippets/similarsDialog.html", function () {
-
-        });
-        $("#pivotsDiv").load("htmlSnippets/pivotsDialog.html", function () {
-            self.initLabels(pivotsDialogSourceLabelsSelect, true);
-
-        });
-        $("#transitiveRelationsDiv").load("htmlSnippets/transitiveRelationsDialog.html", function () {
-            toutlesensController.initLabels(transitiveRelations_labelsSelect, true);
-
-        });
-        $("#cypherQueryDiv").load("htmlSnippets/cypherDialog.html", function () {
-
-
-        });
-
-        $("#queryDiv").load("htmlSnippets/advancedSearchDialog.html", function () {
-
-            searchMenu.init(Schema);
-        });
-        $("#filterDiv").load("htmlSnippets/filterDialog.html", function () {
-
-            //  searchMenu.init(Schema);
-        });
-        $("#expandDiv").load("htmlSnippets/expandGraphDialog.html", function () {
-
-            //  searchMenu.init(Schema);
-        });
-
-
-        $("#tabs-analyzePanel").tabs("option", "disabled", tabsanalyzePanelDisabledOptions);
-        $("#findTabs").tabs("option", "disabled", tabsFindPanelDisabledOptions);
-
-        $(".graphDisplayed").css("visibility", "hidden");
-
-        if (treeController.userRole != "write")
-            $(".canModify").css("visibility", "hidden");
-
-        filters.setLabelsOrTypes("node");
-
-        $("#highlightDiv").load("htmlSnippets/paintDialog.html", function () {
-            paint.initColorsPalette(10, "paintDialogPalette");
-            paint.initHighlight();
             filters.setLabelsOrTypes("node");
-        });
+
+            $("#highlightDiv").load("htmlSnippets/paintDialog.html", function () {
+                paint.initColorsPalette(10, "paintDialogPalette");
+                paint.initHighlight();
+                filters.setLabelsOrTypes("node");
+            });
 
 
-    }
+        }
 
-    /**
-     *
-     *
-     * execute a cypher Query to decide if there is too many relations to draw the graph(i.e relations>Gparams.jsTreeMaxChildNodes)
-     *
-     *
-     *
-     *
-     * @param nodeId
-     * @param maxRels
-     * @param callback
-     */
-    self.checkMaxNumberOfNodeRelations = function (nodeId, maxRels, callback) {
-        var whereSubGraph = "";
-        if (subGraph != Gparams.defaultSubGraph)
-            whereSubGraph = " and n.subGraph='" + subGraph + "'"
-        var matchStr = "match (n)-[r]-(m) where ID(m)=" + nodeId + whereSubGraph + " return count(r) as count";
-        var payload = {match: matchStr};
-        $.ajax({
-            type: "POST",
-            url: self.neo4jProxyUrl,
-            data: payload,
-            dataType: "json",
-            success: function (data, textStatus, jqXHR) {
+        /**
+         *
+         *
+         * execute a cypher Query to decide if there is too many relations to draw the graph(i.e relations>Gparams.jsTreeMaxChildNodes)
+         *
+         *
+         *
+         *
+         * @param nodeId
+         * @param maxRels
+         * @param callback
+         */
+        self.checkMaxNumberOfNodeRelations = function (nodeId, maxRels, callback) {
+            var whereSubGraph = "";
+            if (subGraph != Gparams.defaultSubGraph)
+                whereSubGraph = " and n.subGraph='" + subGraph + "'"
+            var matchStr = "match (n)-[r]-(m) where ID(m)=" + nodeId + whereSubGraph + " return count(r) as count";
+            var payload = {match: matchStr};
+            $.ajax({
+                type: "POST",
+                url: self.neo4jProxyUrl,
+                data: payload,
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {
 
-                var count = data[0].count;
-                if (count > Gparams.jsTreeMaxChildNodes) {
+                    var count = data[0].count;
+                    if (count > Gparams.jsTreeMaxChildNodes) {
 
-                    $("#dialog").dialog("option", "title", "result");
-                    var str = "All nodes cannot be displayed : " + count + " maximum :" + Gparams.jsTreeMaxChildNodes;
-                    // str += "enter criteria"
-                    str += "<br><button onclick=' $(\"#dialog\").dialog(\"close\")')>close</button>"
-                    $("#dialog").html(str);
-                    $("#dialog").dialog("open");
+                        $("#dialog").dialog("option", "title", "result");
+                        var str = "All nodes cannot be displayed : " + count + " maximum :" + Gparams.jsTreeMaxChildNodes;
+                        // str += "enter criteria"
+                        str += "<br><button onclick=' $(\"#dialog\").dialog(\"close\")')>close</button>"
+                        $("#dialog").html(str);
+                        $("#dialog").dialog("open");
+                        callback(false);
+                    }
+                    callback(true);
+                }
+                , error: function (xhr) {
+                    toutlesensController.onErrorInfo(xhr)
                     callback(false);
                 }
-                callback(true);
+            })
+        }
+
+
+        self.onErrorInfo = function (err) {
+            var errObj = JSON.parse(err.responseJSON.ERROR);
+            if (errObj.code == "ECONNREFUSED")
+                alert("No connexion to Neo4j database ");
+            console.log(err.responseText)
+
+        }
+
+        self.initLabels = function (select, withEmptyOption) {
+            var labels = Schema.getAllLabelNames();
+            if (withEmptyOption)
+                labels.splice(0, 0, "")
+            common.fillSelectOptionsWithStringArray(select, labels);
+        }
+
+
+        self.intiRelationTypes = function () {
+            var relations = Schema.schema.relations;
+            var types = [];
+            for (var key in relations) {
+                var type = relations[key].type;
+                if (types.indexOf(type) < 0)
+                    types.push(type);
             }
-            , error: function (xhr) {
-                toutlesensController.onErrorInfo(xhr)
-                callback(false);
+            types.sort();
+            types.splice(0, 0, "")
+            common.fillSelectOptionsWithStringArray(findRelationsSelect, types);
+        }
+
+
+        self.setResponsiveDimensions = function (rightPanelWidth) {
+            if (rightPanelWidth == 0) {
+                $("#tabs-analyzePanel").css("visibility", "hidden");
+                self.hasRightPanel = false;
             }
-        })
-    }
+            else {
+                self.hasRightPanel = true;
+                $("#tabs-analyzePanel").css("visibility", "visible");
+            }
+            $(".ui-tabs .ui-tabs-panel").css("padding", "2px")
+
+            $("#mainPanel").width(totalWidth - (rightPanelWidth)).height(totalHeight)
+            $("#analyzePanel").width(rightPanelWidth - 50).height(totalHeight).css("position", "absolute").css("left", totalWidth - rightPanelWidth + 20).css("top", 20);
 
 
-    self.onErrorInfo = function (err) {
-        var errObj = JSON.parse(err.responseJSON.ERROR);
-        if (errObj.code == "ECONNREFUSED")
-            alert("No connexion to Neo4j database ");
-        console.log(err.responseText)
+            $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0)
 
-    }
-
-    self.initLabels = function (select, withEmptyOption) {
-        var labels = Schema.getAllLabelNames();
-        if (withEmptyOption)
-            labels.splice(0, 0, "")
-        common.fillSelectOptionsWithStringArray(select, labels);
-    }
+            $("#graphLegendDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("background-color", "#eee");
+            $("#graphInfosDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("top", 50).css("background-color", "#eee");
+            $("#BIlegendDiv").css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 80).css("top", 80).css("background-color", "#eee");
+            $("#graphInfosDiv").css("visibility", "hidden")
 
 
-    self.intiRelationTypes = function () {
-        var relations = Schema.schema.relations;
-        var types = [];
-        for (var key in relations) {
-            var type = relations[key].type;
-            if (types.indexOf(type) < 0)
-                types.push(type);
+            $("#treeContainer").width(rightPanelWidth - 15);
+            $("#tagCloudIframe").height(totalHeight);
+
+
+            // $("#graphLegendDiv").width(rightPanelWidth - 50).height(totalHeight)
+            $("#findDiv").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20)
+            $("#findDivInner").width(rightPanelWidth - 10).height((totalHeight))
+            $("#findTabs").width(rightPanelWidth - 10);
+
+            $("#editDiv").width(rightPanelWidth - 10).height((totalHeight))
+            $("#highlightDiv").width(rightPanelWidth - 10).height((totalHeight))
+            $("#filterDiv").width(rightPanelWidth - 10).height((totalHeight))
+            $("#infosDiv").width(rightPanelWidth - 10).height((totalHeight))
+
+            //   $("#analyzePanel").width(rightPanelWidth - 10).height(totalHeight).css("position", "absolute").css("left", (totalWidth - rightPanelWidth) + 30).css("top", 10);
+            //  $("#tabs-analyzePanel").width(rightPanelWidth - 100).height(totalHeight/2).css("position", "absolute").css("left",(totalWidth-rightPanelWidth) + 30).css("top", 10);
+
+
+            $("#analyzePanel").width(rightPanelWidth - 10);
+            $("#nodeInfoMenuDiv").width(rightPanelWidth - 40).height(Gparams.infosanalyzePanelHeight - 80).css("visibility", "hidden")
+
+
+            //   $("#mainButtons").width(rightPanelWidth).height(50).css("position", "absolute").css("left", $("#graphDiv").width() - 200).css("top", 50).css("visibility", "hidden");
+            $("#mainButtons").css(".max-width", 300).height(50).css("position", "absolute").css("left", 20).css("top", 10);//.css("visibility", "hidden");
+            $("#graphCommentDiv").css("max-width", "500").css("position", "absolute").css("left", 20).css("top", totalHeight - 70);
+
+
+            $("#fullScreenButton").css("position", "absolute").css("top", 5).css("left", (totalWidth - rightPanelWidth) - 10);
+            $(".objAttrInput").width(rightPanelWidth - 100);
+
+            self.setRightPanelAppearance(true);
+
         }
-        types.sort();
-        types.splice(0, 0, "")
-        common.fillSelectOptionsWithStringArray(findRelationsSelect, types);
-    }
 
+        self.switchanalyzePanelDisplay = function () {
+            self.hasRightPanel = !self.hasRightPanel
 
-    self.setResponsiveDimensions = function (rightPanelWidth) {
-        if (rightPanelWidth == 0) {
-            $("#tabs-analyzePanel").css("visibility", "hidden");
-            self.hasRightPanel = false;
-        }
-        else {
-            self.hasRightPanel = true;
-            $("#tabs-analyzePanel").css("visibility", "visible");
-        }
-        $(".ui-tabs .ui-tabs-panel").css("padding", "2px")
+            if (!self.hasRightPanel)
+                toutlesensController.setResponsiveDimensions(0);
+            else {
+                toutlesensController.setResponsiveDimensions(rightPanelWidth);
+                toutlesensController.setRightPanelAppearance(false);
+            }
+            $("#mainButtons").css("visibility", "visible");
 
-        $("#mainPanel").width(totalWidth - (rightPanelWidth)).height(totalHeight)
-        $("#analyzePanel").width(rightPanelWidth - 50).height(totalHeight).css("position", "absolute").css("left", totalWidth - rightPanelWidth + 20).css("top", 20);
-
-
-        $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0)
-
-        $("#graphLegendDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("background-color", "#eee");
-        $("#graphInfosDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("top", 50).css("background-color", "#eee");
-        $("#BIlegendDiv").css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 80).css("top", 80).css("background-color", "#eee");
-        $("#graphInfosDiv").css("visibility", "hidden")
-
-
-        $("#treeContainer").width(rightPanelWidth - 15);
-        $("#tagCloudIframe").height(totalHeight);
-
-
-        // $("#graphLegendDiv").width(rightPanelWidth - 50).height(totalHeight)
-        $("#findDiv").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20)
-        $("#findDivInner").width(rightPanelWidth - 10).height((totalHeight))
-        $("#findTabs").width(rightPanelWidth - 10);
-
-        $("#editDiv").width(rightPanelWidth - 10).height((totalHeight))
-        $("#highlightDiv").width(rightPanelWidth - 10).height((totalHeight))
-        $("#filterDiv").width(rightPanelWidth - 10).height((totalHeight))
-        $("#infosDiv").width(rightPanelWidth - 10).height((totalHeight))
-
-        //   $("#analyzePanel").width(rightPanelWidth - 10).height(totalHeight).css("position", "absolute").css("left", (totalWidth - rightPanelWidth) + 30).css("top", 10);
-        //  $("#tabs-analyzePanel").width(rightPanelWidth - 100).height(totalHeight/2).css("position", "absolute").css("left",(totalWidth-rightPanelWidth) + 30).css("top", 10);
-
-
-        $("#analyzePanel").width(rightPanelWidth - 10);
-        $("#nodeInfoMenuDiv").width(rightPanelWidth - 40).height(Gparams.infosanalyzePanelHeight - 80).css("visibility", "hidden")
-
-
-        //   $("#mainButtons").width(rightPanelWidth).height(50).css("position", "absolute").css("left", $("#graphDiv").width() - 200).css("top", 50).css("visibility", "hidden");
-        $("#mainButtons").css(".max-width", 300).height(50).css("position", "absolute").css("left", 20).css("top", 10);//.css("visibility", "hidden");
-        $("#graphCommentDiv").css("max-width", "500").css("position", "absolute").css("left", 20).css("top", totalHeight - 70);
-
-
-        $("#fullScreenButton").css("position", "absolute").css("top", 5).css("left", (totalWidth - rightPanelWidth) - 10);
-        $(".objAttrInput").width(rightPanelWidth - 100);
-
-        self.setRightPanelAppearance(true);
-
-    }
-
-    self.switchanalyzePanelDisplay = function () {
-        self.hasRightPanel = !self.hasRightPanel
-
-        if (!self.hasRightPanel)
-            toutlesensController.setResponsiveDimensions(0);
-        else {
-            toutlesensController.setResponsiveDimensions(rightPanelWidth);
-            toutlesensController.setRightPanelAppearance(false);
-        }
-        $("#mainButtons").css("visibility", "visible");
-
-    }
-
-
-    /**
-     *
-     * if expandTree true; the treePanel will occupy all the height of the right panel else only thr top until totalheight -Gparams.infosanalyzePanelHeight
-     *
-     *
-     *
-     * @param expandTree
-     */
-    self.setRightPanelAppearance = function (expandTree) {
-        var analyzePanelHeight = Gparams.infosanalyzePanelHeight;
-        if (expandTree === true) {
-            analyzePanelHeight = 50;
         }
 
 
-        $("#treeContainer").height((totalHeight - analyzePanelHeight) - 120);
-        $("#findTabs").height((totalHeight - analyzePanelHeight));
+        /**
+         *
+         * if expandTree true; the treePanel will occupy all the height of the right panel else only thr top until totalheight -Gparams.infosanalyzePanelHeight
+         *
+         *
+         *
+         * @param expandTree
+         */
+        self.setRightPanelAppearance = function (expandTree) {
+            var analyzePanelHeight = Gparams.infosanalyzePanelHeight;
+            if (expandTree === true) {
+                analyzePanelHeight = 50;
+            }
 
-        $("#analyzePanel").height(analyzePanelHeight - 10).css("top", (totalHeight - analyzePanelHeight) + 20);
-        ;
-        $("#tabs-analyzePanel").tabs("option", "disabled", []);
-        $("#tabs-analyzePanel").tabs("enable", 1);
-        $("#tabs-analyzePanel").tabs("enable", 2);
+
+            $("#treeContainer").height((totalHeight - analyzePanelHeight) - 120);
+            $("#findTabs").height((totalHeight - analyzePanelHeight));
+
+            $("#analyzePanel").height(analyzePanelHeight - 10).css("top", (totalHeight - analyzePanelHeight) + 20);
+            ;
+            $("#tabs-analyzePanel").tabs("option", "disabled", []);
+            $("#tabs-analyzePanel").tabs("enable", 1);
+            $("#tabs-analyzePanel").tabs("enable", 2);
 
 
-    }
-    self.increaseGraphLimit = function () {
-        var increase = prompt("Enter new graph display limit");
-        if (increase && increase != "") {
-            Gparams.maxResultSupported = parseInt(increase);
-            toutlesensController.generateGraph(null, {useCurrentStatement: true});
         }
-    }
+        self.increaseGraphLimit = function () {
+            var increase = prompt("Enter new graph display limit");
+            if (increase && increase != "") {
+                Gparams.maxResultSupported = parseInt(increase);
+                toutlesensController.generateGraph(null, {useCurrentStatement: true});
+            }
+        }
 
-    return self;
-})
+        return self;
+    }
+)
 ()

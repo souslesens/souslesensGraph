@@ -56,6 +56,12 @@ router.post(serverParams.routesRootUrl + '/neo', function (req, response) {
             processResponse(response, error, result)
         });
     }
+    if (req.body && req.body.executeStatements) {
+        neoProxy.executeStatements(req.body.statements, function (error, result) {
+            processResponse(response, error, result)
+        });
+    }
+
 
 });
 
