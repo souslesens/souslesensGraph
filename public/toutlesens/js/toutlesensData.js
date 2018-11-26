@@ -35,6 +35,7 @@ var toutlesensData = (function () {
         self.queryExcludeRelFilters = "";
         self.querynodeLabelFilters = "";
         self.queryRelTypeFilters = "";
+        self.queryRelWhereFilter = "";
         self.queryExcludeNodeFilters = "";
         self.whereFilter = "";
         self.matchStatement = null;
@@ -179,6 +180,14 @@ var toutlesensData = (function () {
                 whereStatement += self.whereFilter + " ";
             }
 
+            if(self.queryRelWhereFilter!=""){
+                if (whereStatement == "")
+                    whereStatement += " WHERE ";
+                else
+                    whereStatement += " AND ";
+                whereStatement += self.queryRelWhereFilter + " ";
+            }
+
             //*******************************************************return***********************************************
             var returnStatement;
             if (options.output == "filtersDescription") {
@@ -216,6 +225,8 @@ var toutlesensData = (function () {
                 else {
                     if (options.hideNodesWithoutRelations)
                         relCardinalityStr = "*..1";
+                    if(self.queryRelWhereFilter!="")
+                        relCardinalityStr=""
                     else
                         relCardinalityStr = "*0..1";
 
@@ -291,6 +302,7 @@ var toutlesensData = (function () {
             toutlesensData.queryExcludeNodeFilters = "";
             toutlesensData.queryExcludeRelFilters = "";
             toutlesensData.matchStatement = ""
+            toutlesensData.queryRelWhereFilter=""
 
 
             var payload = {match: statement};

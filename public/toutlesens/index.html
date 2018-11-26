@@ -529,10 +529,18 @@
 
 
             <div id="relationDiv">
-                type <select id="findRelationsSelect" onchange="toutlesensController.setRelationProperties(this)"></select>
+                type <select id="findRelationsTypeSelect" onchange="toutlesensController.setRelationProperties(this)"></select>
                 <br>
-               property <select id="findRelationsPropertyKeySelect"></select>  <input id="findRelationsPropertyValueInput">
-                <button onclik="toutlesensController.generateGraphFromRelType()"> OK</button>
+               property <select id="findRelationsPropertyKeySelect"></select>
+                <select id="findRelationsPropertyOperatorSelect">
+                    <option>=</option>
+                    <option><></option>
+                    <option>&lt;</option>
+                    <option>&gt;</option>
+
+                </select>
+                <input id="findRelationsPropertyValueInput" size="10">
+                <button onclick="toutlesensController.generateGraphFromRelType()"> OK</button>
 
             </input>
                 <div id="findRelationsCurrentType"></div>

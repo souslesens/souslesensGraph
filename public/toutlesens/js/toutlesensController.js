@@ -29,849 +29,851 @@
  ******************************************************************************/
 
 var toutlesensController = (function () {
-    var self = {};
-    self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
-    self.rdfProxyUrl = "../../.." + Gparams.rdfProxyUrl;
-    self.imagesRootPath = "../../.." + Gparams.imagesRootPath;
+        var self = {};
+        self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
+        self.rdfProxyUrl = "../../.." + Gparams.rdfProxyUrl;
+        self.imagesRootPath = "../../.." + Gparams.imagesRootPath;
 
 
-    self.currentActionObj = null;
-    self.currentSource = "NEO4J";
-    self.appInitEnded = false;
-    self.currentRelationData = {};
-    self.hasRightPanel = true;
-    self.graphDataTable = null;
+        self.currentActionObj = null;
+        self.currentSource = "NEO4J";
+        self.appInitEnded = false;
+        self.currentRelationData = {};
+        self.hasRightPanel = true;
+        self.graphDataTable = null;
 
 
 // http://graphaware.com/neo4j/2015/01/16/neo4j-graph-model-design-labels-versus-indexed-properties.html
 
 
-    /**
-     *
-     *  generate a graph  (visjs by default)
-     *
-     *  builds cypher query
-     *  draw the graph in the main panel
-     *  set the interface for interaction
-     *
-     *
-     *
-     * @param id
-     * @param options
-     * @param callback
-     * @returns {*}
-     */
+        /**
+         *
+         *  generate a graph  (visjs by default)
+         *
+         *  builds cypher query
+         *  draw the graph in the main panel
+         *  set the interface for interaction
+         *
+         *
+         *
+         * @param id
+         * @param options
+         * @param callback
+         * @returns {*}
+         */
 
 
 
 
-    self.generateGraph = function (id, options, callback) {
-        if (!options)
-            options = {};
+        self.generateGraph = function (id, options, callback) {
+            if (!options)
+                options = {};
 
 
-        d3.select("#graphDiv").selectAll("svg").remove();
-        $("#graphDiv").html("");
-        //  $("#mainButtons").css("visibility", "hidden");
-        $("#graphMessage").html("");
-        $("#relInfoDiv").html("");
-        $("#graphCommentDiv").html("");
-
-
-        if ($("#keepFiltersCbx").prop("checked"))
+            d3.select("#graphDiv").selectAll("svg").remove();
+            $("#graphDiv").html("");
+            //  $("#mainButtons").css("visibility", "hidden");
             $("#graphMessage").html("");
-        currentDataStructure = "flat";
-
-        if (currentDisplayType == "FLOWER" || currentDisplayType == "TREE" || currentDisplayType == "TREEMAP")
-            currentDataStructure = "tree";
+            $("#relInfoDiv").html("");
+            $("#graphCommentDiv").html("");
 
 
-        self.displayButtons = {
-            "FLOWER": "treeFlowerButton",
-            "TREEMAP": "treemapButton",
-            "TREE": "treeButton",
-            "CARDS": "cardsButton",
-            "SIMPLE_FORCE_GRAPH": "graphButton",
-            "SIMPLE_FORCE_GRAPH_BULK": "graphBulkButton",
-            "FORM": "formButton",
+            if ($("#keepFiltersCbx").prop("checked"))
+                $("#graphMessage").html("");
+            currentDataStructure = "flat";
 
-        }
+            if (currentDisplayType == "FLOWER" || currentDisplayType == "TREE" || currentDisplayType == "TREEMAP")
+                currentDataStructure = "tree";
 
-        $(".displayIcon").removeClass("displayIcon-selected");
-        $("#" + self.displayButtons[currentDisplayType]).addClass("displayIcon-selected");
 
-        if (currentDisplayType.indexOf("FORCE") > -1) {
-            currentObject.id = null;
-            if (Gparams.useVisjsNetworkgraph)
-                currentDisplayType = "VISJS-NETWORK"
+            self.displayButtons = {
+                "FLOWER": "treeFlowerButton",
+                "TREEMAP": "treemapButton",
+                "TREE": "treeButton",
+                "CARDS": "cardsButton",
+                "SIMPLE_FORCE_GRAPH": "graphButton",
+                "SIMPLE_FORCE_GRAPH_BULK": "graphBulkButton",
+                "FORM": "formButton",
 
-        }
-        else {
-            if (!id) {
-                if (!currentObject.id && (currentDataStructure == "tree" || currentDisplayType == "CARDS" || currentDisplayType == "FORM")) {
-                    self.setGraphMessage("A node must be selected for this graph type ", "stop");
-                    if (callback)
-                        return callback(null, {});
-                    return;
-                }
-                id = currentObject.id;
-                if (!id && currentObject) {
+            }
+
+            $(".displayIcon").removeClass("displayIcon-selected");
+            $("#" + self.displayButtons[currentDisplayType]).addClass("displayIcon-selected");
+
+            if (currentDisplayType.indexOf("FORCE") > -1) {
+                currentObject.id = null;
+                if (Gparams.useVisjsNetworkgraph)
+                    currentDisplayType = "VISJS-NETWORK"
+
+            }
+            else {
+                if (!id) {
+                    if (!currentObject.id && (currentDataStructure == "tree" || currentDisplayType == "CARDS" || currentDisplayType == "FORM")) {
+                        self.setGraphMessage("A node must be selected for this graph type ", "stop");
+                        if (callback)
+                            return callback(null, {});
+                        return;
+                    }
                     id = currentObject.id;
+                    if (!id && currentObject) {
+                        id = currentObject.id;
+                    }
                 }
             }
-        }
 
 
-        currentObject.id = id;
+            currentObject.id = id;
 
 
-        if (options && options.applyFilters) {
-            //   filters.setQueryFilters();
-            $("#tabs-analyzePanel").tabs("option", "disabled", []);
-            $("#tabs-analyzePanel").tabs("enable", 1);
-            $("#tabs-analyzePanel").tabs("enable", 2);
-            // $("#tabs-analyzePanel").tabs("enable", 1);
+            if (options && options.applyFilters) {
+                //   filters.setQueryFilters();
+                $("#tabs-analyzePanel").tabs("option", "disabled", []);
+                $("#tabs-analyzePanel").tabs("enable", 1);
+                $("#tabs-analyzePanel").tabs("enable", 2);
+                // $("#tabs-analyzePanel").tabs("enable", 1);
 
 
-            // $(".paintIcon").css("visibility","visible")
-        }
-        else {
-            //  self.setGraphMessage("Too many relations to display the graph<br>filter by  relation or label types")
-            //  output = "filtersDescription";
-            $(".paintIcon").css("visibility", "hidden")
-        }
+                // $(".paintIcon").css("visibility","visible")
+            }
+            else {
+                //  self.setGraphMessage("Too many relations to display the graph<br>filter by  relation or label types")
+                //  output = "filtersDescription";
+                $(".paintIcon").css("visibility", "hidden")
+            }
 
 
 //**************** options
-        var addToPreviousQuery = false;
-        if (options.addToPreviousQuery == true)
-            addToPreviousQuery = true;
+            var addToPreviousQuery = false;
+            if (options.addToPreviousQuery == true)
+                addToPreviousQuery = true;
 
-        options.applyFilters = true;
+            options.applyFilters = true;
 
-        if ($("#hideNodesWithoutRelationsCbx").prop("checked"))
-            options.hideNodesWithoutRelations = true;
+            if ($("#hideNodesWithoutRelationsCbx").prop("checked"))
+                options.hideNodesWithoutRelations = true;
 
-        var relationDepth = $("#depth").val();
-        if (relationDepth === undefined)
-            options.relationDepth = Gparams.defaultQueryDepth;
-        else
-            options.relationDepth = parseInt(relationDepth);
+            var relationDepth = $("#depth").val();
+            if (relationDepth === undefined)
+                options.relationDepth = Gparams.defaultQueryDepth;
+            else
+                options.relationDepth = parseInt(relationDepth);
 
-        options.output = currentDisplayType;
-        /*----------------------------------------------------------------------------------------------------*/
-        $("#waitImg").css("visibility", "visible");
-        $("#BIlegendDiv").html("");
-        toutlesensData.getNodeAllRelations(id, options, function (err, data) {
-            toutlesensData.whereFilter = "";
-            if (err) {
-                console.log(err);
-                self.setMessage("ERROR" + err);
-                if (callback)
-                    return callback(err);
-                return;
-            }
-
-
-            if (data.length == 0) {
-
-                self.setGraphMessage("No  result");
-                $("#waitImg").css("visibility", "hidden");
-                $("#tabs-analyzePanel").tabs("enable", 0);
-                self.dispatchAction('nodeInfos');
-                self.setRightPanelAppearance(false);
-
-                if (callback) {
-                    callback(err, data);
+            options.output = currentDisplayType;
+            /*----------------------------------------------------------------------------------------------------*/
+            $("#waitImg").css("visibility", "visible");
+            $("#BIlegendDiv").html("");
+            toutlesensData.getNodeAllRelations(id, options, function (err, data) {
+                toutlesensData.whereFilter = "";
+                if (err) {
+                    console.log(err);
+                    self.setMessage("ERROR" + err);
+                    if (callback)
+                        return callback(err);
+                    return;
                 }
-                return;
-            }
-
-            $("#graphCommentDiv").append(data.length + " nodes and relations displayed ");
-            if (data.length >= Gparams.maxResultSupported && currentDisplayType != "SIMPLE_FORCE_GRAPH_BULK") {
-
-                Gparams.maxResultSupported = Gparams.maxResultSupported;
-                //   return;
-
-            }
 
 
-            self.setResultGraphMessage(data.length);
+                if (data.length == 0) {
 
-            if (data.length > Gparams.maxNodesForRelNamesOnGraph) {
-                Gparams.showRelationNames = false;
-                $("#showRelationTypesCbx").removeAttr("checked");
-            } else {
-                Gparams.showRelationNames = true;
-                $("#showRelationTypesCbx").prop("checked", "checked");
-            }
-            $("#visJsSearchGraphButton").css("visibility: visible");
-            toutlesensData.prepareRawData(data, addToPreviousQuery, currentDisplayType, function (err, data, labels, relations) {
+                    self.setGraphMessage("No  result");
+                    $("#waitImg").css("visibility", "hidden");
+                    $("#tabs-analyzePanel").tabs("enable", 0);
+                    self.dispatchAction('nodeInfos');
+                    self.setRightPanelAppearance(false);
 
-                self.setRightPanelAppearance(false);
+                    if (callback) {
+                        callback(err, data);
+                    }
+                    return;
+                }
 
-                //   paint.init(data);
+                $("#graphCommentDiv").append(data.length + " nodes and relations displayed ");
+                if (data.length >= Gparams.maxResultSupported && currentDisplayType != "SIMPLE_FORCE_GRAPH_BULK") {
 
-                $("#mainButtons").css("visibility", "visible");
-                $("#waitImg").css("visibility", "hidden");
-                $(".graphDisplayed").css("visibility", "visible");
-                $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
+                    Gparams.maxResultSupported = Gparams.maxResultSupported;
+                    //   return;
 
-                if (toutlesensData && toutlesensData.queriesIds.length > 1)
-                    options.dragConnectedNodes = true;
-                toutlesensController.displayGraph(data, options);
-                if (callback)
-                    return callback(null, data);
+                }
+
+
+                self.setResultGraphMessage(data.length);
+
+                if (data.length > Gparams.maxNodesForRelNamesOnGraph) {
+                    Gparams.showRelationNames = false;
+                    $("#showRelationTypesCbx").removeAttr("checked");
+                } else {
+                    Gparams.showRelationNames = true;
+                    $("#showRelationTypesCbx").prop("checked", "checked");
+                }
+                $("#visJsSearchGraphButton").css("visibility: visible");
+                toutlesensData.prepareRawData(data, addToPreviousQuery, currentDisplayType, function (err, data, labels, relations) {
+
+                    self.setRightPanelAppearance(false);
+
+                    //   paint.init(data);
+
+                    $("#mainButtons").css("visibility", "visible");
+                    $("#waitImg").css("visibility", "hidden");
+                    $(".graphDisplayed").css("visibility", "visible");
+                    $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
+
+                    if (toutlesensData && toutlesensData.queriesIds.length > 1)
+                        options.dragConnectedNodes = true;
+                    toutlesensController.displayGraph(data, options);
+                    if (callback)
+                        return callback(null, data);
+
+
+                });
 
 
             });
 
 
-        });
+        }
+
+        /**
+         *
+         * display the graph using relsult from toutlesensdata.getNodeAllRelations
+         *
+         *
+         * @param json result from toutlesensdata.getNodeAllRelations
+         * @param output presently "VISJS-NETWORK"
+         * @param callback
+         */
 
 
-    }
-
-    /**
-     *
-     * display the graph using relsult from toutlesensdata.getNodeAllRelations
-     *
-     *
-     * @param json result from toutlesensdata.getNodeAllRelations
-     * @param output presently "VISJS-NETWORK"
-     * @param callback
-     */
+        self.displayGraph = function (json, options, callback) {
+            if (!options)
+                options = {}
+            d3NodesSelection = [];
+            filters.init(json);
+            $("#textDiv").html("");
 
 
-    self.displayGraph = function (json, options, callback) {
-        if (!options)
-            options = {}
-        d3NodesSelection = [];
-        filters.init(json);
-        $("#textDiv").html("");
+            if (currentDisplayType == "VISJS-NETWORK") {
+
+                if (json.length > Gparams.limitToOptimizeGraphOptions) {
+                    // options.showNodesLabel = false,
+                    options.showRelationsType = false,
+                        options.smooth = false;
+                } else {
+                    if (options.showNodesLabel != false)
+                        options.showNodesLabel = true;
+                    //  options.showRelationsType = false,
+                    options.smooth = true;
+                }
+                if (json.length == 0) {
+                    $("#waitImg").css("visibility", "hidden")
+                    $("#graphDiv").html("< span class ='graphMessage'>No Results</span>")
+                }
+                if (!json)
+                    json = connectors.neoResultsToVisjs(toutlesensData.cachedResultArray, options);
+                else
+                    json = connectors.neoResultsToVisjs(json, options);
 
 
-        if (currentDisplayType == "VISJS-NETWORK") {
+                visjsGraph.draw("graphDiv", json, options);
+                visjsGraph.drawLegend(filters.currentLabels);
+                paint.initHighlight();
+                filters.init()
+                common.fillSelectOptionsWithStringArray(filterDialog_NodeLabelInput, filters.currentLabels);
 
-            if (json.length > Gparams.limitToOptimizeGraphOptions) {
-                // options.showNodesLabel = false,
-                options.showRelationsType = false,
-                    options.smooth = false;
-            } else {
-                if (options.showNodesLabel != false)
-                    options.showNodesLabel = true;
-                //  options.showRelationsType = false,
-                options.smooth = true;
+                if (paint.currentBIproperty && paint.currentBIproperty != "")
+                    paint.paintClasses(paint.currentBIproperty)
+
             }
-            if (json.length == 0) {
-                $("#waitImg").css("visibility", "hidden")
-                $("#graphDiv").html("< span class ='graphMessage'>No Results</span>")
-            }
-            if (!json)
-                json = connectors.neoResultsToVisjs(toutlesensData.cachedResultArray, options);
-            else
-                json = connectors.neoResultsToVisjs(json, options);
 
 
-            visjsGraph.draw("graphDiv", json, options);
-            visjsGraph.drawLegend(filters.currentLabels);
-            paint.initHighlight();
-            filters.init()
-            common.fillSelectOptionsWithStringArray(filterDialog_NodeLabelInput, filters.currentLabels);
+            if (callback)
+                callback()
 
-            if (paint.currentBIproperty && paint.currentBIproperty != "")
-                paint.paintClasses(paint.currentBIproperty)
 
         }
 
+        self.setRelationProperties = function (select) {
+            var type = $(select).val();
+            var properties = Schema.schema.relations[type].properties;
+            if (properties)
+                common.fillSelectOptionsWithStringArray(findRelationsPropertyKeySelect, properties, true)
 
-        if (callback)
-            callback()
-
-
-    }
-
-    self.setRelationProperties = function (select) {
-        var type = $(select).val();
-        var properties=Schema.schema.relations[type].properties;
-        if(properties)
-        common.fillSelectOptionsWithStringArray(findRelationsPropertyKeySelect,properties,true)
-
-    }
-    /**
-     *  generate a graph with a specific relation type
-     *
-     * @param select indicating the relation type
-     */
-
-    self.generateGraphFromRelType = function (select) {
-        var type = $(select).val();
-        if (type !== "") {
-            $("#findRelationsCurrentType").html(type);
-            $("#findRelationsSelect").val("");
-            //   var relation=Schema.getRelationsByType(type);
-            toutlesensData.queryRelTypeFilters = ":" + type;
-            var x=Schema.schema;
-            currentObject.id = null;
-            currentDisplayType = "VISJS-NETWORK";
-            self.generateGraph(null, {hideNodesWithoutRelations: true});
         }
+        /**
+         *  generate a graph with a specific relation type
+         *
+         * @param select indicating the relation type
+         */
 
+        self.generateGraphFromRelType = function (select) {
 
-    }
-    /**
-     *
-     *
-     * from nodeDiv in index.html process autocompletion to dispaly a tree (treeController) with all nodes that match word input regex
-     * autocompletion params are  Gparams.searchInputKeyDelay and Gparams.searchInputMinLength
-     *
-     *
-     *
-     *
-     *
-     * @param resultType
-     * @param limit
-     * @param from
-     * @param callback
-     */
+            var type = $("#findRelationsTypeSelect").val();
+            var property = $("#findRelationsPropertyKeySelect").val();
+            var operator = $("#findRelationsPropertyOperatorSelect").val();
+            var value = $("#findRelationsPropertyValueInput").val();
 
-    self.searchNodesUI = function (resultType, limit, from, callback) {
-        $("#searchResultMessage").html("");
+            if (type != "") {
+                if (property != "" && value != "") {
+                    toutlesensData.queryRelWhereFilter="r."+property+operator+value;
+                }
+                toutlesensData.queryRelTypeFilters = ":" + type;
+                currentObject.id = null;
+                currentDisplayType = "VISJS-NETWORK";
+                self.generateGraph(null, {hideNodesWithoutRelations: true});
+            }
+        }
+        /**
+         *
+         *
+         * from nodeDiv in index.html process autocompletion to dispaly a tree (treeController) with all nodes that match word input regex
+         * autocompletion params are  Gparams.searchInputKeyDelay and Gparams.searchInputMinLength
+         *
+         *
+         *
+         *
+         *
+         * @param resultType
+         * @param limit
+         * @param from
+         * @param callback
+         */
+
+        self.searchNodesUI = function (resultType, limit, from, callback) {
+            $("#searchResultMessage").html("");
 
 
 //********************************************************
-        var word = "";
-        $("#nodesLabelsSelect").val("")
+            var word = "";
+            $("#nodesLabelsSelect").val("")
 
-        currentLabel = null;
-        var label = $("#nodesLabelsSelect").val();
-        word = $("#word").val();
+            currentLabel = null;
+            var label = $("#nodesLabelsSelect").val();
+            word = $("#word").val();
 
-        if (word && word.length < Gparams.searchInputMinLength) {
-            return;
-        }
+            if (word && word.length < Gparams.searchInputMinLength) {
+                return;
+            }
 
-        var word0 = word.toLowerCase()
-        if (word.match(/.* /))
-            word = word.substring(word.length - 2)
+            var word0 = word.toLowerCase()
+            if (word.match(/.* /))
+                word = word.substring(word.length - 2)
 
 
 //********************************************************
-        if (Gparams.queryInElasticSearch) {
+            if (Gparams.queryInElasticSearch) {
 
 
-            word += "*";
-            var payload = {
-                elasticQuery2NeoNodes: 1,
-                queryString: word,
-                index: subGraph.toLowerCase(),
-                resultSize: Gparams.ElasticResultMaxSize
-            }
+                word += "*";
+                var payload = {
+                    elasticQuery2NeoNodes: 1,
+                    queryString: word,
+                    index: subGraph.toLowerCase(),
+                    resultSize: Gparams.ElasticResultMaxSize
+                }
 
-            $.ajax({
-                type: "POST",
-                url: "../../../neo2Elastic",
-                data: payload,
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    if (data.length >= Gparams.ElasticResultMaxSize) {
-                        $("#searchResultMessage").html("cannot show all data : max :" + Gparams.ElasticResultMaxSize);
-                    }
-                    else {
-                        $("#searchResultMessage").html(data.length + " nodes found");
-                    }
-                    return treeController.loadTreeFromNeoResult("treeContainer", data, function (jsTree) {
-                        var xx = jsTree;
-                        setTimeout(function () {
-
-
-                            $('.jstree-leaf').each(function () {
-                                var id = $(this).attr('id');
-                                var text = $(this).children('a').text();
-                                for (var i = 0; i < data.length; i++) {
-                                    var properties = data[i].n.properties;
-                                    //   console.log(id+"-"+text);
-                                    if (properties[Gparams.defaultNodeNameProperty] == text) {
-                                        for (var key in properties) {
-                                            if (properties[Gparams.defaultNodeNameProperty].toLowerCase().indexOf(word0) > -1)
-                                                continue;
-                                            if (properties[key] && typeof properties[key] != "object" && properties[key].indexOf && properties[key].toLowerCase().indexOf(word0) > -1) {
-                                                var xx = key;
-                                                var yy = properties[key]
-                                                //  console.log(xx+"-"+yy);
-                                                //$("#"+treeController.jsTreeDivId).jstree().create_node(id ,  { "id" : (id+"_"+key), "text" : ("<span class='jstreeWordProp'">+xx+":"+yy+"</span>")}, "last", function(){
-                                                $("#" + treeController.jsTreeDivId).jstree().create_node(id, {
-                                                    "id": (id + "_" + key),
-                                                    "text": (xx + ":" + yy),
-                                                    "type": "prop"
-                                                }, "last", function () {
+                $.ajax({
+                    type: "POST",
+                    url: "../../../neo2Elastic",
+                    data: payload,
+                    dataType: "json",
+                    success: function (data, textStatus, jqXHR) {
+                        if (data.length >= Gparams.ElasticResultMaxSize) {
+                            $("#searchResultMessage").html("cannot show all data : max :" + Gparams.ElasticResultMaxSize);
+                        }
+                        else {
+                            $("#searchResultMessage").html(data.length + " nodes found");
+                        }
+                        return treeController.loadTreeFromNeoResult("treeContainer", data, function (jsTree) {
+                            var xx = jsTree;
+                            setTimeout(function () {
 
 
-                                                });
+                                $('.jstree-leaf').each(function () {
+                                    var id = $(this).attr('id');
+                                    var text = $(this).children('a').text();
+                                    for (var i = 0; i < data.length; i++) {
+                                        var properties = data[i].n.properties;
+                                        //   console.log(id+"-"+text);
+                                        if (properties[Gparams.defaultNodeNameProperty] == text) {
+                                            for (var key in properties) {
+                                                if (properties[Gparams.defaultNodeNameProperty].toLowerCase().indexOf(word0) > -1)
+                                                    continue;
+                                                if (properties[key] && typeof properties[key] != "object" && properties[key].indexOf && properties[key].toLowerCase().indexOf(word0) > -1) {
+                                                    var xx = key;
+                                                    var yy = properties[key]
+                                                    //  console.log(xx+"-"+yy);
+                                                    //$("#"+treeController.jsTreeDivId).jstree().create_node(id ,  { "id" : (id+"_"+key), "text" : ("<span class='jstreeWordProp'">+xx+":"+yy+"</span>")}, "last", function(){
+                                                    $("#" + treeController.jsTreeDivId).jstree().create_node(id, {
+                                                        "id": (id + "_" + key),
+                                                        "text": (xx + ":" + yy),
+                                                        "type": "prop"
+                                                    }, "last", function () {
+
+
+                                                    });
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                            });
-                            $("#" + treeController.jsTreeDivId).jstree("open_all");
-                        }, 1000)
-                    });
-                }, error: function (err) {
-                    return callback(err)
-                }
-            });
-        }
-        else {
-
-            toutlesensData.searchNodes(subGraph, label, word, resultType, limit, from, callback);
-        }
-        setTimeout(function () {
-            $("#searchResultMessage").html("click on tree...")
-            self.setRightPanelAppearance(true);
-            treeController.expandAll("treeContainer");
-        }, 500)
-
-    }
-
-
-    /**
-     *
-     *
-     * print in div graphMessage a contextual message
-     *
-     *
-     *
-     * @param resultLength
-     */
-
-    self.setResultGraphMessage = function (resultLength) {
-        var message = " <i><b>click on graph to stop animation</b></i><br>";
-        if (currentLabel)
-            message += "Label : " + currentLabel + "<br>"
-        if (currentObject.id)
-            message += "Node : [" + currentObject.label + "]" + currentObject[Schema.getNameProperty(currentObject.label)] + "<br>";
-        message += filters.printRelationsFilters() + "<br>";
-        message += filters.printPropertyFilters() + "<br>";
-
-
-        message += "<b>" + resultLength + "</b> relations found <br>"
-        $("#graphMessage").html(message);
-    }
-
-
-    /**
-     *
-     * print in div message a contextual message
-     *
-     * @param str
-     * @param color
-     */
-
-    self.setMessage = function (message, color) {
-        $("#message").html(message);
-        if (color)
-            $("#message").css("color", color);
-    }
-
-    self.setGraphMessage = function (message, type) {
-
-        var str = "<br><br><p align='center' >"
-        var name = "";
-        if (currentObject && currentObject.id)
-            name = "Node " + currentObject[Schema.getNameProperty(currentObject.label)];
-        else {
-            if (currentLabel)
-                name = "Label " + currentLabel;
-        }
-        if (name)
-            str += "<span class='objectName'>" + name + "</span><br>"
-        if (type == "stop")
-            str += "<img src='./icons/warning.png' width='50px'><br>"
-        str += "<span id='graphMessageDetail'>" + message + "</span> <br>";
-        str += "</p>";
-
-        $("#graphDiv").html(str);
-
-    }
-    self.clearGraphDiv = function () {
-        $("#graphDiv").html("");
-        $("#graphMessage").html("");
-        $("#filtersDiv").html("");
-        $("#innerLegendDiv").html("");
-        $("#relInfoDiv").html("");
-
-
-    }
-
-
-    self.selectTab = function (index) {
-        $('#ressourcesTab').tabs({
-            active: index
-        });
-    }
-
-
-    /**
-     *
-     *
-     * execute an action
-     *
-     * action ==
-     * "nodeInfos" : show node e info either in a popup or in a viv (bottom rigth)
-     * "removeNode"
-     * "relationInfos" to finsih !!!
-     *  "expandNode"
-     *  "closeNode" to do !!!
-     *  "linkSource"
-     *  "linkTarget"
-     *  "modifyNode"
-     *  "addNode"
-     *  showGraphText
-     *  showGlobalMenu
-     *  showParamsConfigDialog
-     *  showParamsConfigDialog
-     *  showAll
-     *
-     *
-     * @param action
-     * @param objectId
-     * @param targetObjectId
-     * @param callback
-     */
-    self.dispatchAction = function (action, objectId, targetObjectId, callback) {
-
-        $("#graphPopup").css("visibility", "hidden");
-        self.hidePopupMenu();
-
-        var mode = $("#representationSelect").val();
-        var id;
-        if (currentObject && currentObject.id)
-            id = currentObject.id;
-
-
-        if (!currentObject.label && currentObject.nodeType) {
-            currentObject.label = currentObject.nodeType;
-        }
-
-        if (action == "onNodeClick") {
-            toutlesensController.dispatchAction("nodeInfos", id);
-            expandGraph.setSourceLabel(currentObject.labelNeo)
-
-        }
-
-        if (action == "nodeInfos") {
-            if (id) {
-
-
-                if (currentObject.type && currentObject.type == "schema") {
-                    var str = "Label " + currentObject.label + "<br><table>"
-                    if (false) {
-                        if (currentObject.count < Gparams.jsTreeMaxChildNodes)
-                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"list\")'>List all nodes</a></td></tr>"
-                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"search\")'>Search nodes...</a>"
-                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"graph\")'>Graph  all neighbours</a>"
-
-
-                        str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-start-exec\")'>Graph from...</a></td></tr>"
-                        if (graphicController.startLabel) {
-                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-end-exec\")'>Graph to...</a></td></tr>"
-                            //    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"shortestPath\")'>Shortest Path</a></td></tr>"
-                        }
-                    }
-                    $("#graphPopup").html(str);
-                    $("#nodeInfoMenuDiv").css("visibility", "visible");
-                    $("#nodeInfoMenuDiv").html(str);
-
-
-                    return;
-                }
-                if (currentObject.type == "cluster") {
-                    var str = "Cluster <br><table>"
-
-                    str += "<tr><td><a href='javascript:paint.dispatchAction(\"openCluster\")'>open cluster</a>"
-                    str += "<tr><td><a href='javascript:paint.dispatchAction(\"listClusterNodes\")'>list nodes of cluster</a>"
-                    str += "<tr><td><a href='javascript:paint.dispatchAction(\"graphClusterNodes\")'>Graph  neighbours nodes of cluster</a>"
-                    // str += "<tr><td><a href='javascript:paint.dispatchAction(\"queryClusterNodes\")'>query cluster</a>"
-
-
-                    $("#graphPopup").html(str);
-                    $("#nodeInfoMenuDiv").css("visibility", "visible");
-                    // $("#nodeInfoMenuDiv").html(str);
-
-
-                    return;
-                }
-                toutlesensData.getNodeInfos(id, function (obj) {
-                    currentObject = obj[0].n.properties;
-                    currentObject.id = obj[0].n._id;
-                    currentObject.label = obj[0].n.labels[0];
-                    var $currentObj = currentObject;
-                    if (self.hasRightPanel) {
-                        var str = "<input type='image' src='images/back.png' height='15px' title='back' onclick='toutlesensController.restorePopupMenuNodeInfo()' ><br>"
-                        str += textOutputs.formatNodeInfo(obj[0].n.properties);
-                        str += "<br>" + customizeUI.customInfo(obj);
-                        popupMenuNodeInfoCache = $("#nodeInfoMenuDiv").html();
-
-                        //    $("#nodeInfoMenuDiv").css("top", "total");
-                        $("#nodeInfoMenuDiv").css("visibility", "visible");
-                        $("#nodeInfoMenuDiv").html(toutlesensDialogsController.setPopupMenuNodeInfoContent());
-                        self.setRightPanelAppearance(false);
-                        $("#graphPopup").html(toutlesensDialogsController.setPopupMenuNodeInfoContent());
-                        //$("#nodeInfoMenuDiv").html(str)
-
-
-                    }
-                    else {
-                        var str = toutlesensDialogsController.setPopupMenuNodeInfoContent();
-                        $("#graphPopup").html(str);
-
-                        toutlesensController.showPopupMenu($currentObj._graphPosition.x, $currentObj._graphPosition.y, "nodeInfo");
+                                });
+                                $("#" + treeController.jsTreeDivId).jstree("open_all");
+                            }, 1000)
+                        });
+                    }, error: function (err) {
+                        return callback(err)
                     }
                 });
             }
+            else {
 
-
-        }
-
-
-        else if (action == "removeNode") {
-            if (id) {
-                visjsGraph.removeNode(id);
+                toutlesensData.searchNodes(subGraph, label, word, resultType, limit, from, callback);
             }
+            setTimeout(function () {
+                $("#searchResultMessage").html("click on tree...")
+                self.setRightPanelAppearance(true);
+                treeController.expandAll("treeContainer");
+            }, 500)
 
         }
 
 
-        else if (action == 'relationInfos') {
-            $("#graphPopup").html(toutlesensDialogsController.setPopupMenuRelationInfoContent());
+        /**
+         *
+         *
+         * print in div graphMessage a contextual message
+         *
+         *
+         *
+         * @param resultLength
+         */
 
+        self.setResultGraphMessage = function (resultLength) {
+            var message = " <i><b>click on graph to stop animation</b></i><br>";
+            if (currentLabel)
+                message += "Label : " + currentLabel + "<br>"
+            if (currentObject.id)
+                message += "Node : [" + currentObject.label + "]" + currentObject[Schema.getNameProperty(currentObject.label)] + "<br>";
+            message += filters.printRelationsFilters() + "<br>";
+            message += filters.printPropertyFilters() + "<br>";
+
+
+            message += "<b>" + resultLength + "</b> relations found <br>"
+            $("#graphMessage").html(message);
         }
-        else if (action == 'expandNode') {
-            toutlesensController.generateGraph(currentObject.id, {applyFilters: false, addToPreviousQuery: true});
+
+
+        /**
+         *
+         * print in div message a contextual message
+         *
+         * @param str
+         * @param color
+         */
+
+        self.setMessage = function (message, color) {
+            $("#message").html(message);
+            if (color)
+                $("#message").css("color", color);
         }
-        else if (action == 'expandNodeWithLabel') {
-            var labels = Schema.getPermittedLabels(currentObject.labelNeo, true, true);
-            labels.splice(0, 0, "");
-            var str = "labels<br><select onchange=' toutlesensController.dispatchAction(\"expandNodeWithLabelExecute\",$(this).val())'>";
-            for (var i = 0; i < labels.length; i++) {
-                str += "<option>" + labels[i] + "</option>>";
+
+        self.setGraphMessage = function (message, type) {
+
+            var str = "<br><br><p align='center' >"
+            var name = "";
+            if (currentObject && currentObject.id)
+                name = "Node " + currentObject[Schema.getNameProperty(currentObject.label)];
+            else {
+                if (currentLabel)
+                    name = "Label " + currentLabel;
             }
-            $("#graphPopup").append(str);
-            $("#graphPopup").css("visibility", "visible");
+            if (name)
+                str += "<span class='objectName'>" + name + "</span><br>"
+            if (type == "stop")
+                str += "<img src='./icons/warning.png' width='50px'><br>"
+            str += "<span id='graphMessageDetail'>" + message + "</span> <br>";
+            str += "</p>";
+
+            $("#graphDiv").html(str);
 
         }
-        else if (action == 'expandNodeWithLabelExecute') {
-            if (objectId != "" && objectId != "ALL")
-                currentLabel = objectId;
-            else
-                currentLabel = null;
-            toutlesensController.generateGraph(currentObject.id, {
-                applyFilters: false,
-                addToPreviousQuery: true
-            }, function (err, result) {
-                currentLabel = null;
+        self.clearGraphDiv = function () {
+            $("#graphDiv").html("");
+            $("#graphMessage").html("");
+            $("#filtersDiv").html("");
+            $("#innerLegendDiv").html("");
+            $("#relInfoDiv").html("");
+
+
+        }
+
+
+        self.selectTab = function (index) {
+            $('#ressourcesTab').tabs({
+                active: index
             });
         }
-        else if (action == 'expandGraphWithLabelExecute') {
-            var sourceLabel = "";
-            if (objectId != "" && objectId != "ALL")
-                sourceLabel = objectId;
-            else
-                sourceLabel = null;
-            var ids = visjsGraph.getNodesNeoIdsByLabelNeo(currentLabel)
-            var targetLabel = "";
-            if (targetObjectId != "" && targetObjectId != "ALL")
-                currentLabel = targetObjectId;
-            else
-                currentLabel = null;
 
 
-            var options = {
-                applyFilters: false,
-                addToPreviousQuery: true
+        /**
+         *
+         *
+         * execute an action
+         *
+         * action ==
+         * "nodeInfos" : show node e info either in a popup or in a viv (bottom rigth)
+         * "removeNode"
+         * "relationInfos" to finsih !!!
+         *  "expandNode"
+         *  "closeNode" to do !!!
+         *  "linkSource"
+         *  "linkTarget"
+         *  "modifyNode"
+         *  "addNode"
+         *  showGraphText
+         *  showGlobalMenu
+         *  showParamsConfigDialog
+         *  showParamsConfigDialog
+         *  showAll
+         *
+         *
+         * @param action
+         * @param objectId
+         * @param targetObjectId
+         * @param callback
+         */
+        self.dispatchAction = function (action, objectId, targetObjectId, callback) {
+
+            $("#graphPopup").css("visibility", "hidden");
+            self.hidePopupMenu();
+
+            var mode = $("#representationSelect").val();
+            var id;
+            if (currentObject && currentObject.id)
+                id = currentObject.id;
+
+
+            if (!currentObject.label && currentObject.nodeType) {
+                currentObject.label = currentObject.nodeType;
             }
-            var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
-            if (collapseGraph)
-                options.clusterIntermediateNodes = true;
 
-            toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
-                toutlesensController.generateGraph(null, options, function (err, result) {
+            if (action == "onNodeClick") {
+                toutlesensController.dispatchAction("nodeInfos", id);
+                expandGraph.setSourceLabel(currentObject.labelNeo)
+
+            }
+
+            if (action == "nodeInfos") {
+                if (id) {
+
+
+                    if (currentObject.type && currentObject.type == "schema") {
+                        var str = "Label " + currentObject.label + "<br><table>"
+                        if (false) {
+                            if (currentObject.count < Gparams.jsTreeMaxChildNodes)
+                                str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"list\")'>List all nodes</a></td></tr>"
+                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"search\")'>Search nodes...</a>"
+                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"graph\")'>Graph  all neighbours</a>"
+
+
+                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-start-exec\")'>Graph from...</a></td></tr>"
+                            if (graphicController.startLabel) {
+                                str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-end-exec\")'>Graph to...</a></td></tr>"
+                                //    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"shortestPath\")'>Shortest Path</a></td></tr>"
+                            }
+                        }
+                        $("#graphPopup").html(str);
+                        $("#nodeInfoMenuDiv").css("visibility", "visible");
+                        $("#nodeInfoMenuDiv").html(str);
+
+
+                        return;
+                    }
+                    if (currentObject.type == "cluster") {
+                        var str = "Cluster <br><table>"
+
+                        str += "<tr><td><a href='javascript:paint.dispatchAction(\"openCluster\")'>open cluster</a>"
+                        str += "<tr><td><a href='javascript:paint.dispatchAction(\"listClusterNodes\")'>list nodes of cluster</a>"
+                        str += "<tr><td><a href='javascript:paint.dispatchAction(\"graphClusterNodes\")'>Graph  neighbours nodes of cluster</a>"
+                        // str += "<tr><td><a href='javascript:paint.dispatchAction(\"queryClusterNodes\")'>query cluster</a>"
+
+
+                        $("#graphPopup").html(str);
+                        $("#nodeInfoMenuDiv").css("visibility", "visible");
+                        // $("#nodeInfoMenuDiv").html(str);
+
+
+                        return;
+                    }
+                    toutlesensData.getNodeInfos(id, function (obj) {
+                        currentObject = obj[0].n.properties;
+                        currentObject.id = obj[0].n._id;
+                        currentObject.label = obj[0].n.labels[0];
+                        var $currentObj = currentObject;
+                        if (self.hasRightPanel) {
+                            var str = "<input type='image' src='images/back.png' height='15px' title='back' onclick='toutlesensController.restorePopupMenuNodeInfo()' ><br>"
+                            str += textOutputs.formatNodeInfo(obj[0].n.properties);
+                            str += "<br>" + customizeUI.customInfo(obj);
+                            popupMenuNodeInfoCache = $("#nodeInfoMenuDiv").html();
+
+                            //    $("#nodeInfoMenuDiv").css("top", "total");
+                            $("#nodeInfoMenuDiv").css("visibility", "visible");
+                            $("#nodeInfoMenuDiv").html(toutlesensDialogsController.setPopupMenuNodeInfoContent());
+                            self.setRightPanelAppearance(false);
+                            $("#graphPopup").html(toutlesensDialogsController.setPopupMenuNodeInfoContent());
+                            //$("#nodeInfoMenuDiv").html(str)
+
+
+                        }
+                        else {
+                            var str = toutlesensDialogsController.setPopupMenuNodeInfoContent();
+                            $("#graphPopup").html(str);
+
+                            toutlesensController.showPopupMenu($currentObj._graphPosition.x, $currentObj._graphPosition.y, "nodeInfo");
+                        }
+                    });
+                }
+
+
+            }
+
+
+            else if (action == "removeNode") {
+                if (id) {
+                    visjsGraph.removeNode(id);
+                }
+
+            }
+
+
+            else if (action == 'relationInfos') {
+                $("#graphPopup").html(toutlesensDialogsController.setPopupMenuRelationInfoContent());
+
+            }
+            else if (action == 'expandNode') {
+                toutlesensController.generateGraph(currentObject.id, {applyFilters: false, addToPreviousQuery: true});
+            }
+            else if (action == 'expandNodeWithLabel') {
+                var labels = Schema.getPermittedLabels(currentObject.labelNeo, true, true);
+                labels.splice(0, 0, "");
+                var str = "labels<br><select onchange=' toutlesensController.dispatchAction(\"expandNodeWithLabelExecute\",$(this).val())'>";
+                for (var i = 0; i < labels.length; i++) {
+                    str += "<option>" + labels[i] + "</option>>";
+                }
+                $("#graphPopup").append(str);
+                $("#graphPopup").css("visibility", "visible");
+
+            }
+            else if (action == 'expandNodeWithLabelExecute') {
+                if (objectId != "" && objectId != "ALL")
+                    currentLabel = objectId;
+                else
+                    currentLabel = null;
+                toutlesensController.generateGraph(currentObject.id, {
+                    applyFilters: false,
+                    addToPreviousQuery: true
+                }, function (err, result) {
                     currentLabel = null;
                 });
-            })
-
-
-        }
-
-
-        else if (action == 'closeNode') {
-
-        }
-
-        else if (action == "setAsRootNode") {
-            if (self.currentSource == "RDF") {
-                var name = currentObject.name;
-                var p = name.indexOf("#");
-                if (p > 0)
-                    var name = name.substring(0, p);
-                rdfController.searchRDF(name);
             }
-            else {// minus sign on currentObject.id see toutlesensData 148
-                self.generateGraph(currentObject.id, {applyFilters: false});
+            else if (action == 'expandGraphWithLabelExecute') {
+                var sourceLabel = "";
+                if (objectId != "" && objectId != "ALL")
+                    sourceLabel = objectId;
+                else
+                    sourceLabel = null;
+                var ids = visjsGraph.getNodesNeoIdsByLabelNeo(currentLabel)
+                var targetLabel = "";
+                if (targetObjectId != "" && targetObjectId != "ALL")
+                    currentLabel = targetObjectId;
+                else
+                    currentLabel = null;
+
+
+                var options = {
+                    applyFilters: false,
+                    addToPreviousQuery: true
+                }
+                var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
+                if (collapseGraph)
+                    options.clusterIntermediateNodes = true;
+
+                toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
+                    toutlesensController.generateGraph(null, options, function (err, result) {
+                        currentLabel = null;
+                    });
+                })
+
+
             }
-        }
 
-        else if (action == "linkSource") {
 
-            $("#linkActionDiv").css("visibility", "visible");
-            var sourceNode = JSON.parse(JSON.stringify(currentObject));
-            $("#linkSourceNode").val(sourceNode.name);
-            $("#linkSourceNode").css("color", nodeColors[sourceNode.label]);
-            $("#linkSourceLabel").html(sourceNode.label);
-            self.currentRelationData = {
-                sourceNode: sourceNode,
-                context: "visJsGraphAddRel"
+            else if (action == 'closeNode') {
+
             }
-        } else if (action == "linkTarget") {
-            //	selectLeftTab('#dataTab');
-            $("#linkActionDiv").css("visibility", "visible");
-            var targetNode = JSON.parse(JSON.stringify(currentObject));
-            $("#linkTargetNode").val(targetNode.name);
-            $("#linkTargetNode").css("color", nodeColors[targetNode.label]);
-            $("#linkTargetLabel").html(targetNode.label);
 
-            self.currentRelationData.targetNode = targetNode;
-            var links = [];
-            var allowedRelTypes = Schema.getPermittedRelTypes(toutlesensController.currentRelationData.sourceNode.labelNeo, toutlesensController.currentRelationData.targetNode.labelNeo, true);
+            else if (action == "setAsRootNode") {
+                if (self.currentSource == "RDF") {
+                    var name = currentObject.name;
+                    var p = name.indexOf("#");
+                    if (p > 0)
+                        var name = name.substring(0, p);
+                    rdfController.searchRDF(name);
+                }
+                else {// minus sign on currentObject.id see toutlesensData 148
+                    self.generateGraph(currentObject.id, {applyFilters: false});
+                }
+            }
 
-            //  allowedRelTypes.splice(0, 0, "");
-            $("#dialog").load("htmlSnippets/relationsForm.html", function () {
-                common.fillSelectOptionsWithStringArray(relations_relTypeSelect, allowedRelTypes);
-                self.initLabels(relationsFormNewRelationStartLabelSelect);
-                self.initLabels(relationsFormNewRelationEndLabelSelect);
-                $("#dialog").dialog("option", "title", "Relation");
+            else if (action == "linkSource") {
 
-            })
-            $("#dialog").dialog("open");
+                $("#linkActionDiv").css("visibility", "visible");
+                var sourceNode = JSON.parse(JSON.stringify(currentObject));
+                $("#linkSourceNode").val(sourceNode.name);
+                $("#linkSourceNode").css("color", nodeColors[sourceNode.label]);
+                $("#linkSourceLabel").html(sourceNode.label);
+                self.currentRelationData = {
+                    sourceNode: sourceNode,
+                    context: "visJsGraphAddRel"
+                }
+            } else if (action == "linkTarget") {
+                //	selectLeftTab('#dataTab');
+                $("#linkActionDiv").css("visibility", "visible");
+                var targetNode = JSON.parse(JSON.stringify(currentObject));
+                $("#linkTargetNode").val(targetNode.name);
+                $("#linkTargetNode").css("color", nodeColors[targetNode.label]);
+                $("#linkTargetLabel").html(targetNode.label);
 
+                self.currentRelationData.targetNode = targetNode;
+                var links = [];
+                var allowedRelTypes = Schema.getPermittedRelTypes(toutlesensController.currentRelationData.sourceNode.labelNeo, toutlesensController.currentRelationData.targetNode.labelNeo, true);
 
-        } else if (action == "modifyNode") {
-            if (Gparams.readOnly == false) {
-
-                var label = currentObject.labelNeo;
-                $("#dialog").dialog({modal: false});
-                $("#dialog").dialog("option", "title", " node " + label);
-
-
-                $("#dialog").load("htmlSnippets/nodeForm.html", function () {
-
-                    var attrObject = Schema.schema.properties[label];
-                    treeController.selectedNodeData = currentObject;
-                    treeController.selectedNodeData.neoId = currentObject.id
-                    treeController.setAttributesValue(label, attrObject, currentObject.neoAttrs);
-                    treeController.drawAttributes(attrObject, "nodeFormDiv");
-                    // self.setRightPanelAppearance();
+                //  allowedRelTypes.splice(0, 0, "");
+                $("#dialog").load("htmlSnippets/relationsForm.html", function () {
+                    common.fillSelectOptionsWithStringArray(relations_relTypeSelect, allowedRelTypes);
+                    self.initLabels(relationsFormNewRelationStartLabelSelect);
+                    self.initLabels(relationsFormNewRelationEndLabelSelect);
+                    $("#dialog").dialog("option", "title", "Relation");
 
                 })
                 $("#dialog").dialog("open");
 
+
+            } else if (action == "modifyNode") {
+                if (Gparams.readOnly == false) {
+
+                    var label = currentObject.labelNeo;
+                    $("#dialog").dialog({modal: false});
+                    $("#dialog").dialog("option", "title", " node " + label);
+
+
+                    $("#dialog").load("htmlSnippets/nodeForm.html", function () {
+
+                        var attrObject = Schema.schema.properties[label];
+                        treeController.selectedNodeData = currentObject;
+                        treeController.selectedNodeData.neoId = currentObject.id
+                        treeController.setAttributesValue(label, attrObject, currentObject.neoAttrs);
+                        treeController.drawAttributes(attrObject, "nodeFormDiv");
+                        // self.setRightPanelAppearance();
+
+                    })
+                    $("#dialog").dialog("open");
+
+                }
+
+
+            } else if (action == "deleteRelation") {
+                treeController.deleteRelationById(currentObject.neoId, function (err, result) {
+                    if (err) {
+                        return console.log(err);
+                    }
+                    visjsGraph.deleteRelation(currentObject.id)
+                })
+            }
+            else if (action == "addNode") {
+                currentObject = {}
+
+                if (Gparams.readOnly == false) {
+                    $("#dialog").dialog({modal: false});
+                    $("#dialog").dialog("option", "title", "New node");
+
+
+                    $("#dialog").load("htmlSnippets/nodeForm.html", function () {
+                        self.initLabels(nodeFormLabelSelect);
+                        self.setRightPanelAppearance();
+                        for (var i = 0; i < Gparams.palette.length; i++) {
+                            $("#nodeFormNewLabelColor").append($('<option>', {
+                                    value: Gparams.palette[i],
+                                    text: Gparams.palette[i],
+
+                                }).css("background-color", Gparams.palette[i])
+                            );
+
+
+                        }
+
+                    })
+                    $("#dialog").dialog("open");
+
+                }
+
             }
 
+            else if (action == "createNewLabel") {
+                /*   var newLabel = prompt("new label name");*/
+                var newLabel = $("#nodeFormNewLabelName").val()
+                var newLabelColor = $("#nodeFormNewLabelColor").val()
+                if (newLabel && newLabel.length > 0) {
+                    if (!/^[\w]+$/.test(newLabel)) {
+                        return alert("label names only allow ascii characters")
+                        var color = "#FFD900"
+                    }
+                    if (newLabelColor && newLabelColor.length > 0)
+                        color = newLabelColor;
 
-        } else if (action == "deleteRelation") {
-            treeController.deleteRelationById(currentObject.neoId, function (err, result) {
-                if (err) {
-                    return console.log(err);
-                }
-                visjsGraph.deleteRelation(currentObject.id)
-            })
-        }
-        else if (action == "addNode") {
-            currentObject = {}
-
-            if (Gparams.readOnly == false) {
-                $("#dialog").dialog({modal: false});
-                $("#dialog").dialog("option", "title", "New node");
-
-
-                $("#dialog").load("htmlSnippets/nodeForm.html", function () {
-                    self.initLabels(nodeFormLabelSelect);
-                    self.setRightPanelAppearance();
-                    for (var i = 0; i < Gparams.palette.length; i++) {
-                        $("#nodeFormNewLabelColor").append($('<option>', {
-                                value: Gparams.palette[i],
-                                text: Gparams.palette[i],
-
-                            }).css("background-color", Gparams.palette[i])
-                        );
-
+                    Schema.schema.labels[newLabel] = {"color": color};
+                    Schema.schema.properties[newLabel] = {
+                        "name": {
+                            "type": "text"
+                        },
 
                     }
-
-                })
-                $("#dialog").dialog("open");
-
+                    Schema.save(subGraph);
+                    self.initLabels(nodeFormLabelSelect);
+                    var attrObject = Schema.schema.properties[newLabel];
+                    treeController.selectedNodeData = null;
+                    treeController.setAttributesValue(newLabel, attrObject, {});
+                    treeController.drawAttributes(attrObject, "nodeFormDiv");
+                }
             }
 
-        }
+            else if (action == "createNewRelationType") {
+                $('#relationsFormNewRelationDiv').css('visibility', 'visible');
+                var startLabel = $("#relationsFormNewRelationStartLabelSelect").val();
+                var endLabel = $("#relationsFormNewRelationEndLabelSelect").val();
+                var newRelation = $("#relationsFormNewRelationNameInput").val();
+                if (newRelation && newRelation.length > 0) {
+                    if (!/^[\w]+$/.test(newRelation)) {
+                        return alert("relation names only allow ascii characters")
+                    }
 
-        else if (action == "createNewLabel") {
-            /*   var newLabel = prompt("new label name");*/
-            var newLabel = $("#nodeFormNewLabelName").val()
-            var newLabelColor = $("#nodeFormNewLabelColor").val()
-            if (newLabel && newLabel.length > 0) {
-                if (!/^[\w]+$/.test(newLabel)) {
-                    return alert("label names only allow ascii characters")
-                    var color = "#FFD900"
+                    Schema.schema.relations[newRelation] = {
+                        "startLabel": startLabel,
+                        "endLabel": endLabel,
+                        "type": newRelation
+                    }
+                    Schema.save(subGraph);
+                    var allowedRelTypes = Schema.getPermittedRelTypes(toutlesensController.currentRelationData.sourceNode.labelNeo, toutlesensController.currentRelationData.targetNode.labelNeo, true);
+                    common.fillSelectOptionsWithStringArray(relations_relTypeSelect, allowedRelTypes);
                 }
-                if (newLabelColor && newLabelColor.length > 0)
-                    color = newLabelColor;
-
-                Schema.schema.labels[newLabel] = {"color": color};
-                Schema.schema.properties[newLabel] = {
-                    "name": {
-                        "type": "text"
-                    },
-
-                }
-                Schema.save(subGraph);
-                self.initLabels(nodeFormLabelSelect);
-                var attrObject = Schema.schema.properties[newLabel];
-                treeController.selectedNodeData = null;
-                treeController.setAttributesValue(newLabel, attrObject, {});
-                treeController.drawAttributes(attrObject, "nodeFormDiv");
             }
-        }
 
-        else if (action == "createNewRelationType") {
-            $('#relationsFormNewRelationDiv').css('visibility', 'visible');
-            var startLabel = $("#relationsFormNewRelationStartLabelSelect").val();
-            var endLabel = $("#relationsFormNewRelationEndLabelSelect").val();
-            var newRelation = $("#relationsFormNewRelationNameInput").val();
-            if (newRelation && newRelation.length > 0) {
-                if (!/^[\w]+$/.test(newRelation)) {
-                    return alert("relation names only allow ascii characters")
+            else if (action == "showGraphTable") {
+                var dataset = visjsGraph.toList();
+                if (!self.graphDataTable) {
+                    self.graphDataTable = new DataTable();
+                    self.graphDataTable.pageLength = 30;
                 }
-
-                Schema.schema.relations[newRelation] = {
-                    "startLabel": startLabel,
-                    "endLabel": endLabel,
-                    "type": newRelation
-                }
-                Schema.save(subGraph);
-                var allowedRelTypes = Schema.getPermittedRelTypes(toutlesensController.currentRelationData.sourceNode.labelNeo, toutlesensController.currentRelationData.targetNode.labelNeo, true);
-                common.fillSelectOptionsWithStringArray(relations_relTypeSelect, allowedRelTypes);
-            }
-        }
-
-        else if (action == "showGraphTable") {
-            var dataset = visjsGraph.toList();
-            if (!self.graphDataTable) {
-                self.graphDataTable = new DataTable();
-                self.graphDataTable.pageLength = 30;
-            }
-           // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
+                // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
                 $("#dialogLarge").load("htmlSnippets/dataTable.html", function () {
                     $('#dialogLarge').dialog("open");
                     self.graphDataTable.loadJsonInTable(null, "dataTableDiv", dataset, function (err, result) {
@@ -882,8 +884,7 @@ var toutlesensController = (function () {
 
 
             }
-        else
-            if (action == "showGraphText") {
+            else if (action == "showGraphText") {
                 $("#dialogLarge").dialog({modal: true});
                 $("#dialogLarge").dialog("option", "title", "Graph text");
                 $("#dialogLarge").load("htmlSnippets/graphTextDialog.html", function () {
@@ -1268,7 +1269,7 @@ var toutlesensController = (function () {
             }
             types.sort();
             types.splice(0, 0, "")
-            common.fillSelectOptionsWithStringArray(findRelationsSelect, types);
+            common.fillSelectOptionsWithStringArray(findRelationsTypeSelect, types);
         }
 
 
