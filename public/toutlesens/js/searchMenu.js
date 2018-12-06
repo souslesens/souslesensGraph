@@ -118,6 +118,8 @@ var searchMenu = (function () {
             }
             else if (self.currentPanelIndex == 1) {
                 self.previousAction = null;
+
+                $("#searchDialog_newQueryButton").css('visibility', 'hidden');
                 $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
                 //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
                 $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
@@ -126,6 +128,7 @@ var searchMenu = (function () {
                 advancedSearch.resetQueryClauses()
             }
             else {
+                $("#searchDialog_newQueryButton").css('visibility', 'visible');
                 $("#searchDialog_NextPanelButton").css('visibility', 'visible');
             }
             self.showCurrentPanel();
@@ -143,6 +146,7 @@ var searchMenu = (function () {
                     previousAction == "executePath"
                     $("#searchDialog_pathDistanceInput").val(relationDistance);
                     self.activatePanel("searchDialog_pathParamsDiv");
+                    $("#searchDialog_newQueryButton").css('visibility', 'visible');
                     $("#searchDialog_ExecuteButton").css('visibility', 'visible');
                     $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
                 });
@@ -306,6 +310,7 @@ var searchMenu = (function () {
                             where += " and ";
                         where += self.pathQuery.targetQuery.where.replace(/n\./, "m.");
                     }
+                    where+= "  and ID(n)<>id(m)"
                     toutlesensData.whereFilter = where;
                     var options = {};
                     options.hideNodesWithoutRelations = 1;

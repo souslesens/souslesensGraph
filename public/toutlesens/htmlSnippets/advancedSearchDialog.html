@@ -257,7 +257,10 @@
             </div>
             <div id="searchNavDiv" style=" position: fixed;  top: 330px; width: 320px; ">
                 <div style="background-color: #eee; border-style: solid; border-width: thin;margin-bottom: 20px">
-                    <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
+                  <!--  <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
+                    </button>-->
+                    <button style="visibility:hidden" id="searchDialog_newQueryButton"
+                            onclick="self.currentPanelIndex == 1;searchMenu.previousPanel();">new
                     </button>
                     <button style="visibility:hidden" id="searchDialog_SaveQueryButton"
                             onclick="savedQueries.savedQuerySave();">save
