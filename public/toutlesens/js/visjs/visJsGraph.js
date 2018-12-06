@@ -646,6 +646,7 @@ var visjsGraph = (function () {
             for (var key in self.edges._data) {
                 if (show) {
                     self.edges._data[key].label = self.edges._data[key].type;
+                    if(self.edges._data[key].label)
                     self.edges._data[key].label.arrows = 'to';
                     //  self.edges._data[key].font = {background: "red","font-style": 'italic', "font-size": "8px",strokeWidth: 0}
                     self.edges._data[key].font = {size: 8, color: 'grey', face: 'arial'}

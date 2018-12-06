@@ -17,7 +17,6 @@
         margin: auto;
         text-align: center;
 
-
     }
 
     .selectDiv {
@@ -53,8 +52,9 @@
         color: white;
 
     }
-    .selectDivHidden{
-        display:none;
+
+    .selectDivHidden {
+        display: none;
     }
 
     .selectLabelDiv {
@@ -74,7 +74,7 @@
         border-color: #0000cc;
         color: #0000cc;
         border-style: solid;
-      padding:5px;
+        padding: 5px;
         z-index: 20;
     }
 
@@ -87,12 +87,13 @@
         margin: auto;
         text-align: center;
     }
-.searchDialog_CriteriaDiv{
-    background-color:#7f9f7f;
-    border-radius: 6px;
-    width:300px;
-    text-align: center;
-}
+
+    .searchDialog_CriteriaDiv {
+        background-color: #7f9f7f;
+        border-radius: 6px;
+        width: 300px;
+        text-align: center;
+    }
 </style>
 
 
@@ -103,7 +104,7 @@
 
         <!--     <select id="searchDialog_savedQueries" size="14" style="width:270px"
                      ondblclick="searchMenu.savedQueryExecute()"></select>-->
-        <div id="searchDialog_savedQueriesJstree" style="height:250px"></div>
+        <div id="savedQueries_jsTree" style="height:250px"></div>
         <br>
         <button onclick="searchMenu.savedQueryDelete()">delete</button>
         <button onclick="searchMenu.savedQueryExecute()">execute</button>
@@ -116,21 +117,20 @@
 
         <div class="searchPanel" style="flex-direction: column">
 
-            <div id="searchCriteriaDiv" style="visibility: visible;overflow: hidden;display:table;align-content: center" class="searchPanel">
+            <div id="searchCriteriaDiv" style="visibility: visible;overflow: hidden;display:table;align-content: center"
+                 class="searchPanel">
 
                 <!--   object<select id="searchDialog_ObjectTypeInput" onchange="filters.setLabelsOrTypes(this)">
                  <option selected="selected">node</option>
                  <option>relation</option>
              </select>-->
 
-                <div id="advancedSearchNodeLabelsDiv" style="display: table-row;display: inline-block" onclick="searchMenu.clearCurrentLabel()"></div>
+                <div id="advancedSearchNodeLabelsDiv" style="display: table-row;display: inline-block"
+                     onclick="searchMenu.clearCurrentLabel()"></div>
 
 
-
-
-
-               <!-- <div style="display: table-row;display: inline-block">-->
-                    <div style="position: fixed;  top: 260px;align-self: center">
+                <!-- <div style="display: table-row;display: inline-block">-->
+                <div style="position: fixed;  top: 260px;align-self: center">
                     <table>
                         <tr>
                             <td colspan="3">
@@ -149,7 +149,7 @@
                                        onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_NextPanelButton').css('visibility', 'visible');">
 
 
-                              <input type="image" height="20px" src="images/erase.png"
+                                <input type="image" height="20px" src="images/erase.png"
                                        onclick="$('#searchDialog_valueInput').val('')">
                             </td>
                         </tr>
@@ -175,15 +175,18 @@
                     <span class="selectDiv" onclick="searchMenu.onSearchAction('path')"><img align="center"
                                                                                              src="images/graphSmall.png"> Pathes beetwen nodes</span>
                     <span class="selectDiv " onclick="searchMenu.onSearchAction('treeNodes')"><img align="center"
-                                                                                                  src="images/graphSmall.png"> Tree</span>
+                                                                                                   src="images/graphSmall.png"> Tree</span>
                     <span class="selectDiv " onclick="searchMenu.onSearchAction('tableNodes')"><img align="center"
-                                                                                                   src="images/tableSmall.png"> Table</span>
-                    <span class="selectDiv selectDivHidden" onclick="searchMenu.onSearchAction('tagCloud')"><img align="center"
-                                                                                                 src="images/graphSmall.png"> Tag cloud</span>
-                    <span class="selectDiv selectDivHidden"
-                          onclick="searchMenu.onSearchAction('treeMapSomeNeighboursListLabels')"><img align="center" src="images/treemapSmall.png"> Tree map</span>
-                    <span class="selectDiv selectDivHidden" onclick="searchMenu.onSearchAction('graphSimilars')"><img align="center"
-                                                                                                      src="images/graphSmall.png"> Graph similars</span>
+                                                                                                    src="images/tableSmall.png"> Table</span>
+                    <span class="selectDiv selectDivHidden" onclick="searchMenu.onSearchAction('tagCloud')"><img
+                            align="center"
+                            src="images/graphSmall.png"> Tag cloud</span>
+                    <span class="selectDiv "
+                          onclick="searchMenu.onSearchAction('treeMapSomeNeighboursListLabels')"><img align="center"
+                                                                                                      src="images/treemapSmall.png"> Tree map</span>
+                    <span class="selectDiv selectDivHidden" onclick="searchMenu.onSearchAction('graphSimilars')"><img
+                            align="center"
+                            src="images/graphSmall.png"> Graph similars</span>
 
 
                 </div>
@@ -216,7 +219,7 @@
             </div>
 
 
-            <div id="searchDialog_pathParamsDiv" style="visibility:hidden" class="searchPanel" >
+            <div id="searchDialog_pathParamsDiv" style="visibility:hidden" class="searchPanel">
                 <table>
                     <tr>
                         <td>
@@ -238,14 +241,12 @@
                     </tr>
                     <tr>
                         <td>
-                            collapse Graph<input type="checkbox" id="searchDialog_CollapseGraphCbx">
+                            collapse Graph<input type="checkbox" id="searchDialog_CollapseGraphCbx" checked="checked">
 
                         </td>
                     </tr>
                     <tr>
                         <td>
-
-
 
 
                         </td>
@@ -254,12 +255,12 @@
                 </table>
 
             </div>
-            <div id="searchNavDiv"  style=" position: fixed;  top: 330px; width: 320px; ">
+            <div id="searchNavDiv" style=" position: fixed;  top: 330px; width: 320px; ">
                 <div style="background-color: #eee; border-style: solid; border-width: thin;margin-bottom: 20px">
                     <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
                     </button>
                     <button style="visibility:hidden" id="searchDialog_SaveQueryButton"
-                            onclick="searchMenu.savedQuerySave();">save
+                            onclick="savedQueries.savedQuerySave();">save
                     </button>
 
                     <button style="visibility:hidden" id="searchDialog_previousPanelButton"
@@ -273,9 +274,9 @@
                             onclick="searchMenu.onSearchAction('execute')">OK
                     </button>
                 </div>
-                <div id="searchDialog_Criteriatext"  style="  visibility: visible; overflow: auto;height: 70px">
+                <div id="searchDialog_Criteriatext" style="  visibility: visible; overflow: auto;height: 70px">
 
-                   <!-- <input type="image" height="20px" src="images/erase.png">-->
+                    <!-- <input type="image" height="20px" src="images/erase.png">-->
 
 
                 </div>
@@ -287,6 +288,12 @@
 
 
 
+    </div>
+    <h3><b>Cypher</b></h3>
+    <div style="height: 450px;overflow: auto" >
+        Match statement
+        <br><textarea id="searchMenu_cypherDiv" cols="40" rows="10"></textarea><br>
+        <button onclick="searchMenu.execCypherMatchStatement()">next</button>
     </div>
 
 

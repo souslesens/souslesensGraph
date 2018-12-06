@@ -62,6 +62,8 @@ var DataTable = function () {
 
                 dataTableSortArray.push([index, order])
             }
+
+            obj.defaultContent="";
         })
 
         this.columns = columns;
@@ -157,12 +159,12 @@ var DataTable = function () {
                toutlesensController.showPopupMenu(px, py, "nodeInfo");
            }
        });
-      /*  $('#table_' + containerDiv + ' tbody').on('click', 'tr', function (event) {
+     $('#table_' + containerDiv + ' tbody').on('click', 'tr', function (event) {
             if ($(this).hasClass('selected')) {
                 $(this).removeClass('selected');
                 $("#table_" + containerDiv + " tbody tr").css("height", "20px");
             }
-            else {
+            if(true) {
                 if (!event.ctrlKey)
                     $('tr.selected').removeClass('selected');
                 $(this).addClass('selected');
@@ -179,7 +181,7 @@ var DataTable = function () {
 
             }
 
-        });*/
+        });
 
 
     },

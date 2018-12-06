@@ -10,6 +10,23 @@ self.createRels="Match (p1:paragraph)-[r]-(c:concept)-[r2]-(p2:paragraph) where 
 
   /*
 
+
+
+  Match (p:document)-[r]-(c:tag)
+WITH {item:id(p), categories: collect(id(c))} as userData, count(c)  as cnt where cnt>5
+WITH collect(userData) as data
+CALL algo.similarity.jaccard.stream(data, {topK: 3, similarityCutoff: 0.8})
+YIELD item1, item2, count1, count2, intersection, similarity
+with  algo.getNodeById(item1) AS from, algo.getNodeById(item2) AS  to, similarity
+ match (from)-[]-(c2:tag)-[]-(to)   return from.Titre , to.Titre ,c2.name
+ limit 100
+
+
+
+
+
+
+
   CALL algo.pageRank.stream('paragraph', 'similar', {iterations:20, dampingFactor:0.85})
 YIELD nodeId, score
 

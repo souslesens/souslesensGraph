@@ -225,7 +225,7 @@ var toutlesensData = (function () {
                 else {
                     if (options.hideNodesWithoutRelations)
                         relCardinalityStr = "*..1";
-                    if(self.queryRelWhereFilter!="")
+                    if(options.hideNodesWithoutRelations || self.queryRelWhereFilter!="")
                         relCardinalityStr=""
                     else
                         relCardinalityStr = "*0..1";
@@ -304,7 +304,7 @@ var toutlesensData = (function () {
             toutlesensData.matchStatement = ""
             toutlesensData.queryRelWhereFilter=""
 
-
+            $("#searchMenu_cypherDiv").text(statement)
             var payload = {match: statement};
 
             $.ajax({
@@ -1311,7 +1311,7 @@ var toutlesensData = (function () {
             if (whereStr && whereStr.length > 0 && whereStr.toUpperCase().indexOf("WHERE") < 0)
                 whereStr = " WHERE " + whereStr;
             str = "MATCH (n" + labelStr + ") " + whereStr + subGraphWhere + returnStr;
-
+$("#searchMenu_cypherDiv").text("MATCH (n" + labelStr + ") " + whereStr + subGraphWhere)
 
             console.log(str);
             if (resultType == "matchStr" && callback) {
@@ -1341,7 +1341,7 @@ var toutlesensData = (function () {
                     if (callback) {
                         return callback(null, data);
                     }
-                    if (!resultType == "count")
+                    if (resultType != "count")
                         eventsController.startSearchNodesTime = null;
                     if (!data || data.length == 0) {
 

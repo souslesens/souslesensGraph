@@ -158,7 +158,10 @@
     <script src="js/functionalities.js"></script>
     <script src="js/versionController.js"></script>
     <script src="js/eventsController.js"></script>
+    <script src="js/savedQueries.js"></script>
     <script src="js/searchMenu.js"></script>
+
+
 
    <!-- <script src="js/d3graphCreation.js"></script>-->
     <script src="../common/js/others/async.js"></script>
@@ -328,6 +331,7 @@
             lang.setLangage();
             eventsController.initInputEvents();
             eventsController.initcomponentEvents()
+            savedQueries.loadQueries();
 
             var mode = queryParams.mode;
             if (mode == "write")

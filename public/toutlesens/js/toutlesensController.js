@@ -313,7 +313,7 @@ var toutlesensController = (function () {
 
             if (type != "") {
                 if (property != "" && value != "") {
-                    toutlesensData.queryRelWhereFilter="r."+property+operator+value;
+                    toutlesensData.queryRelWhereFilter = "r." + property + operator + value;
                 }
                 toutlesensData.queryRelTypeFilters = ":" + type;
                 currentObject.id = null;
@@ -696,7 +696,7 @@ var toutlesensController = (function () {
                 var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
                 if (collapseGraph)
                     options.clusterIntermediateNodes = true;
-
+                options.hideNodesWithoutRelations=true
                 toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
                     toutlesensController.generateGraph(null, options, function (err, result) {
                         currentLabel = null;
@@ -869,16 +869,14 @@ var toutlesensController = (function () {
 
             else if (action == "showGraphTable") {
                 var dataset = visjsGraph.toList();
-                if (!self.graphDataTable) {
-                    self.graphDataTable = new DataTable();
-                    self.graphDataTable.pageLength = 30;
-                }
-                // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
-                $("#dialogLarge").load("htmlSnippets/dataTable.html", function () {
-                    $('#dialogLarge').dialog("open");
-                    self.graphDataTable.loadJsonInTable(null, "dataTableDiv", dataset, function (err, result) {
 
-                    })
+                // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
+                $("#dialog").load("htmlSnippets/dataTableDialog.html", function () {
+                    $('#dialog').dialog("open");
+                    $('#dialog').dialog({ title:"Select table columns"});
+                    dataTableDialog.init(dataset)
+
+
 
                 })
 
@@ -981,6 +979,14 @@ var toutlesensController = (function () {
                             var point = params.pointer.DOM;
                             var nodeId = params.nodes[0];
                             currentObject = visjsGraph.nodes._data[nodeId];
+
+                            $(".selectLabelDiv ").each(function(){
+                                var label=currentObject.name
+                               if($(this).html()==label)
+                                   advancedSearch.onChangeObjectName(label, this);
+                                searchMenu.activatePanel("searchCriteriaDiv")
+                            })
+
                             toutlesensController.dispatchAction("nodeInfos", nodeId);
                             toutlesensController.showPopupMenu(point.x, point.y, "nodeInfo");
                         }
@@ -1376,6 +1382,12 @@ var toutlesensController = (function () {
                 Gparams.maxResultSupported = parseInt(increase);
                 toutlesensController.generateGraph(null, {useCurrentStatement: true});
             }
+        }
+        self.graphNodeNeighbours = function (obj) {
+            currentObject = obj;
+            self.dispatchAction("setAsRootNode");
+            $("#dialogLarge").dialog("close");
+
         }
 
         return self;

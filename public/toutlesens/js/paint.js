@@ -142,7 +142,7 @@ var paint = (function () {
 
             function getData() {
                 var data = []
-                if (true || searchMenu.currentAction.indexOf("graph") > -1) {
+                if (searchMenu.currentAction.indexOf("graph") > -1) {
                     $("#paint_unClusterButton").css("visibility", "visible");
                     $("#paint_clusterButton").css("visibility", "visible");
                     self.unClusterByClass();
@@ -179,7 +179,8 @@ var paint = (function () {
             if (data.length == 0)
                 return;
             var allGraphNodes = visjsGraph.nodes.get();
-            if (property == "" && self.currentBIproperty) {
+
+            if ( property == "" && self.currentBIproperty) {
 
 
                 $("#BIlegendDiv").html("").css("visibility", "hidden");
@@ -290,7 +291,7 @@ var paint = (function () {
 
             }
 
-            if (searchMenu.currentAction.indexOf("graph") > -1) {
+            if (searchMenu.previousAction.indexOf("graph") >-1) {
                 var neutralColor = "#eee";
                 var neutralSize = 3;
                 var neutralShape = "square";
@@ -313,17 +314,11 @@ var paint = (function () {
                 $("#paint_clusterButton").css("visibility", "visible")
 
             }
-            else if (searchMenu.currentAction.indexOf("treeMap") > -1) {
+            else if (searchMenu.previousAction.indexOf("treeMap") > -1) {
                d3.selectAll(".leafGroup1").each(function (d) {
                       if (d.neoAttrs[self.currentBIproperty]) {
-                          var index = targetIds.indexOf("R_" + d.neoAttrs.id);
+                          var index = targetIds.indexOf("R_"+ d.neoAttrs.id);
                           if (index > -1) {
-                              var xx=   this;
-                              var xx2=    d3.selectAll(this).select("rect");
-                             // $("#R_" + d.neoAttrs.id).css("color",targetNodes[index].color)
-                             // $("#R_" + d.neoAttrs.id+" .parent").css("fill",targetNodes[index].color)
-                             // d3.selectAll("#R_" + d.neoAttrs.id).style("fill", targetNodes[index].color);
-                             // d3.select(this).style("fill", targetNodes[index].color);
                                d3.select(this).select("rect").style("fill", targetNodes[index].color);
                           }
                       }
@@ -331,30 +326,14 @@ var paint = (function () {
                   });
                 d3.selectAll(".leafGroup").each(function (d) {
                     if (d.neoAttrs[self.currentBIproperty]) {
-                        var index = targetIds.indexOf("R_" + d.neoAttrs.id);
+                        var index = targetIds.indexOf("R_"+ d.neoAttrs.id);
                         if (index > -1) {
-                            var xx=   this;
-                            var xx2=    d3.selectAll(this).select("rect");
-                            // $("#R_" + d.neoAttrs.id).css("color",targetNodes[index].color)
-                            // $("#R_" + d.neoAttrs.id+" .parent").css("fill",targetNodes[index].color)
-                            // d3.selectAll("#R_" + d.neoAttrs.id).style("fill", targetNodes[index].color);
-                            // d3.select(this).style("fill", targetNodes[index].color);
                             d3.select(this).select("rect").style("fill", targetNodes[index].color);
                         }
                     }
 
                 });
-               /* for (var i = 0; i < targetNodes.length; i++) {
-                    try {
-                      //  console.log("#" + targetNodes[i].id);
-                        var xx = d3.selectAll("#R_" + targetNodes[i].id).select("rect");
-                        if (xx)
-                            d3.selectAll("#" + targetNodes[i].id).select("rect").style("fill", targetNodes[index].color);
-                    }
-                    catch (e) {
 
-                    }
-                }*/
 
 
             }
@@ -481,7 +460,7 @@ var paint = (function () {
                         }
                     }
                     visjsGraph.paintEdges(ids, self.currentColor, "#eee", radius);
-                    legendStr = "<span style='background-color: " + self.currentColor + ";'>&nbsp;&nbsp;&nbsp;</span></td><td>" + legendStr + "</td></tr>"
+                    legendStr = "<button onclick=' $(\"#BIlegendDiv\").html(\"\").css(\"visibility\", \"hidden\");'>X</button></button><span style='background-color: " + self.currentColor + ";'>&nbsp;&nbsp;&nbsp;</span></td><td>" + legendStr + "</td></tr>"
                     /*   $("#paintDiv").css("height", 100);
                        $("#paintDiv").html(legendStr);*/
                     $("#BIlegendDiv").html(legendStr);

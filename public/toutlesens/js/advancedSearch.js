@@ -6,7 +6,7 @@ var advancedSearch = (function () {
     self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
     self.context = {}
     self.searchClauses = [];
-self.currentQueryNodeIds=[];
+    self.currentQueryNodeIds = [];
     self.showDialog = function (options) {
         self.filterLabelWhere = "";
 
@@ -24,9 +24,6 @@ self.currentQueryNodeIds=[];
     }
 
 
-
-
-
     self.resetQueryClauses = function () {
 
 
@@ -41,7 +38,7 @@ self.currentQueryNodeIds=[];
         self.clearClauses();
         $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
     }
-    self.onChangeObjectName = function (value,div) {
+    self.onChangeObjectName = function (value, div) {
 
         $(".selectLabelDiv").removeClass("selectLabelDivSelected");
         $(div).addClass("selectLabelDivSelected");
@@ -83,28 +80,27 @@ self.currentQueryNodeIds=[];
 
     self.addClauseUI = function (operator) {
 
-        var clauseText="";
-           self.searchNodes("matchSearchClause", null, function (err, clause) {
-               clauseText =(clause.nodeLabel?clause.nodeLabel:"")+" "+ $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
+        var clauseText = "";
+        self.searchNodes("matchSearchClause", null, function (err, clause) {
+            clauseText = (clause.nodeLabel ? clause.nodeLabel : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
 
-               if (err)
+            if (err)
                 return;
             $("#searchDialog_valueInput").val("");
             for (var i = 0; i < self.searchClauses.length; i++) {
                 if (clause.nodeLabel != "" && self.searchClauses[i].nodeLabel != "" && clause.nodeLabel != self.searchClauses[i].nodeLabel)
                     return alert("you cannot add criteria on different labels :" + clause.nodeLabel != "" && self.searchClauses[i].nodeLabel)
             }
-               self.searchNodes("", {where:clause.where}, function (err, result) {
-                   self.currentQueryNodeIds=[];
-                   result.forEach(function(line){
-                       self.currentQueryNodeIds.push(line._id);
-                   });
-                   clause.foundIds=self.currentQueryNodeIds.length;
-                   clauseText+= ": <b> "+clause.foundIds+ "nodes </b>"
-                   self.addClause(clause,clauseText);
+            self.searchNodes("", {where: clause.where,resultType:"count"}, function (err, result) {
+                self.currentQueryNodeIds = [];
+                result.forEach(function (line) {
+                    self.currentQueryNodeIds.push(line._id);
+                });
+                clause.foundIds = self.currentQueryNodeIds.length;
+                clauseText += ": <b> " + clause.foundIds + "nodes </b>"
+                self.addClause(clause, clauseText);
 
-               });
-
+            });
 
 
             // clause.operator=operator;
@@ -112,22 +108,22 @@ self.currentQueryNodeIds=[];
         })
     }
 
-    self.addClause = function (clause,clauseText) {
+    self.addClause = function (clause, clauseText) {
 
         $("#searchDialog_NextPanelButton").css('visibility', 'visible');
-     /*   var clauseText = clause.nodeLabel + " ? " + clause.where;
-        if (clauseText == " ? ")
-            return;
-        if (clause.where == "" && self.searchClauses.length > 0)
-            return;
+        /*   var clauseText = clause.nodeLabel + " ? " + clause.where;
+           if (clauseText == " ? ")
+               return;
+           if (clause.where == "" && self.searchClauses.length > 0)
+               return;
 
 
-        var clauseTextHuman = clauseText.replace("=~'(?i).*", " contains '")
-        var clauseTextHuman = clauseTextHuman.replace("*'", "'")
-        clause.title = clauseTextHuman;*/
-
+           var clauseTextHuman = clauseText.replace("=~'(?i).*", " contains '")
+           var clauseTextHuman = clauseTextHuman.replace("*'", "'")
+           clause.title = clauseTextHuman;*/
+        clause.title = clauseText.substring(clauseText, clauseText.indexOf(":"))
         self.searchClauses.push(clause);
-        $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' onclick=advancedSearch.clearClause("+(self.searchClauses.length-1)+")>"+clauseText+"</div>")
+        $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' onclick=advancedSearch.clearClause(" + (self.searchClauses.length - 1) + ")>" + clauseText + "</div>")
 
 
         $("#clearAllCreteriaButton").css("visibility", "visible");
@@ -142,22 +138,20 @@ self.currentQueryNodeIds=[];
 
         self.searchClauses = [];
 
-         $(".searchDialog_CriteriaDiv").remove();
+        $(".searchDialog_CriteriaDiv").remove();
 
     }
     self.clearClause = function (_index) {
 
-        if(searchMenu.currentPanelIndex>1)
+        if (searchMenu.currentPanelIndex > 1)
             return;
 
-        $(".searchDialog_CriteriaDiv").each(function(index,div){
-          if( _index==index) {
+        $(".searchDialog_CriteriaDiv").each(function (index, div) {
+            if (_index == index) {
                 $(this).remove();
-                self.searchClauses.splice(index,1);
+                self.searchClauses.splice(index, 1);
             }
         })
-
-
 
 
     }
@@ -815,7 +809,7 @@ self.currentQueryNodeIds=[];
             url: self.neo4jProxyUrl,
             data: payload,
             dataType: "json",
-            error:function(err){
+            error: function (err) {
                 console.log(err.responseText);
 
             },

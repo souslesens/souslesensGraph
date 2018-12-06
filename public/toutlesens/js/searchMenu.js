@@ -22,9 +22,6 @@ var searchMenu = (function () {
             })
 
             self.initLabelDivs();
-
-
-            self.loadQueries()
             $("#searchAccordion").accordion({});
             var tab = 1
             if (false && Object.keys(savedQueries).length > 0)
@@ -77,120 +74,11 @@ var searchMenu = (function () {
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
             currentLabel = null;
+            toutlesensController.dispatchAction("showSchema")
 
         }
 
-        self.loadQueries = function () {
 
-            function loadToJsTree(savedQueries) {
-                var treeData = [];
-                var allPaths = [];
-                var types = ["graph", "table", "treemap", "graphNeighbours"]
-                var i = 0;
-                for (var key in savedQueries) {
-                    i++;
-                    var levels = key.split(/[:?]/);
-                    var path = "";
-
-                    for (var j = 0; j < levels.length; j++) {
-                        var parent = "#"
-                        var type = "";
-                        if (j > 0)
-                            var parent = (levels[j - 1].trim());
-
-                        levels[j] = levels[j].trim();
-
-
-                        if (j == 0)
-                            type = "label";
-                        else if (levels[j].indexOf("n.") == 0)
-                            type = "whereN";
-                        else if (nodeColors[levels[j].split("/")[0]])
-                            type = "targetLabels";
-                        else if (types.indexOf(levels[j]) > -1) {
-                            type = levels[j];
-                        }
-
-                        path += ":" + parent;
-                        if (j == levels.length - 1) {
-                            path += ":" + levels[j]
-                        }
-
-                        if (allPaths.indexOf(path) < 0) {
-                            allPaths.push(path);
-                            var text = levels[j];
-
-
-                            treeData.push({text: text, id: levels[j], type: type, data: key, parent: parent})
-                        }
-                    }
-                }
-                $("#searchDialog_savedQueriesJstree").html("");
-                $("#searchDialog_savedQueriesJstree").jstree({
-                    'core': {
-                        'data': treeData
-                    },
-                    "types": {
-                        "graph": {
-                            "icon": "images/graphSmall.png"
-                        },
-                        "graphNeighbours": {
-                            "icon": "images/graphSmall.png"
-                        },
-                        "table": {
-                            "icon": "images/tableSmall.png"
-                        },
-                        "treemap": {
-                            "icon": "images/treemapSmall.png"
-                        },
-                        "label": {
-                            "icon": "images/labelIconSmall.png"
-                        },
-                        "whereN": {
-                            "icon": "images/labelIconSmall.png"
-                        },
-                        "targetLabels": {
-                            "icon": "images/labelIcon2Small.png"
-                        },
-                    }
-                    , plugins: ["types"]
-                });
-                $("#searchDialog_savedQueriesJstree").on('loaded.jstree', function () {
-                    $("#searchDialog_savedQueriesJstree").jstree('open_all');
-                })
-                    .bind("dblclick.jstree", function (e) {
-                        var data = $("#searchDialog_savedQueriesJstree").jstree().get_selected(true);
-                        if (data[0]) {
-                            searchMenu.selectedQuery = data[0].data;
-                            searchMenu.savedQueryExecute();
-                        }
-
-                    })
-                $("#searchDialog_savedQueriesJstree").bind("click.jstree", function (e) {
-                    var data = $("#searchDialog_savedQueriesJstree").jstree().get_selected(true);
-                    if (data[0]) {
-
-                        searchMenu.selectedQuery = data[0].data;
-                    }
-
-                })
-            }
-
-            savedQueries = localStorage.getItem("savedQueries_" + subGraph);
-            if (!savedQueries)
-                savedQueries = {};
-            else
-                savedQueries = JSON.parse(savedQueries);
-            loadToJsTree(savedQueries);
-            /*    var names = []
-               for (var key in savedQueries) {
-                   names.push(key);
-
-               }
-               names.sort();
-
-             common.fillSelectOptionsWithStringArray(searchDialog_savedQueries, names);*/
-        }
 
 
         self.graphNeighboursWithLabels = function () {
@@ -233,6 +121,8 @@ var searchMenu = (function () {
                 $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
                 //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
                 $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
+                $("#searchCriteriaAddButton").css('visibility', 'hidden');
+
                 advancedSearch.resetQueryClauses()
             }
             else {
@@ -333,7 +223,7 @@ var searchMenu = (function () {
                 //    self.dataTable.loadNodes(self.dataTable, "graphDiv", query, {});
                     $("#dialogLarge").load("htmlSnippets/dataTable.html", function () {
                         $('#dialogLarge').dialog("open");
-                        self.dataTable.loadNodes(self.dataTable, "dataTableDiv", query, {}, function (err, result) {
+                        self.dataTable.loadNodes(self.dataTable, "dataTableDiv", query, {onClick:toutlesensController.graphNodeNeighbours}, function (err, result) {
 
                         })
 
@@ -426,10 +316,10 @@ var searchMenu = (function () {
                             return err;
 
 
-                        self.previousAction = null;
+                        self.previousAction = "graphPath";
                         $("#searchDialog_PreviousPanelButton").css('visibility', 'visible');
                         $("#searchDialog_ExecuteButton").css('visibility', 'visible');
-
+                        self.currentAction = "graphPath";
                     })
 
 
@@ -460,6 +350,7 @@ var searchMenu = (function () {
                         advancedSearch.graphNodesAndDirectRelations(err, query, treeMap.draw);
                         paint.initHighlight();
                         $("#searchDialog_ExecuteButton").css('visibility', 'visible');
+                        $("#searchDialog_PreviousPanelButton").css('visibility', 'visible');
                     });
                 }
 
@@ -475,113 +366,7 @@ var searchMenu = (function () {
 
         }
 
-        self.savedQuerySave = function () {
-            //  advancedSearch.addClauseUI();
-            var val = "";
-            var neighboursLabels = [];
-            var neighboursLabels = []
-            if (advancedSearch.searchClauses.length > 0)
-                val = advancedSearch.searchClauses[0].title;
-            if (advancedSearch.searchClauses.length > 1)
-                val = advancedSearch.searchClauses[0].title.substring(0, 10) + "..."
-            val += ":";
-            if (previousAction != "") {
-                val = val + previousAction.replace("SomeNeighboursListLabels", "");
-            }
-            if (previousAction.indexOf("ListLabels") > -1) {
-                val += ":";
-                $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
-                    neighboursLabels.push($(this).val());
-                });
-                for (var i = 0; i < neighboursLabels.length; i++) {
-                    if (i > 0)
-                        val += "/"
-                    val += neighboursLabels[i].trim();
-                }
 
-            }
-            var name = prompt("enter query name", val.trim());
-
-
-            if (name && name != "") {
-
-                query = {clauses: advancedSearch.searchClauses};
-                if (previousAction != "") {
-                    query.outputType = $("#advancedSearchAction").val();
-                }
-                if (previousAction.indexOf("ListLabels") > -1) {
-
-                    query.neighboursLabels = neighboursLabels;
-                }
-
-                savedQueries[name] = query;
-
-                localStorage.setItem("savedQueries_" + subGraph, JSON.stringify(savedQueries));
-                //  $("#searchDialog_savedQueries").prepend("<option>" + name + "</option>")
-
-                self.loadQueries();
-            }
-
-
-        }
-        self.savedQueryDelete = function () {
-
-            var name = $("#searchDialog_savedQueries").val();
-            if (name && name != "") {
-                delete savedQueries[name];
-                localStorage.setItem("savedQueries_" + subGraph, JSON.stringify(savedQueries));
-                self.loadQueries();
-                /*$("#searchDialog_savedQueries option").each(function () {
-                    if ($(this).val() == name) {
-                        $(this).remove();
-                        return;
-                    }
-                });*/
-            }
-        }
-
-        self.savedQueryDeleteAll = function () {
-            localStorage.removeItem("savedQueries_" + subGraph);
-            self.loadQueries();
-        }
-
-        self.savedQueryExecute = function () {
-//$("#searchAccordion").accordion("option","active",1)
-            // var name = $("#searchDialog_savedQueries").val();
-            var name = searchMenu.selectedQuery;
-            var query = savedQueries[name];
-            var clauses = query.clauses;
-
-
-            advancedSearch.clearClauses();
-            for (var i = 0; i < clauses.length; i++) {
-                advancedSearch.addClause(clauses[i]);
-                $("#searchDialog_NodeLabelInput").val(clauses[i].nodeLabel);
-            }
-            if (!query.outputType) {// first screen only
-                self.activatePanel("searchActionDiv");
-                $("#searchDialog_previousPanelButton").css("visibility", "visible");
-                $("#searchAccordion").accordion("option", "active", 1);
-            }
-            else {//query panel+output type panel
-                $("#advancedSearchAction").val(query.outputType);
-            }
-            if (!query.neighboursLabels) {
-                self.onSearchAction(query.outputType)
-            }
-            else {
-
-                self.onSearchAction(query.outputType);
-                $('.advancedSearchDialog_LabelsCbx').each(function () {
-                    if (query.neighboursLabels.indexOf(this.value) > -1)
-                        $(this).prop("checked", true);
-
-                });
-                self.onSearchAction("execute");
-            }
-            $("#searchDialog_NextPanelButton").css('visibility', 'visible');
-
-        }
 
         self.addLabelToPath = function () {
 
@@ -589,14 +374,16 @@ var searchMenu = (function () {
 
         self.onGraphNeighboursAllOptionsCbx = function (cbx) {
             var state = $(cbx).prop("checked");
-            if (state) {
-                state = "checked";
-                searchMenu.onSearchAction('execute')
-            }
+
+
             $('.advancedSearchDialog_LabelsCbx').each(function () {
                 $(this).prop("checked", state);
 
             })
+            if (state) {
+                state = "checked";
+                searchMenu.onSearchAction('execute')
+            }
         }
 
 
