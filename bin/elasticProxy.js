@@ -2538,7 +2538,7 @@ if (false) {
 }
 
 
-if (true) {
+if (false) {
 
     elasticProxy.createSimpleIndex("antiquite", "BASIC", function (err, result) {
         elasticProxy.indexCsv("D:\\jpt\\oeuvres.txt", "antiquiteoeuvres", "oeuvre", function (err, result) {
