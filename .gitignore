@@ -69,3 +69,6 @@ logs/classifierManager.log
 .git/*
 .idea/*
 *.log
+logs/classifierManager.log
+logs/elastic.log
+logs/classifierManager.log

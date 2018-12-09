@@ -1437,7 +1437,9 @@ var elasticProxy = {
 
         var data = "" + fs.readFileSync(csvPath);
         var elasticFields = elasticProxy.getShemasFieldNames(elasticIndex, elasticType);
-        var elasticFieldsMap = elasticProxy.getIndexMappings(elasticIndex, elasticType).fields.fieldObjs;
+        var elasticFieldsMap=null;
+        if(elasticProxy.getIndexMappings(elasticIndex, elasticType).fields)
+        elasticFieldsMap = elasticProxy.getIndexMappings(elasticIndex, elasticType).fields.fieldObjs;
         var jsonData = [];
         csv({noheader: false, trim: true, delimiter: "auto"})
             .fromString(data)
@@ -1449,6 +1451,12 @@ var elasticProxy = {
                 var startId = Math.round(Math.random() * 10000000);
                 var elasticPayload = [];
                 // contcat all fields values in content field
+
+                for (var i = 0; i < jsonData.length; i++) {
+                   for( var key in jsonData[i])
+                   if( elasticFields.indexOf(key)<0)
+                       elasticFields.push(key);
+                }
 
                 for (var i = 0; i < jsonData.length; i++) {
                     var payload = {};
@@ -1463,7 +1471,7 @@ var elasticProxy = {
                             continue;
                         if (value == "0000-00-00")
                             continue;
-                        if (elasticFieldsMap[key].isSearched)
+                        if (true || elasticFieldsMap && elasticFieldsMap[key].isSearched)
                             contentValue += ". " + value;
 
                         payload[key] = value;
@@ -1861,7 +1869,8 @@ var elasticProxy = {
     ,
 
     initDocIndex: function (index, settings, callback) {
-
+if(!settings)
+    settings="ATD"
         elasticProxy.deleteIndex(index, true, function (err) {
             if (err)
                 return callback(err);
@@ -2528,6 +2537,16 @@ if (false) {
 
 }
 
+
+if (true) {
+
+    elasticProxy.createSimpleIndex("antiquite", "BASIC", function (err, result) {
+        elasticProxy.indexCsv("D:\\jpt\\oeuvres.txt", "antiquiteoeuvres", "oeuvre", function (err, result) {
+            var x = 1;
+        })
+    })
+
+}
 if (false) {
     var str = "" + fs.readFileSync("D:\\Total\\docs\\nlp\\thesaurusRefTotal.json")
     var json = JSON.parse(str);
