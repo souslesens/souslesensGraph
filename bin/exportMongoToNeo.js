@@ -658,12 +658,19 @@ function loadAndFetchDataToImport(params, importFn, _rootCallBack) {
                 importFn(params, subset, function (err, result) {
                         if (err)
                             return callback(err);
+                    var message;
                         if (params.label) {//nodes
                             nodeMappings = nodeMappings.concat(result);
+
+
+                            totalLines += result.length;
+                             message = "Imported " + result.length + " lines with label " + params.label;
+                        } else {//relation
+                            totalLines += result.length;
+                             message = "Imported " + result.length + " lines with label " + params.relationType;
+
                         }
-                        ;
-                        totalLines += result.length;
-                        var message = "Imported " + nodeMappings.length + " lines with label " + params.label;
+
                         socket.message(message);
                         callback(null);
                     }

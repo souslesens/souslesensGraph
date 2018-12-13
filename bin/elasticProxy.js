@@ -1437,9 +1437,9 @@ var elasticProxy = {
 
         var data = "" + fs.readFileSync(csvPath);
         var elasticFields = elasticProxy.getShemasFieldNames(elasticIndex, elasticType);
-        var elasticFieldsMap=null;
-        if(elasticProxy.getIndexMappings(elasticIndex, elasticType).fields)
-        elasticFieldsMap = elasticProxy.getIndexMappings(elasticIndex, elasticType).fields.fieldObjs;
+        var elasticFieldsMap = null;
+        if (elasticProxy.getIndexMappings(elasticIndex, elasticType).fields)
+            elasticFieldsMap = elasticProxy.getIndexMappings(elasticIndex, elasticType).fields.fieldObjs;
         var jsonData = [];
         csv({noheader: false, trim: true, delimiter: "auto"})
             .fromString(data)
@@ -1453,9 +1453,9 @@ var elasticProxy = {
                 // contcat all fields values in content field
 
                 for (var i = 0; i < jsonData.length; i++) {
-                   for( var key in jsonData[i])
-                   if( elasticFields.indexOf(key)<0)
-                       elasticFields.push(key);
+                    for (var key in jsonData[i])
+                        if (elasticFields.indexOf(key) < 0)
+                            elasticFields.push(key);
                 }
 
                 for (var i = 0; i < jsonData.length; i++) {
@@ -1501,8 +1501,8 @@ var elasticProxy = {
                             }
                         })
                         return callback(resp.errors);
-                    }else{
-                    return callback(null, "done");
+                    } else {
+                        return callback(null, "done");
                     }
                 });
 
@@ -1869,8 +1869,8 @@ var elasticProxy = {
     ,
 
     initDocIndex: function (index, settings, callback) {
-if(!settings)
-    settings="ATD"
+        if (!settings)
+            settings = "ATD"
         elasticProxy.deleteIndex(index, true, function (err) {
             if (err)
                 return callback(err);
@@ -1901,6 +1901,8 @@ if(!settings)
                 var schemaJson = elasticProxy.getIndexMappings("officeDocument");
                 schemaJson = elasticProxy.removeSchemaMappingsCustomProperties(schemaJson);
                 var settingsJson = elasticSchema._settings[settings];
+
+
                 var options = {
                     method: 'PUT',
                     description: "init mapping on attachment content",
@@ -1909,6 +1911,9 @@ if(!settings)
                     json: {mappings: schemaJson.mappings}
                 };
                 if (settings) {
+                    if ( index.indexOf("temp") > 0)
+                        settingsJson.index = {"refresh_interval": "-1"};
+
                     options.json.mappings.officeDocument.properties.content.analyzer = settings;
                     options.json.settings = settingsJson;
                 }
@@ -1931,6 +1936,47 @@ if(!settings)
 
     }
     ,
+    refreshIndex: function (index, callback) {
+        var options = {
+            method: 'PUT',
+            description: "refresh index",
+            url: baseUrl + index + "/_settings",
+            json: {
+                "index" : {
+                    "refresh_interval" : "1s"
+                }
+            }
+        }
+        request(options, function (error, response, body) {
+            if (error)
+                return callback(error);
+            if (body.error) {
+                console.log(JSON.stringify(body.error));
+                callback(body.error);
+
+            }
+            var options = {
+                method: 'POST',
+                description: "refresh index",
+                url: baseUrl + index + "/_forcemerge?max_num_segments=5"
+
+            }
+            request(options, function (error, response, body) {
+                if (error)
+                    return callback(error);
+                if (body.error) {
+                    console.log(JSON.stringify(body.error));
+                    callback(body.error);
+
+                }
+                callback(null, body)
+
+            });
+
+        });
+
+
+    },
     indexDocumentFile: function (_file, index, type, base64, infos, callback) {
         var id;
         if (infos && infos.hash)
@@ -1980,7 +2026,7 @@ if(!settings)
 
         request(options, function (error, response, body) {
 
-         //   console.log(file+"  "+JSON.stringify(body));
+            //   console.log(file+"  "+JSON.stringify(body));
 
             if (error) {
                 logger.error(file + " : " + error);
@@ -2060,7 +2106,9 @@ if(!settings)
 
                 newObjs.push(newObj);
             }
+            console.log("copying " + newObjs.length + "records")
             async.eachSeries(newObjs, function (newObj, callbackInner) {
+                console.log(newObj.title)
                 var id;
                 if (newObj.id) {
                     id = newObj.id;
@@ -2077,7 +2125,13 @@ if(!settings)
                 });
 
             }, function (err) {
-                callback(err, result);
+                elasticProxy.refreshIndex(index, function (err, result) {
+                    if (err) {
+                        elasticProxy.sendMessage("ERROR" + err);
+                        return callback(err);
+                    }
+                    callback(err, result);
+                });
             });
 
 
@@ -2142,34 +2196,40 @@ if(!settings)
                         elasticProxy.sendMessage("ERROR" + err);
                         return callback(err);
                     }
-
-
-                    elasticProxy.sendMessage("indexation in tempIndex successfull " + result);
-
-
-                    elasticProxy.copyDocIndex(indexTemp, index, type, function (err, result) {
+                    elasticProxy.refreshIndex(index+"temp", function (err, result) {
                         if (err) {
                             elasticProxy.sendMessage("ERROR" + err);
                             return callback(err);
                         }
-                        elasticProxy.sendMessage("index " + indexTemp + " copied to " + index);
 
-                        elasticProxy.deleteIndex(indexTemp, true, function (err, result) {
-                            elasticProxy.sendMessage("delete temporary index " + indexTemp);
-                            var message = "-----------Index " + index + " is ready to use-----------"
-                            if (doClassifier && doClassifier.toLowerCase() == "y") {
 
-                                classifierManager.createIndexClassifierFromElasticFrequentWordsAndOntology(index, 200, null, null, 10, ["BNF"], "fr", 1, function (err, result) {
-                                    elasticProxy.sendMessage("classifier done");
+                        elasticProxy.sendMessage("indexation in tempIndex successfull " + result);
 
-                                    elasticProxy.sendMessage(message);
-                                })
+                        elasticProxy.copyDocIndex(indexTemp, index, type, function (err, result) {
+                            if (err) {
+                                elasticProxy.sendMessage("ERROR" + err);
+                                return callback(err);
                             }
+                            elasticProxy.sendMessage("index " + indexTemp + " copied to " + index);
                             if (callback)
                                 return callback(null, message);
+                            elasticProxy.deleteIndex(indexTemp, true, function (err, result) {
+                                elasticProxy.sendMessage("delete temporary index " + indexTemp);
+                                var message = "-----------Index " + index + " is ready to use-----------"
+                                if (doClassifier && doClassifier.toLowerCase() == "y") {
 
+                                    classifierManager.createIndexClassifierFromElasticFrequentWordsAndOntology(index, 200, null, null, 10, ["BNF"], "fr", 1, function (err, result) {
+                                        elasticProxy.sendMessage("classifier done");
+
+                                        elasticProxy.sendMessage(message);
+                                    })
+                                }
+                                if (callback)
+                                    return callback(null, message);
+
+                            });
                         });
-                    });
+                    })
 
                 });
 
@@ -2538,7 +2598,7 @@ if (false) {
 }
 
 
-if (true) {
+if (false) {
 
     elasticProxy.createSimpleIndex("antiquite", "BASIC", function (err, result) {
         elasticProxy.indexCsv("D:\\jpt\\oeuvres.txt", "antiquiteoeuvres", "oeuvre", function (err, result) {

@@ -4,8 +4,8 @@ var connectors = (function () {
 
     self.neoResultsToVisjs = function (resultArray, options) {
 
-if(!options)
-    options={};
+        if (!options)
+            options = {};
         visjsData = {nodes: [], edges: [], labels: []};
         var nodesMap = {};
         var dataLabels = [];
@@ -69,12 +69,12 @@ if(!options)
                     }
 
 
-                    if (true || resultArray.length<Gparams.showLabelsMaxNumOfNodes ||  !options || !options.clusterIntermediateNodes || options.showNodesLabel) {
+                    if (true || resultArray.length < Gparams.showLabelsMaxNumOfNodes || !options || !options.clusterIntermediateNodes || options.showNodesLabel) {
                         nodeObj.label = labelVisjs;
                         nodeObj.title = labelVisjs;
 
 
-                    }else{
+                    } else {
                         nodeObj.hiddenLabel = labelVisjs;
                         options.showNodesLabel = false;
                     }
@@ -154,26 +154,31 @@ if(!options)
 
 
             }
-            var rel ;
+            var rel;
+
             if (options.clusterIntermediateNodes) {
                 //link first node to last
                 for (var j = 1; j < ids.length; j++) {
                     ids[j] = ids[ids.length - 1];
-                    rel="composite";
+
                 }
             }
 
 
             for (var j = 0; j < rels.length; j++) {
-                rel = rels[j];
+                if (options.clusterIntermediateNodes)
+                    rel = "composite";
+                else
+                    rel = rels[j];
+
                 var startLabel = startLabels[j][0];
                 var from, to, queryId;
 
                 if (options.clusterIntermediateNodes) {
                     if (j > 0 && j < (rels.length - 1))
                         continue;
-                   if( ids[j] == ids[j + 1])
-                       continue;
+                    if (ids[j] == ids[j + 1])
+                        continue;
                 }
 
 
@@ -186,7 +191,6 @@ if(!options)
                     to = ids[j];
                     queryId = ids[j + 1];
                 }
-
 
 
                 var color = "#99d";//linkColors[rel];
@@ -312,7 +316,7 @@ if(!options)
                 neoAttrs: schema.labels[label],
                 labelNeo: "label",// because visjs where label is the node name
                 // color: "lightBlue",
-                color:nodeColors[label],
+                color: nodeColors[label],
                 myId: id,
                 shape: "box",
                 id: id++,

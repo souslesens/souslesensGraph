@@ -152,11 +152,15 @@ var toutlesensController = (function () {
             if ($("#hideNodesWithoutRelationsCbx").prop("checked"))
                 options.hideNodesWithoutRelations = true;
 
-            var relationDepth = $("#depth").val();
-            if (relationDepth === undefined)
-                options.relationDepth = Gparams.defaultQueryDepth;
-            else
-                options.relationDepth = parseInt(relationDepth);
+
+
+            if(! options.relationDepth) {
+                var relationDepth = $("#depth").val();
+                if (relationDepth === undefined)
+                    options.relationDepth = Gparams.defaultQueryDepth;
+                else
+                    options.relationDepth = parseInt(relationDepth);
+            }
 
             options.output = currentDisplayType;
             /*----------------------------------------------------------------------------------------------------*/
@@ -703,6 +707,19 @@ var toutlesensController = (function () {
                     });
                 })
 
+
+            }
+
+
+        else if (action == 'showRelClusterIntermediateNodes') {
+
+
+               // toutlesensData.matchStatement="match(n)-[r]-(m)" ;
+                toutlesensData.whereFilter="ID(n)="+currentObject.fromNode.id+" AND ID(m)="+currentObject.toNode.id;
+               var relationDepth= parseInt($("#searchDialog_pathDistanceInput").val());
+                toutlesensController.generateGraph(null, {addToPreviousQuery:true,relationDepth:relationDepth}, function (err, result) {
+                    currentLabel = null;
+                });
 
             }
 

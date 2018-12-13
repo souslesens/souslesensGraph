@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" media="screen" type="text/css" title="Design" href="../common/js/jquery/jquery-ui.min.css"/>
+
+    <script src="../common/js/jquery/jquery.min.js"></script>
+    <script src="../common/js/jquery/jquery-ui.min.js"></script>
+
+    <script src="./js/admin.js"></script>
+    <script src="./js/users.js"></script>
+    <script src="./js/searchUI.js"></script>
+
+    <!--  <script src="js/async.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.css"/>
+    <script src="js/dataTable.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.js"></script>
+
+
+    <script src="js/jsTree/treeController.js"></script>-->
+
+
+    <!--   <script src="js/d3/d3.js"></script>
+       <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>-->
+
+    <style>
+        body {
+            font-family: Verdana;
+            font-size: 14px;
+        }
+
+        input, button {
+            margin: 0px;
+            padding: 2px;
+            width: 100px;
+
+        }
+
+        button {
+            width: inherit;
+            margin: 3px;
+            padding: 3px;
+        }
+
+        input {
+            width: 150px;
+        }
+
+        #main {
+            width: 100%;
+            display: table
+        }
+
+        #left {
+            float: left;
+            display: inline;
+            width: 20%;
+        }
+
+        #right {
+            float: left;
+            display: inline;
+            width: 77%;
+            margin-left: 5px;
+        }
+
+        .accordionInnerDiv {
+            min-height: 300px;
+            background-color: #9ca7b3;
+            background-color: snow;
+
+        }
+
+        .myDatatable td {
+            border-bottom-style: solid;
+            border-bottom-width: 1px;
+            border-bottom-color: #93aeca;
+            border-left-style: solid;
+            border-left-width: 1px;
+            border-left-color: #93aeca;
+            width: 100px !important;
+
+            height: 20px !important;
+        }
+
+        .dataTables_wrapper {
+            margin: 5px;
+        }
+
+        .dt-buttons {
+            left: 200px;
+            position: relative;
+        }
+
+        .dataTables_paginate {
+            font-weight: bold;
+        }
+
+        #messageDiv {
+            font-style: italic;
+        }
+
+        .selected {
+            background-color: #0a6aa1;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #0a6aa1;
+
+        }
+
+        #recordMessageSpan {
+
+            font: bold 14px Serif;
+            color: red;
+        }
+
+        div.dt-buttons {
+            float: left;
+        }
+
+        .ui-accordion-header {
+            font-weight: bold;
+            color: #0a6aa1;
+        }
+
+        #popupD3Div {
+            visibility: hidden;
+            position: absolute;
+            background-color: #ddd;
+            margin: 3px;
+            padding: 3px;
+            border-style: solid;
+            border-width: 1px;
+        }
+
+        #dialogContentDiv {
+
+        }
+
+        #dialogD3 {
+            background-color: #ddd;
+            margin: 3px;
+            padding: 3px;
+            width: 500px;
+            height: 500px;
+        }
+
+        #messageSpan {
+            color: #003eff;
+            font-weight: bold;
+        }
+
+
+    </style>
+
+    <script>
+        var dialog;
+        $(function () {
+
+
+            $("#leftAccordion").accordion({
+
+                activate: function (event, ui) {
+                    var content = ui;
+                    if (ui.newHeader.text() == "Magasins")
+                        ;// magasinD3.init("listRecordsDiv")
+
+                }
+
+            });
+
+
+            $("#loginDialogDiv").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: {
+                    "OK": function () {
+                        mainController.logon();
+                    },
+                    "Fermer": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+        /*    $('#ChooseFilebutton').file().choose(function(e, input) {
+                alert(input.val()); //alerts the chosen filename.
+            });*/
+
+            var fileSelector = $('<input id="fileSelector" type="file">');
+            $('#ChooseFilebutton').click(function(){
+                fileSelector.click();
+                return false;
+            });
+            $("#fileSelector").on('change', function () {
+                alert(this.files);
+            });
+
+        })
+
+
+
+
+    </script>
+</head>
+<body>
+<div id="messageDiv"></div>
+<div id="main">
+
+    <div id="left">
+
+        <div id="leftAccordion">
+            <h1>Index Documents</h1>
+            <div class="accordionInnerDiv">
+                <table align="center">
+                    <tr>
+                        <td>
+                            indexName
+                        </td>
+
+                        <td>
+                            <input id="indexName" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                    <td>
+                        rootDir
+                    </td>
+                    <td>
+                        <input id="rootDir">
+                    </td>
+                    </tr>
+                    <tr>
+                    <td>
+                        type
+                    </td>
+                    <td>
+
+                        <input id="mappingsType" value="officeDocument">
+                    </td>
+                    <tr align="center">
+                        <td colspan="2">
+                            <br><br>
+                            <button onclick="admin.elasticExec('indexDocDirInNewIndex')">indexDocDirInNewIndex</button>
+
+                            <button onclick="admin.elasticExec('indexDirInExistingIndex')">indexDirInExistingIndex</button>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+            <h1>Index CSV</h1>
+            <div id="MagasinsDiv" class="accordionInnerDiv">
+
+
+            </div>
+
+
+            <h1>Index Json</h1>
+            <div id="statsDiv" class="accordionInnerDiv">
+
+
+            </div>
+
+            <h1>Index SQL table</h1>
+            <div id="statsDiv" class="accordionInnerDiv">
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="right">
+        <!--   <button id="showHideLeftPanelButton"><< >></button>-->
+        <div id="listRecordsDiv" class="dataTableDiv">
+
+
+        </div>
+    </div>
+
+</div>
+
+<div id="dialogDiv">
+
+
+</div>
+
+
+<div id="loginDialogDiv" title="Connexion">
+    <table>
+        <tr>
+            <td>
+                Utilisateur
+            </td>
+            <td>
+                <input id="login">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                mot de passe
+            </td>
+            <td>
+                <input type="password" id="password">
+            </td>
+        </tr>
+    </table>
+    <span id="logonMessageDiv"></span>
+
+</div>
+
+
+</body>
+</html>

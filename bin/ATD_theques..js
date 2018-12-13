@@ -41,7 +41,8 @@ var ATD_theques = {
         "bordereaux": {
             type: "fs",
             settings: "ATD",
-            dir: "H:\\ATD\\Instruments_de_RECHERCHE",
+          //  dir: "H:\\ATD\\Instruments_de_RECHERCHE",
+            dir:"D:\\ATD_Baillet\\versements2018",
             schema: "officeDocument"
         },
         "ocr": {
@@ -118,7 +119,7 @@ var ATD_theques = {
 module.exports = ATD_theques
 
 
-ATD_theques.indexTheques(["testatd"]);
+//ATD_theques.indexTheques(["bordereaux"]);
 
 
 const args = process.argv;
@@ -137,6 +138,6 @@ if (args.length > 2) {
 
 
 } else {
-    console.log("Usage :  indexTheques + index1,index2...");
+    console.log("Usage : node ATD_theques indexTheques  index1,index2...");
 }
 
