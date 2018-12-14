@@ -1911,7 +1911,7 @@ var elasticProxy = {
                     json: {mappings: schemaJson.mappings}
                 };
                 if (settings) {
-                    if ( index.indexOf("temp") > 0)
+                    if (index.indexOf("temp") > 0)
                         settingsJson.index = {"refresh_interval": "-1"};
 
                     options.json.mappings.officeDocument.properties.content.analyzer = settings;
@@ -1942,8 +1942,8 @@ var elasticProxy = {
             description: "refresh index",
             url: baseUrl + index + "/_settings",
             json: {
-                "index" : {
-                    "refresh_interval" : "1s"
+                "index": {
+                    "refresh_interval": "1s"
                 }
             }
         }
@@ -2196,7 +2196,7 @@ var elasticProxy = {
                         elasticProxy.sendMessage("ERROR" + err);
                         return callback(err);
                     }
-                    elasticProxy.refreshIndex(index+"temp", function (err, result) {
+                    elasticProxy.refreshIndex(index + "temp", function (err, result) {
                         if (err) {
                             elasticProxy.sendMessage("ERROR" + err);
                             return callback(err);
@@ -2238,6 +2238,104 @@ var elasticProxy = {
         })
     }
     ,
+    indexCsvFile: function (index, newIndex, file, callback) {
+        async.series([
+
+            function (callbackSeries) {
+                if (newIndex) {
+                    elasticProxy.deleteIndex(index, true, function (err, result) {
+                        if (err)
+                            return callbackSeries(err);
+                        return callbackSeries(null, [])
+                    })
+                }
+                else {
+                    return callbackSeries(null, [])
+                }
+            },
+            function (callbackSeries) {
+                if (newIndex) {
+                    elasticProxy.createSimpleIndex(index, null, function (err, result) {
+                        if (err)
+                            return callbackSeries(err);
+                        return callbackSeries(null, [])
+                    })
+                }
+                else {
+                    return callbackSeries(null, [])
+                }
+            },
+            function (callbackSeries) {
+                try {
+
+
+                    var csv = fs.readFileSync(file)
+                    elasticProxy.indexCsv(file, index, index, function (err, result) {
+                        if (err)
+                            return callbackSeries(err);
+                        return callbackSeries(null, result)
+                    })
+                }
+                catch (e) {
+                    callbackSeries(e);
+                }
+            }
+        ], function (err) {
+            if (err)
+                return callback(err.message);
+            return callback(null, "done")
+
+        })
+    },
+
+    indexjsonFile: function (index, newIndex, file, callback) {
+        async.series([
+            function (callbackSeries) {
+                if (newIndex) {
+                    elasticProxy.deleteIndex(index, true, function (err, result) {
+                        if (err)
+                            return callbackSeries(err);
+                        return callbackSeries(null, [])
+                    })
+                }
+                else {
+                    return callbackSeries(null, [])
+                }
+            },
+            function (callbackSeries) {
+                if (newIndex) {
+                    elasticProxy.createSimpleIndex(index, null, function (err, result) {
+                        if (err)
+                            return callbackSeries(err);
+                        return callbackSeries(null, [])
+                    })
+                }
+                else {
+                    return callbackSeries(null, [])
+                }
+            },
+            function (callbackSeries) {
+                try {
+                    var json = JSON.parse(fs.readFileSync(file));
+                    if (!Array.isArray(json))
+                        json = [json];
+                    elasticProxy.indexJsonArray(index, index, json, {}, function (err, result) {
+                        if (err)
+                            return callbackSeries(err);
+                        return callbackSeries(null, result)
+                    })
+                }
+                catch (e) {
+                   return callbackSeries(e);
+                }
+            }], function (err) {
+            if (err)
+                return callback(err.message);
+            return callback(null, "done")
+
+        })
+    },
+
     indexDirInExistingIndex: function (index, type, rootDir, doClassifier, settings, callback) {
         if (!fs.existsSync(rootDir)) {
             var message = ("directory " + rootDir + " does not not exist on server")

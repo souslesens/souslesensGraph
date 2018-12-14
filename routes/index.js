@@ -144,6 +144,14 @@ router.post(serverParams.routesRootUrl + '/elastic', function (req, response) {
         elasticProxy.indexDirInExistingIndex(req.body.indexName, req.body.type, req.body.rootDir, req.body.doClassifier, null, function (error, result) {
             processResponse(response, error, result)
         });
+    else if (req.body && req.body.indexCsvFile)
+        elasticProxy.indexCsvFile(  req.body.indexName, req.body.newIndex, req.body.file,  function (error, result) {
+            processResponse(response, error, result)
+        });
+    else if (req.body && req.body.indexJsonFile)
+        elasticProxy.indexjsonFile( req.body.indexName,req.body.newIndex,  req.body.file  ,  function (error, result) {
+            processResponse(response, error, result)
+        });
 
     else if (req.body && req.body.indexSqlTable)
         elasticProxy.indexSqlTable( req.body.connection,  req.body.sql,  req.body.elasticIndex,  req.body.elasticType,  function (error, result) {

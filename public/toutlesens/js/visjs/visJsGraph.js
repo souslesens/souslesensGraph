@@ -585,6 +585,11 @@ var visjsGraph = (function () {
 
         }
 
+        self.updateRelations = function (relations) {
+            self.edges.update(relations);
+
+        }
+
 
         self.scaleNodes = function (nodes, valueProp) {
             var newNodes = []
@@ -646,8 +651,8 @@ var visjsGraph = (function () {
             for (var key in self.edges._data) {
                 if (show) {
                     self.edges._data[key].label = self.edges._data[key].type;
-                    if(self.edges._data[key].label)
-                    self.edges._data[key].label.arrows = 'to';
+                    if (self.edges._data[key].label)
+                        self.edges._data[key].label.arrows = 'to';
                     //  self.edges._data[key].font = {background: "red","font-style": 'italic', "font-size": "8px",strokeWidth: 0}
                     self.edges._data[key].font = {size: 8, color: 'grey', face: 'arial'}
                 }
@@ -663,7 +668,6 @@ var visjsGraph = (function () {
             });
             //   network.fit()
         }
-
 
 
         self.changeLayout = function (select) {
@@ -800,13 +804,13 @@ var visjsGraph = (function () {
 
         }
 
-        self.getNodesNeoIdsByLabelNeo=function(labelNeo){
-            var ids=[];
-           for(var key in self.nodes._data){
-               var node=self.nodes._data[key];
-                if(!labelNeo){
+        self.getNodesNeoIdsByLabelNeo = function (labelNeo) {
+            var ids = [];
+            for (var key in self.nodes._data) {
+                var node = self.nodes._data[key];
+                if (!labelNeo) {
                     ids.push(node.id)
-                }else if(node.labelNeo==labelNeo)
+                } else if (node.labelNeo == labelNeo)
                     ids.push(node.id)
 
 
@@ -1014,41 +1018,39 @@ var visjsGraph = (function () {
         }
 
         self.toList = function () {
-            var array=self.exportGraph();
-           // console.log()
-            var dataset=[]
+            var array = self.exportGraph();
+            // console.log()
+            var dataset = []
 
 
-            var map= {};
-            array.forEach(function(node){
-                map[node.id]=node;
+            var map = {};
+            array.forEach(function (node) {
+                map[node.id] = node;
             })
-          array.forEach(function(node){
-              var obj={
+            array.forEach(function (node) {
+                var obj = {
 
-                  label: node.labelNeo,
-                  name:node.label,
+                    label: node.labelNeo,
+                    name: node.label,
 
-              }
-
-
+                }
 
 
-              var str="";
-              node.connections.forEach(function(id,index){
-                  if( index>0)
-                      str+=","
-                  str+=map[id].label+"["+map[id].labelNeo+"]"
-              })
-              obj.connectedTo=str;
-              for(var key in node.neoAttrs){
-                  if(node.neoAttrs[key]!=null)
-                      obj[key]=node.neoAttrs[key]
-              }
-              obj.id=node.id,
+                var str = "";
+                node.connections.forEach(function (id, index) {
+                    if (index > 0)
+                        str += ","
+                    str += map[id].label + "[" + map[id].labelNeo + "]"
+                })
+                obj.connectedTo = str;
+                for (var key in node.neoAttrs) {
+                    if (node.neoAttrs[key] != null)
+                        obj[key] = node.neoAttrs[key]
+                }
+                obj.id = node.id,
 
-              dataset.push(obj);
-          })
+                    dataset.push(obj);
+            })
             return dataset;
 
         }
@@ -1130,12 +1132,24 @@ var visjsGraph = (function () {
         }
 
         self.addNode = function (node) {
-            function exeAdd() {
-                node.x = -100;
-                node.y = -100;
-                node.color = nodeColors[node.labelNeo]
+            self.addNodes([node])
+        }
 
-                self.nodes.add(node);
+        self.addNodes = function (nodes) {
+            function exeAdd() {
+                var visjsNodes = []
+                nodes.forEach(function (node) {
+                    visjsNodes.push({
+                            x: (node.x || -100),
+                            y: (node.y || -100),
+                            label: (node.label || ""),
+                            color: nodeColors[node.labelNeo]
+                        }
+                    )
+                    self.nodes.add(visjsNodes);
+                })
+
+
             }
 
             if (self.nodes.length == 0) {

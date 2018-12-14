@@ -8,28 +8,39 @@ var admin = (function () {
 
     var self = {}
 
-    self.elasticExec = function (operation) {
+    self.elasticExec = function (operation,newIndex) {
         $("#message").html("");
         var indexName = $("#indexName").val();
         if (!indexName || indexName == "") {
             return alert("enter index name")
         }
-        var mappingsType = $("#mappingsType").val();
-        var rootDir = $("#rootDir").val();
+
+     if(!operation) {
+        operation = $("#indexType").val();
+        if(operation=="indexDocDir")
+        if(newIndex)
+            operation="indexDocDirInNewIndex"
+         else
+            operation="indexDirInExistingIndex"
+
+     }
+        var path = $("#path").val();
         //  var doClassifier=$("#doClassifier").val();
         var indexName = $("#indexName").val();
-        if(indexName.match(/[A-Z]/))
-            return alert ("index name cannot contain uppercase characters");
+        if (indexName.match(/[A-Z]/))
+            return alert("index name cannot contain uppercase characters");
 
         var url = "/elastic";
         var payload;
+        if(!operation || operation=="")
+            return  alert("enter index type");
         if (operation == "indexDocDirInNewIndex") {
             payload = {
                 indexDocDirInNewIndex: 1,
                 indexName: indexName,
-                rootDir: rootDir,
+                rootDir: path,
                 doClassifier: "false",
-                type: mappingsType
+                type: "officeDocument"
 
 
             };
@@ -40,14 +51,32 @@ var admin = (function () {
             payload = {
                 indexDirInExistingIndex: 1,
                 indexName: indexName,
-                rootDir: rootDir,
+                rootDir: path,
                 doClassifier: "false",
-                type: mappingsType
+                type: "officeDocument"
 
             };
 
         }
 
+        else if (operation == "indexCsvFile") {
+            payload = {
+                indexCsvFile: 1,
+                indexName: indexName,
+                file: path,
+                newIndex:newIndex,
+            };
+
+        }
+
+        else if (operation == "indexJsonFile") {
+            payload = {
+                indexJsonFile: 1,
+                indexName: indexName,
+                file: path,
+                newIndex:newIndex
+            };
+        }
         else if (operation == "indexMongo") {
             var mongoDB = $("#mongoDB").val();
 
@@ -96,11 +125,11 @@ var admin = (function () {
                     stopWords: stopWords
                 }
             };
-            if($("#lemmeFilterCBX").prop("checked")){
-                payload.options.lemmeFilter=true;
+            if ($("#lemmeFilterCBX").prop("checked")) {
+                payload.options.lemmeFilter = true;
             }
-            if($("#WordNetEntitiesFilterCBX").prop("checked")){
-                payload.options.wordNetEntitiesFilter=true;
+            if ($("#WordNetEntitiesFilterCBX").prop("checked")) {
+                payload.options.wordNetEntitiesFilter = true;
             }
 
         }
@@ -128,7 +157,9 @@ var admin = (function () {
             success: function (data, textStatus, jqXHR) {
                 self.waitIcon(false);
                 var minWordLength = $("#minWordLength").val();
-                if (operation == "listEntities") {
+                if (operation != "listEntities") {
+                    return admin.setMessage(data.result);
+                } else {
                     var array = []
 
                     for (var i = 0; i < data.buckets.length; i++) {
@@ -151,9 +182,9 @@ var admin = (function () {
                         self.getGoogleApiEntities(array)
                         $("#countExtractedEntities").html(array.length);
                         // common.fillSelectOptions(entitiesSelect, array, "label", "key");
-                    //    common.fillSelectOptions(stopWordsSelect, arrayExclude, "label", "key")
+                        //    common.fillSelectOptions(stopWordsSelect, arrayExclude, "label", "key")
                     }
-                    else{
+                    else {
                         $("#countExtractedEntities").html(array.length);
                         common.fillSelectOptions(entitiesSelect, array, "label", "key")
                     }
@@ -285,11 +316,11 @@ var admin = (function () {
 
 
                     }
-                   // entities[term].synonyms = synArray;
+                    // entities[term].synonyms = synArray;
                     str += term + ",";
                     for (var j = 0; j < synArray.length; j++) {
-                        if(synArray[j]!="_EMPTY_")
-                        str += synArray[j] + ",";
+                        if (synArray[j] != "_EMPTY_")
+                            str += synArray[j] + ",";
                     }
                     str += "\n";
 
@@ -474,7 +505,7 @@ var admin = (function () {
     self.loadSynonyms = function () {
         var ontology = $("#ontology").val();
         var thesaurusName = $("#indexName").val();
-        var path="./config/thesaurii/"+thesaurusName + "_" + ontology + ".syn";
+        var path = "./config/thesaurii/" + thesaurusName + "_" + ontology + ".syn";
         var payload = {
             getFileContent: 1,
             path: path
@@ -495,13 +526,13 @@ var admin = (function () {
     }
 
     self.saveSynonyms = function () {
-       var data= $("#synonymsTA").val();
+        var data = $("#synonymsTA").val();
         var ontology = $("#ontology").val();
         var thesaurusName = $("#indexName").val();
-        var path="./config/thesaurii/"+thesaurusName + "_" + ontology + ".syn";
+        var path = "./config/thesaurii/" + thesaurusName + "_" + ontology + ".syn";
         var payload = {
             saveFileContent: 1,
-            data:data,
+            data: data,
             path: path
         }
         $.ajax({

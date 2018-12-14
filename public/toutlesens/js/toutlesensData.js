@@ -53,6 +53,24 @@ var toutlesensData = (function () {
             + ", EXTRACT(rel IN relationships(path) | labels(startNode(rel))) as startLabels";
 
 
+        self.executeCypher = function (cypher,callback) {
+
+            var payload = {match: cypher};
+            $.ajax({
+                type: "POST",
+                url: self.neo4jProxyUrl,
+                data: payload,
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {
+                   callback(null,data)
+                }, error: function (err) {
+                    callback(err)
+
+                }
+            })
+        }
+
+
         self.executeNeoQuery = function (queryType, str, successFunction) {
 
             currentQueryType = queryType;
@@ -180,7 +198,7 @@ var toutlesensData = (function () {
                 whereStatement += self.whereFilter + " ";
             }
 
-            if(self.queryRelWhereFilter!=""){
+            if (self.queryRelWhereFilter != "") {
                 if (whereStatement == "")
                     whereStatement += " WHERE ";
                 else
@@ -225,8 +243,8 @@ var toutlesensData = (function () {
                 else {
                     if (options.hideNodesWithoutRelations)
                         relCardinalityStr = "*..1";
-                    if(options.hideNodesWithoutRelations || self.queryRelWhereFilter!="")
-                        relCardinalityStr=""
+                    if (options.hideNodesWithoutRelations || self.queryRelWhereFilter != "")
+                        relCardinalityStr = ""
                     else
                         relCardinalityStr = "*0..1";
 
@@ -302,7 +320,7 @@ var toutlesensData = (function () {
             toutlesensData.queryExcludeNodeFilters = "";
             toutlesensData.queryExcludeRelFilters = "";
             toutlesensData.matchStatement = ""
-            toutlesensData.queryRelWhereFilter=""
+            toutlesensData.queryRelWhereFilter = ""
 
             $("#searchMenu_cypherDiv").text(statement)
             var payload = {match: statement};
@@ -382,7 +400,7 @@ var toutlesensData = (function () {
                         }
                         if (resultArray && toutlesensData.cachedResultArray)
                             resultArray = $.merge(resultArray, toutlesensData.cachedResultArray);
-                        else if(toutlesensData.cachedResultArray)
+                        else if (toutlesensData.cachedResultArray)
                             resultArray = toutlesensData.cachedResultArray
 
                     }
@@ -1311,7 +1329,7 @@ var toutlesensData = (function () {
             if (whereStr && whereStr.length > 0 && whereStr.toUpperCase().indexOf("WHERE") < 0)
                 whereStr = " WHERE " + whereStr;
             str = "MATCH (n" + labelStr + ") " + whereStr + subGraphWhere + returnStr;
-$("#searchMenu_cypherDiv").text("MATCH (n" + labelStr + ") " + whereStr + subGraphWhere)
+            $("#searchMenu_cypherDiv").text("MATCH (n" + labelStr + ") " + whereStr + subGraphWhere)
 
             console.log(str);
             if (resultType == "matchStr" && callback) {
@@ -1456,20 +1474,20 @@ $("#searchMenu_cypherDiv").text("MATCH (n" + labelStr + ") " + whereStr + subGra
 
         }
 
-        self.neoNodeResultToColumnDataSet=function(json){
+        self.neoNodeResultToColumnDataSet = function (json) {
             var dataSet = [];
             var columns = [];
-            var excludedKeys=["subGraph"]
+            var excludedKeys = ["subGraph"]
             for (var i = 0; i < json.length; i++) {
                 for (var key in json[i].n.properties) {
-                    if (columns.indexOf(key) < 0 && excludedKeys.indexOf(key)<0)
+                    if (columns.indexOf(key) < 0 && excludedKeys.indexOf(key) < 0)
                         columns.push(key);
                 }
             }
 
-            var nameColIndex=columns.indexOf(Schema.getNameProperty());
-            columns.splice(0,0,columns[nameColIndex]);
-            columns.splice(nameColIndex+1,1);
+            var nameColIndex = columns.indexOf(Schema.getNameProperty());
+            columns.splice(0, 0, columns[nameColIndex]);
+            columns.splice(nameColIndex + 1, 1);
 
 
             for (var i = 0; i < json.length; i++) {
@@ -1486,8 +1504,7 @@ $("#searchMenu_cypherDiv").text("MATCH (n" + labelStr + ") " + whereStr + subGra
 
             }
             columns.push("neoId")
-            return {columns:columns,dataSet:dataSet}
-
+            return {columns: columns, dataSet: dataSet}
 
 
         }

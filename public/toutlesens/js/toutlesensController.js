@@ -153,8 +153,7 @@ var toutlesensController = (function () {
                 options.hideNodesWithoutRelations = true;
 
 
-
-            if(! options.relationDepth) {
+            if (!options.relationDepth) {
                 var relationDepth = $("#depth").val();
                 if (relationDepth === undefined)
                     options.relationDepth = Gparams.defaultQueryDepth;
@@ -700,7 +699,7 @@ var toutlesensController = (function () {
                 var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
                 if (collapseGraph)
                     options.clusterIntermediateNodes = true;
-                options.hideNodesWithoutRelations=true
+                options.hideNodesWithoutRelations = true
                 toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
                     toutlesensController.generateGraph(null, options, function (err, result) {
                         currentLabel = null;
@@ -711,15 +710,46 @@ var toutlesensController = (function () {
             }
 
 
-        else if (action == 'showRelClusterIntermediateNodes') {
+            else if (action == 'showRelClusterIntermediateNodes') {
+
+                var relationDepth = parseInt($("#searchDialog_pathDistanceInput").val());
+                var cypher = "match(n)-[r*1.." + relationDepth + "]-(m) where ID(n)=" + currentObject.fromNode.id + " AND ID(m)=" + currentObject.toNode.id + "return r";
+                var cypher = " match(n)-[]-(p)-[]-(m) where ID(n)=" + currentObject.fromNode.id + " AND ID(m)=" + currentObject.toNode.id + " return p";
 
 
-               // toutlesensData.matchStatement="match(n)-[r]-(m)" ;
-                toutlesensData.whereFilter="ID(n)="+currentObject.fromNode.id+" AND ID(m)="+currentObject.toNode.id;
-               var relationDepth= parseInt($("#searchDialog_pathDistanceInput").val());
-                toutlesensController.generateGraph(null, {addToPreviousQuery:true,relationDepth:relationDepth}, function (err, result) {
-                    currentLabel = null;
-                });
+                toutlesensData.executeCypher(cypher, function (err, result) {
+                    var newNodes = [];
+                    var newRelations = [];
+                    var fromId = currentObject.fromNode.id
+                    var toId = currentObject.toNode.id
+                    result.forEach(function (node) {
+                        newNodes.push({
+                           // x: 200,
+                           // y: 200,
+                            id: node.p._id,
+                            label: node.p.properties.name,
+                            color: nodeColors[node.p.labels[0]],
+                            data: node.p.properties
+
+                        });
+                        newRelations.push({
+                                from: fromId,
+                                to: node.p._id,
+                            },
+                            {
+                                from: toId,
+                                to: node.p._id,
+                            }
+                        )
+
+
+                    })
+                    visjsGraph.updateNodes(newNodes);
+                    visjsGraph.updateRelations(newRelations);
+                    visjsGraph.network.setOptions({
+                        physics: {enabled: true}
+                    });
+                })
 
             }
 
@@ -890,9 +920,8 @@ var toutlesensController = (function () {
                 // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
                 $("#dialog").load("htmlSnippets/dataTableDialog.html", function () {
                     $('#dialog').dialog("open");
-                    $('#dialog').dialog({ title:"Select table columns"});
+                    $('#dialog').dialog({title: "Select table columns"});
                     dataTableDialog.init(dataset)
-
 
 
                 })
@@ -997,10 +1026,10 @@ var toutlesensController = (function () {
                             var nodeId = params.nodes[0];
                             currentObject = visjsGraph.nodes._data[nodeId];
 
-                            $(".selectLabelDiv ").each(function(){
-                                var label=currentObject.name
-                               if($(this).html()==label)
-                                   advancedSearch.onChangeObjectName(label, this);
+                            $(".selectLabelDiv ").each(function () {
+                                var label = currentObject.name
+                                if ($(this).html() == label)
+                                    advancedSearch.onChangeObjectName(label, this);
                                 searchMenu.activatePanel("searchCriteriaDiv")
                             })
 

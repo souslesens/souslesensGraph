@@ -11,6 +11,7 @@
     <script src="./js/admin.js"></script>
     <script src="./js/users.js"></script>
     <script src="./js/searchUI.js"></script>
+    <script src="../common/js/socket.io.js"></script>
 
     <!--  <script src="js/async.js"></script>
     <link rel="stylesheet" type="text/css"
@@ -49,6 +50,10 @@
             width: 150px;
         }
 
+        #path{
+            width: 250px;
+        }
+
         #main {
             width: 100%;
             display: table
@@ -57,14 +62,19 @@
         #left {
             float: left;
             display: inline;
-            width: 20%;
+            width: 50%;
         }
 
         #right {
             float: left;
             display: inline;
-            width: 77%;
+            width:400px;
+            min-height: 300px;
+
             margin-left: 5px;
+            border: #0a6aa1;
+            border-width: 2px;
+            border-style: solid;
         }
 
         .accordionInnerDiv {
@@ -74,30 +84,14 @@
 
         }
 
-        .myDatatable td {
-            border-bottom-style: solid;
-            border-bottom-width: 1px;
-            border-bottom-color: #93aeca;
-            border-left-style: solid;
-            border-left-width: 1px;
-            border-left-color: #93aeca;
-            width: 100px !important;
+        #message{
 
-            height: 20px !important;
+           // width :400px;
+          //  height: 400px;
+            overflow: auto;
         }
 
-        .dataTables_wrapper {
-            margin: 5px;
-        }
 
-        .dt-buttons {
-            left: 200px;
-            position: relative;
-        }
-
-        .dataTables_paginate {
-            font-weight: bold;
-        }
 
         #messageDiv {
             font-style: italic;
@@ -192,15 +186,26 @@
         /*    $('#ChooseFilebutton').file().choose(function(e, input) {
                 alert(input.val()); //alerts the chosen filename.
             });*/
+            var url = window.location.href;
+            var p = url.indexOf('/search');
+            url = url.substring(0, p);
+            var socket = io.connect(url);
+            socket.on('connect', function (data) {
+                socket.emit('join', 'Hello World from client');
+            });
+            socket.on('messages', function (message) {
+                if (!message || message.length == 0)
+                    return;
+                if (typeof message == 'string') {
+                    color = "blue";
+                    if (message.toLowerCase().indexOf("error") > -1)
+                        color = "red";
 
-            var fileSelector = $('<input id="fileSelector" type="file">');
-            $('#ChooseFilebutton').click(function(){
-                fileSelector.click();
-                return false;
-            });
-            $("#fileSelector").on('change', function () {
-                alert(this.files);
-            });
+                    admin.setMessage(message, color)
+
+
+                }
+            })
 
         })
 
@@ -221,41 +226,53 @@
                 <table align="center">
                     <tr>
                         <td>
-                            indexName
+                            indexName (lower case only)
                         </td>
 
                         <td>
-                            <input id="indexName" value="">
+                            <input id="indexName" value="" size="30">
                         </td>
                     </tr>
                     <tr>
                     <td>
-                        rootDir
+                        path
                     </td>
                     <td>
-                        <input id="rootDir">
+                        <input id="path" >
                     </td>
                     </tr>
                     <tr>
                     <td>
-                        type
+                        index type
                     </td>
                     <td>
 
-                        <input id="mappingsType" value="officeDocument">
+                        <select id="indexType" >
+                            <option> </option>
+                            <option value="indexDocDir">documents directory</option>
+
+                            <option value="indexCsvFile">csv file</option>
+                            <option value="indexJsonFile">json file</option>
+
+                        </select>
                     </td>
                     <tr align="center">
                         <td colspan="2">
                             <br><br>
-                            <button onclick="admin.elasticExec('indexDocDirInNewIndex')">indexDocDirInNewIndex</button>
+                            <button onclick="admin.elasticExec(null,true)">Index in wew Index</button>(delete old data)
+                            <br>
+                            <button onclick="admin.elasticExec()">Add to existing index</button>
 
-                            <button onclick="admin.elasticExec('indexDirInExistingIndex')">indexDirInExistingIndex</button>
+
+
+
+
                         </td>
                     </tr>
                 </table>
 
             </div>
-            <h1>Index CSV</h1>
+        <!--    <h1>Index CSV</h1>
             <div id="MagasinsDiv" class="accordionInnerDiv">
 
 
@@ -272,18 +289,14 @@
             <div id="statsDiv" class="accordionInnerDiv">
 
 
-            </div>
+            </div>-->
 
         </div>
 
     </div>
 
     <div id="right">
-        <!--   <button id="showHideLeftPanelButton"><< >></button>-->
-        <div id="listRecordsDiv" class="dataTableDiv">
-
-
-        </div>
+      <div id="message"></div>
     </div>
 
 </div>
