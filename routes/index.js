@@ -9,7 +9,7 @@ var neo2Elastic= require('../bin/neo2Elastic..js');
 var httpProxy = require('../bin/httpProxy.js');
 var fileUpload = require('../bin/fileUpload.js');
 var jsonFileStorage = require('../bin/jsonFileStorage.js');
-var exportMongoToNeo = require('../bin/exportMongoToNeo.js');
+var importDataIntoNeo4j = require('../bin/importDataIntoNeo4j.js');
 var exportToNeoBatch = require('../bin/exportToNeoBatch.js');
 var uploadToNeo = require('../bin/uploadToNeo.js');
 var uploadCsvForNeo = require('../bin/uploadCsvForNeo.js');
@@ -65,13 +65,13 @@ router.post(serverParams.routesRootUrl + '/neo', function (req, response) {
 
 });
 
-router.post(serverParams.routesRootUrl + '/mongo', function (req, response) {
+router.post(serverParams.routesRootUrl + '/source', function (req, response) {
     if (req.body && req.body.find)
-        mongoProxy.find(req.body.dbName, req.body.collectionName, req.body.mongoQuery, function (error, result) {
+        mongoProxy.find(req.body.dbName, req.body.collectionName, req.body.sourceQuery, function (error, result) {
             processResponse(response, error, result)
         });
     if (req.body && req.body.distinct)
-        mongoProxy.distinct(req.body.dbName, req.body.collectionName, req.body.field, req.body.mongoQuery, function (error, result) {
+        mongoProxy.distinct(req.body.dbName, req.body.collectionName, req.body.field, req.body.sourceQuery, function (error, result) {
             processResponse(response, error, result)
         });
     if (req.body && req.body.insert)
@@ -184,8 +184,8 @@ router.post(serverParams.routesRootUrl + '/elastic', function (req, response) {
         skos.saveSkosClassifier(req.body.indexName, function (error, result) {
             processResponse(response, error, result)
         });
-    else if (req.body && req.body.indexMongoCollection)
-        elasticProxy.indexMongoCollection(req.body.mongoDB, req.body.mongoCollection, req.body.mongoQuery, req.body.elasticIndex, req.body.elasticType, function (error, result) {
+    else if (req.body && req.body.indexsourceCollection)
+        elasticProxy.indexsourceCollection(req.body.sourceDB, req.body.sourceCollection, req.body.sourceQuery, req.body.elasticIndex, req.body.elasticType, function (error, result) {
             processResponse(response, error, result)
         });
     else if (req.body && req.body.deleteDoc)
@@ -243,26 +243,26 @@ router.post(serverParams.routesRootUrl + '/elasticIndexJson', function (req, res
     });
 });
 
-router.post(serverParams.routesRootUrl + '/exportMongoToNeo', function (req, response) {
-    exportMongoToNeo.clearVars();
+router.post(serverParams.routesRootUrl + '/importDataIntoNeo4j', function (req, response) {
+    importDataIntoNeo4j.clearVars();
     if (req.body.type == "batch")
         exportToNeoBatch.exportBatch(req.body.sourceType, req.body.dbName, req.body.subGraph, JSON.parse(req.body.data), null, function (error, result) {
             processResponse(response, error, result)
         });
     if (req.body.type == "node")
-        exportMongoToNeo.exportNodes(JSON.parse(req.body.data), function (error, result) {
+        importDataIntoNeo4j.importNodes(JSON.parse(req.body.data), function (error, result) {
             processResponse(response, error, result)
         });
     if (req.body.type == "relation")
-        exportMongoToNeo.exportRelations(JSON.parse(req.body.data), function (error, result) {
+        importDataIntoNeo4j.importRelations(JSON.parse(req.body.data), function (error, result) {
             processResponse(response, error, result)
         });
     if (req.body.type == "copyNodes")
-        exportMongoToNeo.copyNodes(JSON.parse(req.body.data), function (error, result) {
+        importDataIntoNeo4j.copyNodes(JSON.parse(req.body.data), function (error, result) {
             processResponse(response, error, result)
         });
     if (req.body.type == "copyRelations")
-        exportMongoToNeo.copyRelations(JSON.parse(req.body.data), function (error, result) {
+        importDataIntoNeo4j.copyRelations(JSON.parse(req.body.data), function (error, result) {
             processResponse(response, error, result)
         });
 
@@ -376,6 +376,12 @@ router.post(serverParams.routesRootUrl + '/uploadCsvForNeo', function (req, resp
     });
 
 });
+router.post(serverParams.routesRootUrl + '/loadLocalCsvForNeo', function (req, response) {
+    uploadCsvForNeo.loadLocal(req.body.filePath,req.body.subGraph, function (error, result) {
+        processResponse(response, error, result)
+    });
+
+});
 
 
 router.post(serverParams.routesRootUrl + '/rest', function (req, response) {
@@ -384,8 +390,8 @@ router.post(serverParams.routesRootUrl + '/rest', function (req, response) {
             processResponse(response, error, result)
         });
     }
-    else if (req.query && req.query.updateNeoFromMongo) {
-        restAPI.updateNeoFromMongo(req.body, function (error, result) {
+    else if (req.query && req.query.updateNeoFromsource) {
+        restAPI.updateNeoFromsource(req.body, function (error, result) {
             processResponse(response, error, result)
         });
     }
@@ -446,8 +452,8 @@ router.get(serverParams.routesRootUrl + '/rest', function (req, response) {
             processResponse(response, error, result)
         });
     }
-    if (req.query && req.query.desc_updateNeoFromMongo) {
-        restAPI.desc_updateNeoFromMongo(function (error, result) {
+    if (req.query && req.query.desc_updateNeoFromsource) {
+        restAPI.desc_updateNeoFromsource(function (error, result) {
             processResponse(response, error, result)
         });
     }

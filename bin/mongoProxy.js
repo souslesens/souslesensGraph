@@ -25,7 +25,7 @@
  *
  ******************************************************************************/
 
-var MongoClient = require('mongodb').MongoClient;
+var mongoClient = require('mongodb').mongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var async = require('async');
 var serverParams = require("./serverParams.js");
@@ -43,7 +43,7 @@ function getDb(dbName, callback) {
     var url = urlBase + dbName;
   //  console.log("!!!!!!getDb "+url);
   //  console.trace();
-    MongoClient.connect(url, function (err, db) {
+    mongoClient.connect(url, function (err, db) {
         if (err) {
             callback(err);
         } else {
@@ -53,9 +53,9 @@ function getDb(dbName, callback) {
     })
 
 }
-var MongoProxy = {
+var mongoProxy = {
     pagedFind: function (startIndex, pageSize, dbName, collectionName, query, fields, _callback) {
-        Util.prepareJsonForMongo(query);
+        Util.prepareJsonFormongo(query);
         var callback = _callback;
         try {
             getDb(dbName, function (err, db, callbackDB) {
@@ -94,7 +94,7 @@ var MongoProxy = {
                 callback(e);
             }
         }
-   Util.prepareJsonForMongo(query);
+   Util.prepareJsonFormongo(query);
 
 
         try {
@@ -160,7 +160,7 @@ var MongoProxy = {
 
     ,
     insertOne: function (dbName, collectionName, data, _callback) {
-        Util.prepareJsonForMongo(data);
+        Util.prepareJsonFormongo(data);
         var callback = _callback;
         try {
             getDb(dbName, function (err, db, callbackDB) {
@@ -168,7 +168,7 @@ var MongoProxy = {
                     callbackDB(err, null);
                 }
                 var collection = db.collection(collectionName);
-                Util.prepareJsonForMongo(data);
+                Util.prepareJsonFormongo(data);
 
                 collection.insertOne(data, function (err, response) {
                     if (err) {
@@ -217,7 +217,7 @@ var MongoProxy = {
                 }
                 // Execute the forEach method, triggers for each entry in the array
                 data.forEach(function (obj) {
-                    Util.prepareJsonForMongo(obj);
+                    Util.prepareJsonFormongo(obj);
 
 
                     bulk.insert(obj);
@@ -267,13 +267,13 @@ var MongoProxy = {
                 var results = [];
                 for (var i = 0; i < data.length; i++) {
                     var dataObj = data[i];// JSON.parse(data[i]);
-                    Util.prepareJsonForMongo(dataObj);
+                    Util.prepareJsonFormongo(dataObj);
                     if (!query || query.length == 0) {
                         collection.insertOne(dataObj,callback);
 
                     } else {
                         var aquery = query[i];//JSON.parse(query[i]);
-                        Util.prepareJsonForMongo(aquery);
+                        Util.prepareJsonFormongo(aquery);
 
                         var update = {$set: dataObj};
                         collection.update(aquery, update, {upsert: true, multi: true}, function (err, result) {
@@ -296,7 +296,7 @@ var MongoProxy = {
 
     ,
     delete: function (dbName, collectionName, query, _callback) {
-        Util.prepareJsonForMongo(query);
+        Util.prepareJsonFormongo(query);
         var callback = _callback;
         var url = urlBase + dbName;
         try {
@@ -423,14 +423,14 @@ var MongoProxy = {
     }
     ,
     test: function () {
-        MongoProxy.insert("chaudron", "jfm", [{a: 1}, {b: 2}], function (err, docs) {
+        mongoProxy.insert("chaudron", "jfm", [{a: 1}, {b: 2}], function (err, docs) {
             if (err)
                 return err;
             console.log(docs);
             return {data: docs}
         });
 
-        MongoProxy.find("chaudron", "jfm", {}, function (err, docs) {
+        mongoProxy.find("chaudron", "jfm", {}, function (err, docs) {
             if (err)
                 return err;
             console.log(docs);
@@ -442,4 +442,4 @@ var MongoProxy = {
 }
 
 
-module.exports = MongoProxy;
+module.exports = mongoProxy;

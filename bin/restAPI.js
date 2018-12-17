@@ -30,7 +30,7 @@ var csv = require('csvtojson');
 var mongoProxy = require("./mongoProxy")
 var serverParams = require("./serverParams.js");
 var exportToNeoBatch = require("./exportToNeoBatch.js");
-var exportMongoToNeo = require("./exportMongoToNeo.js");
+var importDataIntoNeo4j = require("./importDataIntoNeo4j.js");
 
 
 var sourceType;
@@ -42,7 +42,7 @@ var csvData;
 /*
  {
  "type": "batch",
- "sourceType": "MongoDB",
+ "sourceType": "sourceDB",
  "subGraph": "POTXXX",
  "data": "[\"Nodes_Fabrice.cat_category\",\"Nodes_Fabrice.scenario_name\",\"Nodes_POT.BC\",\"Nodes_POT.BD\",\"Nodes_POT.BU\",\"Nodes_POT.DC\",\"Nodes_POT.Scenarii\",\"Nodes_POT.allScenarii\",\"Nodes_POT.buildingBlock\",\"Nodes_POT.layer\",\"Nodes_POT.scenario\",\"Nodes_POT.technology\",\"Nodes_POT.useCase\",\"Nodes_POT5.technology\",\"Nodes_POT5.useCase\",\"Nodes_geneve.UC_name\",\"Nodes_geneve.techno_name\"]",
  "dbName": "POT2017"
@@ -54,7 +54,7 @@ var restAPI = {
         var params = {
 
             fileName: " not needed if mappings is present. Name of the original file else ignored: used to find recorded mappings (MUST end with .csv)",
-            mappings: "JSON of mappings between csv or mongo and Neo4j: this json can be generated with exportMappings request. if present and not empty fileName is not needed",
+            mappings: "JSON of mappings between csv or source and Neo4j: this json can be generated with exportMappings request. if present and not empty fileName is not needed",
             csvData: "the CSV content URIencoded",
             subGraph: "name of the subGraph : can be different from the recorded one",
 
@@ -67,9 +67,9 @@ var restAPI = {
 
 
     },
-    desc_updateNeoFromMongo: function (callback) {
+    desc_updateNeoFromsource: function (callback) {
         var params = {
-            dbName: "if sourceType mongoDB, name of MongoDB database else ignored",
+            dbName: "if sourceType sourceDB, name of sourceDB database else ignored",
             subGraph: "name of the subGraph : can be different from the recorded one",
 
 
@@ -151,7 +151,7 @@ var restAPI = {
 
 
     },
-    updateNeoFromMongo: function (params, callback) {
+    updateNeoFromsource: function (params, callback) {
 
         dbName = params.dbName;
         subGraph = params.subGraph;
@@ -466,7 +466,7 @@ function getNeoKeyValuePairs(obj, sep, prefix) {
 
 var execNeoUpdate = function (sourceType, dbName, subGraph, nodeLabels, relTypes, mappings, Xcallback) {
     //5  delete oldGraph
-    exportMongoToNeo.clearVars();
+    importDataIntoNeo4j.clearVars();
     var match = 'MATCH (n)-[r]-(m) where n.subGraph="' + subGraph + '" delete  r';
     neoProxy.match(match, function (err, result) {
         match = 'MATCH (n)where n.subGraph="' + subGraph + '" delete n';

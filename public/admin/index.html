@@ -45,7 +45,7 @@
     <script src="js/socket.io.js"></script>
 
 
-    <!-- script src="js/adminMongo.js"></script> -->
+    <!-- script src="js/adminsource.js"></script> -->
     <script src="js/admin.js"></script>
     <script src=js/graphD3.js></script>
     <script src=js/params.js></script>
@@ -61,6 +61,7 @@
     <script src="../toutlesens/js/schema.js"></script>
     <link rel="stylesheet" type="text/css" href="js/visjs/vis-network.min.css.js"/>
     <script src="js/admin2.js"></script>
+    <script src="js/requests.js"></script>
 
 
     <script src="../common/js/neo4jDataModel.js"></script>
@@ -139,6 +140,16 @@
         #tabs-center select {
             width: 450px;
         }
+        .dataSourceDiv{
+            display: none;
+            width: 200px;
+
+        }
+        .dataSourceDiv{
+
+            width: 200px;
+
+        }
 
         #labelsDiv0000 {
             width: 250px;
@@ -167,7 +178,7 @@
             width: 400px;
         }
 
-        #importMongoDiv, #importCSVdiv, .dbInfos {
+        #importsourceDiv, #importCSVdiv, .dbInfos {
             visibility: hidden;
         }
 
@@ -176,6 +187,7 @@
             background-color: #CCCCCC;
             opacity: 0.9;
             color: black;
+            width: 250px;
 
         }
 
@@ -204,6 +216,7 @@
         .jsTree {
             overflow: auto;
         }
+
 
     </style>
 
@@ -338,7 +351,10 @@
 
     <div id="accordionPanel" style="position: absolute">
         <div id="accordion">
-
+            <h3>Neo4j</h3>
+            <div>
+                <div id="neoDbDiv" style="height:450px"></div>
+            </div>
             <h3>
                 Data source
             </h3>
@@ -355,8 +371,9 @@
                                 <hr>
                                 Import type <br><select id="importSourceType" onchange="setImportSourceType()">
                                     <option selected="selected"></option>
-                                    <option>MongoDB</option>
-                                    <option>CSV</option>
+                                    <option>sourceDB</option>
+                                    <option>uploadCSV</option>
+                                    <option>localCSV</option>
                                 </select>
                             </td>
                         </tr>
@@ -364,7 +381,7 @@
                         <tr class="source" align="center">
                             <td>
 
-                                <div id="importCSVdiv">
+                                <div id="uploadCSVdiv"  class="dataSourceDiv">
                                     ImportCSV<br>
                                     <form name="uploadCsvForm" enctype="multipart/form-data" action="/uploadCsvForNeo"
                                           method="post"
@@ -374,6 +391,40 @@
                                         <!--   <input type="submit" value="upload" name="submit" class='exportNeo'/>  voir script $function-->
                                     </form>
                                 </div>
+
+                                <div id="localCSVdiv"  class="dataSourceDiv">
+                                   CSV path<input id="localCSVpath" size="40">
+                                    <br>
+                                    <button onclick="admin.loadLocalCSV()"> load</button>
+<br>
+                                    <select id="localCSVSelect" onclick="requests.loadFields($(this).val())" size="6">
+
+                                    </select>
+                                </div>
+
+
+                                <div id="sourceSourceDiv"  class="dataSourceDiv">>
+                                    Source<br>
+                                    <select id="dbSelect" onchange="onDBselect()">
+                                        <option>-------------</option>
+
+
+                                    </select>
+
+                                    <br>
+                                    <div class="dbInfos">
+                                        collections<br>
+                                        <select size="5" id="collSelect"
+                                                onchange='onCollSelect()'>
+                                            <option>-------------</option>
+                                        </select>
+
+
+                                        <br> <input id="currentField">
+                                    </div>
+                                </div>
+
+
                             </td>
 
                         </tr>
@@ -382,24 +433,6 @@
                         <tr class="source" align="center">
                             <td>
 
-                                Source<br>
-                                <select id="dbSelect" onchange="onDBselect()">
-                                    <option>-------------</option>
-
-
-                                </select>
-
-                                <br>
-                                <div class="dbInfos">
-                                    collections<br>
-                                    <select size="5" id="collSelect"
-                                            onchange='onCollSelect()'>
-                                        <option>-------------</option>
-                                    </select>
-
-
-                                    <br> <input id="currentField">
-                                </div>
                             </td>
 
                         </tr>
@@ -411,10 +444,7 @@
                 </div>
 
             </div>
-            <h3>Neo4j</h3>
-            <div>
-                <div id="neoDbDiv" style="height:450px"></div>
-            </div>
+
             <h3>ImportNodes</h3>
             <div>
                 <div id="importNodesDiv" style="height:450px"></div>

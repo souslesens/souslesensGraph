@@ -81,7 +81,7 @@ var Gparams = {
     neo4jProxyUrl: serverRootUrl+"/neo",
     rdfProxyUrl: serverRootUrl+"/rdf",
     restProxyUrl: serverRootUrl+"/rest",
-    mongoProxyUrl: serverRootUrl+"/mongo",
+    mongoProxyUrl: serverRootUrl+"/source",
     uploadToNeo: serverRootUrl+"/uploadToNeo",
     storedParamsUrl: serverRootUrl+"/storedParams",
     imagesRootPath: serverRootUrl+"/files/albumPhotos/",

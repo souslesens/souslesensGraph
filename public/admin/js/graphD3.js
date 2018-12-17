@@ -1085,7 +1085,7 @@ function setRadarLabel(label, className) {
 function savelabelCoordinates(d) {
 
 
-    query = "action=updateOrCreateMongoObj";
+    query = "action=updateOrCreatesourceObj";
 
     var data = {
 
@@ -1108,8 +1108,8 @@ function savelabelCoordinates(d) {
         })
 
     };
-    //submitMongo(query, data);
-    callMongo("", data, function (data) {
+    //submitsource(query, data);
+    callsource("", data, function (data) {
     });
 
 
@@ -1121,13 +1121,13 @@ function loadLabelsCoordinates(subGraph, labelsMap, callback) {
         find: 1,
         dbName: "graphAdmin",
         collectionName: "labelsCoordinates",
-        mongoQuery: JSON.stringify({
+        sourceQuery: JSON.stringify({
             subGraph: subGraph,
         })
 
     };
-    //callMongo(query, data, function(d){
-    callMongo("", data, function (data) {
+    //callsource(query, data, function(d){
+    callsource("", data, function (data) {
         for (var i = 0; i < data.length; i++) {
             var objCoords = data[i];
             var objLabel = labelsMap[objCoords.label];

@@ -534,8 +534,8 @@ var searchUI = (function () {
                     html += doc.content.replace(/[\n\r]/g, "<br>");
 
                     /*    mode = data.mode[doc.type];
-                        if (mode && mode.source == "MongoDB") {
-                            var str = "<button onclick=searchUI.editMongoForm('" + doc.mongoId + "','" + doc._id + "')>Edit</button>"
+                        if (mode && mode.source == "sourceDB") {
+                            var str = "<button onclick=searchUI.editsourceForm('" + doc.sourceId + "','" + doc._id + "')>Edit</button>"
                             $("#dialogLeftDiv").append(str);
                             $("#dialogLeftDiv").css("visibility", "visible");
                         }*/
@@ -599,7 +599,7 @@ var searchUI = (function () {
 
     }
 
-    self.editMongoContent = function (id) {
+    self.editsourceContent = function (id) {
         $("#dialogContentDiv").html(html);
         $("#dialog").css("visibility", "visible");
     }
@@ -730,13 +730,13 @@ var searchUI = (function () {
 
     }
 
-    self.editMongoForm = function (mongoId, elasticId) {
+    self.editsourceForm = function (sourceId, elasticId) {
         var url = "./form.html";
         $("#dialogLeftDiv").css("visibility", "hidden");
 
         $("#dialogContentDiv").load(url, function () {
 
-            loadFormDataFromMongo(mode.dbName, mode.collectionName, mongoId, elasticId)
+            loadFormDataFromsource(mode.dbName, mode.collectionName, sourceId, elasticId)
 
         })
     }
@@ -747,7 +747,7 @@ var searchUI = (function () {
         $("#dialog").css("visibility", "hidden")
     }
 
-    self.showMongoForm = function () {
+    self.showsourceForm = function () {
         var url = "./form.html";
         $("#dialogLeftDiv").css("visibility", "hidden");
         $("#dialogContentDiv").load(url, function () {

@@ -28,7 +28,7 @@ var fs = require('fs');
 var ObjectID = require('mongodb').ObjectID;
 Util = {
 
-    prepareJsonForMongo: function (obj) {
+    prepareJsonForsource: function (obj) {
         /*  if (!(typeof obj === "object"))
          obj = JSON.parse(obj);*/
 

@@ -29,10 +29,10 @@ var Gparams = {
 
     httpProxyUrl: serverRootUrl+"/http",
     neo4jProxyUrl: serverRootUrl+"/neo",
-    exportMongoToNeo: serverRootUrl+"/exportMongoToNeo",
+    importDataIntoNeo4j: serverRootUrl+"/importDataIntoNeo4j",
     rdfProxyUrl: serverRootUrl+"/rdf",
     restProxyUrl: serverRootUrl+"/rest",
-    mongoProxyUrl: serverRootUrl+"/mongo",
+    mongoProxyUrl: serverRootUrl+"/source",
     uploadToNeo: serverRootUrl+"/uploadToNeo",
     storedParamsUrl: serverRootUrl+"/storedParams",
     imagesRootPath: serverRootUrl+"/files/albumPhotos/",

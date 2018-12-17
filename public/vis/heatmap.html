@@ -32,7 +32,7 @@
              find: 1,
              dbName: "requirements",
              collectionName: "similarities",
-             mongoQuery: {startDomain: "STR"}
+             sourceQuery: {startDomain: "STR"}
              };*/
             var where="";
             var domain=$("#domainSelect").val()
@@ -180,7 +180,7 @@ www=value;
              find: 1,
              dbName: "requirements",
              collectionName: "import",
-             mongoQuery: query
+             sourceQuery: query
              };*/
             var payload = {
                 match: "MATCH (n:rule) where n._id IN " + JSON.stringify(rules) + " return n"

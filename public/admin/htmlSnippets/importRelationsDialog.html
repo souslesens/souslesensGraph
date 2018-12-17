@@ -1,5 +1,5 @@
 <div id="export2NeoLinks">
-    <input type="hidden" name="linkInput" id="mongoCollectionRel">
+    <input type="hidden" name="linkInput" id="sourceCollectionRel">
     <table>
 
         <tr class="source0">
@@ -11,13 +11,13 @@
         <tr>
             <td align="right"> ID column</td>
             <td>
-                <select id="mongoSourceField"></select></td>
+                <select id="sourceSourceField"></select></td>
         </tr>
 
 
         <tr>
             <td align="right">Neo Label</td>
-            <td><select  onchange="admin.setNeoKey(this,neoSourceKey,mongoSourceField)"  id="neoSourceLabel" ></select>
+            <td><select  onchange="admin.setNeoKey(this,neoSourceKey,sourceSourceField)"  id="neoSourceLabel" ></select>
 
             </td>
         </tr>
@@ -37,14 +37,14 @@
             <td align="right"> ID column</td>
             <td>
 
-                <select   id="mongoTargetField"></select></td>
+                <select   id="sourceTargetField"></select></td>
 
 
         </tr>
 
         <tr>
             <td align="right">Neo Label</td>
-            <td><select  onchange="admin.setNeoKey(this,neoTargetKey,mongoTargetField)" id="neoTargetLabel"></select>
+            <td><select  onchange="admin.setNeoKey(this,neoTargetKey,sourceTargetField)" id="neoTargetLabel"></select>
 
             </td>
 
@@ -81,7 +81,7 @@
 
         <tr>
             <td align="right">Query</td>
-            <td><input name="linkInput" id="mongoQueryR" value="{}"></td>
+            <td><input name="linkInput" id="sourceQueryR" value="{}"></td>
 
 
         </tr>

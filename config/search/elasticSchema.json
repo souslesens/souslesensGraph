@@ -578,7 +578,7 @@
             "title": {
               "type": "text"
             },
-            "mongodId": {
+            "sourcedId": {
               "type": "keyword"
             },
             "content": {

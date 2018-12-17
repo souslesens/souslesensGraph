@@ -28,7 +28,7 @@ var mongoProxy = require("./mongoProxy.js");
 var httpProxy = require("./httpProxy.js");
 var neoProxy = require("./neoProxy.js");
 var socket = require('../routes/socket.js');
-var exportMongoToNeo = require('./exportMongoToNeo.js');
+var importDataIntoNeo4j = require('./importDataIntoNeo4j.js');
 var async = require('async');
 var fs = require("fs");
 var serverParams = require("./serverParams.js");
@@ -42,7 +42,7 @@ var exportToNeoBatch = {
     exportBatch: function (sourceType, dbName, subGraph, requestNames,mappings, callbackG) {
         var globalMessage = [];
         var requestsToExecute = [];
-        if (sourceType == "CSV") {
+        if (sourceType.indexOf("CSV")>-1) {
             var requestData;
             if(mappings)
                 requestData=mappings;
@@ -60,7 +60,7 @@ var exportToNeoBatch = {
             }
             execSynchRequests(requestsToExecute, dbName, subGraph, callbackG);
         }
-        else {// MongoDB
+        else {// sourceDB
             mongoProxy.find(dbName, "requests", {}, function (err, data) {
                 for (var i = 0; i < data.length; i++) {
                     if (requestNames.indexOf(data[i].name) > -1) {
@@ -92,14 +92,14 @@ var exportToNeoBatch = {
                     else {
                         requestObj = request.request;
                     }
-                    requestObj.mongoDB = dbName;
+                    requestObj.sourceDB = dbName;
                     if (subGraph)
                         requestObj.subGraph = subGraph;
                     //  requestObj={params:requestObj};
 
                     if (request.name.indexOf("Nodes_") == 0) {
-                        requestObj.mongoCollection = requestObj.mongoCollectionNode;
-                        exportMongoToNeo.exportNodes(requestObj, function (err, result) {
+                        requestObj.sourceCollection = requestObj.sourceCollectionNode;
+                        importDataIntoNeo4j.exportNodes(requestObj, function (err, result) {
                             if (err) {
                                 console.log(err);
                                 callback(err);
@@ -114,8 +114,8 @@ var exportToNeoBatch = {
                     }
                     else if (request.name.indexOf("Rels_") == 0) {
                         console.log("--importing--" + requestObj.name);
-                        requestObj.mongoCollection = requestObj.mongoCollectionRel;
-                        exportMongoToNeo.exportRelations(requestObj, function (err, result) {
+                        requestObj.sourceCollection = requestObj.sourceCollectionRel;
+                        importDataIntoNeo4j.exportRelations(requestObj, function (err, result) {
                             if (err) {
                                 console.log(err);
                                 globalMessage.push(err);

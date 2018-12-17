@@ -1,16 +1,16 @@
 <div id="export2NeoNodes">
-    <input type="hidden" name="nodeInput" id="mongoIdField" value="">
-    <input type="hidden" name="nodeInput" id="mongoCollectionNode">
+    <input type="hidden" name="nodeInput" id="sourceIdField" value="">
+    <input type="hidden" name="nodeInput" id="sourceCollectionNode">
 
     <table>
 
         <tr>
             <td align="right">Node name field</td>
             <td>
-                <button class="source" onclick="setMongoField()">Set</button>
-                <input disabled="disabled" name="nodeInput" id="mongoField"></td>
+                <button class="source" onclick="setsourceField()">Set</button>
+                <input disabled="disabled" name="nodeInput" id="sourceField"></td>
             <td>
-                <button onclick="showHelp('mongoField')">?</button>
+                <button onclick="showHelp('sourceField')">?</button>
             </td>
 
         </tr>
@@ -18,10 +18,10 @@
         <tr>
             <td align="right">Node key field</td>
             <td>
-                <button class="source" onclick="setMongoKey()">Set</button>
-                <input disabled="disabled" name="nodeInput" id="mongoKey"></td>
+                <button class="source" onclick="setsourceKey()">Set</button>
+                <input disabled="disabled" name="nodeInput" id="sourceKey"></td>
             <td>
-                <button onclick="showHelp('mongoKey')">?</button>
+                <button onclick="showHelp('sourceKey')">?</button>
             </td>
 
         </tr>
@@ -57,9 +57,9 @@
         </tr>
         <tr class="source0">
             <td align="right">Query</td>
-            <td><input name="nodeInput" id="mongoQuery" value="{}"></td>
+            <td><input name="nodeInput" id="sourceQuery" value="{}"></td>
             <td>
-                <button onclick="showHelp('mongoQuery')">?</button>
+                <button onclick="showHelp('sourceQuery')">?</button>
             </td>
         </tr>
 

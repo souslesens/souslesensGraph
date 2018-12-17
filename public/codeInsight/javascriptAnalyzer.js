@@ -270,20 +270,20 @@ function saveSyntax(syntax){
 	for(var key in syntax.functionDefs){
 	var data=syntax.functionDefs[key];
 	var jsonData={
-			mongoDB:"CFappsModels",
+			sourceDB:"CFappsModels",
 			collection:"souslesens",
 			json:data
 	}
 	
 	
-	submitMongo("action=saveData", jsonData, function(result){
+	submitsource("action=saveData", jsonData, function(result){
 		console.log("done");
 	})
 	}
 	
 }
 
-function submitMongo(query, data, callback) {
+function submitsource(query, data, callback) {
 
 	// if(confirm("execute request ?"))
 	jsonData = JSON.stringify(data);

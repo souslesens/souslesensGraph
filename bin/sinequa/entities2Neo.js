@@ -1,7 +1,7 @@
 /**
  * Created by claud on 21/02/2017.
  */
-var exportMongoToNeoBatch = require('../exportMongoToNeo');
+var importDataIntoNeo4jBatch = require('../importDataIntoNeo4j');
 var fs = require('fs');
 var path = require('path');
 var neoImportObjects = require('../neoImportObjects.js');
@@ -110,7 +110,7 @@ function writeNodesToNeo(newObjs, sourceLabel,targetLabel, relType, subGraph) {
     neoImportObjects.writeNodesToNeoNodes( nodesArray, function (result) {
         var nodeMappings = result;;
         for(var i=0;i<result.length;i++){
-            existingNodes.push(result[i].mongoId);
+            existingNodes.push(result[i].sourceId);
         }
 
         var params = {

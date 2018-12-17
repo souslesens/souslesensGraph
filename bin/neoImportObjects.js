@@ -72,7 +72,7 @@ var neoImportObjects = {
                 var id = obj.data[0].row[1];
                 var nodeMapping = {};
                 nodeMapping.neoId = id;
-                nodeMapping.mongoId = objs[i].id;
+                nodeMapping.sourceId = objs[i].id;
                 nodeMapping.label = label;
                 nodeMappings.push(nodeMapping);
             }
@@ -97,7 +97,7 @@ var neoImportObjects = {
         var totalImported=0;
        var nodeMappings={};
         for (var i = 0; i < nodeMappingArray.length; i++) {
-            nodeMappings["_"+nodeMappingArray[i].mongoId]=  nodeMappingArray[i].neoId
+            nodeMappings["_"+nodeMappingArray[i].sourceId]=  nodeMappingArray[i].neoId
         }
         for (var i = 0; i < data.length; i++) {
 

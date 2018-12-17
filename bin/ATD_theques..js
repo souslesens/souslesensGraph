@@ -89,7 +89,7 @@ var ATD_theques = {
                         if (description.type == "mySQL") {
                             elasticProxy.indexSqlTable(description.connOptions, description.sqlQuery, index, index, callbackAfterIndexation);
                         }
-                        else if (description.type == "mongoDB") {
+                        else if (description.type == "sourceDB") {
 
                         }
                         else if (description.type == "webPage") {

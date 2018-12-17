@@ -348,7 +348,7 @@ var dataModel = (function () {
         drawNeoModel(subGraph);
     }
 
-    self.callMongo = function (urlSuffix, payload, callback) {
+    self.callsource = function (urlSuffix, payload, callback) {
         if (!urlSuffix)
             urlSuffix = "";
         $.ajax({

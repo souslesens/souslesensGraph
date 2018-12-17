@@ -37,7 +37,7 @@ function searchParent(){
     var value=$("#word").val();
     var regEx=new RegExp(value,"i");
     var query={ parent: { $regex: value}};
-    callMongo(query,function(result){
+    callsource(query,function(result){
         fillSelectOptionsWithStringArray(parentSelect,result);
 
     })
@@ -48,7 +48,7 @@ function searchParent(){
 function searchChild(){
     var value=$("#parentSelect").val();
     var query={ child: value};
-    callMongo(query,function(result){
+    callsource(query,function(result){
         fillSelectOptionsWithStringArray(childSelect,result);
 
 
@@ -62,16 +62,16 @@ function setAsParent(){
     searchChild();
 }
 
-function callMongo(query,callback){
+function callsource(query,callback){
     var payload= {
         distinct: 1,
         field:"parent",
         dbName: "wikipedia",
         collectionName: "wiki_taxonomy",
-        mongoQuery: query
+        sourceQuery: query
     }
     $.ajax({
-        url: "../mongo",
+        url: "../source",
         type: "post",
         data: payload,
         dataType: "json",

@@ -1,6 +1,6 @@
 <div id="export2NeoNodes">
-    <input type="hidden" name="nodeInput" id="mongoIdField" value="">
-    <input type="hidden" name="nodeInput" id="mongoCollectionNode">
+    <input type="hidden" name="nodeInput" id="sourceIdField" value="">
+    <input type="hidden" name="nodeInput" id="sourceCollectionNode">
 
     <table>
 
@@ -8,14 +8,14 @@
             <td align="right">name  property</td>
             <td>
 
-                <select   id="mongoField" onchange="$('#mongoKey').val($(this).val())"></td>
+                <select   id="sourceField" onchange="$('#sourceKey').val($(this).val())"></td>
 
         </tr>
 
         <tr>
             <td align="right">id property</td>
             <td>
-                <select  id="mongoKey"></select></td>
+                <select  id="sourceKey"></select></td>
         </tr>
 
         <tr>
@@ -45,7 +45,7 @@
         </tr>
         <tr class="source0">
             <td align="right">Query</td>
-            <td><input name="nodeInput" id="mongoQuery" value="{}"></td>
+            <td><input name="nodeInput" id="sourceQuery" value="{}"></td>
 
         </tr>
 

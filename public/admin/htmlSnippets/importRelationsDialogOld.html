@@ -1,5 +1,5 @@
 <div id="export2NeoLinks">
-    <input type="hidden" name="linkInput" id="mongoCollectionRel">
+    <input type="hidden" name="linkInput" id="sourceCollectionRel">
     <table>
 
         <tr class="source0">
@@ -11,10 +11,10 @@
         <tr>
             <td align="right"> Source Key</td>
             <td>
-                <button class="source" onclick="setMongoSourceField()">Set</button>
-                <input disabled="disabled" name="linkInput" id="mongoSourceField"></td>
+                <button class="source" onclick="setsourceSourceField()">Set</button>
+                <input disabled="disabled" name="linkInput" id="sourceSourceField"></td>
             <td>
-                <button onclick="showHelp('mongoSourceField')">?</button>
+                <button onclick="showHelp('sourceSourceField')">?</button>
             </td>
         </tr>
 
@@ -42,11 +42,11 @@
         <tr>
             <td align="right"> Source Key</td>
             <td>
-                <button class="source" onclick="setMongoTargetField()">Set</button>
-                <input disabled="disabled" name="linkInput" id="mongoTargetField"></td>
+                <button class="source" onclick="setsourceTargetField()">Set</button>
+                <input disabled="disabled" name="linkInput" id="sourceTargetField"></td>
 
             <td>
-                <button onclick="showHelp('mongoTargetField')">?</button>
+                <button onclick="showHelp('sourceTargetField')">?</button>
             </td>
         </tr>
         <tr>
@@ -92,10 +92,10 @@
 
         <tr>
             <td align="right">Query</td>
-            <td><input name="linkInput" id="mongoQueryR" value="{}"></td>
+            <td><input name="linkInput" id="sourceQueryR" value="{}"></td>
 
             <td>
-                <button onclick="showHelp('mongoQueryR')">?</button>
+                <button onclick="showHelp('sourceQueryR')">?</button>
             </td>
         </tr>
 

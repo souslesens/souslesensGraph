@@ -24,18 +24,18 @@
  * SOFTWARE.
  *
  ******************************************************************************/
-var neoMongoSynchronizer=(function(){
+var neosourceSynchronizer=(function(){
     var self={};
 
 
 
     self.synchronize=function() {
         var dbName = $("#dbName").val();
-        var collection = $("#mongoCollectionObjs").val();
+        var collection = $("#sourceCollectionObjs").val();
         if (!collection)
             return;
-        var mongoQuery = {id:2016020}
-        self.importNodeNeo(dbName,collection, mongoQuery);
+        var sourceQuery = {id:2016020}
+        self.importNodeNeo(dbName,collection, sourceQuery);
 
     }
 
@@ -71,20 +71,20 @@ var neoMongoSynchronizer=(function(){
     }
 
 
-    self.importNodeNeo=function(dbName,type,mongoQuery){
+    self.importNodeNeo=function(dbName,type,sourceQuery){
         var params=self.neoMappings.objects[type];
-        if(!mongoQuery){
-            mongoQuery=self.mongoDefaultQuery;
+        if(!sourceQuery){
+            sourceQuery=self.sourceDefaultQuery;
 
         }
 
         var payload= {
             find:1,
             dbName: dbName,
-            collectionName: params.mongoCollection,
-            query: mongoQuery
+            collectionName: params.sourceCollection,
+            query: sourceQuery
         }
-      self.callMongo(payload, function(result){
+      self.callsource(payload, function(result){
             //for (var i=0;i<result.length;i++){
                 for (var i=0;i<1;i++){
                 var attrsStr="";
@@ -119,7 +119,7 @@ var neoMongoSynchronizer=(function(){
 
     }
 
-    self.callMongo=function( payload, callback) {
+    self.callsource=function( payload, callback) {
         $("#message").val("");
       var   urlSuffix = "";
         $.ajax({
@@ -168,8 +168,8 @@ var neoMongoSynchronizer=(function(){
     self.neoMappings={
         objects:{
             technologies:{
-                mongoCollection:"technologies",
-                mongoDefaultQuery:{},
+                sourceCollection:"technologies",
+                sourceDefaultQuery:{},
                 labelNeo:"technology",
                 neoProps:["id","name","dexcription"]
 

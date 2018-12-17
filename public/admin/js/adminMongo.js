@@ -125,7 +125,7 @@ function executeAction(action) {
 				}
 				var body = formatResultToCsv(result, sep);
 				$("#resultTextArea").val(body);
-				$("#mongoTabs").tabs({
+				$("#sourceTabs").tabs({
 					active : 1
 				});
 				return;
@@ -136,7 +136,7 @@ function executeAction(action) {
 				else
 					result = proxy_loadData(dbName, collectionName, obj);
 				$("#resultTextArea").val(JSON.stringify(result));
-				$("#mongoTabs").tabs({
+				$("#sourceTabs").tabs({
 					active : 1
 				});
 				return;
@@ -153,7 +153,7 @@ function executeAction(action) {
 			processResult(result, headers);
 			// drawSpreadSheet(resultSheet, null, result);
 			drawResultSpreadSheet(headers, result);
-			$("#mongoTabs").tabs({
+			$("#sourceTabs").tabs({
 				active : 0
 			});
 

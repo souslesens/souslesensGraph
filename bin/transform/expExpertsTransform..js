@@ -175,7 +175,7 @@ importCSVtoNeo = function () {
     /* updateNeoFromCSV: function (params, callback) {
 
           fileName: " not needed if mappings is present. Name of the original file else ignored: used to find recorded mappings (MUST end with .csv)",
-             mappings: "JSON of mappings between csv or mongo and Neo4j: this json can be generated with exportMappings request. if present and not empty fileName is not needed",
+             mappings: "JSON of mappings between csv or source and Neo4j: this json can be generated with exportMappings request. if present and not empty fileName is not needed",
              csvData: "the CSV content URIencoded",
              subGraph: "name of the subGraph : can be different from the recorded one",*/
     var rootPath = inputFileTest.substring(0, inputFileTest.lastIndexOf("\\") + 1);
@@ -200,115 +200,115 @@ importCSVtoNeo = function () {
 
 var mappingMain = {
     "Nodes_experts.people_name": {
-        "mongoDB": "main.csv",
+        "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "mongoCollectionNode": "main.csv",
+            "sourceCollectionNode": "main.csv",
             "exportedFields": "all",
-            "mongoField": "name",
-            "mongoKey": "name",
+            "sourceField": "name",
+            "sourceKey": "name",
             "distinctValues": "true",
-            "mongoIdField": "name",
+            "sourceIdField": "name",
             "label": "people",
-            "mongoQuery": "{}",
+            "sourceQuery": "{}",
             "subGraph": "experts"
         },
         "name": "Nodes_experts.people_name",
         "date": "Thu May 24 2018 18:41:09 GMT+0200 (Paris, Madrid (heure d’été))"
     },
     "Nodes_experts.division_division": {
-        "mongoDB": "main.csv",
+        "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "mongoCollectionNode": "main.csv",
+            "sourceCollectionNode": "main.csv",
             "exportedFields": "BU",
-            "mongoField": "division",
-            "mongoKey": "division",
+            "sourceField": "division",
+            "sourceKey": "division",
             "distinctValues": "true",
-            "mongoIdField": "division",
+            "sourceIdField": "division",
             "label": "division",
-            "mongoQuery": "{}",
+            "sourceQuery": "{}",
             "subGraph": "experts"
         },
         "name": "Nodes_experts.division_division",
         "date": "Thu May 24 2018 18:42:40 GMT+0200 (Paris, Madrid (heure d’été))"
     },
     "Nodes_experts.site_site": {
-        "mongoDB": "main.csv",
+        "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "mongoCollectionNode": "main.csv",
+            "sourceCollectionNode": "main.csv",
             "exportedFields": "country",
-            "mongoField": "site",
-            "mongoKey": "site",
+            "sourceField": "site",
+            "sourceKey": "site",
             "distinctValues": "true",
-            "mongoIdField": "site",
+            "sourceIdField": "site",
             "label": "site",
-            "mongoQuery": "{}",
+            "sourceQuery": "{}",
             "subGraph": "experts"
         },
         "name": "Nodes_experts.site_site",
         "date": "Thu May 24 2018 18:43:04 GMT+0200 (Paris, Madrid (heure d’été))"
     },
     "Rels_experts.people->site:locatedIn": {
-        "mongoDB": "main.csv",
+        "sourceDB": "main.csv",
         "type": "relation",
         "request": {
-            "mongoCollectionRel": "main.csv",
-            "mongoSourceField": "name",
+            "sourceCollectionRel": "main.csv",
+            "sourceSourceField": "name",
             "neoSourceKey": "name",
             "neoSourceLabel": "people",
-            "mongoTargetField": "site",
+            "sourceTargetField": "site",
             "neoTargetLabel": "site",
             "neoTargetKey": "site",
             "relationType": "locatedIn",
             "neoRelAttributeField": "",
-            "mongoQueryR": "{}",
+            "sourceQueryR": "{}",
             "subGraph": "experts"
         },
         "name": "Rels_experts.people->site:locatedIn",
         "date": "Thu May 24 2018 18:43:52 GMT+0200 (Paris, Madrid (heure d’été))"
     },
     "Rels_experts.people->division:worksIn": {
-        "mongoDB": "main.csv",
+        "sourceDB": "main.csv",
         "type": "relation",
         "request": {
-            "mongoCollectionRel": "main.csv",
-            "mongoSourceField": "name",
+            "sourceCollectionRel": "main.csv",
+            "sourceSourceField": "name",
             "neoSourceKey": "name",
             "neoSourceLabel": "people",
-            "mongoTargetField": "division",
+            "sourceTargetField": "division",
             "neoTargetLabel": "division",
             "neoTargetKey": "division",
             "relationType": "worksIn",
             "neoRelAttributeField": "",
-            "mongoQueryR": "{}",
+            "sourceQueryR": "{}",
             "subGraph": "experts"
         },
         "name": "Rels_experts.people->division:worksIn",
         "date": "Thu May 24 2018 18:44:31 GMT+0200 (Paris, Madrid (heure d’été))"
     },
     "Nodes_experts.domain_domain": {
-        "mongoDB": "main.csv",
+        "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "mongoCollectionNode": "main.csv",
+            "sourceCollectionNode": "main.csv",
             "exportedFields": "none",
-            "mongoField": "domain",
-            "mongoKey": "domain",
+            "sourceField": "domain",
+            "sourceKey": "domain",
             "distinctValues": "true",
-            "mongoIdField": "domain",
+            "sourceIdField": "domain",
             "label": "domain",
-            "mongoQuery": "{}",
+            "sourceQuery": "{}",
             "subGraph": "experts"
         },
         "name": "Nodes_experts.domain_domain",
         "date": "Thu May 24 2018 18:55:57 GMT+0200 (Paris, Madrid (heure d’été))"
     },
     "Rels_experts.people->domain:hasDomain": {
-        "mongoDB": "main.csv",
+        "sourceDB": "main.csv",
         "type": "relation",
-        "request": "{\n\"mongoCollectionRel\":\"main.csv\",\"mongoSourceField\":\"name\",\"neoSourceKey\":\"name\",\"neoSourceLabel\":\"people\",\"mongoTargetField\":\"domain\",\"neoTargetLabel\":\"domain\",\"neoTargetKey\":\"domain\",\"relationType\":\"hasDomain\",\"neoRelAttributeField\":\"\",\"mongoQueryR\":\"{}\",\"subGraph\":\"experts\"}",
+        "request": "{\n\"sourceCollectionRel\":\"main.csv\",\"sourceSourceField\":\"name\",\"neoSourceKey\":\"name\",\"neoSourceLabel\":\"people\",\"sourceTargetField\":\"domain\",\"neoTargetLabel\":\"domain\",\"neoTargetKey\":\"domain\",\"relationType\":\"hasDomain\",\"neoRelAttributeField\":\"\",\"sourceQueryR\":\"{}\",\"subGraph\":\"experts\"}",
         "name": "Rels_experts.people->domain:hasDomain",
         "date": "Thu May 24 2018 18:56:48 GMT+0200 (Paris, Madrid (heure d’été))"
     }

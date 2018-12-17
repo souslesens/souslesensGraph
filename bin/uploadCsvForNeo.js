@@ -27,12 +27,149 @@
 
 var fileUpload = require("./fileUpload.js");
 var fs = require("fs");
-//var exportMongoToNeao=require("./exportMongoToNeo.js");
+var path = require("path");
+//var exportsourceToNeao=require("./importDataIntoNeo4j.js");
 var csv = require('csvtojson');
 var socket = require('../routes/socket.js');
 
 var uploadCsvForNeo = {
 
+    /*  getNormalizedCsvHeader: function (file, callback) {
+
+
+          function getseparator(line) {
+              var separators = [";", ",", "\t"];
+              var scoreSep = [];
+              separators.forEach(function (_sep, index) {
+                  var array = line.split(_sep)
+                  scoreSep[index] = array.length;
+              })
+          //    var indexOfMaxValue = scoreSep.reduce((iMax, x, i, arr) = > x > arr[iMax] ? i : iMax, 0
+          )
+              ;
+              return separators[indexOfMaxValue];
+          }
+
+          accentsTidy = function (s) {
+              //  var r=s.toLowerCase();
+              var r = s;
+              r = r.replace(new RegExp("\\s", 'g'), "");
+              r = r.replace(new RegExp("[àáâãäå]", 'g'), "a");
+              r = r.replace(new RegExp("æ", 'g'), "ae");
+              r = r.replace(new RegExp("ç", 'g'), "c");
+              r = r.replace(new RegExp("[èéêë]", 'g'), "e");
+              r = r.replace(new RegExp("[ìíîï]", 'g'), "i");
+              r = r.replace(new RegExp("ñ", 'g'), "n");
+              r = r.replace(new RegExp("[òóôõö]", 'g'), "o");
+              r = r.replace(new RegExp("œ", 'g'), "oe");
+              r = r.replace(new RegExp("[ùúûü]", 'g'), "u");
+              r = r.replace(new RegExp("[ýÿ]", 'g'), "y");
+              r = r.replace(new RegExp("\\W", 'g'), "");
+              return r;
+          };
+
+
+          sep = getseparator(line);
+          if (!sep)
+              return callback("no correct separator : ; , or \t")
+          header = lineStr.split(sep)
+          // normalize columnNames
+          header.forEach(function (column, index) {
+              column = column.toLowerCase();
+              column = column.replace(/[\s-_]+\w/g, function (txt) {
+                  return txt.charAt(txt.length - 1).toUpperCase()
+              })
+              column = accentsTidy(column);
+              header[index] = column;
+          })
+
+
+      },*/
+
+
+    loadLocal: function (file,subGraph, callback) {
+        var headers = [];
+        normalizeHeader = function (headerArray, s) {
+            //   var   r = s.toLowerCase();
+            var r = s;
+            r = r.replace(/[\(\)'.]/g, "")
+            r = r.replace(/[\s-_]+\w/g, function (txt) {
+                return txt.charAt(txt.length - 1).toUpperCase()
+            });
+            r = r.replace(new RegExp("\\s", 'g'), "");
+            r = r.replace(new RegExp("[àáâãäå]", 'g'), "a");
+            r = r.replace(new RegExp("æ", 'g'), "ae");
+            r = r.replace(new RegExp("ç", 'g'), "c");
+            r = r.replace(new RegExp("[èéêë]", 'g'), "e");
+            r = r.replace(new RegExp("[ìíîï]", 'g'), "i");
+            r = r.replace(new RegExp("ñ", 'g'), "n");
+            r = r.replace(new RegExp("[òóôõö]", 'g'), "o");
+            r = r.replace(new RegExp("œ", 'g'), "oe");
+            r = r.replace(new RegExp("[ùúûü]", 'g'), "u");
+            r = r.replace(new RegExp("[ýÿ]", 'g'), "y");
+            r = r.replace(new RegExp("\\W", 'g'), "");
+            r = "" + r.charAt(0).toLowerCase() + r.substring(1);
+            headerArray.push(r);
+            return r;
+        };
+
+        processValues = function (header, value) {
+
+            if (value.indexOf("\n") > -1) {
+              //  value = value.replace(/\n/g, "")
+                var array = value.split("\n");
+                //value= JSON.stringify(array)
+                value = array;
+            }
+            return value
+
+
+        }
+
+
+        const csv = require('csv-parser')
+        const fs = require('fs')
+        const results = [];
+
+
+        fs.createReadStream(file)
+            .pipe(csv(
+                {
+                    separator: ';',
+                    mapHeaders: ({header, index}) =>
+                        normalizeHeader(headers, header)
+                    ,
+                    mapValues: ({header, index, value}) =>
+                        processValues(header, value),
+
+                })
+
+                .on('data', function (data) {
+
+                    results.push(data)
+
+                })
+                .on('end', function () {
+                    var xx = results;
+                    var yy = headers;
+
+                    var fileName = file.substring(file.lastIndexOf(path.sep) + 1)
+                    var filePath = path.resolve("uploads/" + fileName + ".json");
+                   // headers = headers.sort();
+                    fs.writeFileSync(filePath, JSON.stringify({headers:headers, data :results},null,2));
+                    var result = {message: "listCsvFields", remoteJsonPath: filePath, name: fileName, header: headers,subGraph:subGraph};
+               socket.message("file "+fileName+"loaded");
+                    callback(null, result);
+                }))
+        /*  .on('headers', (headers) => {
+              console.log(`First header: ${headers[0]}`)
+          })*/
+
+
+    }
+
+
+    ,
     upload: function (req, callback) {
         fileUpload.upload(req, 'csv', function (err, req) {
             if (err) {
@@ -59,10 +196,10 @@ var uploadCsvForNeo = {
 
                         }
 
-                        var jsonArrayMultiple=[];
+                        var jsonArrayMultiple = [];
                         // var jsonArrayMultiple = uploadCsvForNeo.splitMultipleValuesInColumns(json, ";");
                         if (true && jsonArrayMultiple.length > 0) {
-                            for( var i=0;i<jsonArrayMultiple.length;i++) {
+                            for (var i = 0; i < jsonArrayMultiple.length; i++) {
                                 jsonArray.push(jsonArrayMultiple[i]);
                             }
                         }
@@ -84,7 +221,7 @@ var uploadCsvForNeo = {
     }
     ,
     splitMultipleValuesInColumns: function (json, sep) {
-        var multipleKeys=[]
+        var multipleKeys = []
         for (var key in json) {
             if (json[key].indexOf(";") > -1)
                 multipleKeys.push(key)
@@ -93,11 +230,11 @@ var uploadCsvForNeo = {
         var jsonArray = [json];
 
         for (var i = 0; i < multipleKeys.length; i++) {
-            var jsonMultiple=[]
-            var key=multipleKeys[i];
-           var rowsToRemove=[];
+            var jsonMultiple = []
+            var key = multipleKeys[i];
+            var rowsToRemove = [];
             for (var j = 0; j < jsonArray.length; j++) {
-                var json=jsonArray[j];
+                var json = jsonArray[j];
 
                 if (json[key].indexOf(";") > -1) {
 
@@ -110,16 +247,24 @@ var uploadCsvForNeo = {
 
                     }
                 }
-                else{
+                else {
                     jsonMultiple.push(json);
                 }
             }
-            jsonArray= JSON.parse(JSON.stringify(jsonMultiple));
+            jsonArray = JSON.parse(JSON.stringify(jsonMultiple));
         }
 
         return jsonArray;
     }
 
+
+}
+
+if (false) {
+
+    uploadCsvForNeo.loadLocal("D:\\keolis\\Dec2018\\fichiersKeolis\\personnesFR.csv", function (err, result) {
+        var x = result;
+    })
 
 }
 

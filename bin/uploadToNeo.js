@@ -24,7 +24,7 @@
  * SOFTWARE.
  *
  ******************************************************************************/
-var exportMongoToNeo = require('../bin/exportMongoToNeo.js');
+var importDataIntoNeo4j = require('../bin/importDataIntoNeo4j.js');
 var fileUpload= require('../bin/fileUpload.js');
 
 var uploadToNeo = {
@@ -51,9 +51,9 @@ var uploadToNeo = {
             }
 
             if (data[0].r)
-                exportMongoToNeo.copyRelations(data, callback);
+                importDataIntoNeo4j.copyRelations(data, callback);
             else
-                exportMongoToNeo.copyNodes(data, callback);
+                importDataIntoNeo4j.copyNodes(data, callback);
 
         }
         else {
@@ -74,9 +74,9 @@ var uploadToNeo = {
                 }
 
                 if (data[0].r)
-                    exportMongoToNeo.copyRelations(data, callback);
+                    importDataIntoNeo4j.copyRelations(data, callback);
                 else
-                    exportMongoToNeo.copyNodes(data, callback);
+                    importDataIntoNeo4j.copyNodes(data, callback);
             });
         }
 
