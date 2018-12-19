@@ -127,9 +127,14 @@ var toutlesensController = (function () {
 
             if (options && options.applyFilters) {
                 //   filters.setQueryFilters();
-                $("#tabs-analyzePanel").tabs("option", "disabled", []);
-                $("#tabs-analyzePanel").tabs("enable", 1);
-                $("#tabs-analyzePanel").tabs("enable", 2);
+            /*  tabsAnalyzePanel.tabs("option", "disabled", []);
+              tabsAnalyzePanel.tabs("enable", 1);
+              tabsAnalyzePanel.tabs("enable", 2);*/
+
+                tabsAnalyzePanel
+                tabsAnalyzePanel.tabs("option", "disabled", []);
+                tabsAnalyzePanel.tabs("enable", 1);
+                tabsAnalyzePanel.tabs("enable", 2);
                 // $("#tabs-analyzePanel").tabs("enable", 1);
 
 
@@ -180,7 +185,7 @@ var toutlesensController = (function () {
 
                     self.setGraphMessage("No  result");
                     $("#waitImg").css("visibility", "hidden");
-                    $("#tabs-analyzePanel").tabs("enable", 0);
+                  tabsAnalyzePanel.tabs("enable", 0);
                     self.dispatchAction('nodeInfos');
                     self.setRightPanelAppearance(false);
 
@@ -218,7 +223,7 @@ var toutlesensController = (function () {
                     $("#mainButtons").css("visibility", "visible");
                     $("#waitImg").css("visibility", "hidden");
                     $(".graphDisplayed").css("visibility", "visible");
-                    $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
+                  tabsAnalyzePanel.tabs("option", "active", 2);//highlight
 
                     if (toutlesensData && toutlesensData.queriesIds.length > 1)
                         options.dragConnectedNodes = true;
@@ -919,8 +924,8 @@ var toutlesensController = (function () {
 
                 // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
                 $("#dialog").load("htmlSnippets/dataTableDialog.html", function () {
-                    $('#dialog').dialog("open");
-                    $('#dialog').dialog({title: "Select table columns"});
+                    dialog.dialog("open");
+                    dialog.dialog({title: "Select table columns"});
                     dataTableDialog.init(dataset)
 
 
@@ -929,13 +934,13 @@ var toutlesensController = (function () {
 
             }
             else if (action == "showGraphText") {
-                $("#dialogLarge").dialog({modal: true});
-                $("#dialogLarge").dialog("option", "title", "Graph text");
-                $("#dialogLarge").load("htmlSnippets/graphTextDialog.html", function () {
+              dialogLarge.dialog({modal: true});
+              dialogLarge.dialog("option", "title", "Graph text");
+              dialogLarge.load("htmlSnippets/graphTextDialog.html", function () {
                     var text = visjsGraph.graph2Text();
                     $("#graphTextDiv").html(text);
                 })
-                $("#dialogLarge").dialog("open");
+              dialogLarge.dialog("open");
             }
             else if (action == "showGlobalMenu") {
                 $("#dialog").dialog({modal: true});
@@ -947,7 +952,7 @@ var toutlesensController = (function () {
 
             else if (action == "showSchemaConfigDialog") {
 
-                $("#dialogLarge").load("htmlSnippets/schemaConfig.html", function () {
+              dialogLarge.load("htmlSnippets/schemaConfig.html", function () {
                     if (options && options.create)
                         $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
                     else
@@ -958,13 +963,13 @@ var toutlesensController = (function () {
 
 
                 })
-                $("#dialogLarge").dialog("option", "title", "Souslesens schema configuration");
-                $("#dialogLarge").dialog("open");
+              dialogLarge.dialog("option", "title", "Souslesens schema configuration");
+              dialogLarge.dialog("open");
             }
 
             else if (action == "showParamsConfigDialog") {
 
-                $("#dialogLarge").load("htmlSnippets/paramsConfig.html", function () {
+              dialogLarge.load("htmlSnippets/paramsConfig.html", function () {
                     if (options && options.create)
                         $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
                     else
@@ -975,8 +980,8 @@ var toutlesensController = (function () {
 
 
                 })
-                $("#dialogLarge").dialog("option", "title", "Souslesens schema configuration");
-                $("#dialogLarge").dialog("open");
+              dialogLarge.dialog("option", "title", "Souslesens schema configuration");
+              dialogLarge.dialog("open");
             }
 
             else if (action == "showAll") {
@@ -1010,7 +1015,7 @@ var toutlesensController = (function () {
                 var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
 
                 currentActionObj.graphType = "schema";
-                $("#dialogLarge").dialog("close");
+              dialogLarge.dialog("close");
 
 
                 var graphOptions = {
@@ -1137,7 +1142,7 @@ var toutlesensController = (function () {
 
         self.showPopupMenu = function (x, y, type) {
 
-            $("#tabs-analyzePanel").tabs("option", "active", 0);
+          tabsAnalyzePanel.tabs("option", "active", 0);
             $("#graphPopup").css("visibility", "visible").css("top", y).css("left", x);
 
 
@@ -1149,6 +1154,7 @@ var toutlesensController = (function () {
 
 
         self.afterGraphInit = function () {
+            customizeUI.addPlugins(Gparams.plugins)
 
 
             currentActionObj = {graphType: "schema"};
@@ -1231,7 +1237,7 @@ var toutlesensController = (function () {
             });
 
 
-            $("#tabs-analyzePanel").tabs("option", "disabled", tabsanalyzePanelDisabledOptions);
+          tabsAnalyzePanel.tabs("option", "disabled", tabsanalyzePanelDisabledOptions);
             $("#findTabs").tabs("option", "disabled", tabsFindPanelDisabledOptions);
 
             $(".graphDisplayed").css("visibility", "hidden");
@@ -1332,12 +1338,12 @@ var toutlesensController = (function () {
 
         self.setResponsiveDimensions = function (rightPanelWidth) {
             if (rightPanelWidth == 0) {
-                $("#tabs-analyzePanel").css("visibility", "hidden");
+              tabsAnalyzePanel.css("visibility", "hidden");
                 self.hasRightPanel = false;
             }
             else {
                 self.hasRightPanel = true;
-                $("#tabs-analyzePanel").css("visibility", "visible");
+              tabsAnalyzePanel.css("visibility", "visible");
             }
             $(".ui-tabs .ui-tabs-panel").css("padding", "2px")
 
@@ -1368,7 +1374,7 @@ var toutlesensController = (function () {
             $("#infosDiv").width(rightPanelWidth - 10).height((totalHeight))
 
             //   $("#analyzePanel").width(rightPanelWidth - 10).height(totalHeight).css("position", "absolute").css("left", (totalWidth - rightPanelWidth) + 30).css("top", 10);
-            //  $("#tabs-analyzePanel").width(rightPanelWidth - 100).height(totalHeight/2).css("position", "absolute").css("left",(totalWidth-rightPanelWidth) + 30).css("top", 10);
+            //tabsAnalyzePanel.width(rightPanelWidth - 100).height(totalHeight/2).css("position", "absolute").css("left",(totalWidth-rightPanelWidth) + 30).css("top", 10);
 
 
             $("#analyzePanel").width(rightPanelWidth - 10);
@@ -1421,9 +1427,14 @@ var toutlesensController = (function () {
 
             $("#analyzePanel").height(analyzePanelHeight - 10).css("top", (totalHeight - analyzePanelHeight) + 20);
             ;
-            $("#tabs-analyzePanel").tabs("option", "disabled", []);
-            $("#tabs-analyzePanel").tabs("enable", 1);
-            $("#tabs-analyzePanel").tabs("enable", 2);
+            try {
+              tabsAnalyzePanel.tabs("option", "disabled", []);
+              tabsAnalyzePanel.tabs("enable", 1);
+              tabsAnalyzePanel.tabs("enable", 2);
+            }
+            catch(e){
+
+            }
 
 
         }
@@ -1437,7 +1448,7 @@ var toutlesensController = (function () {
         self.graphNodeNeighbours = function (obj) {
             currentObject = obj;
             self.dispatchAction("setAsRootNode");
-            $("#dialogLarge").dialog("close");
+          dialogLarge.dialog("close");
 
         }
 

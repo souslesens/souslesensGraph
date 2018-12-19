@@ -838,12 +838,12 @@ var paint = (function () {
                 var query = "match (n) where ID(n) in " + JSON.stringify(nodeIds).replace(/"/g, "") + " return n";
 
 
-                $("#dialogLarge").dialog({modal: true});
-                $("#dialogLarge").dialog("option", "title", "Graph text");
-                $("#dialogLarge").html("<div id='dialogDiv'></div>");
+              dialogLarge.dialog({modal: true});
+              dialogLarge.dialog("option", "title", "Graph text");
+              dialogLarge.html("<div id='dialogDiv'></div>");
                 dataTable.loadNodes(query, {containerDiv: "dialogDiv"})
 
-                $("#dialogLarge").dialog("open");
+              dialogLarge.dialog("open");
 
             }
 

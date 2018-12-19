@@ -110,7 +110,7 @@ var advancedSearch = (function () {
 
 
 
-    self.addClauseByIdsArray=function(idKey,ids,label){
+    self.addClauseByIdsArray=function(idKey,ids,label,callback){
 
         toutlesensData.setSearchByPropertyListStatement (idKey, JSON.stringify(ids), function(err, result){
             var where=result;
@@ -124,6 +124,11 @@ var advancedSearch = (function () {
             }
 
             self.addClause(clause, clauseText);
+            searchMenu.activatePanel("searchActionDiv")
+            findTabs.tabs("option", "active", 0);
+
+            if(callback)
+                callback(err,clauseText);
 
 
         })

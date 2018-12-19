@@ -875,7 +875,7 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
             self.showNodeData(node);
             //   toutlesensController.addToHistory = true;
             toutlesensController.generateGraph(parentId, {});
-            $("#tabs-analyzePanel").tabs("option", "active", 0);
+          tabsAnalyzePanel.tabs("option", "active", 0);
             currentObject=node;
             currentObject.id=node.neoId;
             $("#nodeInfoMenuDiv").css("visibility","visible");

@@ -841,7 +841,7 @@ var infosGenericDisplay = (function () {
                 self.showNodeData(node);
                 toutlesensController.addToHistory = true;
                 toutlesensController.generateGraph(parentId, {});
-                $("#tabs-analyzePanel").tabs("option", "active", 3);
+              tabsAnalyzePanel.tabs("option", "active", 3);
                 return;
             } else if (toutlesensController.currentActionObj.type == 'findShortestPath') {
                 traversalMenu.setTraversalNode(toutlesensController.currentActionObj.stage, node.data);

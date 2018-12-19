@@ -222,11 +222,11 @@ var searchMenu = (function () {
                     if (err)
                         return console.log(err);
                     if (!self.dataTable) {
-                        self.dataTable = new DataTable();
+                        self.dataTable = new myDataTable();
                     }
                 //    self.dataTable.loadNodes(self.dataTable, "graphDiv", query, {});
-                    $("#dialogLarge").load("htmlSnippets/dataTable.html", function () {
-                        $('#dialogLarge').dialog("open");
+                  dialogLarge.load("htmlSnippets/dataTable.html", function () {
+                      dialogLarge.dialog("open");
                         self.dataTable.loadNodes(self.dataTable, "dataTableDiv", query, {onClick:toutlesensController.graphNodeNeighbours}, function (err, result) {
 
                         })
@@ -295,8 +295,8 @@ var searchMenu = (function () {
 
                 $("#paintAccordion").accordion("option", "active", 1)
 
-                $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
-
+               // $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
+                tabsAnalyzePanel.tabs("option", "active", 2);//highlight
 
                 if (previousAction == 'path') {
                     var relationDistance = parseInt($("#searchDialog_pathDistanceInput").val());

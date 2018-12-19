@@ -34,7 +34,7 @@
 
 
 
-                
+
                 function customMenu(node) {
                     var items = {
                         'item1': {
@@ -200,7 +200,11 @@
 
             self.graphSelection = function () {
                 var sel=self.selection;
-               advancedSearch.addClauseByIdsArray("id",self.selection,type)
+               advancedSearch.addClauseByIdsArray("id",self.selection,type,function(err, result){
+
+
+               });
+
 
             }
 

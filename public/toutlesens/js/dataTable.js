@@ -1,5 +1,5 @@
 
-var DataTable = function () {
+var myDataTable = function () {
 
 
     dataSet = [];
@@ -70,118 +70,122 @@ var DataTable = function () {
 
         var htmlStr = "<table style=' z-index:100 ' id='table_" + containerDiv + "'  class='myDatatable cell-border display nowrap'></table>"
 
-        var xxx = $("#" + containerDiv).html();
-        $("#" + containerDiv).html(htmlStr);
-        $('#' + containerDiv).css("font-size", "10px");
-        /*   var height;
-           var width;
-           if (options.height)
-               height = options.height;
-           else
-               height = $(".dataTableDiv").height() - (mainController.leftPanelWidth + 50);
-           if (options.width)
-               height = options.width;
-           else
-               width = $(".dataTableDiv").width() - 280;
-           $("#table_" + containerDiv).width("400px").height(height);*/
 
 
-        /*    if (json.length < this.pageLength)
-                height = this.colHeight * json.length;*/
 
-        var dom = '<"top"firptl><"bottom"B><"clear">'
-        var dom = '<"top"firptl><"bottom"B><"clear">'
+            $("#" + containerDiv).html(htmlStr).promise().done(function() {
+            $('#' + containerDiv).css("font-size", "10px");
+            /*   var height;
+               var width;
+               if (options.height)
+                   height = options.height;
+               else
+                   height = $(".dataTableDiv").height() - (mainController.leftPanelWidth + 50);
+               if (options.width)
+                   height = options.width;
+               else
+                   width = $(".dataTableDiv").width() - 280;
+               $("#table_" + containerDiv).width("400px").height(height);*/
 
-        if (options.dom)
-            dom = options.dom;
 
+            /*    if (json.length < this.pageLength)
+                    height = this.colHeight * json.length;*/
 
-        var _table = $("#table_" + containerDiv).DataTable({
+            var dom = '<"top"firptl><"bottom"B><"clear">'
+            var dom = '<"top"firptl><"bottom"B><"clear">'
 
-            "dom": dom,
+            if (options.dom)
+                dom = options.dom;
 
-            buttons: [
-                'copy', 'csv', 'print'
-                // 'copy', 'csv', 'excel', 'pdf', 'print'
-            ],
-            data: dataSet,
-            columns: columns,
-            "order": dataTableSortArray,
+            var xx= $("#table_" + containerDiv)
 
-            "columnDefs": [
-                {//dates
-                    "render": function (data, type, row) {
-                        var str = "";
-                        if (data != null && data != "" && data.indexOf("0000") < 0) {
-                            var date = new Date(data);
-                            str = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-                        }
-                        return str;
+            var _table = $("#table_" + containerDiv).DataTable({
 
-                    },
-                    "targets": self.dateColumns
+                "dom": dom,
+
+                buttons: [
+                    'copy', 'csv', 'print'
+                    // 'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+                data: dataSet,
+                columns: columns,
+                "order": dataTableSortArray,
+
+                "columnDefs": [
+                    {//dates
+                        "render": function (data, type, row) {
+                            var str = "";
+                            if (data != null && data != "" && data.indexOf("0000") < 0) {
+                                var date = new Date(data);
+                                str = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+                            }
+                            return str;
+
+                        },
+                        "targets": self.dateColumns
+                    }
+
+                ],
+                select: {
+                    style: 'os',
+                    selector: 'td:first-child'
+                },
+
+                pageLength: this.pageLength,
+                "pager": true,
+
+                /*    "scrollY": "" + height + "px",
+                    "scrollX": "" + width + "px",*/
+                scrollCollapse: true,
+
+            })
+            _table.columns.adjust().draw();
+            $("#table_" + containerDiv).css('display', 'block');
+            table = _table;
+
+            $("#table_" + containerDiv + " tbody").on('click', 'tr', function (event) {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                    $("#dataTable tbody tr").css("height", "20px");
                 }
-
-            ],
-            select: {
-                style: 'os',
-                selector: 'td:first-child'
-            },
-
-            pageLength: this.pageLength,
-            "pager": true,
-
-            /*    "scrollY": "" + height + "px",
-                "scrollX": "" + width + "px",*/
-            scrollCollapse: true,
-
-        })
-        _table.columns.adjust().draw();
-        $("#table_" + containerDiv).css('display', 'block');
-        table = _table;
-
-       $("#table_" + containerDiv+" tbody").on('click', 'tr', function (event) {
-           if ($(this).hasClass('selected')) {
-               $(this).removeClass('selected');
-               $("#dataTable tbody tr").css("height", "20px");
-           }
-           else {
-               $('tr.selected').removeClass('selected');
-               $(this).addClass('selected');
-               var px = event.clientX;
-               var py = event.clientY;
-               var idx = table.cell('.selected', 0).index();
-               // var data = table.row( idx.row ).data();
-               var line = dataSet[idx.row];
-               currentObject = {id: line.id};
-
-               toutlesensController.dispatchAction("nodeInfos", currentObject.id);
-               toutlesensController.showPopupMenu(px, py, "nodeInfo");
-           }
-       });
-     $('#table_' + containerDiv + ' tbody').on('click', 'tr', function (event) {
-            if ($(this).hasClass('selected')) {
-                $(this).removeClass('selected');
-                $("#table_" + containerDiv + " tbody tr").css("height", "20px");
-            }
-            if(true) {
-                if (!event.ctrlKey)
+                else {
                     $('tr.selected').removeClass('selected');
-                $(this).addClass('selected');
-                if (options.onClick) {
-
+                    $(this).addClass('selected');
                     var px = event.clientX;
                     var py = event.clientY;
-                    this.selectedRow = table.row(this);
-                    var line = table.row(this).data();
-                    options.onClick(line);
-                    //
+                    var idx = table.cell('.selected', 0).index();
+                    // var data = table.row( idx.row ).data();
+                    var line = dataSet[idx.row];
+                    currentObject = {id: line.id};
+
+                    toutlesensController.dispatchAction("nodeInfos", currentObject.id);
+                    toutlesensController.showPopupMenu(px, py, "nodeInfo");
+                }
+            });
+            $('#table_' + containerDiv + ' tbody').on('click', 'tr', function (event) {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                    $("#table_" + containerDiv + " tbody tr").css("height", "20px");
+                }
+                if (true) {
+                    if (!event.ctrlKey)
+                        $('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    if (options.onClick) {
+
+                        var px = event.clientX;
+                        var py = event.clientY;
+                        this.selectedRow = table.row(this);
+                        var line = table.row(this).data();
+                        options.onClick(line);
+                        //
+                    }
+
+
                 }
 
-
-            }
-
-        });
+            });
+        })
 
 
     },

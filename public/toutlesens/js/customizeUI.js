@@ -71,7 +71,7 @@ var customizeUI = (function () {
 
     }
     self.init = function () {
-        customizeUI.addPlugins(Gparams.plugins)
+        //
 
         if (queryParams.sinequaCallbackUrl)
             customizeUI.customizationName = "Sinequa";
@@ -113,17 +113,27 @@ var customizeUI = (function () {
 
     }
 
-    self.addPlugins = function (plugins) {
+    self.addPlugins = function (plugins, callback) {
         plugins.forEach(function (plugin) {
-            $("#findTabsUl").append("  <li><a href='#" + plugin + "Div'><span id='lang_60'>" + plugin + "</span></a></li>")
-            $("#findTabs").append("<div id='" + plugin + "Div'></div>") .ready(function () {
-                $("#"+ plugin + "Div").load("plugins/"+plugin+"/index.html")
+            $("#pluginLi").html(plugin)
+            $("#plugin").load("plugins/" + plugin + "/index.html",function(err,result){
+                if (callback)
+                    callback();
+            })
+
+        });
+        }
+         /*  $("#findTabsUl").append("  <li><a href='#" + plugin + "Div'><span id='lang_60'>" + plugin + "</span></a></li>")
+            $("#findTabs").append("<div id='" + plugin + "Div'></div>").ready(function () {
+                $("#" + plugin + "Div").load("plugins/" + plugin + "/index.html")
+                if (callback)
+                    callback();
             });
 
-        })
+        })*/
 
 
-    }
+
 
 
     return self;

@@ -1,4 +1,7 @@
-
+var findTabs;
+var dialogLarge;
+var dialog;
+var tabsAnalyzePanel;
 var eventsController = (function () {
         var self = {};
         self.stopEvent=false;
@@ -92,7 +95,7 @@ var eventsController = (function () {
 //*****************************************************************************************
             self.initcomponentEvents = function () {
 
-                var dialog=$("#dialog").dialog({
+                 dialog=$("#dialog").dialog({
                     autoOpen: false,
                     height: Gparams.smallDialogSize.h,
                     width: Gparams.smallDialogSize.w,
@@ -103,7 +106,7 @@ var eventsController = (function () {
 
                 });
 
-                $("#dialogLarge").dialog({
+                dialogLarge=  $("#dialogLarge").dialog({
                     autoOpen: false,
                     height: Gparams.bigDialogSize.h,
                     width: Gparams.bigDialogSize.w,
@@ -122,11 +125,11 @@ var eventsController = (function () {
                     });
                 ;
 
-                $("#tabs-analyzePanel").tabs({
+                tabsAnalyzePanel=$("#tabs-analyzePanel").tabs({
 
 
                     activate: function (event, ui) {
-                        $("#dialog").dialog("close");
+                       dialog.dialog("close");
                         $("#graphPopup").css("visibility", "hidden");
 
                         var index = ui.newTab.index();
@@ -171,7 +174,11 @@ var eventsController = (function () {
 
                     }
                 });
-                var findTabs=$("#findTabs").tabs({
+
+
+               findTabs=$("#findTabs").tabs({
+
+
                     load: function (event, ui) {
 
                     },
@@ -205,6 +212,7 @@ var eventsController = (function () {
 
                     }
                 });
+
 
 
                 $("#graphDiv").click(function (e) {

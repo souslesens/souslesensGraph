@@ -34,7 +34,7 @@ var selection = (function () {
 
 
     self.addToSelection = function (node) {
-     //   $("#tabs-analyzePanel").tabs("option", "active", 3)
+     // tabsAnalyzePanel.tabs("option", "active", 3)
         self.addNodeToSelection(node);
     }
     self.addNodeToSelection = function (node) {

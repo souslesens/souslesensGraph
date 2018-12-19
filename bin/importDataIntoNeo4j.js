@@ -205,43 +205,32 @@ var importDataIntoNeo4j = {
             //get neomappings in sourceNeoTargetIdsMap
             function (callbackSeries) {
                 //retrieve in Neo4j mappings between neoIds and name field
-                var sourceNodeMappingsStatement = "match (n) where n.subGraph=\"" + subGraph + "\" and (n:" + neoSourceLabel + " or n:" + neoTargetLabel + ") return n.id as sourceId, id(n) as neoId, labels(n)[0] as label; "
-
-                neoProxy.match(sourceNodeMappingsStatement, function (err, result) {
+                var sourceNodeMappingsStatement = "match (n:"+neoSourceLabel+") where n.subGraph=\"" + subGraph + "\"  return n."+params.neoSourceKey+" as sourceId, id(n) as neoId, labels(n)[0] as label; "
+                neoProxy.match(sourceNodeMappingsStatement, function (err, resultSource) {
                     if (err)
                         return callback(err);
-                    var sourceNodeMappings = [];
-                    var targetNodeMappings = [];
 
-                    for (var i = 0; i < result.length; i++) {
-                        var mapping = result[i];
-                        if (mapping.label == neoSourceLabel) {
-                            sourceNodeMappings.push(mapping)
-                        }
-                        if (mapping.label == neoTargetLabel) {
-                            targetNodeMappings.push(mapping)
-                        }
+                        var targetNodeMappingsStatement = "match (n:"+neoTargetLabel+") where n.subGraph=\"" + subGraph + "\"  return n."+params.neoTargetKey+" as sourceId, id(n) as neoId, labels(n)[0] as label; "
+                        neoProxy.match(targetNodeMappingsStatement, function (err, resultTarget) {
 
-                    }
-
-
-                    if (sourceNodeMappings.length == 0 || targetNodeMappings.length == 0) {
+                    if (resultSource.length == 0 || resultTarget.length == 0) {
                         return callback("ERROR : missing Neo4j nodes mapping: import nodes before relations");
 
                     }
 
 
-                    for (var i = 0; i < sourceNodeMappings.length; i++) {
-                        sourceNeoTargetIdsMap["_" + sourceNodeMappings[i].sourceId] = sourceNodeMappings[i].neoId;
+                    for (var i = 0; i < resultSource.length; i++) {
+                        sourceNeoTargetIdsMap[neoSourceLabel+"_" + resultSource[i].sourceId] = resultSource[i].neoId;
                     }
-                    for (var i = 0; i < targetNodeMappings.length; i++) {
-                        sourceNeoTargetIdsMap["_" + targetNodeMappings[i].sourceId] = targetNodeMappings[i].neoId;
+                    for (var i = 0; i < resultTarget.length; i++) {
+                        sourceNeoTargetIdsMap[neoTargetLabel+"_" + resultTarget[i].sourceId] = resultTarget[i].neoId;
                     }
-                    params.nodeMappings = sourceNeoTargetIdsMap;
+                    params.nodeMappings = {source:sourceNeoTargetIdsMap,target:sourceNeoTargetIdsMap};
                     params.missingMappings = [];
                     params.uniqueRelations = [];
                     callbackSeries(null, params)
 
+                })
                 })
 
             },
@@ -456,8 +445,8 @@ var importDataIntoNeo4j = {
             // delete obj._id;
 
 
-            var neoIdStart = params.nodeMappings["_" + obj[params.sourceSourceField]];
-            var neoIdEnd = params.nodeMappings["_" + obj[params.sourceTargetField]];
+            var neoIdStart = params.nodeMappings.source[params.neoSourceLabel+"_" + obj[params.sourceSourceField]];
+            var neoIdEnd = params.nodeMappings.target[params.neoTargetLabel+"_" + obj[params.sourceTargetField]];
 
             if (neoIdStart == null | neoIdEnd == null) {
                 params.missingMappings.push(obj)
