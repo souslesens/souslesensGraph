@@ -108,6 +108,8 @@ var advancedSearch = (function () {
         })
     }
 
+
+
     self.addClauseByIdsArray=function(idKey,ids,label){
 
         toutlesensData.setSearchByPropertyListStatement (idKey, JSON.stringify(ids), function(err, result){
