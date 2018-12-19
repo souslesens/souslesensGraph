@@ -1150,6 +1150,7 @@ var toutlesensController = (function () {
 
         self.afterGraphInit = function () {
 
+
             currentActionObj = {graphType: "schema"};
             self.dispatchAction("showSchema");
 
@@ -1245,6 +1246,10 @@ var toutlesensController = (function () {
                 paint.initHighlight();
                 filters.setLabelsOrTypes("node");
             });
+
+
+
+
 
 
         }

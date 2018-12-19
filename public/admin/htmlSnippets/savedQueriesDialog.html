@@ -7,22 +7,23 @@
             <td align="left">
 
                 <br>
-                Saved Requests <select size="15" id="requests" onchange="loadRequest(null,true)"
-                        ondblclick="loadRequest(null,true)">
+                Saved Requests <select size="15" multiple="multiple" id="requestsSelect" ondblclick="requests.loadRequest($(this).val())">
                     <option>----------</option>
                 </select>
 
 
                 <br>
-                <button onclick="deleteRequest()">Delete request</button>
+                <button onclick="requests.deleteRequest()">Delete request</button>
+                <button onclick="requests.export(subGraph)">export</button>
+                <button onclick="requests.clearLocalStorage()">ClearAll</button>
             </td>
         </tr>
         <tr>
             <td>
-                <button onclick="initBatchNeoRefresh('Nodes');">Refresh
+                <button onclick="requests.executeRequestsUI('nodes');">Refresh
                     Neo4j Nodes
                 </button>
-                <button onclick="initBatchNeoRefresh('Rels');">Refresh
+                <button onclick="requests.executeRequestsUI('relations');">Refresh
                     Neo4j Relations
                 </button>
                 <br>

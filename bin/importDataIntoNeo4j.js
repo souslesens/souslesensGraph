@@ -48,100 +48,118 @@ var importDataIntoNeo4j = {
         neoMappings = [];
         countNodes = 0;
     },
-    importNodes: function (params, callback) {
-        var totalImported = 0;
-        var dbName = params.sourceDB;
-        var collection = params.sourceCollection;
-        var nameSourceField = params.sourceField;
-        var sourceKey = params.sourceKey;
-        var subGraph = params.subGraph;
-        var label = params.label;
-        var isDistinct = params.distinctValues ? true : false;
 
 
-        params.fields = importDataIntoNeo4j.setNodeSourceFieldsToExport(params);
-        var params = importDataIntoNeo4j.setLoadParams(params);
-
-        if (label == null)
-            label = collection;
-
-        // to avoid to import twice if browser timeout
-        // see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-dev/urswDsm6Pe0
-        // timeout 2 min et retry delay <5sec
-        if (lastImports.length > 0 && lastImports[lastImports.length - 1].label == label) {
-            var now = new Date();
-            if ((now - lastImports[lastImports.length - 1].startTime > (2 * 1000 * 60)) && (now - lastImports[lastImports.length - 1].endTime < (1000 * 5))) {
-                return callback(null, "Abort Retry on browser timeout");
-            }
-
+    importNodes: function (allParams, callback) {
+        var journal="";
+        if(!Array.isArray(allParams)){
+            allParams =[allParams];
         }
+        async.eachSeries(allParams,function(params,callbackEachRequest) {
+            var totalImported = 0;
+            var dbName = params.sourceDB;
+            var source = params.source;
+            var nameSourceField = params.sourceField;
+            var sourceKey = params.sourceKey;
+            var subGraph = params.subGraph;
+            var label = params.label;
+            var isDistinct = params.distinctValues ? true : false;
 
-        lastImports.push({label: label, startTime: new Date()});
-        console.log("------------Importing" + label)
 
+            params.fields = importDataIntoNeo4j.setNodeSourceFieldsToExport(params);
+            var params = importDataIntoNeo4j.setLoadParams(params);
 
-        var dataSubsetsToImport = [];
-        async.series([
+            if (label == null)
+                label = source;
 
-            //load data
-            function (callbackSeries) {
-                if (params.type == "csv") {
-                    importDataIntoNeo4j.loadCsvData(params, function (err, result) {
-                        if (err)
-                            return callbackSeries(err);
-                        dataSubsetsToImport = result
-                        callbackSeries(null, dataSubsetsToImport);
-                    });
-                } else if (params.type == "sourceDB") {
-// to finish   callbackSeries(null, dataSubsetsToImport);
+            // to avoid to import twice if browser timeout
+            // see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-dev/urswDsm6Pe0
+            // timeout 2 min et retry delay <5sec
+            if (lastImports.length > 0 && lastImports[lastImports.length - 1].label == label) {
+                var now = new Date();
+                if ((now - lastImports[lastImports.length - 1].startTime > (2 * 1000 * 60)) && (now - lastImports[lastImports.length - 1].endTime < (1000 * 5))) {
+                    return callback(null, "Abort Retry on browser timeout");
                 }
 
-            },
+            }
+
+            lastImports.push({label: label, startTime: new Date()});
+            console.log("------------Importing" + label)
 
 
-            //importToNeo each subset
-            function (callbackSeries) {
+            var dataSubsetsToImport = [];
+            async.series([
 
-                async.eachSeries(dataSubsetsToImport, function (subset, callbackEach) {
-                    if (subset.length == 0)
-                        callbackEach(null);
-                    importDataIntoNeo4j.writeNodesToNeo(params, subset, function (err, result) {
+                //load data
+                function (callbackSeries) {
+                    if (params.type == "csv") {
+                        importDataIntoNeo4j.loadCsvData(params, function (err, result) {
                             if (err)
                                 return callbackSeries(err);
-                            totalImported += result.results.length;
-                            var message = "Imported " + totalImported + " lines with label " + params.label;
-                            socket.message(message);
+                            dataSubsetsToImport = result
+                            callbackSeries(null, dataSubsetsToImport);
+                        });
+                    } else if (params.type == "sourceDB") {
+// to finish   callbackSeries(null, dataSubsetsToImport);
+                    }
+
+                },
+
+
+                //importToNeo each subset
+                function (callbackSeries) {
+
+                    async.eachSeries(dataSubsetsToImport, function (subset, callbackEach) {
+                        if (subset.length == 0)
                             callbackEach(null);
-                        }
-                    )
+                        importDataIntoNeo4j.writeNodesToNeo(params, subset, function (err, result) {
+                                if (err)
+                                    return callbackSeries(err);
+                                totalImported += result.results.length;
+                                var message = "Imported " + totalImported + " lines with label " + params.label;
+                                socket.message(message);
+                                callbackEach(null);
+                            }
+                        )
 
 
-                }, function (err, result) {// after all subset import in Neo
-                    if (err)
-                        return callbackSeries(err);
-                    var message = "import done : " + totalImported + "lines ";
-                    socket.message(message);
-                    console.log(message);
+                    }, function (err, result) {// after all subset import in Neo
+                        if (err)
+                            return callbackSeries(err);
+                        var message = "label :" + label +"import done : " + totalImported + "lines ";
+                        journal+=message+"<br>";
+                        socket.message(message);
+                        console.log(message);
 
-                    callbackSeries(null, message);
+                        callbackSeries(null, message);
 
-                })
-
-
-            }], function (err, result) {// at the end of series
-
-            callback(err, result[result.length - 1]);
+                    })
 
 
-        })
+                }], function (err, result) {// at the end of series
+
+                callbackEachRequest(err, result[result.length - 1]);
+
+
+            })
+        },
+            function(err){
+            callback(err, journal)
+            })
+
 
     }
     ,
 
-    importRelations: function (params, callback) {
+    importRelations: function (allParams, callback) {
+        var journal="";
+        if(!Array.isArray(allParams)){
+            allParams =[allParams];
+        }
+        async.eachSeries(allParams,function(params,callbackEachRequest) {
         var totalImported = 0;
         var dbName = params.sourceDB;
-        var sourceCollection = params.sourceCollection;
+        var source = params.source;
         var sourceSourceField = params.sourceSourceField;
         var neoSourceKey = params.neoSourceKey;
         var neoTargetKey = params.neoTargetKey;
@@ -265,7 +283,8 @@ var importDataIntoNeo4j = {
                 }, function (err, result) {// after all subset import in Neo
                     if (err)
                         return callbackSeries(err);
-                    var message = "import done : " + totalImported + "lines ";
+                    var message = "relation "+relationType+" import done : " + totalImported + "lines ";
+                    journal+=message+"<br>"
                     socket.message(message);
                     console.log(message);
 
@@ -275,10 +294,14 @@ var importDataIntoNeo4j = {
             }
         ], function (err, result) {// at the end of series
 
-            callback(err, result[result.length - 1]);
+            callbackEachRequest(err, result[result.length - 1]);
 
 
         })
+            },
+            function(err){
+                callback(err, journal)
+            })
     },
 
 
@@ -670,13 +693,13 @@ var importDataIntoNeo4j = {
     setLoadParams: function (params) {
 
         var loadParams = params;
-        if (params.sourceDB.toLowerCase().indexOf(".csv") > -1 || params.sourceDB.toLowerCase().indexOf(".txt") > -1) {//|| params.sourceDB.toLowerCase().indexOf(".txt") > -1) {
+        if (params.source.toLowerCase().indexOf(".csv") > -1 || params.source.toLowerCase().indexOf(".txt") > -1) {//|| params.sourceDB.toLowerCase().indexOf(".txt") > -1) {
             loadParams.type = "csv";
-            loadParams.filePath = "./uploads/" + params.sourceCollection + ".json";
+            loadParams.filePath = "./uploads/" + params.source + ".json";
             loadParams.fetchSize = 500;
         } else {
             loadParams = params;
-            loadParams.type = "sourceDB";
+            loadParams.type = "mongoDB";
         }
         return loadParams;
 
@@ -759,7 +782,7 @@ var importDataIntoNeo4j = {
 
 
         var dbName = loadParams.sourceDB;
-        var collection = loadParams.sourceCollection;
+        var source = loadParams.source;
         var query = params.sourceQuery;
         if (!query)
             query = {}
@@ -781,7 +804,7 @@ var importDataIntoNeo4j = {
             },
             function (_callback) {//iterate
                 var callback = _callback;
-                mongoProxy.pagedFind(currentIndex, serverParams.sourceFetchSize, dbName, collection, query, params.fields, function (err, resultsource) {
+                mongoProxy.pagedFind(currentIndex, serverParams.sourceFetchSize, dbName, source, query, params.fields, function (err, resultsource) {
                     if (err)
                         return rootCallBack(err);
 
@@ -820,7 +843,7 @@ var importDataIntoNeo4j = {
                 lastImports[lastImports.length - 1].endTime = new Date();
                 var message = "";
                 if (err) {
-                    var message = "  sourceDB:" + dbName + "  , collection:" + collection + "  ; " + JSON.stringify(err[0].message).substring(0, Math.min(200, err[0].message.length)) + "...";
+                    var message = "  sourceDB:" + dbName + "  , source:" + source + "  ; " + JSON.stringify(err[0].message).substring(0, Math.min(200, err[0].message.length)) + "...";
                     socket.message(message);
                     console.log(message);
                     rootCallBack(message);

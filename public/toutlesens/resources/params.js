@@ -25,82 +25,72 @@
  * SOFTWARE.
  *
  ******************************************************************************/
-var   serverRootUrl="";
+var serverRootUrl = "";
 var Gparams = {
+    plugins: ['keolis'],
+    displayVersion: "1_googleLike",
 
-    displayVersion:"1_googleLike",
-
-    searchNodeAutocompletion:true,
-    queryInElasticSearch:false,
-    ElasticResultMaxSize:1000,
-
+    searchNodeAutocompletion: true,
+    queryInElasticSearch: false,
+    ElasticResultMaxSize: 1000,
 
 
     //init defaults*******************************
-    defaultSubGraph:"DB_",
-    visibleLinkProperty:null,
-    logLevel:5,
+    defaultSubGraph: "DB_",
+    visibleLinkProperty: null,
+    logLevel: 5,
     readOnly: true,
-    showRelationAttrs:true,
+    showRelationAttrs: true,
     startWithBulkGraphView: false,
-    defaultNodeNameProperty:"name",
-    defaultQueryDepth:1,
-    defaultGraphtype:"FLOWER",
+    defaultNodeNameProperty: "name",
+    defaultQueryDepth: 1,
+    defaultGraphtype: "FLOWER",
     graphNavigationMode: "expandNode",
     modifyMode: 'onList',//''onList',
-    useVisjsNetworkgraph:true,
-    graphAllowPaint:true,
-    allowOrphanNodesInGraphQuery:true,
+    useVisjsNetworkgraph: true,
+    graphAllowPaint: true,
+    allowOrphanNodesInGraphQuery: true,
 
-    searchInputKeyDelay:500,
-    searchInputMinLength:2,
-    showRelationNames:true,
-    limitToOptimizeGraphOptions:1000,
-
-
+    searchInputKeyDelay: 500,
+    searchInputMinLength: 2,
+    showRelationNames: true,
+    limitToOptimizeGraphOptions: 1000,
 
 
 //limits************************************
-    maxResultSupported:5000,
-    graphMaxDataLengthToDisplayGraphDirectly:1000,
-    bulkGraphViewMaxNodesToDrawLinks:1000,
-    listDisplayLimitMax:1500,
-    jsTreeMaxChildNodes:1500,
+    maxResultSupported: 5000,
+    graphMaxDataLengthToDisplayGraphDirectly: 1000,
+    bulkGraphViewMaxNodesToDrawLinks: 1000,
+    listDisplayLimitMax: 1500,
+    jsTreeMaxChildNodes: 1500,
     maxDepthExplorationAroundNode: 3,
-    maxNodesForRelNamesOnGraph:100,
-    showLabelsMaxNumOfNodes:4000,//in fact relations
+    maxNodesForRelNamesOnGraph: 100,
+    showLabelsMaxNumOfNodes: 4000,//in fact relations
 
 
-
-    shortestPathMaxDistanceTest:8,
-    graphDefaultLayout:"random",
-    graphDefaultShape:"dot",
+    shortestPathMaxDistanceTest: 8,
+    graphDefaultLayout: "random",
+    graphDefaultShape: "dot",
 
     //urls************************
-    httpProxyUrl: serverRootUrl+"/http",
-    neo4jProxyUrl: serverRootUrl+"/neo",
-    rdfProxyUrl: serverRootUrl+"/rdf",
-    restProxyUrl: serverRootUrl+"/rest",
-    mongoProxyUrl: serverRootUrl+"/source",
-    uploadToNeo: serverRootUrl+"/uploadToNeo",
-    storedParamsUrl: serverRootUrl+"/storedParams",
-    imagesRootPath: serverRootUrl+"/files/albumPhotos/",
-
-
-
+    httpProxyUrl: serverRootUrl + "/http",
+    neo4jProxyUrl: serverRootUrl + "/neo",
+    rdfProxyUrl: serverRootUrl + "/rdf",
+    restProxyUrl: serverRootUrl + "/rest",
+    mongoProxyUrl: serverRootUrl + "/source",
+    uploadToNeo: serverRootUrl + "/uploadToNeo",
+    storedParamsUrl: serverRootUrl + "/storedParams",
+    imagesRootPath: serverRootUrl + "/files/albumPhotos/",
 
 
     //divs size*************************
-        rightPanelTotalWidthRatio: .3,
-    infosanalyzePanelHeight:300,
-
+    rightPanelTotalWidthRatio: .3,
+    infosanalyzePanelHeight: 300,
 
 
     //durations************************************
-    durationMsecBeforeGraphStop:8000,
+    durationMsecBeforeGraphStop: 8000,
     forceAnimationDuration: 2000,
-
-
 
 
     //others****************************************
@@ -121,9 +111,6 @@ var Gparams = {
     navigationStyle: "",// , "jpt" // Jean Paul
 
 
-
-
-
 //Graph display defaults***************************
     circleR: 15,
     defaultNodeColor: "grey",
@@ -133,11 +120,9 @@ var Gparams = {
     relStrokeWidth: 4,
 
 
-
-
-    outlineColor:"grey",
-    outlineEdgeWidth:10,
-    outlineTextColor:"red",
+    outlineColor: "grey",
+    outlineEdgeWidth: 10,
+    outlineTextColor: "red",
 
     minOpacity: .3,
     d3ForceParams: {distance: 200, charge: -500, gravity: .25},
@@ -147,37 +132,37 @@ var Gparams = {
     treeGraphVertSpacing: 35,
     smallDialogSize: {w: 300, h: 400},
     bigDialogSize: {w: 1000, h: 800},
-    showBItab:false,
+    showBItab: false,
     gantt: {
         name: "nom",
         startField: "datedebut",
         endField: "datefin",
     },
 
- /*   palette: ['#B39BAB', '#FF78FF', '#A84F02', '#A8A302', '#0056B3',
-        '#B354B3', '#FFD900', '#B37A00', '#B3B005', '#007DFF', '#F5ED02',
-        '#F67502', '#B35905', '#FFFB08', '#FF7D07', '#FFDEF4',]
-,*/
+    /*   palette: ['#B39BAB', '#FF78FF', '#A84F02', '#A8A302', '#0056B3',
+           '#B354B3', '#FFD900', '#B37A00', '#B3B005', '#007DFF', '#F5ED02',
+           '#F67502', '#B35905', '#FFFB08', '#FF7D07', '#FFDEF4',]
+   ,*/
 
 //http://tools.medialab.sciences-po.fr/iwanthue/palettes.php
- palette:[
-     "#0072d5",
-     '#FF7D07',
-     "#c00000",
-     '#FFD900',
-     '#B354B3',
-     "#a6f1ff",
-     "#007aa4",
-     "#584f99",
-     "#cd4850",
-     "#005d96",
-     "#ffc6ff",
-     '#007DFF',
-     "#ffc36f",
-     "#ff6983",
-     "#7fef11",
-     '#B3B005',
- ],
+    palette: [
+        "#0072d5",
+        '#FF7D07',
+        "#c00000",
+        '#FFD900',
+        '#B354B3',
+        "#a6f1ff",
+        "#007aa4",
+        "#584f99",
+        "#cd4850",
+        "#005d96",
+        "#ffc6ff",
+        '#007DFF',
+        "#ffc36f",
+        "#ff6983",
+        "#7fef11",
+        '#B3B005',
+    ],
     paletteX: [
         '#F5ED02',
         '#007DFF',

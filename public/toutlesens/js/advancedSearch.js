@@ -108,6 +108,26 @@ var advancedSearch = (function () {
         })
     }
 
+    self.addClauseByIdsArray=function(idKey,ids,label){
+
+        toutlesensData.setSearchByPropertyListStatement (idKey, JSON.stringify(ids), function(err, result){
+            var where=result;
+
+          var   clauseText = ": <b> " + ids+ " "+label +" </b>"
+            self.currentQueryNodeIds=ids;
+            var clause= {foundIds: ids.length,
+                nodeLabel:label,
+                where:where
+
+            }
+
+            self.addClause(clause, clauseText);
+
+
+        })
+
+    }
+
     self.addClause = function (clause, clauseText) {
 
         $("#searchDialog_NextPanelButton").css('visibility', 'visible');

@@ -447,7 +447,7 @@ var toutlesensData = (function () {
             }
             query += "] ";
             toutlesensData.whereFilter = query;
-            callback(null, []);
+            callback(null, query);
 
         }
 

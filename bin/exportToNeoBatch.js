@@ -98,7 +98,7 @@ var exportToNeoBatch = {
                     //  requestObj={params:requestObj};
 
                     if (request.name.indexOf("Nodes_") == 0) {
-                        requestObj.sourceCollection = requestObj.sourceCollectionNode;
+                        requestObj.sourceCollection = requestObj.sourceNode;
                         importDataIntoNeo4j.exportNodes(requestObj, function (err, result) {
                             if (err) {
                                 console.log(err);

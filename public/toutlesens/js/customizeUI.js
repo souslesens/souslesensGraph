@@ -26,41 +26,40 @@
  ******************************************************************************/
 var customizeUI = (function () {
     self = {}
-    self.hideFilters=false;
+    self.hideFilters = false;
 
     var idsList;
- //   var legendDivWidth=Gparams.rightPanelWidth;
+    //   var legendDivWidth=Gparams.rightPanelWidth;
 
     self.customInfo = function (obj) {
 
 
+        if (queryParams.sinequaCallbackUrl && obj.labelNeo == "norme") {
 
-        if (queryParams.sinequaCallbackUrl && obj.labelNeo=="norme") {
-			
             var str = "";
 
-            if (obj.neoAttrs && obj.neoAttrs.id_doc){
-				
+            if (obj.neoAttrs && obj.neoAttrs.id_doc) {
+
                 // str = "<a href='" + queryParams.sinequaCallbackUrl + "?~~ID~~=" + obj.neoAttrs.id_doc + "target='_parent'>search in Sinequa</a>";
-				str = '<a href="'+
-					//decodeURIComponent(queryParams.sinequaCallbackUrl).replace('~~ID~~',obj.neoAttrs.id_doc)+
-                  (queryParams.sinequaCallbackUrl).replace('~~ID~~',obj.neoAttrs.id_doc)+
-					'" target="_parent">Show in Sinequa</a>';
-			}
+                str = '<a href="' +
+                    //decodeURIComponent(queryParams.sinequaCallbackUrl).replace('~~ID~~',obj.neoAttrs.id_doc)+
+                    (queryParams.sinequaCallbackUrl).replace('~~ID~~', obj.neoAttrs.id_doc) +
+                    '" target="_parent">Show in Sinequa</a>';
+            }
 
             return str;
 
         }
-        if (queryParams.entityFilterUrl && obj.labelNeo=="ref") {
+        if (queryParams.entityFilterUrl && obj.labelNeo == "ref") {
 
             var str = "";
 
-            if (obj.neoAttrs && obj.neoAttrs.ref){
+            if (obj.neoAttrs && obj.neoAttrs.ref) {
 
                 // str = "<a href='" + queryParams.sinequaCallbackUrl + "?~~ID~~=" + obj.neoAttrs.id_doc + "target='_parent'>search in Sinequa</a>";
-                str = '<a href="'+
-                   // decodeURIComponent(queryParams.entityFilterUrl).replace('~~ID~~',obj.neoAttrs.ref)+
-                    (queryParams.entityFilterUrl).replace('~~Ref~~',obj.neoAttrs.ref)+
+                str = '<a href="' +
+                    // decodeURIComponent(queryParams.entityFilterUrl).replace('~~ID~~',obj.neoAttrs.ref)+
+                    (queryParams.entityFilterUrl).replace('~~Ref~~', obj.neoAttrs.ref) +
                     '" target="_parent">Search in Sinequa</a>';
             }
 
@@ -72,12 +71,10 @@ var customizeUI = (function () {
 
     }
     self.init = function () {
+        customizeUI.addPlugins(Gparams.plugins)
 
-
-
-
-    if( queryParams.sinequaCallbackUrl)
-        customizeUI.customizationName="Sinequa";
+        if (queryParams.sinequaCallbackUrl)
+            customizeUI.customizationName = "Sinequa";
     }
 
     self.customize = function () {
@@ -90,35 +87,43 @@ var customizeUI = (function () {
         if (initialQuery && initialQuery.length > 0) {
 
 
-            var idsList=initialQuery.split(",");
+            var idsList = initialQuery.split(",");
             Gparams.startWithBulkGraphView = false;
-            currentDisplayType="SIMPLE_FORCE_GRAPH";
+            currentDisplayType = "SIMPLE_FORCE_GRAPH";
 
             toutlesensController.setResponsiveDimensions(0);
-            toutlesensData.setSearchByPropertyListStatement("id",idsList, function (err, result) {
-                    toutlesensController.generateGraph(null,{applyFilters:true},function(){
+            toutlesensData.setSearchByPropertyListStatement("id", idsList, function (err, result) {
+                toutlesensController.generateGraph(null, {applyFilters: true}, function () {
 
-                        $("#filtersDiv").html("");
-                        $("#graphMessage").html("");
+                    $("#filtersDiv").html("");
+                    $("#graphMessage").html("");
 
 
-
-                    });
+                });
 
             })
 
         }
-        else{
+        else {
             toutlesensController.setResponsiveDimensions(rightPanelWidth);
-            if(Gparams.startWithBulkGraphView )
-             advancedSearch.showBulkGraph(subGraph);
+            if (Gparams.startWithBulkGraphView)
+                advancedSearch.showBulkGraph(subGraph);
         }
 
 
     }
 
+    self.addPlugins = function (plugins) {
+        plugins.forEach(function (plugin) {
+            $("#findTabsUl").append("  <li><a href='#" + plugin + "Div'><span id='lang_60'>" + plugin + "</span></a></li>")
+            $("#findTabs").append("<div id='" + plugin + "Div'></div>") .ready(function () {
+                $("#"+ plugin + "Div").load("plugins/"+plugin+"/index.html")
+            });
+
+        })
 
 
+    }
 
 
     return self;

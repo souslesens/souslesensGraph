@@ -21,10 +21,12 @@ var admin = (function () {
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
                 setCsvImportFields(data);
-                loadRequests();
+               // loadRequests();
                 $("#message").css("color", "green");
                 $("#message").html("file loaded " + data.name);
-                requests.saveCSVsource(data)
+                requests.saveCSVsource(data);
+                requests.list(subGraph,requestsSelect);
+                requests.loadSubGraphCSVsources()
             },
             error: function (xhr, err, msg) {
                 $("#message").css("color", "red");
@@ -89,7 +91,14 @@ var admin = (function () {
 
     }
 
-    self.initImportDialogSelects = function (columnNames) {
+    self.initImportDialogSelects = function (_columnNames) {
+       var columnNames=[];
+        _columnNames.forEach(function(column){
+            if(column!="")
+                columnNames.push(column)
+            })
+
+
         columnNames.splice(0, 0, "");
         common.fillSelectOptionsWithStringArray(sourceKey, columnNames);
         common.fillSelectOptionsWithStringArray(sourceField, columnNames);

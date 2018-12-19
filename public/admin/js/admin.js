@@ -248,8 +248,8 @@ function onCollSelect() {
         return;
     }
     var collectionName = $("#collSelect").val();
-    $("#sourceCollectionNode").val(collectionName);
-    $("#sourceCollectionRel").val(collectionName);
+    $("#sourceNode").val(collectionName);
+    $("#sourceRel").val(collectionName);
     clearImportFields();
     var dbName = $("#dbSelect").val();
 
@@ -373,7 +373,7 @@ function validatesourceQuery(sourceQuery) {
 function exportNeoNodes(execute, save) {
     importType = "NODE";
     var sourceDB = $("#dbSelect").val();
-    var sourceCollectionNode = $("#sourceCollectionNode").val();
+    var sourceNode = $("#sourceNode").val();
     var exportedFields = $("#exportedFields").val();
     if (exportedFields == "")
         exportedFields = "none";
@@ -395,8 +395,7 @@ function exportNeoNodes(execute, save) {
     var query = "action=exportsource2NeoNodes";
 
     var data = {
-        sourceDB: sourceDB,
-        sourceCollection: sourceCollectionNode,
+        source: sourceNode,
         exportedFields: exportedFields,
         sourceField: sourceField,
         sourceKey: sourceKey,
@@ -421,7 +420,7 @@ function exportNeoNodes(execute, save) {
 
     $("#exportParams").val(JSON.stringify(data).replace(/,/, ",\n"));
     if (save)
-        requests.saveImportParams(data);
+        requests.saveRequest(data);
        // saveRequest(JSON.stringify(data).replace(/,/, ",\n"));
     if (execute) {
         $("#exportResultDiv").html("");
@@ -460,7 +459,7 @@ function clearImportFields() {
 function exportNeoLinks(execute, save) {
     importType = "LINK";
     var sourceDB = $("#dbSelect").val();
-    var sourceCollectionRel = $("#sourceCollectionRel").val();
+    var sourceRel = $("#sourceRel").val();
     var sourceSourceField = $("#sourceSourceField").val();
     var neoSourceLabel = $("#neoSourceLabel").val();
     var neoSourceKey = $("#neoSourceKey").val();
@@ -476,7 +475,7 @@ function exportNeoLinks(execute, save) {
 
     var data = {
         sourceDB: sourceDB,
-        sourceCollection: sourceCollectionRel,
+        source: sourceRel,
         sourceSourceField: sourceSourceField,
         neoSourceKey: neoSourceKey,
         neoSourceLabel: neoSourceLabel,
@@ -506,7 +505,7 @@ function exportNeoLinks(execute, save) {
     $("#exportParams").val(JSON.stringify(data).replace(/,/, ",\n"));
 
     if (save)
-        saveRequest(JSON.stringify(data).replace(/,/, ",\n"));
+        requests.saveRequest(data);
     if (execute) {
         $("#exportResultDiv").html("");
         callExportToNeo("relation", data,function(err, result){
@@ -580,250 +579,7 @@ function loadSubgraphs(defaultSubGraph) {
 };
 
 
-function deleteRequest() {
-    var request = $("#requests").val();
-    var db = $("#dbSelect").val();
 
-    if (confirm("delete request :" + request)) {
-        if (db.indexOf(".csv") > -1) {
-            var requestsObj = {};
-            var index=-1;
-            for (var i = 0; i < currentRequests.length; i++) {
-                if (currentRequests[i].name != request)
-                    requestsObj[currentRequests[i].name] = currentRequests[i];
-                else
-                    index=i;
-            }
-
-
-            var path = "./uploads/requests_" + $("#collSelect").val() + ".json";
-            var paramsObj = {
-                path: path,
-                store: true,
-                data: requestsObj
-            }
-            $.ajax({
-                type: "POST",
-                url:  "../../.."+serverRootUrl+"/jsonFileStorage",
-                data: paramsObj,
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    common.setMessage("request " + request + " deleted", "green");
-                    $("#requests option:contains(" + request + ")").remove();
-                   if(index>-1)
-                    currentRequests.splice(index, 1);
-                },
-
-                error: function (xhr, err, msg) {
-                    common.setMessage(err, "red");
-                    console.log(xhr);
-                    console.log(err);
-                    console.log(msg);
-                },
-
-            });
-
-        } else {
-
-            callsource("", {
-                delete: 1,
-                dbName: db,
-                collectionName: "requests_" + request,
-                query: {name: request},
-            }, function (result) {
-                $("#requests option:contains(" + request + ")").remove();
-            });
-        }
-    }
-}
-
-
-function saveRequest(json) {
-    var subGraph = $("#subGraphSelect").val();
-    var query = "action=saveQuery";
-    var sourceDB = $("#dbSelect").val();
-    var sourceField = $("#sourceField").val();
-    //var json = $("#exportParams").val();
-    if (json.indexOf("relationType") > -1) {
-        json = json.replace("sourceCollection", "sourceCollectionRel");
-    }
-    if (json.indexOf("label") > -1) {
-        json = json.replace("sourceCollection", "sourceCollectionNode");
-    }
-
-    json = json.replace('"sourceDB":"' + sourceDB + '",', "");// on ne stoke pas la base
-    var jsonObj = JSON.parse(json);
-    var name = "";
-    var type = "";
-    if (json.indexOf("relationType") > -1) {
-        type = "relation";
-        name = "Rels_" + $("#subGraphSelect").val() + "." + $("#neoSourceLabel").val()
-            + "->" + $("#neoTargetLabel").val() + ":" + jsonObj.relationType;
-
-    }
-    if (json.indexOf("label") > -1) {
-        type = "node";
-        name += "Nodes_" + $("#subGraphSelect").val() + "." + $("#label").val() + "_" + sourceField;
-    }
-
-
-    data = {
-        sourceDB: sourceDB,
-        type: type,
-        request: json,
-        name: name,
-        date: new Date()
-    }
-    var query = {name: name};
-
-    if (sourceDB.indexOf(".csv") > -1) {
-        var requestsObj = {}
-        if (currentRequests) {
-            for (var i = 0; i < currentRequests.length; i++) {
-                requestsObj[currentRequests[i].name] = currentRequests[i];
-            }
-
-        }
-        else {
-            currentRequests = [];
-        }
-
-        currentRequests.push(data)
-
-        requestsObj[name] = data;
-        var path = "./uploads/requests_" + $("#collSelect").val() + ".json";
-        var paramsObj = {
-
-
-            path: path,
-            store: true,
-            data: requestsObj
-        }
-        $.ajax({
-            type: "POST",
-            url:  "../../.."+serverRootUrl+"/jsonFileStorage",
-            data: paramsObj,
-            dataType: "json",
-            success: function (data, textStatus, jqXHR) {
-                common.setMessage(data.result, "green");
-                try {
-                   // loadRequests();
-                }
-                catch (e) {
-                    console("!!!loadRequests!!!" + e);
-                }
-                return;
-            },
-
-            error: function (xhr, err, msg) {
-                common.setMessage(err, "red");
-                console.log(xhr);
-                console.log(err);
-                console.log(msg);
-            },
-
-        });
-
-
-    } else {
-        callsource("", {
-            updateOrCreate: 1,
-            dbName: sourceDB,
-            collectionName: "requests",
-            query: query,
-            data: data
-        }, function (result) {
-
-            loadRequests()
-        });
-
-    }
-}
-
-function loadRequests() {
-    var dbName = $("#dbSelect").val();
-    var subGraph = $("#subGraphSelect").val();
-
-    if ($("#importSourceType").val().indexOf("CSV")>-1) {
-        var path = "./uploads/requests_" + $("#collSelect").val() + ".json";
-        var paramsObj = {
-            path: path,
-            retrieve: true,
-
-        }
-        $.ajax({
-            type: "POST",
-            url:  "../../.."+serverRootUrl+"/jsonFileStorage",
-            data: paramsObj,
-            dataType: "json",
-            success: function (data, textStatus, jqXHR) {
-                if (!data)
-                    return;
-                //   var currentRequestsObj = data;
-                //  var requestsArray = [];
-                currentRequests = [];
-                for (var key in data) {
-                    if (typeof data[key].request == "string")
-                        data[key].request = JSON.parse(data[key].request);
-                    currentRequests.push(data[key]);
-
-
-                }
-
-                /*  for (var key in currentRequestsObj) {
-
-                 var obj = currentRequestsObj[key];
-                 if(typeof obj.request=="string")
-                 obj.request=JSON.parse( obj.request);
-                 currentRequests.push(obj);
-                 }*/
-            common.fillSelectOptions(requests, currentRequests, "name", "name");
-               // setRequestSubGraphFilterOptions();
-            },
-
-            error: function (xhr, err, msg) {
-                console.log(xhr);
-                console.log(err);
-                console.log(msg);
-            },
-
-        });
-    }
-    else {
-        callsource("", {
-            find: 1,
-            dbName: dbName,
-            collectionName: "requests",
-            sourceQuery: "{}"
-        }, function (data) {
-
-
-            data.sort(function (a, b) {
-                if (a.name > b.name)
-                    return 1;
-                if (a.name < b.name)
-                    return -1;
-                return 0;
-            });
-
-            currentRequests = data;
-            for (var i = 0; i < currentRequests.length; i++) {
-                if (currentRequests[i].request) {
-                    currentRequests[i].request = JSON.parse(currentRequests[i].request);
-                    if (currentRequests[i].sourceIdField)//patch
-                        currentRequests[i].sourceKey = currentRequests.sourceIdField
-                }
-            }
-
-            common.common.fillSelectOptions(requests, currentRequests, "name", "name");
-            setRequestSubGraphFilterOptions();
-
-
-        });
-    }
-
-
-}
 
 function setRequestSubGraphFilterOptions() {
     loadLabels();
@@ -853,52 +609,7 @@ function filterRequests(select) {
     common.fillSelectOptions(requests, filteredRequests, "name", "name");
 }
 
-function loadRequest(requestName, changeTab) {
 
-    if (!requestName)
-        requestName = $("#requests").val();
-    if (requestName.startsWith("Node"))
-        clearInputs("nodeInput");
-    if (requestName.startsWith("Rel"))
-        clearInputs("linkInput");
-    var requests = [];
-
-    if (Array.isArray(currentRequests))// case source
-        requests = currentRequests
-    else {// case CSV
-        for (var key in currentRequests) {
-            requests.push(currentRequests[key]);
-        }
-    }
-
-    for (var i = 0; i < requests.length; i++) {
-        if (requests[i].name == requestName) {
-            var obj = requests[i].request;
-
-            for (var key in obj) {
-
-                $("#" + key).val(obj[key]);
-                if (key == "distinctValues" && obj[key] == true) {
-                    $("#distinctValues").prop('checked', 'checked');
-                }
-
-
-            }
-
-            $("#neoTargetKey").html("").append('<option>'+obj["neoTargetKey"]+'</option>');
-            $("#neoSourceKey").html("").append('<option>'+obj["neoSourceKey"]+'</option>');
-
-
-            if (changeTab && requestName.startsWith("Node"))
-                $( "#accordion" ).accordion( "option", "active",2 );
-
-            else if (changeTab && requestName.startsWith("Rel"))
-                $( "#accordion" ).accordion( "option", "active",3 );
-
-            return;
-        }
-    }
-}
 
 
 function deleteNeoSubgraph(subGraph) {
@@ -1088,7 +799,7 @@ function onSubGraphSelect(select, showgraph) {
     if (value == "")
         return;
     loadLabels($('#subGraphSelect').val());
-    requests.init(value)
+    requests.init(value);
     var subGraph = $("#subGraphSelect").val();
     if (showgraph) {
         admin.drawVisjsGraph()
@@ -1227,8 +938,8 @@ json.header.splice(0,0,"")
 
     common.fillSelectOptionsWithStringArray(collSelect,[json.name]);
     $("#collSelect").val(json.name);
-    $("#sourceCollectionRel").val(json.name);
-    $("#sourceCollectionNode").val(json.name);
+    $("#sourceRel").val(json.name);
+    $("#sourceNode").val(json.name);
 
     common.fillSelectOptionsWithStringArray(dbSelect,  [json.name]);
 //  $("#dbSelect").val('CSV');

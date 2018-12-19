@@ -27,53 +27,67 @@
 /*var Gparams = {
  neo4jProxyUrl: "../http",
  };*/
-var newSubgraph="";
-function downloadNodeJson(outputType, outputObj) {
+var newSubgraph = "";
+var fetchSize = 10000
+
+function downloadJson(outputType, type) {
     var limit = parseInt($("#limit").val())
     var subGraphExport = $("#subGraphExportSelect").val();
-    var whereSubGraph ="";
-    if(subGraphExport!="")
-     whereSubGraph = " where n.subGraph=\"" + subGraphExport + "\" ";
+    var whereSubGraph = "";
+    if (subGraphExport != "")
+        whereSubGraph = " where n.subGraph=\"" + subGraphExport + "\" ";
     var whereLabel = setWhereLabels();
 
-     newSubgraph=prompt("import in subGraph ",subGraphExport);
-if(newSubgraph==null)
-    return;
+    newSubgraph = prompt("import in subGraph ", subGraphExport);
+    if (newSubgraph == null)
+        return;
 
-    var match = "MATCH (n) " + whereSubGraph + whereLabel
-        + "return  n,ID(n)  limit " + limit;
-    console.log(match);
-    callNeoMatch(match,null, function (data) {
-        for(var i=0;i<data.length;i++){
-            if(  data[i].n.properties )
-            data[i].n.properties.subGraph=newSubgraph;
+    var totalExported = 0
+    var skip = 0;
+    var fetchIndex = 1
+    var fetchCount = 1
 
-        }
-        download(JSON.stringify(data),newSubgraph+".nodes.cypher", "text/plain");
-       // download(newSubgraph+".nodes.cypher",JSON.stringify(data));
-      /*  callExportToNeo("copyNodes", data, function (result) {
-            var xx = result;
+    async.whilst(
+        function () {
+            return (fetchCount > 0 && totalExported < limit);
 
-        });*/
+        },
+        function (callback) {
+            var match = "";
+            var prefix = type + "s";
+            if (type == "node") {
+                match = "MATCH (n) " + whereSubGraph + whereLabel
+                    + "return  n,ID(n) order by ID(n) skip " + totalExported + " limit " + fetchSize;
+            }
 
-    });
+            else if (type == "relation") {
+                match = "MATCH (n)-[r]->(m)" + whereSubGraph + ""
+                    + " return  r order by ID(r) skip  " + totalExported + " limit " + limit;
+            }
+            console.log(match);
+            callNeoMatch(match, null, function (data) {
+                fetchCount = data.length;
+                totalExported += fetchCount;
+                for (var i = 0; i < data.length; i++) {
+                    if (type == "node") {
+                        if (data[i].n.properties)
+                            data[i].n.properties.subGraph = newSubgraph;
+                    }
+                    else if (type == "relation") {
+                        if (data[i].r.properties)
+                            data[i].r.properties.subGraph = newSubgraph;
 
-}
+                    }
+                }
+                if (fetchCount > 0)
+                    download(JSON.stringify(data), newSubgraph + "." + prefix + "_" + (fetchIndex++) + ".cypher", "text/plain");
+                callback(null, fetchCount);
 
-
-function downloadRelJson(outputType, outputObj) {
-    var limit = parseInt($("#limit").val())
-    var subGraphExport = $("#subGraphExportSelect").val();
-    var whereSubGraph = " where n.subGraph=\"" + subGraphExport + "\" ";
-    var match = "MATCH (n)-[r]->(m)" + whereSubGraph +""
-        + " return  r limit " + limit;
-    console.log(match);
-    callNeoMatch(match,null, function (data) {
-        download(JSON.stringify(data),newSubgraph+".relations.cypher", "text/plain");
-       // download(newSubgraph+".relations.cypher",JSON.stringify(data));
-
-
-    });
+            });
+        },
+        function (err) {
+            common.setMessage("export done, records : "+totalExported, "green")
+        });
 
 }
 
@@ -88,21 +102,22 @@ function setWhereLabels() {
     }
     var whereLabel = " and (";
     for (var i = 0; i < exportedLabels.length; i++) {
-        if(exportedLabels[i]=="")
+        if (exportedLabels[i] == "")
             continue;
         if (i > 0)
             whereLabel += " OR ";
 
-        var p=exportedLabels[i].indexOf(",");// multi labels
-        if(  p>-1) {
+        var p = exportedLabels[i].indexOf(",");// multi labels
+        if (p > -1) {
             exportedLabels[i] = exportedLabels[i].substring(0, p);
-            exportedLabels.push( exportedLabels[i].substring(p+1));
+            exportedLabels.push(exportedLabels[i].substring(p + 1));
         }
         whereLabel += "n:" + exportedLabels[i];
     }
     whereLabel += ") ";
     return whereLabel;
 }
+
 function showResult(str, type) {
     download(type + ".cypher", str);
     if (str.length > 50000) {
@@ -167,7 +182,7 @@ function onSubGraphExportSelect() {
 
 function setExportLabels(subGraph) {
     var checked = "checked='checked'";
-    callNeoMatch(" MATCH (n) where n.subGraph=\"" + subGraph + "\" RETURN DISTINCT  LABELS(n) as name, COUNT(n) as count", null,function (labels) {
+    callNeoMatch(" MATCH (n) where n.subGraph=\"" + subGraph + "\" RETURN DISTINCT  LABELS(n) as name, COUNT(n) as count", null, function (labels) {
         str = "";
         str += "<table><tr align='center' class='italicSpecial'><td ><span class='bigger'>Noeuds</span></td><td>Inclure<br><input type='checkbox' checked='checked' id='#comuteAllFiltersNodesInclude' onchange='comuteAllCBXs(this)'></td>" +
             "</tr>";
@@ -175,7 +190,7 @@ function setExportLabels(subGraph) {
             str += "<tr align='center'>";
             str += "</td><td>" + labels[i].name + "(" + labels[i].count + ")";
             str += "<td><input type='checkbox' name='labelCbx' value='"
-                + labels[i].name + "'" + checked  + "/> "
+                + labels[i].name + "'" + checked + "/> "
 
             str += "<td></tr>";
         }
@@ -203,9 +218,9 @@ function comuteAllCBXs(caller) {
 
 }
 
-function importOnServer(){
-    var path=$("#importPathOnServer").val();
-    if( path==""){
+function importOnServer() {
+    var path = $("#importPathOnServer").val();
+    if (path == "") {
         $("#message").html("  server path is mandatory");
         return;
     }

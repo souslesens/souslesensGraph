@@ -10,7 +10,7 @@ var requests = (function () {
 
         if (!allParams) {
             allParams = {}
-            allParams[subGraph] = {};
+            allParams[subGraph] = {requests: {}};
         }
         else {
             try {
@@ -18,14 +18,20 @@ var requests = (function () {
             }
             catch (e) {
                 allParams = {}
-                allParams[subGraph] = {};
+                allParams[subGraph] = {requests: {}};
             }
         }
         self.loadSubGraphCSVsources()
-
+        self.list(subGraph, requestsSelect);
+        setCsvImportFields(allParams[subGraph]);
     }
 
-
+    self.clearLocalStorage = function () {
+        if (confirm("clear all requests for subGraph" + subGraph))
+            delete  allParams[subGraph]
+        localStorage.setItem(localStorageKey, allParams)
+        self.init(subGraph)
+    }
     self.loadSubGraphCSVsources = function () {
         var files = [];
 
@@ -49,7 +55,7 @@ var requests = (function () {
             allParams[data.subGraph] = {};
         if (!allParams[data.subGraph][data.name]) {
             allParams[data.subGraph][data.name] = data;
-            allParams[data.subGraph][data.name].requests = {};
+            allParams[data.subGraph][data.name].requests = [];
             localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2))
             self.loadSubGraphCSVsources();
 
@@ -57,186 +63,117 @@ var requests = (function () {
     }
 
 
-    self.saveImportParams = function (json) {
+    self.saveRequest = function (json) {
         var subGraph = $("#subGraphSelect").val();
         var query = "action=saveQuery";
         var sourceDB = $("#dbSelect").val();
+        var source = $("#sourceNode").val();
         var sourceField = $("#sourceField").val();
         //var json = $("#exportParams").val();
         var name = "";
         var type = "";
         if (json["relationType"]) {
-            json.sourceCollection = json.sourceCollectionRel;
+            json.sourceCollection = json.sourceRel;
             type = "relation";
             name = "Rels_" + $("#subGraphSelect").val() + "." + $("#neoSourceLabel").val()
-                + "->" + $("#neoTargetLabel").val() + ":" + jsonObj.relationType;
+                + "->" + $("#neoTargetLabel").val() + ":" + json.relationType;
         }
         if (json["label"]) {
-            json.sourceCollection = json.sourceCollectionNode;
+            json.sourceCollection = json.sourceNode;
             type = "node";
             name += "Nodes_" + $("#subGraphSelect").val() + "." + $("#label").val() + "_" + sourceField;
         }
-
+        json.source = source;
         if (!allParams[subGraph][source].requests)
-            allParams[subGraph][source].requests = {};
-        allParams[subGraph][source].requests[name] = json;
+            allParams[subGraph][source].requests = [];
+        if (!allParams[subGraph].requests)
+            allParams[subGraph].requests = {};
+        allParams[subGraph].requests[name] = json;
+        allParams[subGraph][source].requests.push(name);
         localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2));
-
         return;
-        data = {
-            sourceDB: sourceDB,
-            type: type,
-            request: json,
-            name: name,
-            date: new Date()
+
+    }
+    self.list = function (subGraph, select) {
+        if (!allParams)
+            self.init();
+        var requests = []
+        for (var key in allParams[subGraph].requests) {
+            requests.push(key)
         }
-        var query = {name: name};
-
-        if (sourceDB.indexOf(".csv") > -1) {
-            var requestsObj = {}
-            if (currentRequests) {
-                for (var i = 0; i < currentRequests.length; i++) {
-                    requestsObj[currentRequests[i].name] = currentRequests[i];
-                }
-
-            }
-            else {
-                currentRequests = [];
-            }
-
-            currentRequests.push(data)
-
-            requestsObj[name] = data;
-            var path = "./uploads/requests_" + $("#collSelect").val() + ".json";
-            var paramsObj = {
-
-
-                path: path,
-                store: true,
-                data: requestsObj
-            }
-            $.ajax({
-                type: "POST",
-                url: "../../.." + serverRootUrl + "/jsonFileStorage",
-                data: paramsObj,
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    common.setMessage(data.result, "green");
-                    try {
-                        // loadRequests();
-                    }
-                    catch (e) {
-                        console("!!!loadRequests!!!" + e);
-                    }
-                    return;
-                },
-
-                error: function (xhr, err, msg) {
-                    common.setMessage(err, "red");
-                    console.log(xhr);
-                    console.log(err);
-                    console.log(msg);
-                },
-
-            });
-
-
-        } else {
-            callsource("", {
-                updateOrCreate: 1,
-                dbName: sourceDB,
-                collectionName: "requests",
-                query: query,
-                data: data
-            }, function (result) {
-
-                loadRequests()
-            });
-
-        }
+        if (select)
+            common.fillSelectOptionsWithStringArray(select, requests, true)
+        return requests;
     }
 
-    self.loadRequests = function () {
-        var dbName = $("#dbSelect").val();
-        var subGraph = $("#subGraphSelect").val();
+    self.deleteRequest = function (name, select) {
+        var request = allParams[subGraph].requests[name];
+        var index = allParams[subGraph][request.file].requests.indexOf(name);
+        if (index > -1) {
+            allParams[subGraph][request.file].requests.splice(index, 1)
+        }
+        delete allParams[subGraph].requests[name];
 
-        if ($("#importSourceType").val().indexOf("CSV") > -1) {
-            var path = "./uploads/requests_" + $("#collSelect").val() + ".json";
-            var paramsObj = {
-                path: path,
-                retrieve: true,
+
+    }
+
+
+    self.export = function (subGraph) {
+        if (!allParams)
+            self.init();
+        console.log(JSON.stringify(allParams[subGraph]));
+        return allParams[subGraph];
+
+    }
+    self.loadRequest = function (name) {
+
+
+        admin.initImportDialogSelects(allParams[subGraph][obj.source].header)
+
+        for (var key in obj) {
+
+            $("#" + key).val(obj[key]);
+            if (key == "distinctValues" && obj[key] == true) {
+                $("#distinctValues").prop('checked', 'checked');
+            }
+
+        }
+        $("#sourceNode").val(obj.source);
+        $("#neoTargetKey").html("").append('<option>' + obj["neoTargetKey"] + '</option>');
+        $("#neoSourceKey").html("").append('<option>' + obj["neoSourceKey"] + '</option>');
+
+
+    }
+self.executeRequestsUI=function(type){
+        var selectedRequests=$("#requestsSelect").val();
+    self.executeRequests (subGraph, type,selectedRequests);
+}
+
+    self.executeRequests = function (subGraph,type, requestNames) {
+       var  requestsMap = allParams[subGraph].requests;
+
+        if (requestNames == null) {//all
+            requestNames = [];
+            for (var key in requests) {
+                requestNames.push(key)
 
             }
-            $.ajax({
-                type: "POST",
-                url: "../../.." + serverRootUrl + "/jsonFileStorage",
-                data: paramsObj,
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    if (!data)
-                        return;
-                    //   var currentRequestsObj = data;
-                    //  var requestsArray = [];
-                    currentRequests = [];
-                    for (var key in data) {
-                        if (typeof data[key].request == "string")
-                            data[key].request = JSON.parse(data[key].request);
-                        currentRequests.push(data[key]);
-
-
-                    }
-
-                    /*  for (var key in currentRequestsObj) {
-
-                     var obj = currentRequestsObj[key];
-                     if(typeof obj.request=="string")
-                     obj.request=JSON.parse( obj.request);
-                     currentRequests.push(obj);
-                     }*/
-                    common.fillSelectOptions(requests, currentRequests, "name", "name");
-                    // setRequestSubGraphFilterOptions();
-                },
-
-                error: function (xhr, err, msg) {
-                    console.log(xhr);
-                    console.log(err);
-                    console.log(msg);
-                },
-
-            });
         }
-        else {
-            callsource("", {
-                find: 1,
-                dbName: dbName,
-                collectionName: "requests",
-                sourceQuery: "{}"
-            }, function (data) {
+
+        var requestsArray = [];
+        requestNames.forEach(function (requestName) {
+            if (requestsMap[requestName])
+                if( type=="node" && requestName.indexOf("Node")==0)
+                requestsArray.push(requestsMap[requestName]);
+            else if( type=="relation" && requestName.indexOf("Rel")==0)
+                requestsArray.push(requestsMap[requestName]);
 
 
-                data.sort(function (a, b) {
-                    if (a.name > b.name)
-                        return 1;
-                    if (a.name < b.name)
-                        return -1;
-                    return 0;
-                });
-
-                currentRequests = data;
-                for (var i = 0; i < currentRequests.length; i++) {
-                    if (currentRequests[i].request) {
-                        currentRequests[i].request = JSON.parse(currentRequests[i].request);
-                        if (currentRequests[i].sourceIdField)//patch
-                            currentRequests[i].sourceKey = currentRequests.sourceIdField
-                    }
-                }
-
-                common.common.fillSelectOptions(requests, currentRequests, "name", "name");
-                setRequestSubGraphFilterOptions();
-
-
-            });
-        }
+        })
+        callExportToNeo(type, requestsArray, function(err, result){
+            loadLabels();
+            admin.drawVisjsGraph();
+        });
 
 
     }

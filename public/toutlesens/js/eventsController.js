@@ -1,3 +1,4 @@
+
 var eventsController = (function () {
         var self = {};
         self.stopEvent=false;
@@ -91,6 +92,25 @@ var eventsController = (function () {
 //*****************************************************************************************
             self.initcomponentEvents = function () {
 
+                var dialog=$("#dialog").dialog({
+                    autoOpen: false,
+                    height: Gparams.smallDialogSize.h,
+                    width: Gparams.smallDialogSize.w,
+
+                    modal: true,
+                    position: {my: "left top", at: "left bottom", of: $("#mainButtons")}
+
+
+                });
+
+                $("#dialogLarge").dialog({
+                    autoOpen: false,
+                    height: Gparams.bigDialogSize.h,
+                    width: Gparams.bigDialogSize.w,
+                    modal: true
+
+                });
+
                 $("#advancedQueriesAccordion").accordion(
                     {
                         active: false,
@@ -151,14 +171,14 @@ var eventsController = (function () {
 
                     }
                 });
-                $("#findTabs").tabs({
+                var findTabs=$("#findTabs").tabs({
                     load: function (event, ui) {
 
                     },
                     activate: function (event, ui) {
-                        $("#dialog").dialog("close");
+                      //  $("#dialog").dialog("close");
                         $("#graphPopup").css("visibility", "hidden");
-                        toutlesensController.setRightPanelAppearance(true);
+                     //   toutlesensController.setRightPanelAppearance(true);
                         var index = ui.newTab.index();
                         if (index == 0) {
                             toutlesensController.currentActionObj = {type: "findNode"}
@@ -185,6 +205,8 @@ var eventsController = (function () {
 
                     }
                 });
+
+
                 $("#graphDiv").click(function (e) {
                     if (currentDisplayType = "VISJS-NETWORK")
                         return;
@@ -199,24 +221,7 @@ var eventsController = (function () {
                 });
 
 
-                $("#dialog").dialog({
-                    autoOpen: false,
-                    height: Gparams.smallDialogSize.h,
-                    width: Gparams.smallDialogSize.w,
 
-                    modal: true,
-                    position: {my: "left top", at: "left bottom", of: $("#mainButtons")}
-
-
-                });
-
-                $("#dialogLarge").dialog({
-                    autoOpen: false,
-                    height: Gparams.bigDialogSize.h,
-                    width: Gparams.bigDialogSize.w,
-                    modal: true
-
-                });
 
                 $("#BIlegendDiv").draggable();
 

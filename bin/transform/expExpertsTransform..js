@@ -203,7 +203,7 @@ var mappingMain = {
         "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "sourceCollectionNode": "main.csv",
+            "sourceNode": "main.csv",
             "exportedFields": "all",
             "sourceField": "name",
             "sourceKey": "name",
@@ -220,7 +220,7 @@ var mappingMain = {
         "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "sourceCollectionNode": "main.csv",
+            "sourceNode": "main.csv",
             "exportedFields": "BU",
             "sourceField": "division",
             "sourceKey": "division",
@@ -237,7 +237,7 @@ var mappingMain = {
         "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "sourceCollectionNode": "main.csv",
+            "sourceNode": "main.csv",
             "exportedFields": "country",
             "sourceField": "site",
             "sourceKey": "site",
@@ -292,7 +292,7 @@ var mappingMain = {
         "sourceDB": "main.csv",
         "type": "node",
         "request": {
-            "sourceCollectionNode": "main.csv",
+            "sourceNode": "main.csv",
             "exportedFields": "none",
             "sourceField": "domain",
             "sourceKey": "domain",
