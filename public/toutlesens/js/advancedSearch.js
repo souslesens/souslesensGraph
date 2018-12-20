@@ -16,9 +16,9 @@ var advancedSearch = (function () {
             searchMenu.init(Schema);
 
         });
-        $("#dialog").dialog("option", "title", "Advanced search");
-        $("#dialog").dialog({modal: false});
-        $("#dialog").dialog("open");
+        dialog.dialog("option", "title", "Advanced search");
+        dialog.dialog({modal: false});
+        dialog.dialog("open");
 
 
     }
@@ -112,7 +112,7 @@ var advancedSearch = (function () {
 
     self.addClauseByIdsArray=function(idKey,ids,label,callback){
 
-        toutlesensData.setSearchByPropertyListStatement (idKey, JSON.stringify(ids), function(err, result){
+        toutlesensData.setSearchByPropertyListStatement (idKey,ids, function(err, result){
             var where=result;
 
           var   clauseText = ": <b> " + ids+ " "+label +" </b>"
@@ -394,7 +394,7 @@ var advancedSearch = (function () {
                     setTimeout(function () {
                         toutlesensController.setRightPanelAppearance(true);
                         treeController.expandAll("treeContainer");
-                        $("#dialog").dialog("close");
+                        dialog.dialog("close");
                     }, 500)
 
 
@@ -464,7 +464,7 @@ var advancedSearch = (function () {
                         toutlesensController.setRightPanelAppearance(true);
                         treeController.expandAll("treeContainer");
                     }, 500)
-                    $("#dialog").dialog("close");
+                    dialog.dialog("close");
 
 
                 })
@@ -830,7 +830,7 @@ var advancedSearch = (function () {
         var payload = {
             match: query
         }
-
+        console.log(query);
         $.ajax({
             type: "POST",
             url: self.neo4jProxyUrl,

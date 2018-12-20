@@ -53,7 +53,7 @@ var toutlesensData = (function () {
             + ", EXTRACT(rel IN relationships(path) | labels(startNode(rel))) as startLabels";
 
 
-        self.executeCypher = function (cypher,callback) {
+        self.executeCypher = function (cypher, callback) {
 
             var payload = {match: cypher};
             $.ajax({
@@ -62,7 +62,7 @@ var toutlesensData = (function () {
                 data: payload,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
-                   callback(null,data)
+                    callback(null, data)
                 }, error: function (err) {
                     callback(err)
 
@@ -439,11 +439,13 @@ var toutlesensData = (function () {
             var query = "n." + property + " in ["
             if (property == "_id")
                 query = "ID(n) in ["
-
+            var quote = "";
             for (var i = 0; i < ids.length; i++) {
                 if (i > 0 && i < ids.length)
                     query += ","
-                query += ids[i];
+                else if ((typeof ids[i] === 'string'))
+                    var quote = "\"";
+                query += quote + ids[i] + quote;
             }
             query += "] ";
             toutlesensData.whereFilter = query;
@@ -1458,7 +1460,7 @@ var toutlesensData = (function () {
                     return;
                 }
                 $("#message").html("relation saved");
-                $("#dialog").dialog("close");
+                dialog.dialog("close");
                 if (callback) {
                     var edge = result[0].r.properties;
                     edge.from = result[0].r._fromId;

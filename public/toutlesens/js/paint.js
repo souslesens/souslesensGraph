@@ -1,6 +1,7 @@
 /**
  * Created by claud on 23/11/2017.
  */
+var paintAccordion;
 var paint = (function () {
         var self = {};
         self.colorsPalette;
@@ -142,7 +143,8 @@ var paint = (function () {
 
             function getData() {
                 var data = []
-                if (searchMenu.currentAction.indexOf("graph") > -1) {
+               // if (searchMenu.currentAction.indexOf("graph") > -1)  {
+                    if (searchMenu.currentAction.indexOf("treeMap") <0) {
                     $("#paint_unClusterButton").css("visibility", "visible");
                     $("#paint_clusterButton").css("visibility", "visible");
                     self.unClusterByClass();
@@ -786,7 +788,7 @@ var paint = (function () {
             if (paintDialog_highlightPropertySelect)
                 common.fillSelectOptionsWithStringArray(paintDialog_highlightPropertySelect, properties);
             common.fillSelectOptionsWithStringArray(paint_showNodeNamesForLabelSelect, filters.currentLabels);
-            $("#paintAccordion").accordion(
+            paintAccordion=$("#paintAccordion").accordion(
                 {
                     active: 0,
                     collapsible: false,

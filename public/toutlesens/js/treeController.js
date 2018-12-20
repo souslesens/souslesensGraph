@@ -1122,7 +1122,7 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
                     $('#' + self.jsTreeDivId).jstree().delete_node("#" + self.selectedNodeData.jtreeId);
                 self.clearNodePropertiesDiv();
                 visjsGraph.removeNode(self.selectedNodeData.neoId);
-                $("#dialog").dialog("close");
+                dialog.dialog("close");
                 // toutlesensController.replayGraph("same");
             });
 

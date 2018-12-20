@@ -99,6 +99,7 @@ var myDataTable = function () {
 
             var xx= $("#table_" + containerDiv)
 
+              $.noConflict();
             var _table = $("#table_" + containerDiv).DataTable({
 
                 "dom": dom,

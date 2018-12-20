@@ -293,7 +293,7 @@ var searchMenu = (function () {
 
                 toutlesensController.setRightPanelAppearance(false);
 
-                $("#paintAccordion").accordion("option", "active", 1)
+               paintAccordion.accordion("option", "active", 1)
 
                // $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
                 tabsAnalyzePanel.tabs("option", "active", 2);//highlight

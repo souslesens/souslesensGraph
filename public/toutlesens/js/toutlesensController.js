@@ -166,6 +166,7 @@ var toutlesensController = (function () {
                     options.relationDepth = parseInt(relationDepth);
             }
 
+
             options.output = currentDisplayType;
             /*----------------------------------------------------------------------------------------------------*/
             $("#waitImg").css("visibility", "visible");

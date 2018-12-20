@@ -343,7 +343,7 @@ var filters = (function () {
 
 
         }
-        $("#dialog").dialog("close");
+        dialog.dialog("close");
         self.setQueryFilters(true);
     }
 

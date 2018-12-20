@@ -14,6 +14,7 @@
     <script>
 
         $(function () {
+$("#graphSelectionButton").prop("disabled", "disabled");
             $("#treeDivKeolis").width(rightPanelWidth - 40).height(totalHeight - 150).css("visibility", "visible")
         })
         var keolis = (function () {
@@ -24,6 +25,7 @@
             var type;
            self.selection = []
             self.loadJon = function (_type) {
+                $("#graphSelectionButton").prop("disabled", "disabled")
                 type=_type
                 //   $("#treeDivKeolis").html("");
                 var file
@@ -67,9 +69,9 @@
                         data.forEach(function (line, index) {
                             var ok = false;
                             var parent;
-                            if (type == "tags" && line.parent == "Tags") {
+                            if (type == "tags" && line.parent == "Classification") {
                                 ok = true;
-                                parent = (line.parent == "Tags") ? "#" : line.parentID;
+                                parent = (line.parent == "Classification") ? "#" : line.parentID;
                             }
                             if (type == "categories" && line.parent == "Communautés") {
                                 ok = true;
@@ -164,15 +166,18 @@
                 var items = {}
 
 
+
                 var menuItemData = {}
                 menuItemData.parentId = node.parent;
                 menuItemData.parents = node.parents;
-
+                $("#graphSelectionButton").removeAttr("disabled");
                 items ["selectNode"] = {
                     label: "selectNode",
                     data: menuItemData,
                     action: (function (menuItem) {
+
                         keolis.selection.push(node.id)
+                        $("#"+node.id+"_anchor").css("color","red");
                     })
 
                 }
@@ -181,8 +186,10 @@
                     data: menuItemData,
                     action: (function (menuItem) {
                         keolis.selection.push(node.id)
+                        $("#"+node.id+"_anchor").css("color","red");
                         node.children.forEach(function(child){
                             keolis.selection.push(child)
+                            $("#"+child+"_anchor").css("color","red");
                         })
                     })
 
@@ -191,7 +198,9 @@
                     label: "clearSelection",
                     data: menuItemData,
                     action: (function (menuItem) {
+                        $(".jstree-anchor").css("color","black");
                         keolis.selection=[];
+                        $("#graphSelectionButton").prop("disabled","disabled");
                     })
 
                 }
@@ -199,8 +208,14 @@
             }
 
             self.graphSelection = function () {
+
                 var sel=self.selection;
-               advancedSearch.addClauseByIdsArray("id",self.selection,type,function(err, result){
+                var label="";
+                if( type=="categories")
+                    label="categorieCommunaute"
+                else if( type=="tags")
+                    label="tag"
+               advancedSearch.addClauseByIdsArray("iD",self.selection,label,function(err, result){
 
 
                });
@@ -217,10 +232,11 @@
 </head>
 <body>
 <button onclick="  keolis.loadJon('tags')">tags</button>
-<button onclick="  keolis.loadJon('categories')">categories</button>
+<button onclick="  keolis.loadJon('categories')" >categories</button>
+<button onclick="keolis.graphSelection()" id="graphSelectionButton" disabled>graphSelection</button>
 <br>
 <div id="treeDivKeolis" style="width:400px;height: 800px;overflow: auto"></div>
-<button onclick="keolis.graphSelection()">graphSelection</button>
+
 <script>
 
 </script>

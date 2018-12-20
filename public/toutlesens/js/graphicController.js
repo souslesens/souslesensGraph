@@ -25,7 +25,7 @@ var graphicController = (function () {
                 setTimeout(function () {
                     toutlesensController.setRightPanelAppearance(true);
                     treeController.expandAll("treeContainer");
-                    $("#dialog").dialog("close");
+                    dialog.dialog("close");
                 }, 500)
 
 

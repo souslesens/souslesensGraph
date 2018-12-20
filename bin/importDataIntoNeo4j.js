@@ -262,7 +262,7 @@ var importDataIntoNeo4j = {
                             if (err)
                                 return callbackSeries(err);
                             totalImported += result.length;
-                            var message = "Imported " + totalImported + " lines with label " + params.label;
+                            var message = "Imported " + totalImported + " lines with type " + params.relationType;
                             socket.message(message);
                             callbackEach(null);
                         }

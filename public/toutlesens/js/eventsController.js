@@ -4,7 +4,7 @@ var dialog;
 var tabsAnalyzePanel;
 var eventsController = (function () {
         var self = {};
-        self.stopEvent=false;
+        self.stopEvent = false;
         self.startSearchNodesTime = null;
 
         self.initInputEvents = function () {
@@ -25,12 +25,12 @@ var eventsController = (function () {
 
             $("#tagCloudButton").click(function (e) {
                 toutlesensController.searchNodesUI('exec', null, null, tagCloud.drawCloud);
-              //  $("#findTabs").tabs({active:4});
+                //  $("#findTabs").tabs({active:4});
 
             });
 
             $("#graphDiv").click(function (e) {
-            var xx=e;
+                var xx = e;
             })
 
 
@@ -78,15 +78,15 @@ var eventsController = (function () {
                 }
             });
 
-           $("#queryDiv").on('mousedown', function (e) {
-              if( self.stopEvent)
-                  return  self.stopEvent=false;
-            toutlesensController.setRightPanelAppearance(true);
+            $("#queryDiv").on('mousedown', function (e) {
+                if (self.stopEvent)
+                    return self.stopEvent = false;
+                toutlesensController.setRightPanelAppearance(true);
             })
-;
+            ;
             $("#analyzePanel").on('mousedown', function (e) {
-                if( self.stopEvent)
-                    return  self.stopEvent=false;
+                if (self.stopEvent)
+                    return self.stopEvent = false;
                 toutlesensController.setRightPanelAppearance(false);
             })
 
@@ -95,7 +95,7 @@ var eventsController = (function () {
 //*****************************************************************************************
             self.initcomponentEvents = function () {
 
-                 dialog=$("#dialog").dialog({
+                dialog = $("#dialog").dialog({
                     autoOpen: false,
                     height: Gparams.smallDialogSize.h,
                     width: Gparams.smallDialogSize.w,
@@ -106,7 +106,7 @@ var eventsController = (function () {
 
                 });
 
-                dialogLarge=  $("#dialogLarge").dialog({
+                dialogLarge = $("#dialogLarge").dialog({
                     autoOpen: false,
                     height: Gparams.bigDialogSize.h,
                     width: Gparams.bigDialogSize.w,
@@ -119,17 +119,17 @@ var eventsController = (function () {
                         active: false,
                         collapsible: true,
                         activate: function (event, ui) {
-                            $("#dialog").dialog("close");
+                            dialog.dialog("close");
                             $("#graphPopup").css("visibility", "hidden");
                         }
                     });
                 ;
 
-                tabsAnalyzePanel=$("#tabs-analyzePanel").tabs({
+                tabsAnalyzePanel = $("#tabs-analyzePanel").tabs({
 
 
                     activate: function (event, ui) {
-                       dialog.dialog("close");
+                        dialog.dialog("close");
                         $("#graphPopup").css("visibility", "hidden");
 
                         var index = ui.newTab.index();
@@ -140,17 +140,17 @@ var eventsController = (function () {
                         }
                         if (index == 1) {
                             toutlesensController.currentActionObj.mode = "filter";
-                        /*    var filterMovableDiv = $("#filterMovableDiv").detach();
-                            $("#searchCriteriaTextDiv").css("visibility", "hidden");
-                            $("#searchCriteriaAddButton").css("visibility", "hidden");
+                            /*    var filterMovableDiv = $("#filterMovableDiv").detach();
+                                $("#searchCriteriaTextDiv").css("visibility", "hidden");
+                                $("#searchCriteriaAddButton").css("visibility", "hidden");
 
-                            $("#filterDiv").append(filterMovableDiv);
-                            $("#filterActionDiv").html(
-                                "<button onclick=\"filters.filterOnProperty(null,'only')\">Only</button>" +
-                                "<button onclick=\"filters.filterOnProperty(null,'not')\">Not</button>" +
-                                "<button onclick=\"filters.filterOnProperty(null,'removeAll')\">Clear Filter</button>"
-                            );
-                            filters.setLabelsOrTypes("node");*/
+                                $("#filterDiv").append(filterMovableDiv);
+                                $("#filterActionDiv").html(
+                                    "<button onclick=\"filters.filterOnProperty(null,'only')\">Only</button>" +
+                                    "<button onclick=\"filters.filterOnProperty(null,'not')\">Not</button>" +
+                                    "<button onclick=\"filters.filterOnProperty(null,'removeAll')\">Clear Filter</button>"
+                                );
+                                filters.setLabelsOrTypes("node");*/
                         }
                         if (index == 2) {
                             toutlesensController.currentActionObj.mode = "highlight";
@@ -160,10 +160,10 @@ var eventsController = (function () {
                                $("#propertiesSelectionDialog_propertySelect").val("");
                                var filterMovableDiv = $("#filterMovableDiv").detach();
                                $("#highlightDiv").append(filterMovableDiv);*/
-                         /*   $("#highlightDiv").load("htmlSnippets/paintDialog.html", function () {
-                                paint.initColorsPalette(10, "paintDialogPalette");
-                                filters.setLabelsOrTypes("node");
-                            });*/
+                            /*   $("#highlightDiv").load("htmlSnippets/paintDialog.html", function () {
+                                   paint.initColorsPalette(10, "paintDialogPalette");
+                                   filters.setLabelsOrTypes("node");
+                               });*/
 
                         }
 
@@ -176,16 +176,16 @@ var eventsController = (function () {
                 });
 
 
-               findTabs=$("#findTabs").tabs({
+                findTabs = $("#findTabs").tabs({
 
 
                     load: function (event, ui) {
 
                     },
                     activate: function (event, ui) {
-                      //  $("#dialog").dialog("close");
+                       // $("#dialog").dialog("close");
                         $("#graphPopup").css("visibility", "hidden");
-                     //   toutlesensController.setRightPanelAppearance(true);
+                        toutlesensController.setRightPanelAppearance(true);
                         var index = ui.newTab.index();
                         if (index == 0) {
                             toutlesensController.currentActionObj = {type: "findNode"}
@@ -198,21 +198,20 @@ var eventsController = (function () {
                         if (index == 0)
                             ;//toutlesensController.currentActionObj = {type: "findNode"}
                         if (index == 1)
-                        toutlesensController.currentActionObj = {type: "findNode"}
+                            toutlesensController.currentActionObj = {type: "findNode"}
 
                         if (index == 2)
                             toutlesensController.currentActionObj = {type: "relation"}
                         if (index == 3)
                             toutlesensController.currentActionObj = {type: "pathes"}
                         if (index == 4)
-                         ;//   toutlesensController.searchNodesUI('exec', null, null, tagCloud.drawCloud);
+                            ;//   toutlesensController.searchNodesUI('exec', null, null, tagCloud.drawCloud);
                     },
                     create: function (event, ui) {
                         toutlesensController.currentActionObj = {type: "findNode"}
 
                     }
                 });
-
 
 
                 $("#graphDiv").click(function (e) {
@@ -227,8 +226,6 @@ var eventsController = (function () {
                         toutlesensController.hidePopupMenu();
 
                 });
-
-
 
 
                 $("#BIlegendDiv").draggable();

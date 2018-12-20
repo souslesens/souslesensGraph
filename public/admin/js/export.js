@@ -28,7 +28,7 @@
  neo4jProxyUrl: "../http",
  };*/
 var newSubgraph = "";
-var fetchSize = 10000
+var fetchSize = 30000
 
 function downloadJson(outputType, type) {
     var limit = parseInt($("#limit").val())
@@ -62,7 +62,7 @@ function downloadJson(outputType, type) {
 
             else if (type == "relation") {
                 match = "MATCH (n)-[r]->(m)" + whereSubGraph + ""
-                    + " return  r order by ID(r) skip  " + totalExported + " limit " + limit;
+                    + " return  r order by ID(r) skip  " + totalExported + " limit " + fetchSize;
             }
             console.log(match);
             callNeoMatch(match, null, function (data) {
