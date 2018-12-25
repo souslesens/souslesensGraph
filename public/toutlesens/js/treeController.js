@@ -827,7 +827,7 @@ var treeController = (function () {
         var node = node;
 
         if (node.parent == "#") {
-            toutlesensData.setSearchByPropertyListStatement("_id", self.currentNodesSelection, function (err, result) {
+            toutlesensData.setWhereFilterWithArray("_id", self.currentNodesSelection, function (err, result) {
                 toutlesensController.generateGraph(null, {
                     applyFilters: true,
                     dragConnectedNodes: true

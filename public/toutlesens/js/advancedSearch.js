@@ -110,30 +110,7 @@ var advancedSearch = (function () {
 
 
 
-    self.addClauseByIdsArray=function(idKey,ids,label,callback){
 
-        toutlesensData.setSearchByPropertyListStatement (idKey,ids, function(err, result){
-            var where=result;
-
-          var   clauseText = ": <b> " + ids+ " "+label +" </b>"
-            self.currentQueryNodeIds=ids;
-            var clause= {foundIds: ids.length,
-                nodeLabel:label,
-                where:where
-
-            }
-
-            self.addClause(clause, clauseText);
-            searchMenu.activatePanel("searchActionDiv")
-            findTabs.tabs("option", "active", 0);
-
-            if(callback)
-                callback(err,clauseText);
-
-
-        })
-
-    }
 
     self.addClause = function (clause, clauseText) {
 
@@ -638,7 +615,7 @@ var advancedSearch = (function () {
 
     self.similarsGraphSimilars = function () {
         currentObject.id = null;
-        toutlesensData.setSearchByPropertyListStatement("_id", self.currentObject.similarNodes, function (err, result) {
+        toutlesensData.setWhereFilterWithArray("_id", self.currentObject.similarNodes, function (err, result) {
 
             toutlesensController.generateGraph(null, null, function (err, result) {
                 var selectedNodes = []
@@ -847,7 +824,7 @@ var advancedSearch = (function () {
                 }
 
 
-                toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
+                toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
                     if (self.filterLabelWhere.length > 0) {
                         if (toutlesensData.whereFilter != "")
                             toutlesensData.whereFilter += " and " + self.filterLabelWhere;
@@ -932,7 +909,7 @@ var advancedSearch = (function () {
                 }
 
 
-                toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
+                toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
                     /*  if(toutlesensData.whereFilter!="")
                           toutlesensData.whereFilter+= " and " + self.filterLabelWhere;
                       else*/

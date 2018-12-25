@@ -818,7 +818,7 @@ var paint = (function () {
             }
             else if (action == "graphClusterNodes") {
                 var nodeIds = visjsGraph.network.getNodesInCluster(currentObject.id)
-                toutlesensData.setSearchByPropertyListStatement("_id", nodeIds, function (err, result) {
+                toutlesensData.setWhereFilterWithArray("_id", nodeIds, function (err, result) {
 
                     toutlesensController.generateGraph(null, {
                         applyFilters: true,

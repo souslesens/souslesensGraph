@@ -127,6 +127,10 @@ var importDataIntoNeo4j = {
                         if (err)
                             return callbackSeries(err);
                         var message = "label :" + label +"import done : " + totalImported + "lines ";
+
+
+
+
                         journal+=message+"<br>";
                         socket.message(message);
                         console.log(message);
@@ -274,6 +278,11 @@ var importDataIntoNeo4j = {
                         return callbackSeries(err);
                     var message = "relation "+relationType+" import done : " + totalImported + "lines ";
                     journal+=message+"<br>"
+                    if(params.missingMappings.length>0){
+                        var str=JSON.stringify(params.missingMappings,null,2)
+                        message+="<br> relation missingMappings "+str;
+                        console.log(str);
+                    }
                     socket.message(message);
                     console.log(message);
 
@@ -289,6 +298,7 @@ var importDataIntoNeo4j = {
         })
             },
             function(err){
+
                 callback(err, journal)
             })
     },
@@ -486,6 +496,7 @@ var importDataIntoNeo4j = {
 
             }
         }
+
         var path = "/db/data/batch";
         var payload = [];
         for (var i = 0; i < relations.length; i++) {

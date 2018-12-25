@@ -184,6 +184,10 @@
                     <span class="selectDiv "
                           onclick="searchMenu.onSearchAction('treeMapSomeNeighboursListLabels')"><img align="center"
                                                                                                       src="images/treemapSmall.png"> Tree map</span>
+                    <span class="selectDiv "
+                          onclick="searchMenu.onSearchAction('algorithms')"><img align="center"
+                                                                                 src="images/treemapSmall.png"> Algorithms</span>
+
                     <span class="selectDiv selectDivHidden" onclick="searchMenu.onSearchAction('graphSimilars')"><img
                             align="center"
                             src="images/graphSmall.png"> Graph similars</span>
@@ -219,6 +223,51 @@
             </div>
 
 
+            <div id="algorithmsDiv" style="visibility:hidden" class="searchPanel">
+                <table>
+                    <tr>
+                        <td>
+                            algorithm
+                        </td>
+                        <td>
+                            <select id="searchDialog_algorithmSelect"> </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            target label
+                        </td>
+                        <td>
+                            <select id="searchDialog_AlgorithmsTargetLabelSelect"> </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            count target nodes min
+                        </td>
+                        <td>
+                            <input id="searchDialog_AlgorithmsMinCountTargetNodes" value="0">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            result size
+                        </td>
+                        <td>
+                            <input id="searchDialog_AlgorithmsResultSize" value="1000">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            similarityCutoff
+                        </td>
+                        <td>
+                            <input id="searchDialog_AlgorithmsSimilarityCutoff" value="0.8">
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
             <div id="searchDialog_pathParamsDiv" style="visibility:hidden" class="searchPanel">
                 <table>
                     <tr>
@@ -227,12 +276,12 @@
 
                         </td>
                     </tr>
-                   <!-- <tr>
-                        <td>
-                            <button onclick="searchMenu.addLabelToPath()">add label to path</button>
+                    <!-- <tr>
+                         <td>
+                             <button onclick="searchMenu.addLabelToPath()">add label to path</button>
 
-                        </td>
-                    </tr>-->
+                         </td>
+                     </tr>-->
                     <tr>
                         <td>
                             distance<input id="searchDialog_pathDistanceInput" size="2">
@@ -257,10 +306,10 @@
             </div>
             <div id="searchNavDiv" style=" position: fixed;  top: 330px; width: 320px; ">
                 <div style="background-color: #eee; border-style: solid; border-width: thin;margin-bottom: 20px">
-                  <!--  <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
-                    </button>-->
+                    <!--  <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
+                      </button>-->
                     <button style="visibility:hidden" id="searchDialog_newQueryButton"
-                            onclick="self.currentPanelIndex == 1;searchMenu.previousPanel();">new
+                            onclick="self.currentPanelIndex == 1;searchMenu.activatePanel('searchCriteriaDiv');">new
                     </button>
                     <button style="visibility:hidden" id="searchDialog_SaveQueryButton"
                             onclick="savedQueries.savedQuerySave();">save
@@ -289,13 +338,11 @@
         </div>
 
 
-
-
     </div>
     <h3><b>Cypher</b></h3>
-    <div style="height: 450px;overflow: auto" >
+    <div style="height: 450px;overflow: auto">
         Match statement
-        <br><textarea id="searchMenu_cypherDiv" cols="40" rows="10"></textarea><br>
+        <br><textarea id="searchMenu_cypherInput" cols="40" rows="10"></textarea><br>
         <button onclick="searchMenu.execCypherMatchStatement()">next</button>
     </div>
 

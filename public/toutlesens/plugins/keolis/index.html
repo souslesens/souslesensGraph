@@ -23,7 +23,8 @@ $("#graphSelectionButton").prop("disabled", "disabled");
             var self = {};
             var data = {};
             var type;
-           self.selection = []
+           self.selection = [];
+           self.currentNode;
             self.loadJon = function (_type) {
                 $("#graphSelectionButton").prop("disabled", "disabled")
                 type=_type
@@ -170,6 +171,7 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                 var menuItemData = {}
                 menuItemData.parentId = node.parent;
                 menuItemData.parents = node.parents;
+                self.currentNode=node;
                 $("#graphSelectionButton").removeAttr("disabled");
                 items ["selectNode"] = {
                     label: "selectNode",
@@ -185,6 +187,7 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                     label: "selectNodeAndChildren",
                     data: menuItemData,
                     action: (function (menuItem) {
+                        self.currentNode+=" and children"
                         keolis.selection.push(node.id)
                         $("#"+node.id+"_anchor").css("color","red");
                         node.children.forEach(function(child){
@@ -194,6 +197,7 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                     })
 
                 }
+
                 items ["clearSelection"] = {
                     label: "clearSelection",
                     data: menuItemData,
@@ -215,11 +219,35 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                     label="categorieCommunaute"
                 else if( type=="tags")
                     label="tag"
-               advancedSearch.addClauseByIdsArray("iD",self.selection,label,function(err, result){
+               self.addClauseByIdsArray("iD",self.selection,label,function(err, result){
 
 
                });
 
+
+            }
+            self.addClauseByIdsArray=function(idKey,ids,label,callback){
+
+                toutlesensData.setWhereFilterWithArray (idKey,ids, function(err, result){
+                    var where=result;
+
+                    var   clauseText = "[label] "+ self.currentNode.text +" </b>"
+                    advancedSearch.currentQueryNodeIds=ids;
+                    var clause= {foundIds: ids.length,
+                        nodeLabel:label,
+                        where:where
+
+                    }
+                    advancedSearch.clearClauses();
+                    advancedSearch.addClause(clause, clauseText);
+                    searchMenu.activatePanel("searchActionDiv")
+                    findTabs.tabs("option", "active", 0);
+
+                    if(callback)
+                        callback(err,clauseText);
+
+
+                })
 
             }
 

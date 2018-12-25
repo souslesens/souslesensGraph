@@ -56,7 +56,7 @@ function onRectSelection(nodeIds, position){
     for(var i=0;i<nodeIds.length;i++){
         nodeIds[i]=parseInt(nodeIds[i]);
     }
-    toutlesensData.setSearchByPropertyListStatement("_id",nodeIds,function(){
+    toutlesensData.setWhereFilterWithArray("_id",nodeIds,function(){
         toutlesensController.generateGraph(null);
         ctx=null;
     })

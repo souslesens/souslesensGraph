@@ -118,7 +118,13 @@ var toutlesensController = (function () {
                     if (!id && currentObject) {
                         id = currentObject.id;
                     }
+
                 }
+               else if(Array.isArray(id)){
+                    toutlesensData.setWhereFilterWithArray("_id",id);
+                }
+                else
+                    toutlesensData.whereFilter = "";
             }
 
 
@@ -172,7 +178,7 @@ var toutlesensController = (function () {
             $("#waitImg").css("visibility", "visible");
             $("#BIlegendDiv").html("");
             toutlesensData.getNodeAllRelations(id, options, function (err, data) {
-                toutlesensData.whereFilter = "";
+
                 if (err) {
                     console.log(err);
                     self.setMessage("ERROR" + err);
@@ -706,7 +712,7 @@ var toutlesensController = (function () {
                 if (collapseGraph)
                     options.clusterIntermediateNodes = true;
                 options.hideNodesWithoutRelations = true
-                toutlesensData.setSearchByPropertyListStatement("_id", ids, function (err, result) {
+                toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
                     toutlesensController.generateGraph(null, options, function (err, result) {
                         currentLabel = null;
                     });

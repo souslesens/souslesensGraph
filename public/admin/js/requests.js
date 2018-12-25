@@ -126,9 +126,11 @@ var requests = (function () {
 
     }
     self.loadRequest = function (name) {
+var request=allParams[subGraph].requests[name];
+var header=allParams[subGraph][request.source].header;
+var obj=request;
 
-
-        admin.initImportDialogSelects(allParams[subGraph][obj.source].header)
+        admin.initImportDialogSelects(header)
 
         for (var key in obj) {
 

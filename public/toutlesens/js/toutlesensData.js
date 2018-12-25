@@ -46,8 +46,7 @@ var toutlesensData = (function () {
 
         self.standardReturnStatement = " RETURN EXTRACT(rel IN relationships(path) | type(rel)) as rels," +
             "EXTRACT(rel IN relationships(path) | rel)  as relProperties," +
-            "nodes(path) as nodes," +//   !!!!!!!!!!!!!!!!!!!!! a voir pour alléger les données transmises
-            //   "EXTRACT(node IN nodes(path) | node.subGraph) as nodes,"+   !!!!!!!!!!!!!!!!!!!!! a voir pour alléger les données transmises
+            "nodes(path) as nodes," +
             " EXTRACT(node IN nodes(path) | ID(node)) as ids," +
             " EXTRACT(node IN nodes(path) | labels(node)) as labels "
             + ", EXTRACT(rel IN relationships(path) | labels(startNode(rel))) as startLabels";
@@ -428,28 +427,29 @@ var toutlesensData = (function () {
             return "";
 
         }
-        self.setSearchByPropertyListStatement = function (property, idsList, callback) {
-            var ids;
+        self.setWhereFilterWithArray = function (property, _array, callback) {
+            var array;
 
-            if (typeof idsList == "string")
-                ids = idsList.split(",");
+            if (typeof _array == "string")
+                array = _array.split(",");
             else
-                ids = idsList;
+                array = _array;
 
             var query = "n." + property + " in ["
             if (property == "_id")
                 query = "ID(n) in ["
             var quote = "";
-            for (var i = 0; i < ids.length; i++) {
-                if (i > 0 && i < ids.length)
+            for (var i = 0; i < array.length; i++) {
+                if (i > 0 && i < array.length)
                     query += ","
-                else if ((typeof ids[i] === 'string'))
+                else if ((typeof array[i] === 'string'))
                     var quote = "\"";
-                query += quote + ids[i] + quote;
+                query += quote + array[i] + quote;
             }
             query += "] ";
             toutlesensData.whereFilter = query;
-            callback(null, query);
+            if (callback)
+                callback(null, query);
 
         }
 
