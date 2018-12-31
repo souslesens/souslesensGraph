@@ -134,6 +134,7 @@
 
     <script src="js/selection.js"></script>
     <script src="js/statistics.js"></script>
+    <script src="js/stats.js"></script>
     <script src="js/traversalQueries.js"></script>
 
 
@@ -310,6 +311,11 @@
             height: 20px!important;
         }
 
+        .findTab{
+                min-height: 200px;
+
+        }
+
 
 
 
@@ -482,7 +488,7 @@
             </script>
 
 
-            <div id="nodeDiv">
+            <div id="nodeDiv" class="findTab">
                 <div id="nodeDivDetachable">
                     <input type="hidden" value="500" id="limitResult">
                     <table border="0">
@@ -545,7 +551,7 @@
             </div>
 
 
-            <div id="relationDiv">
+            <div id="relationDiv" class="findTab">
                 type <select id="findRelationsTypeSelect" onchange="toutlesensController.setRelationProperties(this)"></select>
                 <br>
                property <select id="findRelationsPropertyKeySelect"></select>
@@ -564,7 +570,7 @@
 
             </div>
 
-            <div id="pathDiv">
+            <div id="pathDiv" class="findTab">
 
                 <table>
                     <tr>
@@ -636,7 +642,7 @@
 
             </div>
 
-            <div id="advancedQueriesDiv">
+            <div id="advancedQueriesDiv" class="findTab">
                 <div id="advancedQueriesAccordion">
                     <h3>Pivots nodes</h3>
                     <div>
@@ -660,10 +666,10 @@
             </iframe>
             </div>-->
 
-            <div id="queryDiv">
+            <div id="queryDiv" class="findTab">
             </div>
 
-            <div id="plugin"></div>
+            <div id="plugin" class="findTab"></div>
 
             <!--    <div id="requestDiv">
 

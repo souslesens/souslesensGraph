@@ -19,13 +19,23 @@
 
     }
 
-    .selectDiv {
+    .
+    selectDiv {
         background-color: #9ca7b3;
         margin: 5px;
         padding: 2px;
         border-radius: 3px;
         font-weight: normal;
         color: white;
+
+        background-color: #9ca7b3;
+        margin: 1px;
+        padding: 2px;
+        border-radius: 3px;
+        font-weight: normal;
+        color: white;
+        width: 300px;
+        height: 1px;
 
     }
 
@@ -170,27 +180,45 @@
                 <b>Ouput type</b>
                 <br>
                 <div id="advancedSearchActionDiv" style="display: inline-grid">
-                    <span class="selectDiv" onclick="searchMenu.onSearchAction('graphSomeNeighboursListLabels')"><img
-                            align="center" src="images/graphSmall.png"> Graph neighbours</span>
-                    <span class="selectDiv" onclick="searchMenu.onSearchAction('path')"><img align="center"
-                                                                                             src="images/graphSmall.png"> Pathes beetwen nodes</span>
-                    <span class="selectDiv " onclick="searchMenu.onSearchAction('treeNodes')"><img align="center"
-                                                                                                   src="images/graphSmall.png"> Tree</span>
-                    <span class="selectDiv " onclick="searchMenu.onSearchAction('tableNodes')"><img align="center"
-                                                                                                    src="images/tableSmall.png"> Table</span>
-                    <span class="selectDiv selectDivHidden" onclick="searchMenu.onSearchAction('tagCloud')"><img
+                    <div style="display:inline-list-item" class="selectDiv"
+                         onclick="searchMenu.onSearchAction('graphSomeNeighboursListLabels')"><img
+                            align="center" src="images/graphSmall.png"> Graph neighbours
+                    </div>
+                    <div style="display:inline-list-item" class="selectDiv" onclick="searchMenu.onSearchAction('path')">
+                        <img align="center"
+                             src="images/graphSmall.png"> Pathes beetwen nodes
+                    </div>
+                    <div style="display:inline-list-item" class="selectDiv "
+                         onclick="searchMenu.onSearchAction('treeNodes')"><img align="center"
+                                                                               src="images/graphSmall.png">
+                        Tree
+                    </div>
+                    <div style="display:inline-list-item" class="selectDiv "
+                         onclick="searchMenu.onSearchAction('tableNodes')"><img align="center"
+                                                                                src="images/tableSmall.png">
+                        Table
+                    </div>
+                    <div style="display:inline-list-item" class="selectDiv selectDivHidden"
+                         onclick="searchMenu.onSearchAction('tagCloud')"><img
                             align="center"
-                            src="images/graphSmall.png"> Tag cloud</span>
-                    <span class="selectDiv "
-                          onclick="searchMenu.onSearchAction('treeMapSomeNeighboursListLabels')"><img align="center"
-                                                                                                      src="images/treemapSmall.png"> Tree map</span>
-                    <span class="selectDiv "
-                          onclick="searchMenu.onSearchAction('algorithms')"><img align="center"
-                                                                                 src="images/treemapSmall.png"> Algorithms</span>
+                            src="images/graphSmall.png"> Tag cloud
+                    </div>
+                    <div style="display:inline-list-item" class="selectDiv "
+                         onclick="searchMenu.onSearchAction('treeMapSomeNeighboursListLabels')"><img
+                            align="center"
+                            src="images/treemapSmall.png"> Tree map
+                    </div>
+                    <div style="display:inline-list-item" class="selectDiv "
+                         onclick="searchMenu.onSearchAction('algorithms')"><img align="center"
+                                                                                src="images/treemapSmall.png">
+                        Algorithms
+                    </div>
 
-                    <span class="selectDiv selectDivHidden" onclick="searchMenu.onSearchAction('graphSimilars')"><img
+                    <div style="display:inline-list-item" class="selectDiv selectDivHidden"
+                         onclick="searchMenu.onSearchAction('graphSimilars')"><img
                             align="center"
-                            src="images/graphSmall.png"> Graph similars</span>
+                            src="images/graphSmall.png"> Graph similars
+                    </div>
 
 
                 </div>
@@ -212,25 +240,27 @@
 
             </div>
 
-            <div id="searchNeighboursLabelsDiv" class="searchPanel" style="visibility:hidden">
+            <div id="searchNeighboursLabelsDiv" class="searchPanel"
+                 style="visibility:hidden">
                 <b>Neighbour Type</b>
                 <br>
                 <input type="checkbox" id="graphNeighboursAllOptionsCbx"
                        onchange="searchMenu.onGraphNeighboursAllOptionsCbx(this)"> All
-                <div id='neighboursTypesDiv' style="max-height: 120px;width:320px;overflow: auto"></div>
+                <div id='neighboursTypesDiv'
+                     style="max-height: 150px;width:320px;overflow: auto"></div>
 
 
             </div>
 
 
-            <div id="algorithmsDiv" style="visibility:hidden" class="searchPanel">
+            <div id="algorithmsDiv" style="visibility:hidden" class="searchPanel" >
                 <table>
                     <tr>
                         <td>
                             algorithm
                         </td>
                         <td>
-                            <select id="searchDialog_algorithmSelect"> </select>
+                            <select id="searchDialog_algorithmSelect"  onchange="algorithms.initAlgorithm($(this).val())"> </select>
                         </td>
                     </tr>
                     <tr>
@@ -241,34 +271,36 @@
                             <select id="searchDialog_AlgorithmsTargetLabelSelect"> </select>
                         </td>
                     </tr>
-                    <tr>
+                    <tr class="algorithmParam" >
                         <td>
                             count target nodes min
                         </td>
                         <td>
-                            <input id="searchDialog_AlgorithmsMinCountTargetNodes" value="0">
+                            <input id="searchDialog_AlgorithmsMinCountTargetNodes"  value="0">
                         </td>
                     </tr>
-                    <tr>
+                    <tr  class="algorithmParam searchDialog_AlgorithmsResultSize">
                         <td>
                             result size
                         </td>
                         <td>
-                            <input id="searchDialog_AlgorithmsResultSize" value="1000">
+                            <input id="searchDialog_AlgorithmsResultSize" value="1000" >
                         </td>
                     </tr>
-                    <tr>
+                    <tr  class="algorithmParam">
                         <td>
                             similarityCutoff
                         </td>
                         <td>
-                            <input id="searchDialog_AlgorithmsSimilarityCutoff" value="0.8">
+                            <input id="searchDialog_AlgorithmsSimilarityCutoff" value="0.8"
+
                         </td>
                     </tr>
 
                 </table>
             </div>
-            <div id="searchDialog_pathParamsDiv" style="visibility:hidden" class="searchPanel">
+            <div id="searchDialog_pathParamsDiv" style="visibility:hidden"
+                 class="searchPanel">
                 <table>
                     <tr>
                         <td>
@@ -290,7 +322,9 @@
                     </tr>
                     <tr>
                         <td>
-                            collapse Graph<input type="checkbox" id="searchDialog_CollapseGraphCbx" checked="checked">
+                            collapse Graph<input type="checkbox"
+                                                 id="searchDialog_CollapseGraphCbx"
+                                                 checked="checked">
 
                         </td>
                     </tr>
@@ -309,7 +343,8 @@
                     <!--  <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
                       </button>-->
                     <button style="visibility:hidden" id="searchDialog_newQueryButton"
-                            onclick="self.currentPanelIndex == 1;searchMenu.activatePanel('searchCriteriaDiv');">new
+                            onclick="self.currentPanelIndex == 1;searchMenu.activatePanel('searchCriteriaDiv');">
+                        new
                     </button>
                     <button style="visibility:hidden" id="searchDialog_SaveQueryButton"
                             onclick="savedQueries.savedQuerySave();">save
@@ -319,14 +354,16 @@
                             onclick="searchMenu.previousPanel();">previous
                     </button>
 
-                    <button onclick="searchMenu.nextPanel();" id="searchDialog_NextPanelButton">next
+                    <button onclick="searchMenu.nextPanel();"
+                            id="searchDialog_NextPanelButton">next
                     </button>
 
                     <button style="visibility:hidden" id="searchDialog_ExecuteButton"
                             onclick="searchMenu.onSearchAction('execute')">OK
                     </button>
                 </div>
-                <div id="searchDialog_Criteriatext" style="  visibility: visible; overflow: auto;height: 70px">
+                <div id="searchDialog_Criteriatext"
+                     style="  visibility: visible; overflow: auto;height: 70px">
 
                     <!-- <input type="image" height="20px" src="images/erase.png">-->
 

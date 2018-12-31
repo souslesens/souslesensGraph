@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Title</title>
 
-    <script src="../../../common/js/jquery/jquery.min.js"></script>
-    <script src="../../../common/js/jquery/jquery-ui.min.js"></script>
+    <!--  <script src="../../../common/js/jquery/jquery.min.js"></script>
+      <script src="../../../common/js/jquery/jquery-ui.min.js"></script>-->
     <script src="../../../common/js/jquery/jquery.splitter.js"></script>
 
     <script src="../../../common/js/jsTree/jstree.min.js"></script>
@@ -14,7 +14,7 @@
     <script>
 
         $(function () {
-$("#graphSelectionButton").prop("disabled", "disabled");
+            $("#graphSelectionButton").prop("disabled", "disabled");
             $("#treeDivKeolis").width(rightPanelWidth - 40).height(totalHeight - 150).css("visibility", "visible")
         })
         var keolis = (function () {
@@ -23,19 +23,18 @@ $("#graphSelectionButton").prop("disabled", "disabled");
             var self = {};
             var data = {};
             var type;
-           self.selection = [];
-           self.currentNode;
+            self.selection = [];
+            self.currentNode;
+            self.initiated=false;
             self.loadJon = function (_type) {
                 $("#graphSelectionButton").prop("disabled", "disabled")
-                type=_type
+                type = _type
                 //   $("#treeDivKeolis").html("");
                 var file
                 if (type == 'tags')
                     file = "tagsFR.csv.json"
                 else if (type == 'categories')
                     file = 'categoriesFR.csv.json'
-
-
 
 
                 function customMenu(node) {
@@ -95,12 +94,22 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                             return 0;
 
                         })
+
+
+                        if (self.initiated) {
+                            $('#treeDivKeolis').jstree(true).settings.core.data = jsTreeData;
+                            $('#treeDivKeolis').jstree(true).refresh();
+                            return;
+                        }
+
+                        self.initiated=true;
                         //console.log(JSON.stringify(jsTreeData,null,2))
                         var plugins = [];
                         plugins.push("search");
                         plugins.push("sort");
                         plugins.push("types");
-                        plugins.push("contextmenu")
+                        plugins.push("contextmenu");
+
 
                         $('#treeDivKeolis').jstree({
                             'core': {
@@ -167,11 +176,10 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                 var items = {}
 
 
-
                 var menuItemData = {}
                 menuItemData.parentId = node.parent;
                 menuItemData.parents = node.parents;
-                self.currentNode=node;
+                self.currentNode = node;
                 $("#graphSelectionButton").removeAttr("disabled");
                 items ["selectNode"] = {
                     label: "selectNode",
@@ -179,7 +187,7 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                     action: (function (menuItem) {
 
                         keolis.selection.push(node.id)
-                        $("#"+node.id+"_anchor").css("color","red");
+                        $("#" + node.id + "_anchor").css("color", "red");
                     })
 
                 }
@@ -187,55 +195,66 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                     label: "selectNodeAndChildren",
                     data: menuItemData,
                     action: (function (menuItem) {
-                        self.currentNode+=" and children"
+                        self.currentNode += " and children"
                         keolis.selection.push(node.id)
-                        $("#"+node.id+"_anchor").css("color","red");
-                        node.children.forEach(function(child){
+                        $("#" + node.id + "_anchor").css("color", "red");
+                        node.children.forEach(function (child) {
                             keolis.selection.push(child)
-                            $("#"+child+"_anchor").css("color","red");
+                            $("#" + child + "_anchor").css("color", "red");
                         })
                     })
 
                 }
-
                 items ["clearSelection"] = {
-                    label: "clearSelection",
+                    label: "clear selection",
                     data: menuItemData,
                     action: (function (menuItem) {
-                        $(".jstree-anchor").css("color","black");
-                        keolis.selection=[];
-                        $("#graphSelectionButton").prop("disabled","disabled");
+                        $(".jstree-anchor").css("color", "black");
+                        keolis.selection = [];
+                        $("#graphSelectionButton").prop("disabled", "disabled");
                     })
 
                 }
+
+                  items ["useSelection"] = {
+                   label: "use selection...",
+                   data: menuItemData,
+                   action: (function (menuItem) {
+                       self.graphSelection();
+                   })
+
+               }
+
+
                 return items;
             }
 
             self.graphSelection = function () {
 
-                var sel=self.selection;
-                var label="";
-                if( type=="categories")
-                    label="categorieCommunaute"
-                else if( type=="tags")
-                    label="tag"
-               self.addClauseByIdsArray("iD",self.selection,label,function(err, result){
+                var sel = self.selection;
+                var label = "";
+                if (type == "categories")
+                    label = "categorieCommunaute"
+                else if (type == "tags")
+                    label = "tag"
+                self.addClauseByIdsArray("iD", self.selection, label, function (err, result) {
 
 
-               });
+                });
 
 
             }
-            self.addClauseByIdsArray=function(idKey,ids,label,callback){
+            self.addClauseByIdsArray = function (idKey, ids, label, callback) {
 
-                toutlesensData.setWhereFilterWithArray (idKey,ids, function(err, result){
-                    var where=result;
+                toutlesensData.setWhereFilterWithArray(idKey, ids, function (err, result) {
+                    var where = result;
 
-                    var   clauseText = "[label] "+ self.currentNode.text +" </b>"
-                    advancedSearch.currentQueryNodeIds=ids;
-                    var clause= {foundIds: ids.length,
-                        nodeLabel:label,
-                        where:where
+                    var clauseText = "[label] " + self.currentNode.text + " </b>"
+                    advancedSearch.currentQueryNodeIds = ids;
+                    var clause = {
+                        foundIds: ids.length,
+                        nodeLabel: label,
+                        where: where
 
                     }
                     advancedSearch.clearClauses();
@@ -243,14 +262,19 @@ $("#graphSelectionButton").prop("disabled", "disabled");
                     searchMenu.activatePanel("searchActionDiv")
                     findTabs.tabs("option", "active", 0);
 
-                    if(callback)
-                        callback(err,clauseText);
+                    if (callback)
+                        callback(err, clauseText);
 
 
                 })
 
             }
 
+            self.clearSelection=function(){
+                $(".jstree-anchor").css("color", "black");
+                keolis.selection = [];
+                $("#graphSelectionButton").prop("disabled", "disabled");
+            }
 
 
             return self;
@@ -260,8 +284,10 @@ $("#graphSelectionButton").prop("disabled", "disabled");
 </head>
 <body>
 <button onclick="  keolis.loadJon('tags')">tags</button>
-<button onclick="  keolis.loadJon('categories')" >categories</button>
-<button onclick="keolis.graphSelection()" id="graphSelectionButton" disabled>graphSelection</button>
+<button onclick="  keolis.loadJon('categories')">categories</button>
+<button onclick="  keolis.clearSelection()">clear selection</button>
+<!--<button onclick="keolis.graphSelection()" id="graphSelectionButton" disabled>graphSelection</button>-->
+
 <br>
 <div id="treeDivKeolis" style="width:400px;height: 800px;overflow: auto"></div>
 

@@ -143,6 +143,11 @@ var paint = (function () {
 
             function getData() {
                 var data = []
+                if(!searchMenu.currentAction)
+                    searchMenu.currentAction="graph"
+                if(!searchMenu.previousAction)
+                    searchMenu.previousAction="graph"
+
                // if (searchMenu.currentAction.indexOf("graph") > -1)  {
                     if (searchMenu.currentAction.indexOf("treeMap") <0) {
                     $("#paint_unClusterButton").css("visibility", "visible");

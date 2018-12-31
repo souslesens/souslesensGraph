@@ -214,7 +214,9 @@ input {
     top: 0px;
     left: 5px;
     padding: 3px;
-    overflow-y: auto;
+    //overflow-y: auto;
+    overflow: hidden;
+    background: none;
 }
 
 .message {

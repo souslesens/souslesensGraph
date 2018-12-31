@@ -1029,7 +1029,8 @@ var toutlesensController = (function () {
                     fixed: true,
                     onEndDrag: function () {
                         Schema.currentGraph = visjsGraph.exportGraph();
-                        localStorage.setItem("schemaGraph_" + subGraph, JSON.stringify(Schema.currentGraph, null, 2));
+                        var str= "{\"nodes\":"+JSON.stringify(Schema.currentGraph, null, 2)+",\"edges\":"+JSON.stringify(Schema.currentGraph.edges, null, 2)+"}";
+                        localStorage.setItem("schemaGraph_" + subGraph,str);
                     },
                     onClick: function (params) {
                         $("#graphPopup").css("visibility", "hidden");
@@ -1072,7 +1073,8 @@ var toutlesensController = (function () {
                             self.setRightPanelAppearance(false);
                             visjsGraph.draw("graphDiv", data, graphOptions, function () {
                                 Schema.currentGraph = visjsGraph.exportGraph();
-                                localStorage.setItem("schemaGraph_" + subGraph, JSON.stringify(Schema.currentGraph, null, 2));
+                                var str= "{\"nodes\":"+JSON.stringify(Schema.currentGraph, null, 2)+",\"edges\":"+JSON.stringify(Schema.currentGraph.edges, null, 2)+"}";
+                                localStorage.setItem("schemaGraph_" + subGraph,str);
                             });
                         });
                     }
@@ -1360,7 +1362,7 @@ var toutlesensController = (function () {
 
             $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0)
 
-            $("#graphLegendDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("background-color", "#eee");
+            $("#graphLegendDiv").width(120).height(200).css("position", "absolute").css("top", 60).css("left", 5).css("background-color", "#eee");
             $("#graphInfosDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("top", 50).css("background-color", "#eee");
             $("#BIlegendDiv").css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 80).css("top", 80).css("background-color", "#eee");
             $("#graphInfosDiv").css("visibility", "hidden")

@@ -204,8 +204,14 @@ var eventsController = (function () {
                             toutlesensController.currentActionObj = {type: "relation"}
                         if (index == 3)
                             toutlesensController.currentActionObj = {type: "pathes"}
-                        if (index == 4)
+                        if (index == 5) {// plugin
+                            $("#plugin").css("visibility","visible")
+
                             ;//   toutlesensController.searchNodesUI('exec', null, null, tagCloud.drawCloud);
+                        }
+                        else{
+                            $("#plugin").css("visibility","hidden")
+                        }
                     },
                     create: function (event, ui) {
                         toutlesensController.currentActionObj = {type: "findNode"}

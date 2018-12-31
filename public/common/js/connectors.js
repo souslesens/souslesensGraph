@@ -50,7 +50,7 @@ var connectors = (function () {
                     if (labelVisjs && labelVisjs.length > Gparams.nodeMaxTextLength)
                         labelVisjs = labelVisjs.substring(0, Gparams.nodeMaxTextLength) + "...";
 
-                    var color = nodeColors[nodes[j].labels[0]]
+                    var color = nodeColors[nodes[j].labels[0]];
                     var nodeObj = {
 
                         labelNeo: labels[0],// because visjs where label is the node name
@@ -95,7 +95,7 @@ var connectors = (function () {
 
                     nodeObj.initialColor = nodeObj.color;
                     if (nodeObj.labelNeo == currentLabel) {
-                        nodeObj.value = 30;
+                       ;// nodeObj.value = 30;
                         //  nodeObj.size = 15;
 
                     }

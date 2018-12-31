@@ -39,7 +39,7 @@
 
                     if (key == "connectedTo") {
                         if (line[key].length > 200)
-                            self.dataset[index][key] = line[key].substring(0 ,200) + "...";
+                            self.dataset[index][key] = line[key].substring(0, 200) + "...";
                     }
 
                     if (checkedProperties.indexOf(key) < 0)
@@ -53,28 +53,45 @@
             }
 
             //if($('#dialog').dialog)
-                $('.ui-button-icon').click();
-          //  $('#dialog').dialog("close");
+            $('.ui-button-icon').click();
+            //  $('#dialog').dialog("close");
             // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
-         //   $('#dialogLarge').load("htmlSnippets/dataTable.html", function () {
-             //   $('#dialogLarge').dialog("open");
-            var x=dialogLarge
-
-                dialogLarge.load("htmlSnippets/dataTable.html", function () {
-                   dialogLarge.dialog("open");
-
-                      toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv", self.dataset, function (err, result) {
+            //   $('#dialogLarge').load("htmlSnippets/dataTable.html", function () {
+            //   $('#dialogLarge').dialog("open");
 
 
-                  },2000)
+            dialogLarge.load("htmlSnippets/dataTable.html", function () {
+                dialogLarge.dialog("open");
+
+                toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv", self.dataset, function (err, result) {
+
+
+                }, 2000)
 
             })
+        }
+
+        self.initStatsDialog = function () {
+            $("#dataTableDialog_statsDiv").css("visibility", "visible");
+            debugger;
+            var labels = []
+            dataTableDialog.dataset.forEach(function (line) {
+                if (labels.indexOf(line.label) < 0) {
+                    labels.push(line.label)
+                }
+            })
+            common.fillSelectOptionsWithStringArray(stats_sourceLabelSelect, labels, true)
+            common.fillSelectOptionsWithStringArray(stats_targetLabelSelect, labels, true)
+
+
         }
 
 
         return self;
 
     })()
+
+   
 
 
 </script>
@@ -84,4 +101,24 @@
 
 
 </div>
-<button onclick="dataTableDialog.execute()">OK</button>
+<button onclick="dataTableDialog.execute()">Show</button>
+<button onclick="dataTableDialog.initStatsDialog()">Stats</button>
+
+<div id="dataTableDialog_statsDiv" style="visibility: hidden">
+
+    <select id="stats_typeSelect">
+        <option value="relationsRanking"> relationsRanking</option>
+
+    </select>
+
+    source label <select id="stats_sourceLabelSelect">
+
+
+</select>
+    target label <select id="stats_targetLabelSelect">
+
+
+</select>
+    <button onclick="stats.execute()">ok</button>
+
+</div>

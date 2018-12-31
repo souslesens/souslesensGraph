@@ -466,24 +466,49 @@ var visjsGraph = (function () {
             var nodes = [];
             var x = 10;
             var y = -50;
+            var y = 10;
+            var html = "<table>";
+            var onClick = ""// onclick=\"filters.filterOnProperty(null,'not') ";
+            for (var i = 0; i < labels.length; i++) {
+                var label = labels[i];
+                if (!nodeColors[label])
+                    continue;
+                html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" +label + "</span></td></tr>"
+
+            }
+            html +="</table>"
+                $("#graphLegendDiv").html(html);
+
+
+        }
+
+
+        self.drawLegendVisj = function (labels, relTypes) {
+            var nodes = [];
+            var x = 10;
+            var y = -50;
+            var y = 10;
             for (var i = 0; i < labels.length; i++) {
                 var label = labels[i];
                 if (!nodeColors[label])
                     continue;
                 labelObj = {
                     id: label,
-                    shape: "square",
-                    size: 5,
+                    shape: "box",
+                    // size: 5,
                     color: nodeColors[label],
                     label: label,
-                    font: {size: 10},
+                    //   font: {stroke: "black", "font-size": "14px"},
                     x: x,
                     y: y,
+                    fixed: true
                     // margin: { top: 5, right:5, bottom:5, left: 5 }
                 }
-                x += 50
+                // x += 50;
+                y += 30;
                 nodes.push(labelObj);
             }
+
             ;
 
 
@@ -492,20 +517,20 @@ var visjsGraph = (function () {
                 edges: []
             };
             var options = {
-                nodes: {
-                    shape: 'square'
-                }
+                /* nodes: {
+                     shape: 'square'
+                 }*/
             };
             var container = document.getElementById("graphLegendDiv");
             var network = new vis.Network(container, data, options);
             network.on("click", function (params) {
 
                 var label = params.nodes[0];
-                currentLabel = label;
-                currentObject.id == null;
-                return toutlesensController.generateGraph(null, {applyFilters: true}, function (err, result) {
-                    currentLabel = null;
-                });
+                /* currentLabel = label;
+                 currentObject.id == null;
+                 return toutlesensController.generateGraph(null, {applyFilters: true}, function (err, result) {
+                     currentLabel = null;
+                 });*/
 
 
             });
@@ -784,6 +809,7 @@ var visjsGraph = (function () {
 
             function addConnections(elem, index) {
                 // need to replace this with a tree of the network, then get child direct children of the element
+
                 elem.connections = network.getConnectedNodes(elem.id);
             }
 
@@ -794,7 +820,11 @@ var visjsGraph = (function () {
             var positions = network.getPositions();
 
             var nodes = objectToArray(self.nodes._data, positions);
+
+
             nodes.forEach(addConnections);
+            var edges = self.edges._data;
+            nodes.edges = edges;
             return nodes;
 
             // pretty print node data
@@ -886,13 +916,32 @@ var visjsGraph = (function () {
                 throw 'Can not find id \'' + id + '\' in data';
             }
 
+            function setEdgeProperties(edge) {
+                for (var key in allEdges) {
+                    if (allEdges[key].from == edge.from && allEdges[key].to == edge.to) {
+                        edge.label = allEdges[key].label;
+                        edge.arrows = "to";
+                        neoAttrs:allEdges[key].neoAttrs;
+
+                    }
+                    else if (allEdges[key].from == edge.to && allEdges[key].to == edge.from) {
+                        edge.label = allEdges[key].label
+                        edge.arrows = "to";
+                        neoAttrs:allEdges[key].neoAttrs;
+                    }
+                }
+            }
+
             function getEdgeData(data) {
                 var networkEdges = [];
 
                 data.forEach(function (node) {
                     // add the connection
                     node.connections.forEach(function (connId, cIndex, conns) {
-                        networkEdges.push({from: node.id, to: "" + connId});
+                        var edge = {from: node.id, to: "" + connId}
+                        setEdgeProperties(edge)
+                        networkEdges.push(edge);
+
                         var cNode = getNodeById(data, connId);
 
                         var elementConnections = cNode.connections;
@@ -916,9 +965,10 @@ var visjsGraph = (function () {
 
             }
 
+            var allEdges = inputData.edges;
             var data = {
-                nodes: getNodeData(inputData),
-                edges: getEdgeData(inputData)
+                nodes: getNodeData(inputData.nodes),
+                edges: getEdgeData(inputData.nodes)
             }
             self.draw("graphDiv", data, options);
             //  network = new vis.Network(container, data, {});
@@ -1035,12 +1085,15 @@ var visjsGraph = (function () {
 
                 }
 
-
                 var str = "";
+                var connectionsCountMap={}
                 node.connections.forEach(function (id, index) {
                     if (index > 0)
                         str += ","
                     str += map[id].label + "[" + map[id].labelNeo + "]"
+                    if(!connectionsCountMap[map[id].labelNeo])
+                        connectionsCountMap[map[id].labelNeo]=0;
+                    connectionsCountMap[map[id].labelNeo]+=1;
                 })
                 obj.connectedTo = str;
                 for (var key in node.neoAttrs) {
@@ -1048,6 +1101,7 @@ var visjsGraph = (function () {
                         obj[key] = node.neoAttrs[key]
                 }
                 obj.id = node.id,
+                    obj.connectionsCountMap = connectionsCountMap,
 
                     dataset.push(obj);
             })

@@ -310,6 +310,8 @@ var searchMenu = (function () {
                 });
             }
             else if (option == 'execute') {
+
+                toutlesensController.setGraphMessage("Working...")
                 eventsController.stopEvent = true;
 
 
