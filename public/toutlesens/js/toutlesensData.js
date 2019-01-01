@@ -205,12 +205,15 @@ var toutlesensData = (function () {
                     whereStatement += " AND ";
                 whereStatement += self.queryRelWhereFilter + " ";
             }
-            if(self.targetWhereFilter!= "") {
+            if (self.targetWhereFilter != "") {
                 if (whereStatement == "")
                     whereStatement += " WHERE ";
                 else
                     whereStatement += " AND ";
-                whereStatement += "m."+self.targetWhereFilter + " ";
+                if (self.targetWhereFilter.indexOf("m.") > -1)
+                    whereStatement += self.targetWhereFilter + " ";
+                else
+                    whereStatement += "m." + self.targetWhereFilter + " ";
             }
 
             //*******************************************************return***********************************************
@@ -328,7 +331,7 @@ var toutlesensData = (function () {
             toutlesensData.queryExcludeRelFilters = "";
             toutlesensData.matchStatement = "";
             toutlesensData.queryRelWhereFilter = "";
-            toutlesensData.targetWhereFilter="";
+            toutlesensData.targetWhereFilter = "";
 
             $("#searchMenu_cypherDiv").text(statement)
             var payload = {match: statement};

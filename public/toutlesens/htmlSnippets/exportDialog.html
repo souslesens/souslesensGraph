@@ -1,9 +1,13 @@
 <script>
 
-    var dataTableDialog = (function () {
+    var exportDialog = (function () {
         var self = {};
         self.dataset;
         self.init = function (data) {
+            exportDialog_tabDiv=$("#exportDialog_tabDiv").tabs();
+
+
+
             self.dataset = data;
             var properties = []
             data.forEach(function (line) {
@@ -18,9 +22,11 @@
                 if (prop == "connectedTo" || prop == Schema.schema.defaultNodeNameProperty)
                     checked = "checked='checked'"
 
-                html += "<br><input type=checkbox class='dataTableDialog_propcbx' value='" + prop + "'" + checked + "> " + prop;
+                html += "<br><input type=checkbox class='exportDialog_propcbx' value='" + prop + "'" + checked + "> " + prop;
             })
-            $("#dataTableDialog_cbxsDiv").html(html);
+            $("#exportDialog_cbxsDiv").html(html);
+
+            self.initStatsDialog()
 
         }
 
@@ -28,7 +34,7 @@
         self.execute = function () {
 
             var checkedProperties = [];
-            $(".dataTableDialog_propcbx").each(function (index, cbx) {
+            $(".exportDialog_propcbx").each(function (index, cbx) {
                 if ($(this).prop("checked")) {
                     checkedProperties.push(cbx.value)
                 }
@@ -72,10 +78,10 @@
         }
 
         self.initStatsDialog = function () {
-            $("#dataTableDialog_statsDiv").css("visibility", "visible");
-            debugger;
+            $("#exportDialog_statsDiv").css("visibility", "visible");
+
             var labels = []
-            dataTableDialog.dataset.forEach(function (line) {
+            exportDialog.dataset.forEach(function (line) {
                 if (labels.indexOf(line.label) < 0) {
                     labels.push(line.label)
                 }
@@ -96,29 +102,56 @@
 
 </script>
 
+<div id="exportDialog_tabDiv">
+    <ul>
+        <li><a href="#exportDialog_propertiesTabDiv"><span>properties  </span></a></li>
+        <li><a href="#exportDialog_statsTabDiv"><span>statistics </span></a></li>
+    </ul>
 
-<div id="dataTableDialog_cbxsDiv">
+<div id="exportDialog_propertiesTabDiv">
+<div id="exportDialog_cbxsDiv">
 
 
 </div>
-<button onclick="dataTableDialog.execute()">Show</button>
-<button onclick="dataTableDialog.initStatsDialog()">Stats</button>
+<button onclick="exportDialog.execute()">Show</button>
+</div>
 
-<div id="dataTableDialog_statsDiv" style="visibility: hidden">
+<div id="exportDialog_statsTabDiv">
+<table>
+    <tr>
+        <td>
+            output type
+        </td>
+        <td>
+            <select  id="stats_typeSelect"><option value="relationsRanking"> relationsRanking</option></select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            source label
+        </td>
+        <td>
+            <select id="stats_sourceLabelSelect"></select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            target label
+        </td>
+        <td>
+            <select id="stats_targetLabelSelect"></select>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
 
-    <select id="stats_typeSelect">
-        <option value="relationsRanking"> relationsRanking</option>
-
-    </select>
-
-    source label <select id="stats_sourceLabelSelect">
+            <button onclick="stats.execute()">ok</button>
+        </td>
+    </tr>
 
 
-</select>
-    target label <select id="stats_targetLabelSelect">
+</table>
 
 
-</select>
-    <button onclick="stats.execute()">ok</button>
-
+</div>
 </div>

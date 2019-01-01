@@ -69,12 +69,13 @@ var myDataTable = function () {
         this.columns = columns;
 
         var htmlStr = "<table style=' z-index:100 ' id='table_" + containerDiv + "'  class='myDatatable cell-border display nowrap'></table>"
+        htmlStr +="<div id='datatablePopupDiv' style='visibility: hidden;position:absolute;background-color: #ccc' onclick='  dialogLarge.dialog(\"close\");'></div>"
 
 
 
-
-            $("#" + containerDiv).html(htmlStr).promise().done(function() {
+           $("#" + containerDiv).html(htmlStr).promise().done(function() {
             $('#' + containerDiv).css("font-size", "10px");
+
             /*   var height;
                var width;
                if (options.height)
@@ -158,9 +159,14 @@ var myDataTable = function () {
                     // var data = table.row( idx.row ).data();
                     var line = dataSet[idx.row];
                     currentObject = {id: line.id};
+                    $("#datatablePopupDiv").html(toutlesensDialogsController.setPopupMenuNodeInfoContent);
+                    $("#datatablePopupDiv").css("top",py).css("left",px);
 
-                    toutlesensController.dispatchAction("nodeInfos", currentObject.id);
-                    toutlesensController.showPopupMenu(px, py, "nodeInfo");
+                    $("#datatablePopupDiv").css("visibility","visible")
+
+
+
+
                 }
             });
             $('#table_' + containerDiv + ' tbody').on('click', 'tr', function (event) {

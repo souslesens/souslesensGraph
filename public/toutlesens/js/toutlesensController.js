@@ -930,10 +930,10 @@ var toutlesensController = (function () {
                 var dataset = visjsGraph.toList();
 
                 // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
-                $("#dialog").load("htmlSnippets/dataTableDialog.html", function () {
+                $("#dialog").load("htmlSnippets/exportDialog.html", function () {
                     dialog.dialog("open");
                     dialog.dialog({title: "Select table columns"});
-                    dataTableDialog.init(dataset)
+                    exportDialog.init(dataset)
 
 
                 })
@@ -1362,7 +1362,7 @@ var toutlesensController = (function () {
 
             $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0)
 
-            $("#graphLegendDiv").width(120).height(200).css("position", "absolute").css("top", 60).css("left", 5).css("background-color", "#eee");
+            $("#graphLegendDiv").width(120).height(200).css("position", "absolute").css("top", 60).css("left", 5).css("background", "none");
             $("#graphInfosDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("top", 50).css("background-color", "#eee");
             $("#BIlegendDiv").css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 80).css("top", 80).css("background-color", "#eee");
             $("#graphInfosDiv").css("visibility", "hidden")

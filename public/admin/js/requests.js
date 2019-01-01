@@ -150,6 +150,8 @@ var requests = (function () {
         var header = allParams[subGraph][request.source].header;
         var obj = request;
 
+        $("#exportMessageLinks").html("source : "+request.source)
+
         admin.initImportDialogSelects(header)
 
         for (var key in obj) {

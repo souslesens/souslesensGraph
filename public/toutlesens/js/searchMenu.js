@@ -87,13 +87,19 @@ var searchMenu = (function () {
 
             })
             var options = {targetNodesLabels: tagetLabels};
-            var targetWhereClause = $("#neighboursWhereInput").val();
-            if (targetWhereClause != "")
-                options.targetWhereClause = targetWhereClause;
-            toutlesensData.targetWhereFilter = targetWhereClause;
+          self.setTargetWhereFilter();
             advancedSearch.searchNodes('matchStr', options, advancedSearch.graphNodesAndDirectRelations);
         }
 
+
+        self.setTargetWhereFilter=function() {
+            if( $("#neighboursWhere_propertySelect").val()=="")
+                return;
+            var targetWhereClause = $("#neighboursWhere_propertySelect").val()+":"+ $("#neighboursWhere_operatorSelect").val()+" "+$("#neighboursWhere_valueInput").val();
+
+            targetWhereClause= advancedSearch.getWhereProperty(targetWhereClause,"m")
+            toutlesensData.targetWhereFilter = targetWhereClause;
+        }
         self.activatePanel = function (id) {
             var visibility = "visible";
             self.clearCurrentLabel();
@@ -373,6 +379,9 @@ var searchMenu = (function () {
                     //  advancedSearch.searchNodes('matchStr', {targetNodesLabels:true}, self.graphNodesAndDirectRelations);
                     $("#searchDialog_ExecuteButton").css('visibility', 'visible');
                 }
+
+
+
                 if (previousAction == 'treeMapSomeNeighboursListLabels') {
                     self.currentAction = "treeMapSomeNeighbours";
                     var neighboursLabels = [];

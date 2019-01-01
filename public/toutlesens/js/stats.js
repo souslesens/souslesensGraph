@@ -11,7 +11,7 @@ var stats = (function () {
 
         var statType = $("#stats_typeSelect").val();
         if (statType == "relationsRanking") {
-            var statsData = self.getRelationsRankingStat(dataTableDialog.dataset, $("#stats_sourceLabelSelect").val(), $("#stats_targetLabelSelect").val());
+            var statsData = self.getRelationsRankingStat(exportDialog.dataset, $("#stats_sourceLabelSelect").val(), $("#stats_targetLabelSelect").val());
             dialogLarge.load("htmlSnippets/dataTable.html", function () {
                 dialogLarge.dialog("open");
                 toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv", statsData, function (err, result) {

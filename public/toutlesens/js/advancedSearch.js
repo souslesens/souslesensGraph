@@ -481,7 +481,7 @@ var advancedSearch = (function () {
             // return "";
         }
 
-        if (operator == "~") {
+        if (operator == "~" || operator == "contains") {
             operator = "=~"
             // value = "'.*" + value.trim() + ".*'";
             value = "'(?i).*" + value.trim() + ".*'";
