@@ -62,7 +62,7 @@ var advancedSearch = (function () {
         var labels = Schema.getPermittedLabels(label, true, true);
         for (var i = 0; i < labels.length; i++) {
             var label2 = labels[i];//.replace(/^-/,"");
-            labelsCxbs += "<tr><td><input type='checkbox' class='advancedSearchDialog_LabelsCbx' name='advancedSearchDialog_LabelsCbx' value='" + label2 + "'></td><td>" + label2 + "</td></tr>"
+            labelsCxbs += "<tr><td><input type='checkbox' class='advancedSearchDialog_LabelsCbx' name='advancedSearchDialog_LabelsCbx' onclick='searchMenu.initNeighboursTargetWhere($(this))' value='" + label2 + "'></td><td>" + label2 + "</td></tr>"
         }
         labelsCxbs += "</table>";
         $("#" + selectId).html(labelsCxbs).promise().done(function () {

@@ -109,7 +109,7 @@ var algorithms = (function () {
 
 
     self.initDialog = function (label) {
-        $(".algorithmParam").css("display", "none");
+        $('.algorithmParam0').hide();
         if (label)
             common.fillSelectOptionsWithStringArray(searchDialog_AlgorithmsTargetLabelSelect, Schema.getPermittedLabels(label,true,true), true, true)
         else
@@ -120,16 +120,17 @@ var algorithms = (function () {
 
     }
     self.initAlgorithm = function (algoName) {
-        $(".algorithmParam").css("display", "none");
+      // $(".algorithmParam0").hide();
+        $('.algorithmParam0').hide();
         if (algoName == "similarities jaccard") {
-            $("#searchDialog_AlgorithmsMinCountTargetNodes").css("display", "display")
-            $("#searchDialog_AlgorithmsResultSize").css("display", "display")
-            $("#searchDialog_AlgorithmsSimilarityCutoff").css("display", "display")
+            $("#searchDialog_AlgorithmsResultSize").val("1000");
+            $('.algorithmParam0').show();
 
 
         }
         else if (algoName == "relationsRanking") {
-            $(".searchDialog_AlgorithmsResultSize").css("display", "display")
+            $("#searchDialog_AlgorithmsResultSize").val("100");
+            $('.algorithmParam0.algorithmParam1').show();
         }
 
     }

@@ -74,7 +74,7 @@ var searchMenu = (function () {
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
             currentLabel = null;
-         //   toutlesensController.dispatchAction("showSchema")
+            //   toutlesensController.dispatchAction("showSchema")
 
         }
 
@@ -86,7 +86,12 @@ var searchMenu = (function () {
                 tagetLabels.push($(this).val())
 
             })
-            advancedSearch.searchNodes('matchStr', {targetNodesLabels: tagetLabels}, advancedSearch.graphNodesAndDirectRelations);
+            var options = {targetNodesLabels: tagetLabels};
+            var targetWhereClause = $("#neighboursWhereInput").val();
+            if (targetWhereClause != "")
+                options.targetWhereClause = targetWhereClause;
+            toutlesensData.targetWhereFilter = targetWhereClause;
+            advancedSearch.searchNodes('matchStr', options, advancedSearch.graphNodesAndDirectRelations);
         }
 
         self.activatePanel = function (id) {
@@ -113,7 +118,7 @@ var searchMenu = (function () {
             }
 
 
-            if ( previousAction== 'algorithms') {
+            if (previousAction == 'algorithms') {
                 self.activatePanel("advancedSearchActionDiv");
 
                 return;
@@ -410,6 +415,7 @@ var searchMenu = (function () {
 
         self.onGraphNeighboursAllOptionsCbx = function (cbx) {
             var state = $(cbx).prop("checked");
+            $("#neighboursWhereDiv").hide()
 
 
             $('.advancedSearchDialog_LabelsCbx').each(function () {
@@ -422,11 +428,19 @@ var searchMenu = (function () {
             }
         }
 
-        self.execCypherMatchStatement=function(){
-            var cypher=$("#searchMenu_cypherInput").val();
-            toutlesensData.executeCypher(cypher,function(err, result){
-                var xx=result
+        self.execCypherMatchStatement = function () {
+            var cypher = $("#searchMenu_cypherInput").val();
+            toutlesensData.executeCypher(cypher, function (err, result) {
+                var xx = result
             })
+
+        }
+
+        self.initNeighboursTargetWhere = function (cbx) {
+            $("#neighboursWhereDiv").show()
+            var label = $(cbx).val();
+            var props=Object.keys(Schema.schema.properties[label]);
+            common.fillSelectOptionsWithStringArray(neighboursWhere_propertySelect,props,true)
 
         }
 

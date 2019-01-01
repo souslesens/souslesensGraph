@@ -38,6 +38,7 @@ var toutlesensData = (function () {
         self.queryRelWhereFilter = "";
         self.queryExcludeNodeFilters = "";
         self.whereFilter = "";
+        self.targetWhereFilter = "";
         self.matchStatement = null;
         self.currentStatement = null;
 
@@ -204,6 +205,13 @@ var toutlesensData = (function () {
                     whereStatement += " AND ";
                 whereStatement += self.queryRelWhereFilter + " ";
             }
+            if(self.targetWhereFilter!= "") {
+                if (whereStatement == "")
+                    whereStatement += " WHERE ";
+                else
+                    whereStatement += " AND ";
+                whereStatement += "m."+self.targetWhereFilter + " ";
+            }
 
             //*******************************************************return***********************************************
             var returnStatement;
@@ -318,8 +326,9 @@ var toutlesensData = (function () {
             toutlesensData.queryRelTypeFilters = "";
             toutlesensData.queryExcludeNodeFilters = "";
             toutlesensData.queryExcludeRelFilters = "";
-            toutlesensData.matchStatement = ""
-            toutlesensData.queryRelWhereFilter = ""
+            toutlesensData.matchStatement = "";
+            toutlesensData.queryRelWhereFilter = "";
+            toutlesensData.targetWhereFilter="";
 
             $("#searchMenu_cypherDiv").text(statement)
             var payload = {match: statement};

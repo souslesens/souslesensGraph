@@ -261,7 +261,7 @@
             var totalWidth = $(window).width();
             var totalHeight = $(window).height();
             var split = 0;
-            var accordionWidth = 460;
+            var accordionWidth = 600;
             $("#left").width(split).height(totalHeight - 10);
 
             $("#graphPanel").css("left", split + accordionWidth).width((totalWidth - (split + accordionWidth))).height(totalHeight - 10);
@@ -286,7 +286,7 @@
             });
 
 
-            $("#accordion").accordion(
+            importNeoAccordion= $("#accordion").accordion(
                 {
                     activate: function (event, ui) {
 

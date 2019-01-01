@@ -243,12 +243,35 @@
             <div id="searchNeighboursLabelsDiv" class="searchPanel"
                  style="visibility:hidden">
                 <b>Neighbour Type</b>
-                <br>
                 <input type="checkbox" id="graphNeighboursAllOptionsCbx"
                        onchange="searchMenu.onGraphNeighboursAllOptionsCbx(this)"> All
                 <div id='neighboursTypesDiv'
                      style="max-height: 150px;width:320px;overflow: auto"></div>
 
+                <div id='neighboursWhereDiv' style="width:320px;display: none">
+                    <table>
+                        <tr>
+                            <td colspan="3">
+                                <select id="neighboursWhere_propertySelect" style="height: 25px;">
+                                </select>
+
+                                <select id="neighboursWhere_operatorSelect">
+                                    <option>=</option>
+                                    <option>!=</option>
+                                    <option>&lt;</option>
+                                    <option>&gt;</option>
+                                    <option selected="selected">contains</option>
+                                </select>
+
+                                <input id="neighboursWhere_valueInput" size="10" >
+
+
+                            </td>
+                        </tr>
+
+
+                    </table>
+                </div>
 
             </div>
 
@@ -271,7 +294,7 @@
                             <select id="searchDialog_AlgorithmsTargetLabelSelect"> </select>
                         </td>
                     </tr>
-                    <tr class="algorithmParam" >
+                    <tr class="algorithmParam0" >
                         <td>
                             count target nodes min
                         </td>
@@ -279,7 +302,7 @@
                             <input id="searchDialog_AlgorithmsMinCountTargetNodes"  value="0">
                         </td>
                     </tr>
-                    <tr  class="algorithmParam searchDialog_AlgorithmsResultSize">
+                    <tr  class="algorithmParam0 algorithmParam1">
                         <td>
                             result size
                         </td>
@@ -287,12 +310,12 @@
                             <input id="searchDialog_AlgorithmsResultSize" value="1000" >
                         </td>
                     </tr>
-                    <tr  class="algorithmParam">
+                    <tr  class="algorithmParam0">
                         <td>
                             similarityCutoff
                         </td>
                         <td>
-                            <input id="searchDialog_AlgorithmsSimilarityCutoff" value="0.8"
+                            <input id="searchDialog_AlgorithmsSimilarityCutoff" value="0.8">
 
                         </td>
                     </tr>

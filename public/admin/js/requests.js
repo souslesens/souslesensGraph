@@ -99,22 +99,38 @@ var requests = (function () {
             self.init();
         var requests = []
         for (var key in allParams[subGraph].requests) {
-            requests.push(key)
+            requests.push({value:key, label:key.replace(subGraph+".","")})
         }
+
+        requests.sort(function(a,b){
+            if(a.label>b.label)
+                return 1;
+            if(a.label<b.label)
+                return -1;
+            return 0;
+        });
         if (select)
-            common.fillSelectOptionsWithStringArray(select, requests, true)
+            common.fillSelectOptions(select, requests,"label","value", true)
         return requests;
     }
 
-    self.deleteRequest = function (name, select) {
-        var request = allParams[subGraph].requests[name];
-        var index = allParams[subGraph][request.file].requests.indexOf(name);
-        if (index > -1) {
-            allParams[subGraph][request.file].requests.splice(index, 1)
+    self.deleteRequest = function () {
+
+        var name = $("#requestsSelect").val()[0];
+        if (confirm("delete import query " + name)) {
+            console.log(name);
+            var request = allParams[subGraph].requests[name];
+            var xxx = JSON.stringify(allParams[subGraph][request.source].requests)
+            console.log(xxx);
+            var index = allParams[subGraph][request.source].requests.indexOf(name);
+            if (index > -1) {
+                allParams[subGraph][request.source].requests.splice(index, 1)
+            }
+            delete allParams[subGraph].requests[name];
+            localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2));
+            self.list (subGraph, requestsSelect) ;
+
         }
-        delete allParams[subGraph].requests[name];
-
-
     }
 
 
@@ -125,10 +141,14 @@ var requests = (function () {
         return allParams[subGraph];
 
     }
-    self.loadRequest = function (name) {
-var request=allParams[subGraph].requests[name];
-var header=allParams[subGraph][request.source].header;
-var obj=request;
+
+
+
+
+    self.loadRequest = function (name) {savedQueries
+        var request = allParams[subGraph].requests[name];
+        var header = allParams[subGraph][request.source].header;
+        var obj = request;
 
         admin.initImportDialogSelects(header)
 
@@ -143,16 +163,22 @@ var obj=request;
         $("#sourceNode").val(obj.source);
         $("#neoTargetKey").html("").append('<option>' + obj["neoTargetKey"] + '</option>');
         $("#neoSourceKey").html("").append('<option>' + obj["neoSourceKey"] + '</option>');
+        var tab;
+        if(name.indexOf("Node")>-1)
+            tab=2
+        else
+            tab=3
+       importNeoAccordion.accordion("option", "active", tab);
 
 
     }
-self.executeRequestsUI=function(type){
-        var selectedRequests=$("#requestsSelect").val();
-    self.executeRequests (subGraph, type,selectedRequests);
-}
+    self.executeRequestsUI = function (type) {
+        var selectedRequests = $("#requestsSelect").val();
+        self.executeRequests(subGraph, type, selectedRequests);
+    }
 
-    self.executeRequests = function (subGraph,type, requestNames) {
-       var  requestsMap = allParams[subGraph].requests;
+    self.executeRequests = function (subGraph, type, requestNames) {
+        var requestsMap = allParams[subGraph].requests;
 
         if (requestNames == null) {//all
             requestNames = [];
@@ -165,14 +191,14 @@ self.executeRequestsUI=function(type){
         var requestsArray = [];
         requestNames.forEach(function (requestName) {
             if (requestsMap[requestName])
-                if( type=="node" && requestName.indexOf("Node")==0)
-                requestsArray.push(requestsMap[requestName]);
-            else if( type=="relation" && requestName.indexOf("Rel")==0)
-                requestsArray.push(requestsMap[requestName]);
+                if (type == "node" && requestName.indexOf("Node") == 0)
+                    requestsArray.push(requestsMap[requestName]);
+                else if (type == "relation" && requestName.indexOf("Rel") == 0)
+                    requestsArray.push(requestsMap[requestName]);
 
 
         })
-        callExportToNeo(type, requestsArray, function(err, result){
+        callExportToNeo(type, requestsArray, function (err, result) {
             loadLabels();
             admin.drawVisjsGraph();
         });
