@@ -23,6 +23,7 @@ var requests = (function () {
         }
         self.loadSubGraphCSVsources()
         self.list(subGraph, requestsSelect);
+      //  $("#importSourceType").val("localCSV");
         setCsvImportFields(allParams[subGraph]);
     }
 
@@ -151,6 +152,7 @@ var requests = (function () {
         var obj = request;
 
         $("#exportMessageLinks").html("source : "+request.source)
+        $("#sourceNode").val(request.source)
 
         admin.initImportDialogSelects(header)
 

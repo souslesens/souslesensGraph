@@ -428,7 +428,7 @@ var importDataIntoNeo4j = {
             var sourceTargetField = obj[params.sourceTargetField]
             if (Array.isArray(sourceSourceField)) {
                 sourceSourceField.forEach(function (value) {
-                    var obj2=obj;
+                    var obj2=JSON.parse(JSON.stringify(obj));
                     obj[params.sourceSourceField]=value;
                     data.push(obj2);
                 })
@@ -436,7 +436,7 @@ var importDataIntoNeo4j = {
             }
             else if (Array.isArray(sourceTargetField)) {
                 sourceTargetField.forEach(function (value) {
-                    var obj2=obj;
+                    var obj2=JSON.parse(JSON.stringify(obj));
                     obj[params.sourceTargetField]=value;
                     data.push(obj2);
                 })
