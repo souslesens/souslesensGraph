@@ -31,6 +31,65 @@ var searchMenu = (function () {
 
         }
 
+        self.resetQueryClauses = function () {
+            $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
+            $("#searchNavDiv").css('visibility', 'hidden');
+            $("#searchNavActionDiv").css('visibility', 'hidden');
+            $(".searchDialog_NavButton").css('visibility', 'hidden');
+            $(".selectLabelDiv").removeClass("selectLabelDivSelected")
+
+
+            $("#searchDialog_valueInput").val();
+            $('#searchDialog_valueInput').focus();
+            //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
+         //
+            advancedSearch.clearClauses();
+            $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
+        }
+
+        self.onChangeSourceLabel = function (value, div) {
+            $("#searchDialog_criteriaDiv").css('visibility', 'visible');
+            $("#searchNavDiv").css('visibility', 'visible');
+            $("#searchNavActionDiv").css('visibility', 'visible');
+            $("#searchDialog_NextPanelButton").css('visibility', 'visible');
+            $(".selectLabelDiv").removeClass("selectLabelDivSelected");
+            $(div).addClass("selectLabelDivSelected");
+
+
+            $("#searchDialog_NodeLabelInput").val(value);
+            $("#searchDialog_valueInput").val();
+            $('#searchDialog_valueInput').focus();
+            //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
+            $("#searchDialog_NextPanelButton").css('visibility', 'visible');
+            advancedSearch.clearClauses();
+          //  self.resetQueryClauses()
+            if (searchDialog_propertySelect) ;
+            filters.initProperty(null, value, searchDialog_propertySelect);
+            $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
+        }
+
+
+        self.setPermittedLabelsCbxs = function (label, selectId) {
+            var labelsCxbs = "<br><table style='text-align: left;background-color: #eee; width: 300px;margin-bottom: 15px;'>";
+            var labels = Schema.getPermittedLabels(label, true, true);
+            for (var i = 0; i < labels.length; i++) {
+                var label2 = labels[i];//.replace(/^-/,"");
+                labelsCxbs += "<tr><td><input type='checkbox' class='advancedSearchDialog_LabelsCbx' name='advancedSearchDialog_LabelsCbx' onclick='searchMenu.initNeighboursTargetWhere($(this))' value='" + label2 + "'></td><td>" + label2 + "</td></tr>"
+            }
+            labelsCxbs += "</table>";
+            $("#" + selectId).html(labelsCxbs).promise().done(function () {
+
+                $(".advancedSearchDialog_LabelsCbx").bind("click", function (cbx) {// uncheck all cbx if a cbx is changed
+                    var state = $(this).attr("checked");
+                    $("#graphNeighboursAllOptionsCbx").prop("checked", false);
+
+
+                })
+                //your callback logic / code here
+            });
+            ;
+        }
+
         self.initLabelDivs = function () {
 
             var labels = Schema.getAllLabelNames();
@@ -38,7 +97,7 @@ var searchMenu = (function () {
             var str = "";
             labels.forEach(function (label) {
                 var color = nodeColors[label];
-                str += ' <div class="selectLabelDiv" style="background-color: ' + color + '" onclick="advancedSearch.onChangeObjectName(\'' + label + '\',this)">' + label + '</div>'
+                str += ' <div class="selectLabelDiv" style="background-color: ' + color + '" onclick="searchMenu.onChangeSourceLabel(\'' + label + '\',this)">' + label + '</div>'
             })
             $("#advancedSearchNodeLabelsDiv").html(str).promise().done(function () {
 
@@ -87,20 +146,24 @@ var searchMenu = (function () {
 
             })
             var options = {targetNodesLabels: tagetLabels};
-          self.setTargetWhereFilter();
+            self.setTargetWhereFilter();
             advancedSearch.searchNodes('matchStr', options, advancedSearch.graphNodesAndDirectRelations);
         }
 
 
-        self.setTargetWhereFilter=function() {
-            if( $("#neighboursWhere_propertySelect").val()=="")
+        self.setTargetWhereFilter = function () {
+            if ($("#neighboursWhere_propertySelect").val() == "")
                 return;
-            var targetWhereClause = $("#neighboursWhere_propertySelect").val()+":"+ $("#neighboursWhere_operatorSelect").val()+" "+$("#neighboursWhere_valueInput").val();
+            var targetWhereClause = $("#neighboursWhere_propertySelect").val() + ":" + $("#neighboursWhere_operatorSelect").val() + " " + $("#neighboursWhere_valueInput").val();
 
-            targetWhereClause= advancedSearch.getWhereProperty(targetWhereClause,"m")
+            targetWhereClause = advancedSearch.getWhereProperty(targetWhereClause, "m")
             toutlesensData.targetWhereFilter = targetWhereClause;
         }
         self.activatePanel = function (id) {
+            if(id=="searchCriteriaDiv") {
+                self.resetQueryClauses()
+                searchMenu.currentPanelIndex == 1
+            }
             var visibility = "visible";
             self.clearCurrentLabel();
             $(".searchPanel").each(function (index, value) {
@@ -136,14 +199,14 @@ var searchMenu = (function () {
             }
             else if (self.currentPanelIndex == 1) {
                 self.previousAction = null;
+                self.resetQueryClauses()
+                /*   $("#searchDialog_newQueryButton").css('visibility', 'hidden');
+                   $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
+                   //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
+                   $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
+                   $("#searchCriteriaAddButton").css('visibility', 'hidden');*/
 
-                $("#searchDialog_newQueryButton").css('visibility', 'hidden');
-                $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
-                //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
-                $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
-                $("#searchCriteriaAddButton").css('visibility', 'hidden');
-
-                advancedSearch.resetQueryClauses()
+                self.resetQueryClauses()
             }
             else {
                 $("#searchDialog_newQueryButton").css('visibility', 'visible');
@@ -172,8 +235,11 @@ var searchMenu = (function () {
 
             }
             else {
-                if (self.currentPanelIndex == 1)
+                if (self.currentPanelIndex == 1) {
                     advancedSearch.addClauseUI();
+                    $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
+                }
+
                 self.currentPanelIndex += 1;
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
 
@@ -214,7 +280,7 @@ var searchMenu = (function () {
             if (option == "graphSomeNeighboursListLabels") {
                 self.nextPanel();
                 var currentLabel = $("#searchDialog_NodeLabelInput").val();
-                advancedSearch.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
+                self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
 
@@ -223,7 +289,7 @@ var searchMenu = (function () {
                 self.nextPanel();
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
                 var currentLabel = $("#searchDialog_NodeLabelInput").val();
-                advancedSearch.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
+                self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
 
@@ -381,7 +447,6 @@ var searchMenu = (function () {
                 }
 
 
-
                 if (previousAction == 'treeMapSomeNeighboursListLabels') {
                     self.currentAction = "treeMapSomeNeighbours";
                     var neighboursLabels = [];
@@ -448,8 +513,8 @@ var searchMenu = (function () {
         self.initNeighboursTargetWhere = function (cbx) {
             $("#neighboursWhereDiv").show()
             var label = $(cbx).val();
-            var props=Object.keys(Schema.schema.properties[label]);
-            common.fillSelectOptionsWithStringArray(neighboursWhere_propertySelect,props,true)
+            var props = Object.keys(Schema.schema.properties[label]);
+            common.fillSelectOptionsWithStringArray(neighboursWhere_propertySelect, props, true)
 
         }
 

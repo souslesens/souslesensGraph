@@ -24,59 +24,7 @@ var advancedSearch = (function () {
     }
 
 
-    self.resetQueryClauses = function () {
 
-
-
-
-        // self.setPermittedLabelsCbxs(value);
-        //$("#searchDialog_NodeLabelInput").val(value);
-        $("#searchDialog_valueInput").val();
-        $('#searchDialog_valueInput').focus();
-        //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
-        $("#searchDialog_NextPanelButton").css('visibility', 'visible');
-        self.clearClauses();
-        $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
-    }
-    self.onChangeObjectName = function (value, div) {
-
-        $(".selectLabelDiv").removeClass("selectLabelDivSelected");
-        $(div).addClass("selectLabelDivSelected");
-
-        // self.setPermittedLabelsCbxs(value);
-        $("#searchDialog_NodeLabelInput").val(value);
-        $("#searchDialog_valueInput").val();
-        $('#searchDialog_valueInput').focus();
-        //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
-        $("#searchDialog_NextPanelButton").css('visibility', 'visible');
-        self.clearClauses();
-        self.resetQueryClauses()
-        if (searchDialog_propertySelect) ;
-        filters.initProperty(null, value, searchDialog_propertySelect);
-        $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
-    }
-
-
-    self.setPermittedLabelsCbxs = function (label, selectId) {
-        var labelsCxbs = "<br><table style='text-align: left;background-color: #eee; width: 300px;margin-bottom: 15px;'>";
-        var labels = Schema.getPermittedLabels(label, true, true);
-        for (var i = 0; i < labels.length; i++) {
-            var label2 = labels[i];//.replace(/^-/,"");
-            labelsCxbs += "<tr><td><input type='checkbox' class='advancedSearchDialog_LabelsCbx' name='advancedSearchDialog_LabelsCbx' onclick='searchMenu.initNeighboursTargetWhere($(this))' value='" + label2 + "'></td><td>" + label2 + "</td></tr>"
-        }
-        labelsCxbs += "</table>";
-        $("#" + selectId).html(labelsCxbs).promise().done(function () {
-
-            $(".advancedSearchDialog_LabelsCbx").bind("click", function (cbx) {// uncheck all cbx if a cbx is changed
-                var state = $(this).attr("checked");
-                $("#graphNeighboursAllOptionsCbx").prop("checked", false);
-
-
-            })
-            //your callback logic / code here
-        });
-        ;
-    }
 
     self.addClauseUI = function (operator) {
 

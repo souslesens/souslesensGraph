@@ -1042,7 +1042,7 @@ var toutlesensController = (function () {
                             $(".selectLabelDiv ").each(function () {
                                 var label = currentObject.name
                                 if ($(this).html() == label)
-                                    advancedSearch.onChangeObjectName(label, this);
+                                    searchMenu.onChangeSourceLabel(label, this);
                                 searchMenu.activatePanel("searchCriteriaDiv")
                             })
 

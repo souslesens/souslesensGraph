@@ -205,12 +205,16 @@ var eventsController = (function () {
                         if (index == 3)
                             toutlesensController.currentActionObj = {type: "pathes"}
                         if (index == 5) {// plugin
-                            $("#plugin").css("visibility","visible")
+                          $("#treeDivKeolis").css("visibility","visible")
+                            $("#plugin:first-child").css("visibility","visible")
+
 
                             ;//   toutlesensController.searchNodesUI('exec', null, null, tagCloud.drawCloud);
                         }
                         else{
-                            $("#plugin").css("visibility","hidden")
+                          $("#treeDivKeolis").css("visibility","hidden")
+                            $("#plugin:first-child").css("visibility","hidden")
+
                         }
                     },
                     create: function (event, ui) {

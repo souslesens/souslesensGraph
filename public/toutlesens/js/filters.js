@@ -142,8 +142,7 @@ var filters = (function () {
 
     }
 
-    self.onChangeObjectName = function (value) {
-        // self.setPermittedLabelsCbxs(value);
+    self.onChangeSourceLabel = function (value) {
         $("#filterDialog_valueInput").val("");
         $('#filterDialog_valueInput').focus();
         if (filterDialog_propertySelect) ;

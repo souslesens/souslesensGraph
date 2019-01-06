@@ -70,7 +70,7 @@ var graphicController = (function () {
             }
 
             $("#propertiesSelectionDialog_NodeLabelInput").val(currentObject.name)
-            advancedSearch.onChangeObjectName(currentObject.name);
+            searchMenu.onChangeSourceLabel(currentObject.name);
 
             $("#dialog").dialog({modal: false});
             $("#dialog").dialog("open");
@@ -93,7 +93,7 @@ var graphicController = (function () {
             $("#filterActionDiv").html(str);
 
             $("#propertiesSelectionDialog_NodeLabelInput").val(currentObject.name)
-            advancedSearch.onChangeObjectName(currentObject.name);
+            advancedSearch.onChangeSourceLabel(currentObject.name);
             $("#dialog").dialog("option", "title", "End node Query ");
             $("#dialog").dialog({modal: false});
             $("#dialog").dialog("open");
