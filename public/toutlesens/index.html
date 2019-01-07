@@ -53,11 +53,11 @@
     <script src="../common/js/jquery/jquery-ui.min.js"></script>
 
 
-
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.css"/>
     <script src="js/dataTable.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.js"></script>
-
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.js"></script>
 
 
     <script src="resources/params.js"></script>
@@ -165,18 +165,15 @@
     <script src="js/searchMenu.js"></script>
 
 
-
-   <!-- <script src="js/d3graphCreation.js"></script>-->
+    <!-- <script src="js/d3graphCreation.js"></script>-->
     <script src="../common/js/others/async.js"></script>
 
     <!-- test visjs------------------------------------------>
-  <script src="js/visjs/visjs.js"></script>
+    <script src="js/visjs/visjs.js"></script>
     <script src="js/visjs/visJsGraph.js"></script>
     <script src="../common/js/connectors.js"></script>
     <script src="js/visjs/visJsDragRect.js"></script>
     <link rel="stylesheet" type="text/css" href="js/visjs/vis-network.min.css.js"/>
-
-
 
 
     <script src="js/writeDataController.js"></script>
@@ -298,31 +295,25 @@
             border-style: solid;
             background-color: #cdd0d6
         }
-        .jstreeWordProp{
-            color:red;
+
+        .jstreeWordProp {
+            color: red;
         }
 
-        .BIlegendSpan{
-           // border-style: solid;
-         //   border-width: 2px;
-
-        }
-        .myDatatable  tr {
-            height: 20px!important;
-        }
-
-        .findTab{
-                min-height: 200px;
+        .BIlegendSpan {
+        / / border-style: solid;
+        / / border-width: 2 px;
 
         }
 
+        .myDatatable tr {
+            height: 20px !important;
+        }
 
+        .findTab {
+            min-height: 200px;
 
-
-
-
-
-
+        }
 
 
     </style>
@@ -331,12 +322,12 @@
 
         $(function () {
 
-                // jQuery is loaded => print the version
-                console.log("jquery version : "+jQuery.fn.jquery);
-          //  console.log("jquery UI version : "+$.ui.version);
+            // jQuery is loaded => print the version
+            console.log("jquery version : " + jQuery.fn.jquery);
+            //  console.log("jquery UI version : "+$.ui.version);
 
 
-                queryParams = common.getQueryParams(document.location.search);
+            queryParams = common.getQueryParams(document.location.search);
             customizeUI.init();
             subGraph = queryParams.subGraph;
             if (!subGraph)
@@ -364,7 +355,9 @@
 
 
             var afterLoadModelTasks = [
-                treeController.initLabels,
+                eventsController.initInputEvents,
+            eventsController.initcomponentEvents,
+            treeController.initLabels,
                 toutlesensController.intiRelationTypes,
                 customizeUI.customize,
                 toutlesensController.afterGraphInit,
@@ -374,7 +367,7 @@
                 // advancedDisplay.initDecorationDiv,
                 functionalities.initFunctionalities
 
-            ]
+        ]
 
             Schema.load(subGraph, function (err, schema) {
                 if (err)
@@ -394,16 +387,13 @@
             })
 
             versionController.initVersions();
-            var version=null;
-            if(queryParams.displayVersion){
-                version=queryParams.displayVersion;
-                Gparams.displayVersion=queryParams.displayVersion
+            var version = null;
+            if (queryParams.displayVersion) {
+                version = queryParams.displayVersion;
+                Gparams.displayVersion = queryParams.displayVersion
             }
             versionController.applyVersion(version);
         })
-
-
-
 
 
     </script>
@@ -426,13 +416,13 @@
     <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
     <input type="image" title="<span id='lang_XX'>schema</span>" height="20px"
 
-           id="schemaButton" src="images/cube.png"/>
+           id="schemaButton" src="images/cube.png" />
     <!-- <input type="image" title="<span id='lang_XX'>search</span>" height="20px" onclick="advancedSearch.showDialog({multipleClauses:true})"
            id="searchButton2" src="images/advancedSearch2.png"/>-->
     <input type="image" title="display settings" height="20px"
            onclick="toutlesensController.dispatchAction('displaySettings')"
            id="displaySettingButton" src="images/display.png"/></td>
-   &nbsp;<input type="image" title="Display all nodes" height="20px"
+    &nbsp;<input type="image" title="Display all nodes" height="20px"
                  onclick="toutlesensController.dispatchAction('showAll')"
                  id="searchAllButton" src="images/all.png"/></td>
     <input type="image" title="Graph menu" height="20px"
@@ -446,12 +436,12 @@
            src="images/zoom.png" class="graphDisplayed"/>
     <input type="image" title="Fit to page" height="20px" onclick="visjsGraph.fitToPage()" id="fitMenuButton"
            src="images/fit.png" class="graphDisplayed"/>
-    <input type="image" title="Take a snapshot" height="20px" onclick="visjsGraph.saveGraph()" id="snapShotMenuButton"
-           src="images/snapshot.png" class="graphDisplayed"/>
+    <!-- <input type="image" title="Take a snapshot" height="20px" onclick="visjsGraph.saveGraph()" id="snapShotMenuButton"
+            src="images/snapshot.png" class="graphDisplayed"/>-->
 
-    <input type="image" title="Previous graph" height="20px" onclick="visjsGraph.previousGraph()"
-           id="previousMenuButton" src="images/previous.jpg"/>
-    <input type="image" title="Next graph" height="20px" onclick="visjsGraph.nextGraph()" id="nextMenuButton"
+    <input type="image" title="Previous graph" height="20px" onclick="visjsGraph.showPreviousGraph()"
+           id="previousGraphMenuButton" src="images/previous.jpg"/>
+    <input type="image" title="Next graph" height="20px" onclick="visjsGraph.showNextGraph()" id="nextGraphMenuButton"
            src="images/next.jpg"/>
     <input type="image" title="Next display" height="20px" onclick="toutlesensController.dispatchAction('addNode')"
            class="canModify" ; id="newNodeButton" src="images/newNode.png"/>
@@ -460,9 +450,10 @@
 
 </div>
 <div id="graphLegendDiv"></div>
-<div id="graphInfosDiv" style="font-size: 8px" ></div>
+<div id="graphInfosDiv" style="font-size: 8px"></div>
 <div id="graphCommentDiv" style="position: absolute;background-color: white;margin: 2px;padding: 2px"></div>
-<div id="BIlegendDiv" style="visibility:hidden;z-index:20;border: 1px;border-style: solid;padding: 5px;background-color: #fafafa;max-height: 400px;max-width: 250px;overflow: auto"></div>
+<div id="BIlegendDiv"
+     style="visibility:hidden;z-index:20;border: 1px;border-style: solid;padding: 5px;background-color: #fafafa;max-height: 400px;max-width: 250px;overflow: auto"></div>
 
 <div id="findDiv">
     <div id="findDivInner">
@@ -476,7 +467,7 @@
                 <li><a href="#advancedQueriesDiv" id="advancedQueriesTabLi"><span id='lang_60'>Advanced </span></a></li>
 
                 <li><a href="#pluginDiv" id="pluginLi"><span id='lang_60'>Plugin </span></a></li>
-           <!--     <li><a href="#tagCloudDiv" id="tagCloudLi"><span id='lang_60'>tagCloud</span></a></li>-->
+                <!--     <li><a href="#tagCloudDiv" id="tagCloudLi"><span id='lang_60'>tagCloud</span></a></li>-->
 
 
                 <!--  <li><a href="#requestDiv"><span id='lang_60'>Request </span></a></li>-->
@@ -484,7 +475,7 @@
 
             </ul>
             <script>
-              // customizeUI.addPlugins(Gparams.plugins);  PB initalisation dialog and tabs
+                // customizeUI.addPlugins(Gparams.plugins);  PB initalisation dialog and tabs
             </script>
 
 
@@ -500,20 +491,21 @@
                                         <td><input id="word"
 
                                                    size="10"></td>
-                                        <td><input type="image" id="eraseWordButton"  height="20px" src="images/erase.png"></td>
+                                        <td><input type="image" id="eraseWordButton" height="20px"
+                                                   src="images/erase.png"></td>
 
 
-                                      <!--  <td><input type="image"   title="<span id='lang_XX'>search</span>"
-                                                   height="30px"
-                                                   id="advancedSearchButton"
-                                                   src="images/advancedSearch2.png"/>
+                                        <!--  <td><input type="image"   title="<span id='lang_XX'>search</span>"
+                                                     height="30px"
+                                                     id="advancedSearchButton"
+                                                     src="images/advancedSearch2.png"/>
 
-                                        <td><input type="image"   title="<span id='lang_XX'>tag cloud</span>"
-                                                   height="30px"
-                                                   id="tagCloudButton"
-                                                   src="images/tagCloud.png"/>
+                                          <td><input type="image"   title="<span id='lang_XX'>tag cloud</span>"
+                                                     height="30px"
+                                                     id="tagCloudButton"
+                                                     src="images/tagCloud.png"/>
 
-                                                   -->
+                                                     -->
 
 
                                     </tr>
@@ -526,7 +518,8 @@
                         </tr>
                         </tr>
                         <td colspan="2">
-                            <div id="searchResultMessage" style="color: #0000cc;font-size: 10px;font-style: italic"></div>
+                            <div id="searchResultMessage"
+                                 style="color: #0000cc;font-size: 10px;font-style: italic"></div>
                         </td>
 
                         <tr>
@@ -552,9 +545,10 @@
 
 
             <div id="relationDiv" class="findTab">
-                type <select id="findRelationsTypeSelect" onchange="toutlesensController.setRelationProperties(this)"></select>
+                type <select id="findRelationsTypeSelect"
+                             onchange="toutlesensController.setRelationProperties(this)"></select>
                 <br>
-               property <select id="findRelationsPropertyKeySelect"></select>
+                property <select id="findRelationsPropertyKeySelect"></select>
                 <select id="findRelationsPropertyOperatorSelect">
                     <option>=</option>
                     <option><></option>
@@ -565,7 +559,7 @@
                 <input id="findRelationsPropertyValueInput" size="10">
                 <button onclick="toutlesensController.generateGraphFromRelType()"> OK</button>
 
-            </input>
+                </input>
                 <div id="findRelationsCurrentType"></div>
 
             </div>
@@ -581,9 +575,9 @@
                                 <option value="shortestPath">
                                     Shortest path
                                 </option>
-                               <!-- <option value="allTransitivePaths">
-                                    All paths
-                                </option>-->
+                                <!-- <option value="allTransitivePaths">
+                                     All paths
+                                 </option>-->
 
                             </select>
                         </td>
@@ -592,7 +586,7 @@
 
                         <td>
                             <button onclick="traversalController.showSearchMenu('source'); ">Between node</button>
-                      <br><span id="pathes_sourceNode"></span></td>
+                            <br><span id="pathes_sourceNode"></span></td>
                         <td></td>
 
                     </tr>
@@ -601,7 +595,7 @@
 
                         <td>
                             <button onclick="traversalController.showSearchMenu('target'); ">And node</button>
-                       <br><span id="pathes_targetNode" class="targetNode"></span></td>
+                            <br><span id="pathes_targetNode" class="targetNode"></span></td>
                         <td></td>
 
                     </tr>
@@ -611,15 +605,15 @@
                         <td colspan="3">
 
                             <div id="pathes_buttonsDiv"></div>
-                          <!--  <button onclick="traversalController.executePathesUI()"
-                                    id="executeShortestPathButton" style="visibility:hidden">Search
-                            </button>
-                            <button onclick="traversalController.executeMoreOrLessShortestPathTraversalSearch(true)"
-                                    id="executeLessShortestPathButton" style="visibility:hidden">-
-                            </button>
-                            <button onclick="traversalController.executeMoreOrLessShortestPathTraversalSearch()"
-                                    id="executeMoreShortestPathButton" style="visibility:hidden">+
-                            </button>-->
+                            <!--  <button onclick="traversalController.executePathesUI()"
+                                      id="executeShortestPathButton" style="visibility:hidden">Search
+                              </button>
+                              <button onclick="traversalController.executeMoreOrLessShortestPathTraversalSearch(true)"
+                                      id="executeLessShortestPathButton" style="visibility:hidden">-
+                              </button>
+                              <button onclick="traversalController.executeMoreOrLessShortestPathTraversalSearch()"
+                                      id="executeMoreShortestPathButton" style="visibility:hidden">+
+                              </button>-->
 
 
                         </td>
@@ -637,7 +631,6 @@
                     </tr>
 
 
-
                 </table>
 
             </div>
@@ -646,7 +639,7 @@
                 <div id="advancedQueriesAccordion">
                     <h3>Pivots nodes</h3>
                     <div>
-                        <div id="pivotsDiv"style="height:450px"></div>
+                        <div id="pivotsDiv" style="height:450px"></div>
                     </div>
                     <!--   <h3>Count by label</h3>
                        <div>
@@ -661,10 +654,10 @@
 
                 </div>
             </div>
-          <!--  <div id="tagCloudDiv">
-            <iframe id='tagCloudIframe' src='htmlSnippets/tagCloud.html' style='width: 100%;height: 500px'>
-            </iframe>
-            </div>-->
+            <!--  <div id="tagCloudDiv">
+              <iframe id='tagCloudIframe' src='htmlSnippets/tagCloud.html' style='width: 100%;height: 500px'>
+              </iframe>
+              </div>-->
 
             <div id="queryDiv" class="findTab">
             </div>
@@ -727,11 +720,10 @@
 <div id="dialogLarge"></div>
 <div id="controlPanelShowHide">
 
-        <input type="image" title="Graph menu" height="20px"
-               onclick="toutlesensController.switchanalyzePanelDisplay();" id="fullScreenButton"
-               src="images/fullScreen.png"/>
+    <input type="image" title="Graph menu" height="20px"
+           onclick="toutlesensController.switchanalyzePanelDisplay();" id="fullScreenButton"
+           src="images/fullScreen.png"/>
 </div>
-
 
 
 </body>

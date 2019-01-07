@@ -120,8 +120,8 @@ var toutlesensController = (function () {
                     }
 
                 }
-               else if(Array.isArray(id)){
-                    toutlesensData.setWhereFilterWithArray("_id",id);
+                else if (Array.isArray(id)) {
+                    toutlesensData.setWhereFilterWithArray("_id", id);
                 }
                 else
                     toutlesensData.whereFilter = "";
@@ -133,9 +133,9 @@ var toutlesensController = (function () {
 
             if (options && options.applyFilters) {
                 //   filters.setQueryFilters();
-            /*  tabsAnalyzePanel.tabs("option", "disabled", []);
-              tabsAnalyzePanel.tabs("enable", 1);
-              tabsAnalyzePanel.tabs("enable", 2);*/
+                /*  tabsAnalyzePanel.tabs("option", "disabled", []);
+                  tabsAnalyzePanel.tabs("enable", 1);
+                  tabsAnalyzePanel.tabs("enable", 2);*/
 
                 tabsAnalyzePanel
                 tabsAnalyzePanel.tabs("option", "disabled", []);
@@ -192,7 +192,7 @@ var toutlesensController = (function () {
 
                     self.setGraphMessage("No  result");
                     $("#waitImg").css("visibility", "hidden");
-                  tabsAnalyzePanel.tabs("enable", 0);
+                    tabsAnalyzePanel.tabs("enable", 0);
                     self.dispatchAction('nodeInfos');
                     self.setRightPanelAppearance(false);
 
@@ -230,7 +230,7 @@ var toutlesensController = (function () {
                     $("#mainButtons").css("visibility", "visible");
                     $("#waitImg").css("visibility", "hidden");
                     $(".graphDisplayed").css("visibility", "visible");
-                  tabsAnalyzePanel.tabs("option", "active", 2);//highlight
+                    tabsAnalyzePanel.tabs("option", "active", 2);//highlight
 
                     if (toutlesensData && toutlesensData.queriesIds.length > 1)
                         options.dragConnectedNodes = true;
@@ -736,8 +736,8 @@ var toutlesensController = (function () {
                     var toId = currentObject.toNode.id
                     result.forEach(function (node) {
                         newNodes.push({
-                           // x: 200,
-                           // y: 200,
+                            // x: 200,
+                            // y: 200,
                             id: node.p._id,
                             label: node.p.properties.name,
                             color: nodeColors[node.p.labels[0]],
@@ -941,13 +941,13 @@ var toutlesensController = (function () {
 
             }
             else if (action == "showGraphText") {
-              dialogLarge.dialog({modal: true});
-              dialogLarge.dialog("option", "title", "Graph text");
-              dialogLarge.load("htmlSnippets/graphTextDialog.html", function () {
+                dialogLarge.dialog({modal: true});
+                dialogLarge.dialog("option", "title", "Graph text");
+                dialogLarge.load("htmlSnippets/graphTextDialog.html", function () {
                     var text = visjsGraph.graph2Text();
                     $("#graphTextDiv").html(text);
                 })
-              dialogLarge.dialog("open");
+                dialogLarge.dialog("open");
             }
             else if (action == "showGlobalMenu") {
                 $("#dialog").dialog({modal: true});
@@ -959,7 +959,7 @@ var toutlesensController = (function () {
 
             else if (action == "showSchemaConfigDialog") {
 
-              dialogLarge.load("htmlSnippets/schemaConfig.html", function () {
+                dialogLarge.load("htmlSnippets/schemaConfig.html", function () {
                     if (options && options.create)
                         $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
                     else
@@ -970,13 +970,13 @@ var toutlesensController = (function () {
 
 
                 })
-              dialogLarge.dialog("option", "title", "Souslesens schema configuration");
-              dialogLarge.dialog("open");
+                dialogLarge.dialog("option", "title", "Souslesens schema configuration");
+                dialogLarge.dialog("open");
             }
 
             else if (action == "showParamsConfigDialog") {
 
-              dialogLarge.load("htmlSnippets/paramsConfig.html", function () {
+                dialogLarge.load("htmlSnippets/paramsConfig.html", function () {
                     if (options && options.create)
                         $("#schemaConfig_createSchemaDiv").css("visibility", "visible");
                     else
@@ -987,8 +987,8 @@ var toutlesensController = (function () {
 
 
                 })
-              dialogLarge.dialog("option", "title", "Souslesens schema configuration");
-              dialogLarge.dialog("open");
+                dialogLarge.dialog("option", "title", "Souslesens schema configuration");
+                dialogLarge.dialog("open");
             }
 
             else if (action == "showAll") {
@@ -1022,15 +1022,16 @@ var toutlesensController = (function () {
                 var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
 
                 currentActionObj.graphType = "schema";
-              dialogLarge.dialog("close");
+                dialogLarge.dialog("close");
 
 
                 var graphOptions = {
                     fixed: true,
+                    noHistory: true,
                     onEndDrag: function () {
                         Schema.currentGraph = visjsGraph.exportGraph();
-                        var str= "{\"nodes\":"+JSON.stringify(Schema.currentGraph, null, 2)+",\"edges\":"+JSON.stringify(Schema.currentGraph.edges, null, 2)+"}";
-                        localStorage.setItem("schemaGraph_" + subGraph,str);
+                        var str = "{\"nodes\":" + JSON.stringify(Schema.currentGraph, null, 2) + ",\"edges\":" + JSON.stringify(Schema.currentGraph.edges, null, 2) + "}";
+                        localStorage.setItem("schemaGraph_" + subGraph, str);
                     },
                     onClick: function (params) {
                         $("#graphPopup").css("visibility", "hidden");
@@ -1073,8 +1074,8 @@ var toutlesensController = (function () {
                             self.setRightPanelAppearance(false);
                             visjsGraph.draw("graphDiv", data, graphOptions, function () {
                                 Schema.currentGraph = visjsGraph.exportGraph();
-                                var str= "{\"nodes\":"+JSON.stringify(Schema.currentGraph, null, 2)+",\"edges\":"+JSON.stringify(Schema.currentGraph.edges, null, 2)+"}";
-                                localStorage.setItem("schemaGraph_" + subGraph,str);
+                                var str = "{\"nodes\":" + JSON.stringify(Schema.currentGraph, null, 2) + ",\"edges\":" + JSON.stringify(Schema.currentGraph.edges, null, 2) + "}";
+                                localStorage.setItem("schemaGraph_" + subGraph, str);
                             });
                         });
                     }
@@ -1151,7 +1152,7 @@ var toutlesensController = (function () {
 
         self.showPopupMenu = function (x, y, type) {
 
-          tabsAnalyzePanel.tabs("option", "active", 0);
+            tabsAnalyzePanel.tabs("option", "active", 0);
             $("#graphPopup").css("visibility", "visible").css("top", y).css("left", x);
 
 
@@ -1177,8 +1178,8 @@ var toutlesensController = (function () {
             // tabsFindPanelDisabledOptions.push(3)
 
 
-            $("#nextMenuButton").css("visibility", "hidden")
-            $("#previousMenuButton").css("visibility", "hidden")
+            $("#nextGraphMenuButton").css("visibility", "hidden")
+            $("#previousGraphMenuButton").css("visibility", "hidden")
 
 
             if (Gparams.showRelationNames) {
@@ -1246,7 +1247,7 @@ var toutlesensController = (function () {
             });
 
 
-          tabsAnalyzePanel.tabs("option", "disabled", tabsanalyzePanelDisabledOptions);
+            tabsAnalyzePanel.tabs("option", "disabled", tabsanalyzePanelDisabledOptions);
             $("#findTabs").tabs("option", "disabled", tabsFindPanelDisabledOptions);
 
             $(".graphDisplayed").css("visibility", "hidden");
@@ -1261,10 +1262,6 @@ var toutlesensController = (function () {
                 paint.initHighlight();
                 filters.setLabelsOrTypes("node");
             });
-
-
-
-
 
 
         }
@@ -1347,12 +1344,12 @@ var toutlesensController = (function () {
 
         self.setResponsiveDimensions = function (rightPanelWidth) {
             if (rightPanelWidth == 0) {
-              tabsAnalyzePanel.css("visibility", "hidden");
+                tabsAnalyzePanel.css("visibility", "hidden");
                 self.hasRightPanel = false;
             }
             else {
                 self.hasRightPanel = true;
-              tabsAnalyzePanel.css("visibility", "visible");
+                tabsAnalyzePanel.css("visibility", "visible");
             }
             $(".ui-tabs .ui-tabs-panel").css("padding", "2px")
 
@@ -1437,11 +1434,11 @@ var toutlesensController = (function () {
             $("#analyzePanel").height(analyzePanelHeight - 10).css("top", (totalHeight - analyzePanelHeight) + 20);
             ;
             try {
-              tabsAnalyzePanel.tabs("option", "disabled", []);
-              tabsAnalyzePanel.tabs("enable", 1);
-              tabsAnalyzePanel.tabs("enable", 2);
+                tabsAnalyzePanel.tabs("option", "disabled", []);
+                tabsAnalyzePanel.tabs("enable", 1);
+                tabsAnalyzePanel.tabs("enable", 2);
             }
-            catch(e){
+            catch (e) {
 
             }
 
@@ -1457,7 +1454,7 @@ var toutlesensController = (function () {
         self.graphNodeNeighbours = function (obj) {
             currentObject = obj;
             self.dispatchAction("setAsRootNode");
-          dialogLarge.dialog("close");
+            dialogLarge.dialog("close");
 
         }
 

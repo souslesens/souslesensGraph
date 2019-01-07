@@ -11,8 +11,6 @@ var visjsGraph = (function () {
         self.network = null;
         self.layout = "physics";
 
-        self.previousGraphs = []
-        self.previousGraphs.index = -1;
         self.currentLayoutType = "random";
         self.currentLayoutDirection = "";
         self.currentShape = Gparams.graphDefaultShape;
@@ -20,6 +18,8 @@ var visjsGraph = (function () {
         self.scaleToShowLabels = 0.6;
         self.context = null;
         self.dragRect = {x: 0, y: 0, w: 0, h: 0};
+        self.graphHistory = [];
+        self.graphHistory.currentIndex = 0;
 
         var stopPhysicsTimeout = 5000;
         var lastClick = new Date();
@@ -33,6 +33,7 @@ var visjsGraph = (function () {
         self.draw = function (divId, visjsData, _options, callback) {
             if (!_options)
                 _options = {};
+
 
             if (!_options.solver) {
                 _options.solver = "barnesHut";
@@ -54,6 +55,15 @@ var visjsGraph = (function () {
             var container = document.getElementById(divId);
             self.nodes = new vis.DataSet(visjsData.nodes);
             self.edges = new vis.DataSet(visjsData.edges);
+
+            if (!_options.noHistory && self.nodes.length > 0) {// a graph is allready drawn we put  it into history if not allready imported graph
+                self.graphHistory.push(self.exportGraph());
+                self.graphHistory.currentIndex =self.graphHistory.length-1
+                if (self.graphHistory.currentIndex > 0)
+                    $("#previousGraphMenuButton").css("visibility", "visible");
+
+            }
+
 
             //   var x = Math.log10(self.edges.length * 2) + 1;
             var x = (Math.log(self.edges.length * 2) * Math.LOG10E) + 1;
@@ -357,7 +367,7 @@ var visjsGraph = (function () {
                 console.log('graph loaded Event');
             });
 
-            if (true) {// rightclick drag to select by rect drag
+            if (false) {// rightclick drag to select by rect drag
                 container = $("#graphDiv");
                 container.on("mousemove", function (e) {
                     if (drag) {
@@ -473,11 +483,11 @@ var visjsGraph = (function () {
                 var label = labels[i];
                 if (!nodeColors[label])
                     continue;
-                html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" +label + "</span></td></tr>"
+                html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" + label + "</span></td></tr>"
 
             }
-            html +="</table>"
-                $("#graphLegendDiv").html(html);
+            html += "</table>"
+            $("#graphLegendDiv").html(html);
 
 
         }
@@ -807,6 +817,7 @@ var visjsGraph = (function () {
                 });
             }
 
+
             function addConnections(elem, index) {
                 // need to replace this with a tree of the network, then get child direct children of the element
 
@@ -823,9 +834,15 @@ var visjsGraph = (function () {
 
 
             nodes.forEach(addConnections);
-            var edges = self.edges._data;
+            var data={
+                nodes:nodes,
+                edges:self.edges._data
+            }
+            return data;
+          /*  var edges = self.edges._data;
             nodes.edges = edges;
-            return nodes;
+            return nodes;*/
+
 
             // pretty print node data
             //  var exportValue = JSON.stringify(nodes, undefined, 2);
@@ -895,9 +912,9 @@ var visjsGraph = (function () {
             }
 
 
-            function getNodeData(data) {
+            function getNodeData(nodeData) {
                 var networkNodes = [];
-                data.forEach(function (elem, index, array) {
+                nodeData.forEach(function (elem, index, array) {
                     networkNodes.push(elem);
                     //   networkNodes.push({id: elem.id, label: elem.id, x: elem.x, y: elem.y});
                 });
@@ -916,60 +933,25 @@ var visjsGraph = (function () {
                 throw 'Can not find id \'' + id + '\' in data';
             }
 
-            function setEdgeProperties(edge) {
-                for (var key in allEdges) {
-                    if (allEdges[key].from == edge.from && allEdges[key].to == edge.to) {
-                        edge.label = allEdges[key].label;
-                        edge.arrows = "to";
-                        neoAttrs:allEdges[key].neoAttrs;
-
-                    }
-                    else if (allEdges[key].from == edge.to && allEdges[key].to == edge.from) {
-                        edge.label = allEdges[key].label
-                        edge.arrows = "to";
-                        neoAttrs:allEdges[key].neoAttrs;
-                    }
-                }
-            }
 
             function getEdgeData(data) {
-                var networkEdges = [];
-
-                data.forEach(function (node) {
-                    // add the connection
-                    node.connections.forEach(function (connId, cIndex, conns) {
-                        var edge = {from: node.id, to: "" + connId}
-                        setEdgeProperties(edge)
-                        networkEdges.push(edge);
-
-                        var cNode = getNodeById(data, connId);
-
-                        var elementConnections = cNode.connections;
-
-                        // remove the connection from the other node to prevent duplicate connections
-                        var duplicateIndex = elementConnections.findIndex(function (connection) {
-                            return connection == node.id; // double equals since id can be numeric or string
-                        });
-
-
-                        if (duplicateIndex != -1) {
-                            elementConnections.splice(duplicateIndex, 1);
-                        }
-                        ;
-                    });
-                });
-
-                return networkEdges;
-
-                //   return new vis.DataSet(networkEdges);
-
+            var edges=[];
+                for (var key in allEdges) {
+                    edges.push(allEdges[key]);
+                }
+                return edges;
             }
+
 
             var allEdges = inputData.edges;
+            var allNodes = inputData.nodes;
+            if(allNodes.nodes)// correction bug graphSchema
+                allNodes=allNodes.nodes;
             var data = {
-                nodes: getNodeData(inputData.nodes),
-                edges: getEdgeData(inputData.nodes)
+                nodes: getNodeData(allNodes),
+                edges: getEdgeData(allEdges)
             }
+            options={noHistory:true,smooth:true}
             self.draw("graphDiv", data, options);
             //  network = new vis.Network(container, data, {});
 
@@ -1035,37 +1017,38 @@ var visjsGraph = (function () {
         }
 
 
-        self.previousGraph = function () {
-            self.previousGraphs.index -= 1;
-            if (self.previousGraphs.index < 0)
-                self.previousGraphs.index = 0;
-            self.reloadGraph(self.previousGraphs.index);
+        self.showPreviousGraph = function () {
+            if (self.graphHistory.currentIndex > 0)
+                self.graphHistory.currentIndex -= 1;
+            self.importGraph(self.graphHistory[self.graphHistory.currentIndex]);
             self.setPreviousNextButtons();
         }
-        self.nextGraph = function () {
-            self.previousGraphs.index += 1;
-            self.reloadGraph(self.previousGraphs.index);
+        self.showNextGraph = function () {
+            if (self.graphHistory.currentIndex < (self.graphHistory.length - 1))
+                self.graphHistory.currentIndex += 1;
+            self.importGraph(self.graphHistory[self.graphHistory.currentIndex]);
             self.setPreviousNextButtons();
         }
 
         self.setPreviousNextButtons = function () {
-            if (self.previousGraphs.index > 0)
-                $("#previousMenuButton").css("visibility", "visible")
+            if (self.graphHistory.currentIndex > 0)
+                $("#previousGraphMenuButton").css("visibility", "visible")
             else
-                $("#previousMenuButton").css("visibility", "hidden")
-            if (self.previousGraphs.index < (self.previousGraphs.length - 1))
-                $("#nextMenuButton").css("visibility", "visible")
+                $("#previousGraphMenuButton").css("visibility", "hidden")
+
+            if (self.graphHistory.currentIndex < (self.graphHistory.length - 1))
+                $("#nextGraphMenuButton").css("visibility", "visible")
             else
-                $("#nextMenuButton").css("visibility", "hidden")
+                $("#nextGraphMenuButton").css("visibility", "hidden")
         }
 
 
-        self.saveGraph = function () {
-            self.previousGraphs.index += 1
-            self.previousGraphs.push(self.exportGraph());
-            self.setPreviousNextButtons();
+        /*  self.saveGraph = function () {
+              self.previousGraphs.index += 1
+              self.previousGraphs.push(self.exportGraph());
+              self.setPreviousNextButtons();
 
-        }
+          }*/
 
         self.toList = function () {
             var array = self.exportGraph();
@@ -1086,14 +1069,14 @@ var visjsGraph = (function () {
                 }
 
                 var str = "";
-                var connectionsCountMap={}
+                var connectionsCountMap = {}
                 node.connections.forEach(function (id, index) {
                     if (index > 0)
                         str += ","
                     str += map[id].label + "[" + map[id].labelNeo + "]"
-                    if(!connectionsCountMap[map[id].labelNeo])
-                        connectionsCountMap[map[id].labelNeo]=0;
-                    connectionsCountMap[map[id].labelNeo]+=1;
+                    if (!connectionsCountMap[map[id].labelNeo])
+                        connectionsCountMap[map[id].labelNeo] = 0;
+                    connectionsCountMap[map[id].labelNeo] += 1;
                 })
                 obj.connectedTo = str;
                 for (var key in node.neoAttrs) {
@@ -1110,14 +1093,8 @@ var visjsGraph = (function () {
         }
 
 
-        self.reloadGraph = function (index) {
-
-            var data = self.previousGraphs[index];
-            self.importGraph(data);
-        }
-
         self.filterGraph = function (objectType, booleanOption, property, operator, value, type) {
-            self.saveGraph();
+            //  self.saveGraph();
 
 
             if (objectType == "node") {
@@ -1234,7 +1211,9 @@ var visjsGraph = (function () {
         }
 
 
-        self.dragRect = function (action, x, y) {
+        self.dragRect = function (action, x, y) {// pas au point
+            return;
+
             var ctx = self.context;
             if (action == "dragStart") {
                 self.dragRect.x = x;
