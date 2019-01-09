@@ -291,6 +291,7 @@ var searchMenu = (function () {
                     //  self.currentAction.name = "pathTargetSearchCriteria";
                     self.activatePanel("searchCriteriaDiv");
                     $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
+                    $("#searchDialog_newQueryButton").css('visibility', 'visible');
                     //  $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
 

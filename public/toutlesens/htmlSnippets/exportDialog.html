@@ -4,8 +4,7 @@
         var self = {};
         self.dataset;
         self.init = function (data) {
-            exportDialog_tabDiv=$("#exportDialog_tabDiv").tabs();
-
+            exportDialog_tabDiv = $("#exportDialog_tabDiv").tabs();
 
 
             self.dataset = data;
@@ -97,8 +96,6 @@
 
     })()
 
-   
-
 
 </script>
 
@@ -108,50 +105,52 @@
         <li><a href="#exportDialog_statsTabDiv"><span>statistics </span></a></li>
     </ul>
 
-<div id="exportDialog_propertiesTabDiv">
-<div id="exportDialog_cbxsDiv">
+    <div id="exportDialog_propertiesTabDiv">
+        <div id="exportDialog_cbxsDiv" style="max-height: 250px;overflow: auto">
 
 
-</div>
-<button onclick="exportDialog.execute()">Show</button>
-</div>
+        </div>
+        <button onclick="exportDialog.execute()">Show</button>
+    </div>
 
-<div id="exportDialog_statsTabDiv">
-<table>
-    <tr>
-        <td>
-            output type
-        </td>
-        <td>
-            <select  id="stats_typeSelect"><option value="relationsRanking"> relationsRanking</option></select>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            source label
-        </td>
-        <td>
-            <select id="stats_sourceLabelSelect"></select>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            target label
-        </td>
-        <td>
-            <select id="stats_targetLabelSelect"></select>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
+    <div id="exportDialog_statsTabDiv">
+        <table>
+            <tr>
+                <td>
+                    output type
+                </td>
+                <td>
+                    <select id="stats_typeSelect">
+                        <option value="relationsRanking"> relationsRanking</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    source label
+                </td>
+                <td>
+                    <select id="stats_sourceLabelSelect"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    target label
+                </td>
+                <td>
+                    <select id="stats_targetLabelSelect"></select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
 
-            <button onclick="stats.execute()">ok</button>
-        </td>
-    </tr>
+                    <button onclick="stats.execute()">ok</button>
+                </td>
+            </tr>
 
 
-</table>
+        </table>
 
 
-</div>
+    </div>
 </div>
