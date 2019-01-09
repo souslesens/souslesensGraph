@@ -4,17 +4,36 @@
 var expandGraph=(function(){
     var self={};
 self.setSourceLabel=function(label){
-
+    $("#expandWhereDiv").hide()
     $('#expand_labelsSelectSource').val(label);
+    $("#expandWhere_propertySelect").val("");
     var targetLabels=Schema.getPermittedLabels(label,true,true);
     common.fillSelectOptionsWithStringArray(expand_labelsSelectTarget,targetLabels,true);
 
 }
 
 self.onOK=function(){
+    self.setExpandWhereFilter();
     toutlesensController.dispatchAction('expandGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())
    self.setSourceLabel($('#expand_labelsSelectTarget').val());
 }
+
+self.initExpandWhere=function(){
+    $("#expandWhereDiv").show()
+    var label = $("#expand_labelsSelectTarget").val();
+    var props = Object.keys(Schema.schema.properties[label]);
+    common.fillSelectOptionsWithStringArray(expandWhere_propertySelect, props, true)
+
+}
+
+    self.setExpandWhereFilter = function () {
+        if ($("#expandWhere_propertySelect").val() == "")
+            return;
+        var targetWhereClause = $("#expandWhere_propertySelect").val() + ":" + $("#expandWhere_operatorSelect").val() + " " + $("#expandWhere_valueInput").val();
+
+        targetWhereClause = advancedSearch.getWhereProperty(targetWhereClause, "m")
+        toutlesensData.targetWhereFilter = targetWhereClause;
+    }
 
 
 
@@ -34,7 +53,34 @@ self.onOK=function(){
 
 from <select id="expand_labelsSelectSource" onchange="expandGraph.setSourceLabel($(this).val())"></select>
 <br>
-to <select id="expand_labelsSelectTarget" ></select>
+to <select id="expand_labelsSelectTarget"  onchange="expandGraph.initExpandWhere()"></select>
+
+
+
+<div id='expandWhereDiv' style="width:320px;display: none">
+    <table>
+        <tr>
+            <td colspan="3">
+                <select id="expandWhere_propertySelect" style="height: 25px;width:50px">
+                </select>
+
+                <select id="expandWhere_operatorSelect">
+                    <option>=</option>
+                    <option>!=</option>
+                    <option>&lt;</option>
+                    <option>&gt;</option>
+                    <option selected="selected">contains</option>
+                </select>
+
+                <input id="expandWhere_valueInput" size="10" >
+
+
+            </td>
+        </tr>
+
+
+    </table>
+</div>
 
 <button onclick="expandGraph.onOK()">expand</button>
 <!--<button onclick="toutlesensController.dispatchAction('collapseGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())">collapse</button>-->

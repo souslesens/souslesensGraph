@@ -106,7 +106,11 @@ var myDataTable = function () {
                 "dom": dom,
 
                 buttons: [
-                    'copy', 'csv', 'print'
+                   /* {
+                        extend: 'csv',
+                        exportOptions: { fieldSeparator: '\t',charset:"ANSI" }
+                    },*/
+                    'copy','excel' , 'print'
                     // 'copy', 'csv', 'excel', 'pdf', 'print'
                 ],
                 data: dataSet,

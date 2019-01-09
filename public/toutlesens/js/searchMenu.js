@@ -180,6 +180,7 @@ var searchMenu = (function () {
             });
         }
         self.previousPanel = function () {
+            $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
             $("#searchDialog_newQueryButton").css('visibility', 'visible');
             self.currentPanelIndex += -1;
             if (self.currentPanelIndex == 0) {
@@ -221,6 +222,7 @@ var searchMenu = (function () {
         }
 
         self.nextPanel = function () {
+            $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
             $("#searchDialog_newQueryButton").css('visibility', 'visible');
             if (self.previousAction == "path") {
                 advancedSearch.searchNodes('matchObject', null, function (err, result) {
@@ -276,6 +278,7 @@ var searchMenu = (function () {
             self.currentAction = option;
             if (option == '')
                 return;
+
             $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
             $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
 

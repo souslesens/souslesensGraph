@@ -275,7 +275,7 @@ var visjsGraph = (function () {
                            if(delay<dblClickDuration) {//dbleclick*/
                         currentObject._graphPosition = params.pointer.DOM;
                         if (params.event.srcEvent.ctrlKey) {
-                            toutlesensController.dispatchAction("expandNode", nodeId)
+                           // toutlesensController.dispatchAction("expandNode", nodeId)
 
                         }
                     }
@@ -856,9 +856,9 @@ var visjsGraph = (function () {
             for (var key in self.nodes._data) {
                 var node = self.nodes._data[key];
                 if (!labelNeo) {
-                    ids.push(node.id)
+                    ids.push(parseInt(""+node.id))
                 } else if (node.labelNeo == labelNeo)
-                    ids.push(node.id)
+                    ids.push(parseInt(""+node.id))
 
 
             }
@@ -1055,7 +1055,7 @@ var visjsGraph = (function () {
           }*/
 
         self.toList = function () {
-            var array = self.exportGraph();
+            var array = self.exportGraph().nodes;
             // console.log()
             var dataset = []
 
