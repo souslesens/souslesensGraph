@@ -183,7 +183,7 @@ var advancedSearch = (function () {
                 url: toutlesensData.neo4jProxyUrl,
                 data: payload,
                 dataType: "json",
-                success: function (data, textStatus, jqXHR) {
+                success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(statement);
                     toutlesensController.displayGraph(data);
                 },
                 error: function (err) {
@@ -488,7 +488,7 @@ var advancedSearch = (function () {
             url: self.neo4jProxyUrl,
             data: payload,
             dataType: "json",
-            success: function (data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(statement);
 
 
                 if (data.length == 0) {
@@ -646,7 +646,7 @@ var advancedSearch = (function () {
                     url: self.neo4jProxyUrl,
                     data: payload,
                     dataType: "json",
-                    success: function (data, textStatus, jqXHR) {
+                    success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(statement);
 
                         if (data.length == 0) {
                             return $(messageDivId).html("no pivot values found");
@@ -765,7 +765,7 @@ var advancedSearch = (function () {
                 console.log(err.responseText);
 
             },
-            success: function (data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(query,callback || null);
                 var ids = [];
                 for (var i = 0; i < data.length; i++) {
                     ids.push(data[i].n._id)
@@ -815,7 +815,7 @@ var advancedSearch = (function () {
             url: self.neo4jProxyUrl,
             data: payload,
             dataType: "json",
-            success: function (data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(query);
                 var nodes = [];
                 var labels = [];
                 var data2 = [];
@@ -850,7 +850,7 @@ var advancedSearch = (function () {
             url: self.neo4jProxyUrl,
             data: payload,
             dataType: "json",
-            success: function (data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(query);
                 var ids = [];
                 for (var i = 0; i < data.length; i++) {
                     ids.push(data[i].n._id)

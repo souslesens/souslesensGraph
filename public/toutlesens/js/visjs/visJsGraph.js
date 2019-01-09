@@ -951,7 +951,11 @@ var visjsGraph = (function () {
                 nodes: getNodeData(allNodes),
                 edges: getEdgeData(allEdges)
             }
-            options={noHistory:true,smooth:true}
+
+           if(!options)
+           options={smooth:true};
+            options.noHistory=true;
+
             self.draw("graphDiv", data, options);
             //  network = new vis.Network(container, data, {});
 
@@ -1239,6 +1243,25 @@ var visjsGraph = (function () {
 
 
             }
+        }
+
+        self.exportPng=function(){
+          var canvasElement=this.network.canvas
+            var canvasElement=document.getElementsByTagName("canvas")[0]
+         //   var canvasElement = document.getElementById(id);
+
+            var MIME_TYPE = "image/png";
+
+            var imgURL = canvasElement.toDataURL(MIME_TYPE);
+
+            var dlLink = document.createElement('a');
+            dlLink.download = "graph";
+            dlLink.href = imgURL;
+            dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+
+            document.body.appendChild(dlLink);
+            dlLink.click();
+            document.body.removeChild(dlLink);
         }
         /*    self.getClusterByClusterId=function(clusterId){
                 var xx=self.nodes._data;

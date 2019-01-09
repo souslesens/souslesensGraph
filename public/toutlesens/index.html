@@ -147,11 +147,8 @@
 
     <script src="js/advancedSearch.js"></script>
     <script src="../common/js/others/tableFlip.js"></script>
-    <!--<script src="js//jit-yc.js"></script>
-    <link rel="stylesheet" type="text/css"
-        href="../common/js/others/jquery.datatables.min.css" />
-    <script type="text/javascript"
-        src="../common/js/others/jquery.datatables.min.js"></script>-->
+
+
 
 
     <script src="js/help.js"></script>
@@ -336,7 +333,7 @@
             lang.setLangage();
             eventsController.initInputEvents();
             eventsController.initcomponentEvents()
-            savedQueries.loadQueries();
+            savedQueries.loadQueryRuns();
 
             var mode = queryParams.mode;
             if (mode == "write")
@@ -436,8 +433,8 @@
            src="images/zoom.png" class="graphDisplayed"/>
     <input type="image" title="Fit to page" height="20px" onclick="visjsGraph.fitToPage()" id="fitMenuButton"
            src="images/fit.png" class="graphDisplayed"/>
-    <!-- <input type="image" title="Take a snapshot" height="20px" onclick="visjsGraph.saveGraph()" id="snapShotMenuButton"
-            src="images/snapshot.png" class="graphDisplayed"/>-->
+    <input type="image" title="Take a snapshot" height="20px" onclick="visjsGraph.exportPng()" id="snapShotMenuButton"
+            src="images/snapshot.png" class="graphDisplayed"/>
 
     <input type="image" title="Previous graph" height="20px" onclick="visjsGraph.showPreviousGraph()"
            id="previousGraphMenuButton" src="images/previous.jpg"/>
@@ -459,18 +456,18 @@
     <div id="findDivInner">
         <div id="findTabs">
             <ul id="findTabsUl">
-                <li><a href="#queryDiv"><span id='lang_60'>Query </span></a></li>
-                <li><a href="#nodeDiv"><span id='lang_60'>Node  </span></a></li>
-                <li><a href="#relationDiv"><span id='lang_60'>Relation </span></a></li>
+                <li><a href="#queryDiv"><span >Query </span></a></li>
+                <li><a href="#nodeDiv"><span >Node  </span></a></li>
+                <li><a href="#relationDiv"><span >Relation </span></a></li>
 
-                <li><a href="#pathDiv"><span id='lang_60'>Pathes </span></a></li>
-                <li><a href="#advancedQueriesDiv" id="advancedQueriesTabLi"><span id='lang_60'>Advanced </span></a></li>
+                <li><a href="#pathDiv"><span >Pathes </span></a></li>
+                <li><a href="#advancedQueriesDiv" id="advancedQueriesTabLi"><span >Advanced </span></a></li>
 
-                <li><a href="#pluginDiv" id="pluginLi"><span id='lang_60'>Plugin </span></a></li>
-                <!--     <li><a href="#tagCloudDiv" id="tagCloudLi"><span id='lang_60'>tagCloud</span></a></li>-->
+                <li><a href="#pluginDiv" id="pluginLi"><span >Plugin </span></a></li>
+                <!--     <li><a href="#tagCloudDiv" id="tagCloudLi"><span >tagCloud</span></a></li>-->
 
 
-                <!--  <li><a href="#requestDiv"><span id='lang_60'>Request </span></a></li>-->
+                <!--  <li><a href="#requestDiv"><span >Request </span></a></li>-->
 
 
             </ul>
@@ -662,7 +659,7 @@
             <div id="queryDiv" class="findTab">
             </div>
 
-            <div id="plugin" class="findTab"></div>
+            <div id="pluginDiv" class="findTab"></div>
 
             <!--    <div id="requestDiv">
 
@@ -677,12 +674,12 @@
     <div id="tabs-analyzePanel">
 
         <ul>
-            <li><a href="#infosDiv"><span id='lang_60'>Infos  </span></a></li>
-            <li><a href="#filterDiv"><span id='lang_60'>Filter </span></a></li>
-            <li><a href="#expandDiv"><span id='lang_60'>Expand </span></a></li>
-            <li><a href="#highlightDiv"><span id='lang_60'>Highlight </span></a></li>
-            <!--  <li><a href="#graphOptionsDiv"><span id='lang_60'>Graph </span></a></li>-->
-            <li><a href="#similarsDiv"><span id='lang_60'>Similars </span></a></li>
+            <li><a href="#infosDiv"><span >Infos  </span></a></li>
+            <li><a href="#filterDiv"><span >Filter </span></a></li>
+            <li><a href="#expandDiv"><span >Expand </span></a></li>
+            <li><a href="#highlightDiv"><span >Highlight </span></a></li>
+            <!--  <li><a href="#graphOptionsDiv"><span >Graph </span></a></li>-->
+            <li><a href="#similarsDiv"><span >Similars </span></a></li>
 
 
         </ul>

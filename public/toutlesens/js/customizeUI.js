@@ -116,7 +116,7 @@ var customizeUI = (function () {
     self.addPlugins = function (plugins, callback) {
         plugins.forEach(function (plugin) {
             $("#pluginLi").html(plugin)
-            $("#plugin").load("plugins/" + plugin + "/index.html",function(err,result){
+            $("#pluginDiv").load("plugins/" + plugin + "/index.html",function(err,result){
                 if (callback)
                     callback();
             })

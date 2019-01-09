@@ -1064,9 +1064,10 @@ var toutlesensController = (function () {
                     var graphStr = localStorage.getItem("schemaGraph_" + subGraph);
                     if (graphStr) {
                         Schema.currentGraph = JSON.parse(graphStr);
-                        dataModel.getDBstats(subGraph, function () {
+                        visjsGraph.importGraph(Schema.currentGraph, graphOptions);
+                      /*  dataModel.getDBstats(subGraph, function () {
                             visjsGraph.importGraph(Schema.currentGraph, graphOptions);
-                        });
+                        });*/
                     }
                     else {
                         dataModel.getDBstats(subGraph, function () {
@@ -1289,7 +1290,7 @@ var toutlesensController = (function () {
                 url: self.neo4jProxyUrl,
                 data: payload,
                 dataType: "json",
-                success: function (data, textStatus, jqXHR) {
+                success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(matchStr,callback || null);
 
                     var count = data[0].count;
                     if (count > Gparams.jsTreeMaxChildNodes) {

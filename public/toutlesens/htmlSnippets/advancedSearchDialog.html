@@ -101,17 +101,16 @@
 
 <div id="searchAccordion">
 
-    <h3><b>My queries</b></h3>
-    <div style="min-height: 300px;">
+    <!--     <h3><b>My queries</b></h3>
+     <div style="min-height: 300px;">
 
-        <!--     <select id="searchDialog_savedQueries" size="14" style="width:270px"
-                     ondblclick="searchMenu.savedQueryExecute()"></select>-->
-        <div id="savedQueries_jsTree" style="height:250px"></div>
-        <br>
-        <button onclick="searchMenu.savedQueryDelete()">delete</button>
-        <button onclick="searchMenu.savedQueryExecute()">execute</button>
-        <button onclick="searchMenu.savedQueryDeleteAll()">delete all</button>
-    </div>
+
+     <div id="savedQueries_jsTree" style="height:250px"></div>
+         <br>
+         <button onclick="savedQueries.DeleteQueryRun()">delete</button>
+         <button onclick="savedQueries.playQueryRun()">execute</button>
+         <button onclick="savedQueries.DeleteQueryRunAll()">delete all</button>
+     </div>-->
 
     <h3><b>New query</b></h3>
     <div style="height: 450px;overflow: auto">
@@ -136,7 +135,7 @@
                     <table>
                         <tr>
                             <td colspan="3">
-                                <select id="searchDialog_propertySelect" style="height: 25px;">
+                                <select id="searchDialog_propertySelect" style="height: 25px;width:100px">
                                 </select>
 
                                 <select id="searchDialog_operatorSelect">
@@ -238,7 +237,7 @@
                 <input type="checkbox" id="graphNeighboursAllOptionsCbx"
                        onchange="searchMenu.onGraphNeighboursAllOptionsCbx(this)"> All
                 <div id='neighboursTypesDiv'
-                     style="max-height: 150px;width:320px;overflow: auto"></div>
+                     style="max-height: 180px;width:320px;overflow: auto"></div>
 
                 <div id='neighboursWhereDiv' style="width:320px;display: none">
                     <table>
@@ -362,7 +361,7 @@
                         new
                     </button>
                     <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_SaveQueryButton"
-                            onclick="savedQueries.savedQuerySave();">save
+                            onclick="savedQueries.saveQueryRun();">save
                     </button>
 
                     <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_previousPanelButton"
@@ -391,12 +390,12 @@
 
 
     </div>
-    <h3><b>Cypher</b></h3>
+ <!--   <h3><b>Cypher</b></h3>
     <div style="height: 450px;overflow: auto">
         Match statement
         <br><textarea id="searchMenu_cypherInput" cols="40" rows="10"></textarea><br>
         <button onclick="searchMenu.execCypherMatchStatement()">next</button>
-    </div>
+    </div>-->
 
 
 </div>

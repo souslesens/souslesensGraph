@@ -194,7 +194,7 @@ function saveQueries() {
 	proxy_addItem(dbName, "admin", obj);
 }
 
-function loadQueries() {
+function loadQueryRuns() {
 	dbName = $("#dbName").val();
 	var queries = proxy_loadData(dbName, 'admin', {
 		type : "query"

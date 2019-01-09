@@ -62,6 +62,7 @@ var toutlesensData = (function () {
                 data: payload,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
+                    savedQueries.addToCurrentSearchRun(cypher,callback || null);
                     callback(null, data)
                 }, error: function (err) {
                     callback(err)
@@ -94,6 +95,7 @@ var toutlesensData = (function () {
                 data: payload,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
+                    savedQueries.addToCurrentSearchRun(queryStr,successFunction || null);
 
                     currentDataStructure = "flat";
                     //  toutlesensData.cachedResultArray = data;
@@ -342,6 +344,7 @@ var toutlesensData = (function () {
                 data: payload,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
+                    savedQueries.addToCurrentSearchRun(statement,callback|| null);
 
                     if (data.length == 0 && options.addToPreviousQuery) {
                         data = [];
@@ -373,6 +376,7 @@ var toutlesensData = (function () {
                             data: payload,
                             dataType: "json",
                             success: function (data, textStatus, jqXHR) {
+                                savedQueries.addToCurrentSearchRun(statement,callback|| null);
                                 var message = "<br><span class='importantMessage'>" + data[0].countRel + "  relations in the graph only " + Gparams.maxResultSupported + " are currently displayed</span> "
                                 message += "<a href='javascript:toutlesensController.increaseGraphLimit()'>increase Graph display limit</a> (display wil be slower)";
                                 message += "<br> <a href='$(\"#propertiesSelectionDialog_NodeLabelInput\").val(\"\");javascript:advancedSearch.showDialog()'>or set a filter on nodes or relations</a>";
@@ -486,6 +490,7 @@ var toutlesensData = (function () {
                 data: paramsObj,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
+                   // savedQueries.addToCurrentSearchRun(statement,callback|| null);
                     if (!data || data.length == 0) {
                         $("#waitImg").css("visibility", "hidden");
                         return callback("No result")
@@ -1370,6 +1375,7 @@ var toutlesensData = (function () {
                 data: payload,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
+                    savedQueries.addToCurrentSearchRun(str,callback|| null);
                     if (callback) {
                         return callback(null, data);
                     }

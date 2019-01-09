@@ -48,7 +48,7 @@ var graphTraversalQueries = (function () {
             url: self.neo4jProxyUrl,
             data: paramsObj,
             dataType: "json",
-            success: function (data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {//savedQueries.addToCurrentSearchRun(statement,callback || null);
                 if (!data) {
                     return callback("No result")
                     $("#waitImg").css("visibility", "hidden");
@@ -121,7 +121,7 @@ var graphTraversalQueries = (function () {
             url: self.neo4jProxyUrl,
             data: payload,
             dataType: "json",
-            success: function (data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(statement,callback|| null);
                 var rels = {}
                 for (var i = 0; i < data.length; i++) {// marquage des
                     // noeuds source et

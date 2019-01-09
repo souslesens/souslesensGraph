@@ -1,6 +1,5 @@
 var searchMenu = (function () {
         var self = {};
-        var savedQueries = {}
         self.currentPanelIndex = 1;
         self.currentAction = null;
         self.selectedQuery = null;
@@ -42,7 +41,7 @@ var searchMenu = (function () {
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
-         //
+            //
             advancedSearch.clearClauses();
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
         }
@@ -55,6 +54,10 @@ var searchMenu = (function () {
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $(div).addClass("selectLabelDivSelected");
 
+       if(previousAction != 'path') {// reset recoding of saved queries except if choose target label
+        savedQueries.resetCurrentSearchRun();
+    }
+
 
             $("#searchDialog_NodeLabelInput").val(value);
             $("#searchDialog_valueInput").val();
@@ -62,7 +65,7 @@ var searchMenu = (function () {
             //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
             $("#searchDialog_NextPanelButton").css('visibility', 'visible');
             advancedSearch.clearClauses();
-          //  self.resetQueryClauses()
+            //  self.resetQueryClauses()
             if (searchDialog_propertySelect) ;
             filters.initProperty(null, value, searchDialog_propertySelect);
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
@@ -160,7 +163,7 @@ var searchMenu = (function () {
             toutlesensData.targetWhereFilter = targetWhereClause;
         }
         self.activatePanel = function (id) {
-            if(id=="searchCriteriaDiv") {
+            if (id == "searchCriteriaDiv") {
                 self.resetQueryClauses()
                 searchMenu.currentPanelIndex == 1
             }
@@ -276,8 +279,24 @@ var searchMenu = (function () {
             $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
             $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
 
+            if (option == 'path') {
 
-            if (option == "graphSomeNeighboursListLabels") {
+                advancedSearch.searchNodes('matchStr', null, function (err, result) {
+                    var matchObj = advancedSearch.matchStrToObject(result);
+                    self.pathQuery = {sourceQuery: matchObj};
+                    previousAction = "pathSourceSearchCriteria"
+                    //  self.currentAction.name = "pathTargetSearchCriteria";
+                    self.activatePanel("searchCriteriaDiv");
+                    $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
+                    //  $("#searchDialog_ExecuteButton").css('visibility', 'visible');
+
+
+                })
+            }
+
+
+
+           else if (option == "graphSomeNeighboursListLabels") {
                 self.nextPanel();
                 var currentLabel = $("#searchDialog_NodeLabelInput").val();
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
@@ -285,7 +304,7 @@ var searchMenu = (function () {
 
 
             }
-            if (option == "treeMapSomeNeighboursListLabels") {
+            else if (option == "treeMapSomeNeighboursListLabels") {
                 self.nextPanel();
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
                 var currentLabel = $("#searchDialog_NodeLabelInput").val();
@@ -321,22 +340,7 @@ var searchMenu = (function () {
                 })
 
             }
-            else if (option == 'path') {
 
-                advancedSearch.searchNodes('matchStr', null, function (err, result) {
-                    var matchObj = advancedSearch.matchStrToObject(result);
-                    self.pathQuery = {sourceQuery: matchObj};
-                    previousAction = "pathSourceSearchCriteria"
-                    //  self.currentAction.name = "pathTargetSearchCriteria";
-                    self.activatePanel("searchCriteriaDiv");
-                    $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
-                    //  $("#searchDialog_ExecuteButton").css('visibility', 'visible');
-
-
-                })
-
-
-            }
 
             else if (option == 'graphNodes') {
                 advancedSearch.searchNodes('matchStr', null, self.graphNodesOnly);
@@ -376,6 +380,7 @@ var searchMenu = (function () {
                         data: payload,
                         dataType: "json",
                         success: function (data, textStatus, jqXHR) {
+                            savedQueries.addToCurrentSearchRun(query);
 
                             tagCloud.drawCloud(null, data);
                         }

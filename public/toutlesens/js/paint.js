@@ -180,14 +180,9 @@ var paint = (function () {
             }
 
 
-            var data = getData();
-
-
-            if (data.length == 0)
-                return;
             var allGraphNodes = visjsGraph.nodes.get();
 
-            if ( property == "" && self.currentBIproperty) {
+            if ( property == "" ) {
 
 
                 $("#BIlegendDiv").html("").css("visibility", "hidden");
@@ -208,6 +203,11 @@ var paint = (function () {
                 visjsGraph.nodes.update(targetNodes);
                 return;
             }
+            var data = getData();
+
+
+            if (data.length == 0)
+                return;
 
 
             $("#BIlegendDiv").html("").css("visibility", "visible");
@@ -780,7 +780,7 @@ var paint = (function () {
 
 
         self.initHighlight = function () {
-            var properties = [""];
+            var properties = [];
 
             var labels = filters.currentLabels;
             for (var i = 0; i < labels.length; i++) {
@@ -791,8 +791,8 @@ var paint = (function () {
             }
             properties.sort();
             if (paintDialog_highlightPropertySelect)
-                common.fillSelectOptionsWithStringArray(paintDialog_highlightPropertySelect, properties);
-            common.fillSelectOptionsWithStringArray(paint_showNodeNamesForLabelSelect, filters.currentLabels);
+                common.fillSelectOptionsWithStringArray(paintDialog_highlightPropertySelect, properties,true);
+            common.fillSelectOptionsWithStringArray(paint_showNodeNamesForLabelSelect, filters.currentLabels,true);
             paintAccordion=$("#paintAccordion").accordion(
                 {
                     active: 0,
