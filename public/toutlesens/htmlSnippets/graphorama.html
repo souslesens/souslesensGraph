@@ -1,0 +1,120 @@
+<script>
+
+    var graphorama = (function () {
+        var self = {};
+        self.currentRecording = [];
+        self.graphoramaLocalKeys = [];
+
+        var localStorageKeys = "souslesensGraphoramaKeys"
+        var localStoragePrefix = "souslesensGraphorama"
+        self.startRecording = function () {
+            if (self.currentRecording.length > 0) {
+                return self.stopRecording();
+            } else
+                self.currentRecording = [];
+        }
+        self.stopRecording = function () {
+            debugger
+            var name = prompt("save recording with name ")
+            if (!name || name == "") {
+                if (confirm("delete current recording"))
+                    return self.currentRecording = [];
+                return;
+            }
+            else {
+                var date = new Date();
+                var obj = {
+                    name: name,
+                    data: self.currentRecording,
+                    date: date
+                }
+                var key = localStoragePrefix + "_" + name;
+                self.graphoramaLocalKeys.push(key)
+                localStorage.setItem(localStorageKeys, JSON.stringify(self.graphoramaLocalKeys));
+                localStorage.setItem(key, JSON.stringify(obj));
+
+
+            }
+        }
+
+        self.addGraph = function () {
+            var title = prompt("enter graph title")
+            if (!title || title == "")
+                return;
+            var date = new Date();
+            self.currentRecording.push({
+                title: title,
+                data: visjsGraph.graphHistory[visjsGraph.graphHistory.currentIndex],
+                date: date
+            })
+
+        }
+
+
+        self.loadAllRecordings = function () {
+            var keys = localStorage.getItem(localStorageKeys);
+            keys = JSON.parse(keys);
+            common.fillSelectOptionsWithStringArray(graphorama_recordSelect, keys, true)
+
+        }
+
+        self.loadRecording = function () {
+            var name = $("#graphorama_recordSelect").val();
+            var recording = localStorage.getItem(name);
+            recording = JSON.parse(recording).data;
+            self.currentRecording = recording;
+            common.fillSelectOptions(graphorama_slidesSelect, recording, "title", "title", true)
+
+
+        }
+        self.playSlide = function () {
+            debugger
+            var index = $("#graphorama_slidesSelect").prop('selectedIndex')
+            visjsGraph.importGraph(self.currentRecording[index].data)
+
+        }
+
+
+        self.deleteRecording = function () {
+
+        }
+
+        self.saveRecording = function () {
+
+        }
+
+
+        self.nextPage = function () {
+            visjsGraph.showNextGraph()
+        }
+        self.previousPage = function () {
+            visjsGraph.showPreviousGraph()
+        }
+
+
+        return self;
+
+    })()
+
+
+</script>
+
+
+<button onclick="graphorama.startRecording()">startRecording</button>
+<button onclick="graphorama.stopRecording()">stopRecording</button>
+<button onclick="graphorama.addGraph()">select Graph</button>
+
+<br>
+<button onclick="graphorama.nextPage()">next</button>
+<button onclick="graphorama.previousPage()">previous</button>
+
+<br>
+recordings
+<button onclick="graphorama.loadAllRecordings()"> load all</button>
+<select id="graphorama_recordSelect" size="10"></select>
+<button onclick="graphorama.loadRecording()"> load</button>
+<button onclick="graphorama.deleteRecording()"> delete</button>
+<button onclick="graphorama.saveRecording()"> save</button>
+<br>
+recording slides
+<select id="graphorama_slidesSelect" size="10" onclick="graphorama.playSlide()"></select>

@@ -1112,6 +1112,14 @@ var toutlesensController = (function () {
                 self.generateGraph(null, {});
             }
 
+            else if(action=="graphorama") {
+                $("#dialog").load("htmlSnippets/graphorama.html", function () {
+                    $("#dialog").dialog("option", "title", "graphorama");
+                    $("#dialog").dialog("open");
+                })
+            }
+
+
 
         }
 
