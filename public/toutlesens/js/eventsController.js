@@ -81,13 +81,13 @@ var eventsController = (function () {
             $("#queryDiv").on('mousedown', function (e) {
                 if (self.stopEvent)
                     return self.stopEvent = false;
-                toutlesensController.setRightPanelAppearance(true);
+                toutlesensController.openFindAccordionPanel(true);
             })
             ;
             $("#analyzePanel").on('mousedown', function (e) {
                 if (self.stopEvent)
                     return self.stopEvent = false;
-                toutlesensController.setRightPanelAppearance(false);
+                toutlesensController.openFindAccordionPanel(false);
             })
 
 
@@ -117,13 +117,26 @@ var eventsController = (function () {
                 $("#advancedQueriesAccordion").accordion(
                     {
                         active: false,
-                        collapsible: true,
+                        collapsible: false,
                         activate: function (event, ui) {
                             dialog.dialog("close");
                             $("#graphPopup").css("visibility", "hidden");
                         }
                     });
                 ;
+
+                $("#mainAccordion").accordion(
+                    {
+                        active: 0,
+                        collapsible: true,
+                        activate: function (event, ui) {
+
+                        }
+                    });
+                ;
+
+
+
 
                 tabsAnalyzePanel = $("#tabs-analyzePanel").tabs({
 
@@ -185,7 +198,7 @@ var eventsController = (function () {
                     activate: function (event, ui) {
                        // $("#dialog").dialog("close");
                         $("#graphPopup").css("visibility", "hidden");
-                        toutlesensController.setRightPanelAppearance(true);
+                        toutlesensController.openFindAccordionPanel(true);
                         var index = ui.newTab.index();
                         if (index == 0) {
                             toutlesensController.currentActionObj = {type: "findNode"}

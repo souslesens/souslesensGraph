@@ -95,7 +95,7 @@ var advancedSearch = (function () {
     }
     self.clearClause = function (_index) {
 
-        if (searchMenu.currentPanelIndex > 1)
+        if (searchMenu.currentPanelId > 1)
             return;
 
         $(".searchDialog_CriteriaDiv").each(function (index, div) {
@@ -317,7 +317,7 @@ var advancedSearch = (function () {
                     }
                     treeController.loadSearchResultIntree(err, result);
                     setTimeout(function () {
-                        toutlesensController.setRightPanelAppearance(true);
+                        toutlesensController.openFindAccordionPanel(true);
                         treeController.expandAll("treeContainer");
                         dialog.dialog("close");
                     }, 500)
@@ -358,7 +358,7 @@ var advancedSearch = (function () {
                                   }
                                   setTimeout(function () {
 
-                                      toutlesensController.setRightPanelAppearance(true);
+                                      toutlesensController.openFindAccordionPanel(true);
                                       treeController.expandAll("treeContainer");
                                   }, 500)
 
@@ -386,7 +386,7 @@ var advancedSearch = (function () {
                     }
                     treeController.loadSearchResultIntree(err, result);
                     setTimeout(function () {
-                        toutlesensController.setRightPanelAppearance(true);
+                        toutlesensController.openFindAccordionPanel(true);
                         treeController.expandAll("treeContainer");
                     }, 500)
                     dialog.dialog("close");

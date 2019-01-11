@@ -40,10 +40,10 @@ var tagCloud = (function () {
         $("#filterOptionsDiv").html("");
         //   advancedSearch.clearClauses();
         advancedSearch.addClause(clauses[0]);
-        $("#searchAccordion").accordion("option", "active", 1);
+
 
         searchMenu.activatePanel("searchActionDiv");
-        toutlesensController.setRightPanelAppearance(true);
+        toutlesensController.openFindAccordionPanel(true);
         $("#findDiv").tabs("active", 2);
 
 

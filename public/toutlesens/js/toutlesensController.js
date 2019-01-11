@@ -194,7 +194,7 @@ var toutlesensController = (function () {
                     $("#waitImg").css("visibility", "hidden");
                     tabsAnalyzePanel.tabs("enable", 0);
                     self.dispatchAction('nodeInfos');
-                    self.setRightPanelAppearance(false);
+                    self.openFindAccordionPanel(false);
 
                     if (callback) {
                         callback(err, data);
@@ -223,7 +223,7 @@ var toutlesensController = (function () {
                 $("#visJsSearchGraphButton").css("visibility: visible");
                 toutlesensData.prepareRawData(data, addToPreviousQuery, currentDisplayType, function (err, data, labels, relations) {
 
-                    self.setRightPanelAppearance(false);
+                    self.openFindAccordionPanel(false);
 
                     //   paint.init(data);
 
@@ -445,7 +445,7 @@ var toutlesensController = (function () {
             }
             setTimeout(function () {
                 $("#searchResultMessage").html("click on tree...")
-                self.setRightPanelAppearance(true);
+                self.openFindAccordionPanel(true);
                 treeController.expandAll("treeContainer");
             }, 500)
 
@@ -633,7 +633,7 @@ var toutlesensController = (function () {
                             //    $("#nodeInfoMenuDiv").css("top", "total");
                             $("#nodeInfoMenuDiv").css("visibility", "visible");
                             $("#nodeInfoMenuDiv").html(toutlesensDialogsController.setPopupMenuNodeInfoContent());
-                            self.setRightPanelAppearance(false);
+                            self.openFindAccordionPanel(false);
                             $("#graphPopup").html(toutlesensDialogsController.setPopupMenuNodeInfoContent());
                             //$("#nodeInfoMenuDiv").html(str)
 
@@ -832,7 +832,7 @@ var toutlesensController = (function () {
                         treeController.selectedNodeData.neoId = currentObject.id
                         treeController.setAttributesValue(label, attrObject, currentObject.neoAttrs);
                         treeController.drawAttributes(attrObject, "nodeFormDiv");
-                        // self.setRightPanelAppearance();
+                        // self.openFindAccordionPanel();
 
                     })
                     $("#dialog").dialog("open");
@@ -858,7 +858,7 @@ var toutlesensController = (function () {
 
                     $("#dialog").load("htmlSnippets/nodeForm.html", function () {
                         self.initLabels(nodeFormLabelSelect);
-                        self.setRightPanelAppearance();
+                        self.openFindAccordionPanel();
                         for (var i = 0; i < Gparams.palette.length; i++) {
                             $("#nodeFormNewLabelColor").append($('<option>', {
                                     value: Gparams.palette[i],
@@ -1000,7 +1000,7 @@ var toutlesensController = (function () {
                 Gparams.showRelationNames = false;
 
                 self.generateGraph(null, {applyFilters: true, hideNodesWithoutRelations: false});
-                self.setRightPanelAppearance(false);
+                self.openFindAccordionPanel(false);
             }
 
             else if (action == "zoomOnNode") {
@@ -1072,7 +1072,7 @@ var toutlesensController = (function () {
                     else {
                         dataModel.getDBstats(subGraph, function () {
                             var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
-                            self.setRightPanelAppearance(false);
+                            self.openFindAccordionPanel(false);
                             visjsGraph.draw("graphDiv", data, graphOptions, function () {
                                 Schema.currentGraph = visjsGraph.exportGraph();
                                 var str = "{\"nodes\":" + JSON.stringify(Schema.currentGraph, null, 2) + ",\"edges\":" + JSON.stringify(Schema.currentGraph.edges, null, 2) + "}";
@@ -1225,7 +1225,10 @@ var toutlesensController = (function () {
                 self.initLabels(currentQueriesDialogTargetLabelSelect);
             });
 
+            $("#graphoramasDiv").load("htmlSnippets/graphorama.html", function () {
+                    graphorama.init();
 
+            })
             $("#similarsDiv").load("htmlSnippets/similarsDialog.html", function () {
 
             });
@@ -1238,6 +1241,7 @@ var toutlesensController = (function () {
 
             });
             $("#cypherQueryDiv").load("htmlSnippets/cypherDialog.html", function () {
+
 
 
             });
@@ -1352,6 +1356,8 @@ var toutlesensController = (function () {
 
 
         self.setResponsiveDimensions = function (rightPanelWidth) {
+
+
             if (rightPanelWidth == 0) {
                 tabsAnalyzePanel.css("visibility", "hidden");
                 self.hasRightPanel = false;
@@ -1360,10 +1366,11 @@ var toutlesensController = (function () {
                 self.hasRightPanel = true;
                 tabsAnalyzePanel.css("visibility", "visible");
             }
-            $(".ui-tabs .ui-tabs-panel").css("padding", "2px")
+            $(".ui-tabs .ui-tabs-panel").css("padding", "2px");
+            $(".rightPanel").css("with", rightPanelWidth);
 
             $("#mainPanel").width(totalWidth - (rightPanelWidth)).height(totalHeight)
-            $("#analyzePanel").width(rightPanelWidth - 50).height(totalHeight).css("position", "absolute").css("left", totalWidth - rightPanelWidth + 20).css("top", 20);
+        //    $("#analyzePanel").width(rightPanelWidth - 50).height(totalHeight).css("position", "absolute").css("left", totalWidth - rightPanelWidth + 20).css("top", 20);
 
 
             $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0)
@@ -1379,21 +1386,25 @@ var toutlesensController = (function () {
 
 
             // $("#graphLegendDiv").width(rightPanelWidth - 50).height(totalHeight)
-            $("#findDiv").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20)
-            $("#findDivInner").width(rightPanelWidth - 10).height((totalHeight))
-            $("#findTabs").width(rightPanelWidth - 10);
+           // $("#findDiv").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20)
+            $("#mainAccordion").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20);
+            $(".mainAccordionPanel").width(rightPanelWidth - 10).height((totalHeight-120))
+           /* $("#findDivInner").width(rightPanelWidth - 10).height((totalHeight))
+            $("#findTabs").width(rightPanelWidth - 10);*/
 
-            $("#editDiv").width(rightPanelWidth - 10).height((totalHeight))
-            $("#highlightDiv").width(rightPanelWidth - 10).height((totalHeight))
-            $("#filterDiv").width(rightPanelWidth - 10).height((totalHeight))
-            $("#infosDiv").width(rightPanelWidth - 10).height((totalHeight))
+
+            $("#nodeInfoMenuDiv").width(rightPanelWidth - 40).css("visibility", "hidden")
+
+            $("#editDiv").width(rightPanelWidth - 40).height((totalHeight))
+            $("#highlightDiv").width(rightPanelWidth - 40).height((totalHeight))
+            $("#filterDiv").width(rightPanelWidth - 40).height((totalHeight))
+            $("#infosDiv").width(rightPanelWidth - 40).height((totalHeight))
 
             //   $("#analyzePanel").width(rightPanelWidth - 10).height(totalHeight).css("position", "absolute").css("left", (totalWidth - rightPanelWidth) + 30).css("top", 10);
             //tabsAnalyzePanel.width(rightPanelWidth - 100).height(totalHeight/2).css("position", "absolute").css("left",(totalWidth-rightPanelWidth) + 30).css("top", 10);
 
 
             $("#analyzePanel").width(rightPanelWidth - 10);
-            $("#nodeInfoMenuDiv").width(rightPanelWidth - 40).height(Gparams.infosanalyzePanelHeight - 80).css("visibility", "hidden")
 
 
             //   $("#mainButtons").width(rightPanelWidth).height(50).css("position", "absolute").css("left", $("#graphDiv").width() - 200).css("top", 50).css("visibility", "hidden");
@@ -1404,7 +1415,7 @@ var toutlesensController = (function () {
             $("#fullScreenButton").css("position", "absolute").css("top", 5).css("left", (totalWidth - rightPanelWidth) - 10);
             $(".objAttrInput").width(rightPanelWidth - 100);
 
-            self.setRightPanelAppearance(true);
+            self.openFindAccordionPanel(true);
 
         }
 
@@ -1415,7 +1426,7 @@ var toutlesensController = (function () {
                 toutlesensController.setResponsiveDimensions(0);
             else {
                 toutlesensController.setResponsiveDimensions(rightPanelWidth);
-                toutlesensController.setRightPanelAppearance(false);
+                toutlesensController.openFindAccordionPanel(false);
             }
             $("#mainButtons").css("visibility", "visible");
 
@@ -1424,31 +1435,26 @@ var toutlesensController = (function () {
 
         /**
          *
-         * if expandTree true; the treePanel will occupy all the height of the right panel else only thr top until totalheight -Gparams.infosanalyzePanelHeight
+         * if expandTree true; the treePanel will occupy all the height of the right panel else only thr top until totalheight -Gparams.infosAnalyzePanelHeight
          *
          *
          *
          * @param expandTree
          */
-        self.setRightPanelAppearance = function (expandTree) {
-            var analyzePanelHeight = Gparams.infosanalyzePanelHeight;
-            if (expandTree === true) {
-                analyzePanelHeight = 50;
-            }
+        self.openFindAccordionPanel = function (bool) {
+            if(bool)
+            $( "#mainAccordion" ).accordion( "option", "active", 0 );
+            else {
+                $( "#mainAccordion" ).accordion( "option", "active", 1 );
 
+             /*   try {
+                    tabsAnalyzePanel.tabs("option", "disabled", []);
+                    tabsAnalyzePanel.tabs("enable", 1);
+                    tabsAnalyzePanel.tabs("enable", 2);
+                }
+                catch (e) {
 
-            $("#treeContainer").height((totalHeight - analyzePanelHeight) - 120);
-            $("#findTabs").height((totalHeight - analyzePanelHeight));
-
-            $("#analyzePanel").height(analyzePanelHeight - 10).css("top", (totalHeight - analyzePanelHeight) + 20);
-            ;
-            try {
-                tabsAnalyzePanel.tabs("option", "disabled", []);
-                tabsAnalyzePanel.tabs("enable", 1);
-                tabsAnalyzePanel.tabs("enable", 2);
-            }
-            catch (e) {
-
+                }*/
             }
 
 

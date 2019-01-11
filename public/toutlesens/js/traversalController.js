@@ -122,7 +122,7 @@ var traversalController = (function () {
             toutlesensController.currentActionObj = {type: pathType, stage: target}
             if(pathType=="shortestPath") {
 
-                toutlesensController.setRightPanelAppearance(true);
+                toutlesensController.openFindAccordionPanel(true);
                 var nodeDivDetach = $("#nodeDivDetachable").detach();
                 $("#traversalFindDiv").append(nodeDivDetach);
                 $("#word").focus();
@@ -265,7 +265,7 @@ var traversalController = (function () {
 
                     var nodeDivDetach = $("#nodeDivDetachable").detach();
                     $("#nodeDiv").append(nodeDivDetach);
-                    toutlesensController.setRightPanelAppearance(false)
+                    toutlesensController.openFindAccordionPanel(false)
                 })
 
 
@@ -363,7 +363,7 @@ var traversalController = (function () {
 
                     var nodeDivDetach = $("#nodeDivDetachable").detach();
                     $("#nodeDiv").append(nodeDivDetach);
-                    toutlesensController.setRightPanelAppearance(false)
+                    toutlesensController.openFindAccordionPanel(false)
                 })
 
 
@@ -400,7 +400,7 @@ var traversalController = (function () {
                     currentDisplayType = "VISJS-NETWORK";
                     //  var data
                     visjsGraph.draw("graphDiv", connectors.neoResultsToVisjs(data));
-                    toutlesensController.setRightPanelAppearance();
+                    toutlesensController.openFindAccordionPanel();
                     filters.init(data);
 
                     if (data.length == 0) {
@@ -429,7 +429,7 @@ var traversalController = (function () {
                   //  $("#shortestPathDistance").text("Pathes between " + self.context.start.name + " and " + self.context.end.name + " distance : " + self.context.currentDistance)
 
                     visjsGraph.draw("graphDiv", connectors.neoResultsToVisjs(data));
-                    toutlesensController.setRightPanelAppearance();
+                    toutlesensController.openFindAccordionPanel();
                     filters.init(data);
 
 

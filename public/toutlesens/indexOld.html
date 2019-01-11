@@ -51,21 +51,20 @@
 
     <script src="../common/js/jquery/jquery.min.js"></script>
     <script src="../common/js/jquery/jquery-ui.min.js"></script>
-    <!--
+<!--
 
-      <link rel="stylesheet" type="text/css"
-              href="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.css"/>
-
-        <script type="text/javascript"
-                src="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.js"></script>
-    -->
-
-    <script src="js/dataTable.js"></script>
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/b-print-1.5.4/datatables.min.css"/>
+  <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.css"/>
 
     <script type="text/javascript"
-            src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/b-print-1.5.4/datatables.min.js"></script>
+            src="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/fh-3.1.4/r-2.2.2/sc-1.5.0/sl-1.2.6/datatables.min.js"></script>
+-->
+
+    <script src="js/dataTable.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/b-print-1.5.4/datatables.min.css"/>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/b-print-1.5.4/datatables.min.js"></script>
+
 
 
     <script src="resources/params.js"></script>
@@ -155,6 +154,8 @@
 
     <script src="js/advancedSearch.js"></script>
     <script src="../common/js/others/tableFlip.js"></script>
+
+
 
 
     <script src="js/help.js"></script>
@@ -350,9 +351,7 @@
             totalHeight = $(window).height() - 20;
 
             $("body").height(totalHeight);
-
-
-            rightPanelWidth =  Gparams.rightPanelWidth;
+            rightPanelWidth = Math.round(totalWidth * Gparams.rightPanelTotalWidthRatio)
             filterDiv = "radarFiltersDiv";
             bcsTreeDiv = "#bcsTreeDiv";
             radarDiv = "#radarDiv";
@@ -361,8 +360,8 @@
 
             var afterLoadModelTasks = [
                 eventsController.initInputEvents,
-                eventsController.initcomponentEvents,
-                treeController.initLabels,
+            eventsController.initcomponentEvents,
+            treeController.initLabels,
                 toutlesensController.intiRelationTypes,
                 customizeUI.customize,
                 toutlesensController.afterGraphInit,
@@ -372,7 +371,7 @@
                 // advancedDisplay.initDecorationDiv,
                 functionalities.initFunctionalities
 
-            ]
+        ]
 
             Schema.load(subGraph, function (err, schema) {
                 if (err)
@@ -421,7 +420,7 @@
     <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
     <input type="image" title="<span id='lang_XX'>schema</span>" height="20px"
 
-           id="schemaButton" src="images/cube.png"/>
+           id="schemaButton" src="images/cube.png" />
     <!-- <input type="image" title="<span id='lang_XX'>search</span>" height="20px" onclick="advancedSearch.showDialog({multipleClauses:true})"
            id="searchButton2" src="images/advancedSearch2.png"/>-->
     <input type="image" title="display settings" height="20px"
@@ -441,9 +440,8 @@
            src="images/zoom.png" class="graphDisplayed"/>
     <input type="image" title="Fit to page" height="20px" onclick="visjsGraph.fitToPage()" id="fitMenuButton"
            src="images/fit.png" class="graphDisplayed"/>
-    <input type="image" title="Take a snapshot" height="20px"
-           onclick="toutlesensController.dispatchAction('graphorama')" id="snapShotMenuButton"
-           src="images/snapshot.png" class="aa"/>
+    <input type="image" title="Take a snapshot" height="20px" onclick="toutlesensController.dispatchAction('graphorama')" id="snapShotMenuButton"
+            src="images/snapshot.png" class="aa"/>
 
     <input type="image" title="Previous graph" height="20px" onclick="visjsGraph.showPreviousGraph()"
            id="previousGraphMenuButton" src="images/previous.jpg"/>
@@ -461,21 +459,18 @@
 <div id="BIlegendDiv"
      style="visibility:hidden;z-index:20;border: 1px;border-style: solid;padding: 5px;background-color: #fafafa;max-height: 400px;max-width: 250px;overflow: auto"></div>
 
-
-<div id="mainAccordion">
-    <h3><b>Query</b></h3>
-    <div id="findDiv" class="mainAccordionPanel">
-
+<div id="findDiv">
+    <div id="findDivInner">
         <div id="findTabs">
             <ul id="findTabsUl">
-                <li><a href="#queryDiv"><span>Query </span></a></li>
-                <li><a href="#nodeDiv"><span>Node  </span></a></li>
-                <li><a href="#relationDiv"><span>Relation </span></a></li>
+                <li><a href="#queryDiv"><span >Query </span></a></li>
+                <li><a href="#nodeDiv"><span >Node  </span></a></li>
+                <li><a href="#relationDiv"><span >Relation </span></a></li>
 
-                <li><a href="#pathDiv"><span>Pathes </span></a></li>
-                <li><a href="#advancedQueriesDiv" id="advancedQueriesTabLi"><span>Advanced </span></a></li>
+                <li><a href="#pathDiv"><span >Pathes </span></a></li>
+                <li><a href="#advancedQueriesDiv" id="advancedQueriesTabLi"><span >Advanced </span></a></li>
 
-                <li><a href="#pluginDiv" id="pluginLi"><span>Plugin </span></a></li>
+                <li><a href="#pluginDiv" id="pluginLi"><span >Plugin </span></a></li>
                 <!--     <li><a href="#tagCloudDiv" id="tagCloudLi"><span >tagCloud</span></a></li>-->
 
 
@@ -678,46 +673,46 @@
                 </div>-->
         </div>
     </div>
+</div>
+<script>
 
-    <h3><b>Analyze</b></h3>
-    <div id="analyzePanel" class="mainAccordionPanel">
-        <div id="tabs-analyzePanel">
+</script>
+<div id="analyzePanel">
+    <div id="tabs-analyzePanel">
 
-            <ul>
-                <li><a href="#infosDiv"><span>Infos  </span></a></li>
-                <li><a href="#filterDiv"><span>Filter </span></a></li>
-                <li><a href="#expandDiv"><span>Expand </span></a></li>
-                <li><a href="#highlightDiv"><span>Highlight </span></a></li>
-                <!--  <li><a href="#graphOptionsDiv"><span >Graph </span></a></li>-->
-                <li><a href="#similarsDiv"><span>Similars </span></a></li>
+        <ul>
+            <li><a href="#infosDiv"><span >Infos  </span></a></li>
+            <li><a href="#filterDiv"><span >Filter </span></a></li>
+            <li><a href="#expandDiv"><span >Expand </span></a></li>
+            <li><a href="#highlightDiv"><span >Highlight </span></a></li>
+            <!--  <li><a href="#graphOptionsDiv"><span >Graph </span></a></li>-->
+            <li><a href="#similarsDiv"><span >Similars </span></a></li>
 
 
-            </ul>
-            <div id="infosDiv">
-                <div id="nodeInfoMenuDiv"></div>
-            </div>
-            <div id="filterDiv">
+        </ul>
+        <div id="infosDiv">
+            <div id="nodeInfoMenuDiv"></div>
+        </div>
+        <div id="filterDiv">
 
-            </div>
-            <div id="expandDiv">
+        </div>
+        <div id="expandDiv">
 
-            </div>
-
-            <div id="highlightDiv">
-
-            </div>
-
-            <!--   <div id="graphOptionsDiv">
-
-               </div>-->
-            <div id="similarsDiv">
-
-            </div>
         </div>
 
+        <div id="highlightDiv">
+
+        </div>
+
+        <!--   <div id="graphOptionsDiv">
+
+           </div>-->
+        <div id="similarsDiv">
+
+        </div>
+
+
     </div>
-    <h3><b>Graphoramas</b></h3>
-    <div id="graphoramasDiv" class="mainAccordionPanel"></div>
 
 </div>
 

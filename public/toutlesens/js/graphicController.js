@@ -23,7 +23,7 @@ var graphicController = (function () {
             toutlesensData.searchNodesWithOption(options, function (err, result) {
                 treeController.loadSearchResultIntree(err, result);
                 setTimeout(function () {
-                    toutlesensController.setRightPanelAppearance(true);
+                    toutlesensController.openFindAccordionPanel(true);
                     treeController.expandAll("treeContainer");
                     dialog.dialog("close");
                 }, 500)

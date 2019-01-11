@@ -1,3 +1,13 @@
+<style>
+
+#graphoramaAccordion{
+
+    font-size: 12px;
+}
+
+
+</style>
+
 <script>
 
     var graphorama = (function () {
@@ -7,12 +17,35 @@
 
         var localStorageKeys = "souslesensGraphoramaKeys"
         var localStoragePrefix = "souslesensGraphorama"
+
+
+
+
+        self.init = function () {
+            graphoramaAccordion = $("#graphoramaAccordion").accordion(
+                {
+                    active: 1,
+                    collapsible: false,
+                    activate: function (event, ui) {
+
+                    }
+                });
+            graphorama.loadAllRecordings();
+            $( "#graphoramaAccordion" ).accordion( "option", "active", 0 );
+
+        }
+
+
         self.startRecording = function () {
             if (self.currentRecording.length > 0) {
                 return self.stopRecording();
             } else
                 self.currentRecording = [];
+            $( "#graphoramaAccordion" ).accordion( "option", "active", 1);
         }
+
+
+
         self.stopRecording = function () {
             debugger
             var name = prompt("save recording with name ")
@@ -47,6 +80,9 @@
                 data: visjsGraph.graphHistory[visjsGraph.graphHistory.currentIndex],
                 date: date
             })
+
+        }
+        self.addSlides=function(){
 
         }
 
@@ -98,23 +134,60 @@
 
 
 </script>
+<div id="graphoramaAccordion">
+
+    <h3>Graphoramas</h3>
+    <div id="graphorama_savedGraphoramasDiv" style="min-height: 200px">
+
+      <table>
+          <tr>
+              <td>
+                  <select id="graphorama_recordSelect" ondblclick="graphorama.loadRecording()" size="10" style="width:250px"></select>
+              </td>
+
+              <td>
+
+                  <button onclick="graphorama.startRecording()"> new</button><br>
+                  <button onclick="graphorama.addSlides()"> add </button><br>
+                  <button onclick="graphorama.loadRecording()"> load</button><br>
+                  <button onclick="graphorama.deleteRecording()"> delete</button><br>
+                  <button onclick="graphorama.saveRecording()"> save</button>
+              </td>
+          </tr>
+      </table>
+
+    </div>
+
+    <h3>Actions</h3>
+    <div id="graphorama_currentGraphoramasDiv" style="min-height: 200px">
+    <table>
+        <tr>
+            <td>
+
+                <button onclick="graphorama.stopRecording()">stopRecording</button>
+                <button onclick="graphorama.addGraph()">select Graph</button>
+            </td>
+
+            <td>
+                <button onclick="graphorama.nextPage()">next</button>
+                <button onclick="graphorama.previousPage()">previous</button>
+            </td>
+        </tr>
+    </table>
 
 
-<button onclick="graphorama.startRecording()">startRecording</button>
-<button onclick="graphorama.stopRecording()">stopRecording</button>
-<button onclick="graphorama.addGraph()">select Graph</button>
 
-<br>
-<button onclick="graphorama.nextPage()">next</button>
-<button onclick="graphorama.previousPage()">previous</button>
 
-<br>
-recordings
-<button onclick="graphorama.loadAllRecordings()"> load all</button>
-<select id="graphorama_recordSelect" size="10"></select>
-<button onclick="graphorama.loadRecording()"> load</button>
-<button onclick="graphorama.deleteRecording()"> delete</button>
-<button onclick="graphorama.saveRecording()"> save</button>
-<br>
-recording slides
-<select id="graphorama_slidesSelect" size="10" onclick="graphorama.playSlide()"></select>
+        <br>
+
+    </div>
+
+
+</div>
+<div>
+   Slides
+    <select id="graphorama_slidesSelect" size="10" style="width:250px" onclick="graphorama.playSlide()"></select>
+</div>
+
+
+

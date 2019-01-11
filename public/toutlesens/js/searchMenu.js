@@ -1,16 +1,21 @@
 var searchMenu = (function () {
         var self = {};
-        self.currentPanelIndex = 1;
+        self.currentPanelId = null;
         self.currentAction = null;
         self.selectedQuery = null;
         self.pathQuery = null;
         self.previousAction;
         self.dataTable = null;
+        self.searchPanels=[];
+        self.searchPanels.index=0
 
         var previousAction = "";
         self.init = function (schema) {
-            self.currentPanelIndex = 1;
-            //   toutlesensController.initLabels(searchDialog_NodeLabelInput, true);
+$("#searchNavActionDiv").width(rightPanelWidth-50)
+            $(".searchPanel").each(function(){
+                self.searchPanels.push($(this).attr("id"))
+            })
+
             $("#searchDialog_NodeLabelInput").val("");
             //  $("#searchDialog_NodeLabelInput").attr("size", 8);
             $("#searchDialog_propertySelect").append("<option selected='selected'>" + Schema.getNameProperty() + "</option>");
@@ -19,13 +24,13 @@ var searchMenu = (function () {
                     //  advancedSearch.addClauseUI()
                 }
             })
-
+            self.activatePanel("searchCriteriaDiv");
+            self.currentPanelId="searchCriteriaDiv";
             self.initLabelDivs();
-            $("#searchAccordion").accordion({});
-            var tab = 1
-            if (false && Object.keys(savedQueries).length > 0)
-                tab = 0
-            $("#searchAccordion").accordion("option", "active", tab);
+
+
+
+
 
 
         }
@@ -98,9 +103,11 @@ var searchMenu = (function () {
             var labels = Schema.getAllLabelNames();
             labels.sort();
             var str = "";
+            var parentWidth = $("#advancedSearchNodeLabelsDiv").width() - 10;
+            var parentTop = $("#advancedSearchNodeLabelsDiv").css("top");
             labels.forEach(function (label) {
                 var color = nodeColors[label];
-                str += ' <div class="selectLabelDiv" style="background-color: ' + color + '" onclick="searchMenu.onChangeSourceLabel(\'' + label + '\',this)">' + label + '</div>'
+                str += ' <div class="selectLabelDiv"   style=" background-color: ' + color + '" onclick="searchMenu.onChangeSourceLabel(\'' + label + '\',this)">' + label + '</div>'
             })
             $("#advancedSearchNodeLabelsDiv").html(str).promise().done(function () {
 
@@ -108,27 +115,10 @@ var searchMenu = (function () {
                     event.stopPropagation();
                     // Do something
                 });
-                var parentWidth = $("#advancedSearchNodeLabelsDiv").width() - 10;
-                var x = 10;
-                var y = 10;
-
-                var yOffset;
-
-                $(".selectLabelDiv").each(function (div) {
-
-                    var xOffset = $(this).width();
-                    if (!yOffset)
-                        yOffset = $(this).height() + 10;
-
-                    if ((x + xOffset + 10) > parentWidth) {
-                        x = 10;
-                        y += yOffset
-                    }
-
-                    $(this).css("top", y).css("left", x);
-                    x += xOffset + 10;
-                })
             })
+
+          //  $("#advancedSearchNodeLabelsDiv").css("height",(labels.count*50/2));
+
 
         }
 
@@ -165,64 +155,48 @@ var searchMenu = (function () {
         self.activatePanel = function (id) {
             if (id == "searchCriteriaDiv") {
                 self.resetQueryClauses()
-                searchMenu.currentPanelIndex == 1
             }
             var visibility = "visible";
             self.clearCurrentLabel();
-            $(".searchPanel").each(function (index, value) {
-                if (value.id == id) {
-                    visibility = "visible";
-                    self.currentPanelIndex = index
-                }
-                else
-                    visibility = "hidden";
-                $(this).css('visibility', visibility);
-            });
+            self.searchPanels.currentIndex= self.searchPanels.indexOf(id);
+            $(".searchPanel").hide();
+            $("#"+id).show();
+
+      //  $("#searchNavDiv").toggle().toggle();
         }
+
+
+
         self.previousPanel = function () {
-            $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
             $("#searchDialog_newQueryButton").css('visibility', 'visible');
-            self.currentPanelIndex += -1;
-            if (self.currentPanelIndex == 0) {
-                self.pathQuery = {};
-                previousAction = null
-                self.currentPanelIndex = 1;
-                self.clearCurrentLabel();
-            }
+            self.searchPanels.currentIndex-=1;
 
 
             if (previousAction == 'algorithms') {
                 self.activatePanel("advancedSearchActionDiv");
-
                 return;
 
             }
             if (previousAction == 'path') {
-                self.currentPanelIndex = 1;
+                self.searchPanels.currentIndex=1;
 
             }
-            else if (self.currentPanelIndex == 1) {
+            else if (self.currentPanelId == 1) {
                 self.previousAction = null;
                 self.resetQueryClauses()
-                /*   $("#searchDialog_newQueryButton").css('visibility', 'hidden');
-                   $("#searchDialog_previousPanelButton").css('visibility', 'hidden');
-                   //  $("#searchDialog_ExecuteButton").css('visibility', 'hidden');
-                   $("#searchDialog_NextPanelButton").css('visibility', 'hidden');
-                   $("#searchCriteriaAddButton").css('visibility', 'hidden');*/
 
-                self.resetQueryClauses()
             }
             else {
                 $("#searchDialog_newQueryButton").css('visibility', 'visible');
                 $("#searchDialog_NextPanelButton").css('visibility', 'visible');
             }
-            self.showCurrentPanel();
+            self.activatePanel(self.searchPanels[self.searchPanels.currentIndex])
 
 
         }
 
         self.nextPanel = function () {
-            $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
+
             $("#searchDialog_newQueryButton").css('visibility', 'visible');
             if (self.previousAction == "path") {
                 advancedSearch.searchNodes('matchObject', null, function (err, result) {
@@ -240,32 +214,21 @@ var searchMenu = (function () {
 
             }
             else {
-                if (self.currentPanelIndex == 1) {
+                if (self.searchPanels.currentIndex == 0) {
                     advancedSearch.addClauseUI();
                     $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
                 }
 
-                self.currentPanelIndex += 1;
+                self.searchPanels.currentIndex += 1;
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
 
 
-                self.showCurrentPanel();
+                self.activatePanel(self.searchPanels[self.searchPanels.currentIndex])
+
             }
             $("#searchDialog_previousPanelButton").css('visibility', 'visible');
         }
-        self.showCurrentPanel = function () {
-            var visibility = "visible";
 
-            $(".searchPanel").each(function (index, value) {
-                if (index == self.currentPanelIndex)
-                    visibility = "visible";
-                else
-                    visibility = "hidden";
-                $(this).css('visibility', visibility);
-            });
-
-
-        }
 
 
         self.onPropertyKeyPressed = function (input) {
@@ -401,7 +364,7 @@ var searchMenu = (function () {
                 eventsController.stopEvent = true;
 
 
-                toutlesensController.setRightPanelAppearance(false);
+                toutlesensController.openFindAccordionPanel(false);
 
                 paintAccordion.accordion("option", "active", 1)
 
