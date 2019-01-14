@@ -140,7 +140,7 @@ var paint = (function () {
 
             self.currentBIproperty = property;
 
-            self.addToGraphContext({highlight:{property:_property}})
+            context.addToGraphContext({highlight:{property:_property}})
             function getData() {
                 var data = []
                 if(!searchMenu.currentAction)

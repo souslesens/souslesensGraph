@@ -709,7 +709,7 @@ var toutlesensController = (function () {
                     addToPreviousQuery: true
                 }
 
-                self.addToGraphContext({expandGraph:{sourceLabel:currentLabel,targetLabel:currentLabel}})
+                context.addToGraphContext({expandGraph:{sourceLabel:currentLabel,targetLabel:currentLabel}})
                 var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
                 if (collapseGraph)
                     options.clusterIntermediateNodes = true;
