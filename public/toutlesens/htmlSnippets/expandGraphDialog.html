@@ -14,6 +14,8 @@ self.setSourceLabel=function(label){
 
 self.onOK=function(){
     self.setExpandWhereFilter();
+
+
     toutlesensController.dispatchAction('expandGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())
    self.setSourceLabel($('#expand_labelsSelectTarget').val());
 }

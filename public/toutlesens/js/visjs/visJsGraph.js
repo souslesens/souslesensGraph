@@ -57,7 +57,7 @@ var visjsGraph = (function () {
             self.edges = new vis.DataSet(visjsData.edges);
 
             if (!_options.noHistory && self.nodes.length > 0) {// a graph is allready drawn we put  it into history if not allready imported graph
-                self.graphHistory.push(self.exportGraph());
+                self.graphHistory.push({context:context.getGraphContext(),graph:self.exportGraph(), date: new Date()});
                 self.graphHistory.currentIndex =self.graphHistory.length-1
                 if (self.graphHistory.currentIndex > 0)
                     $("#previousGraphMenuButton").css("visibility", "visible");
@@ -1024,13 +1024,13 @@ var visjsGraph = (function () {
         self.showPreviousGraph = function () {
             if (self.graphHistory.currentIndex > 0)
                 self.graphHistory.currentIndex -= 1;
-            self.importGraph(self.graphHistory[self.graphHistory.currentIndex]);
+            self.importGraph(self.graphHistory[self.graphHistory.currentIndex].graph);
             self.setPreviousNextButtons();
         }
         self.showNextGraph = function () {
             if (self.graphHistory.currentIndex < (self.graphHistory.length - 1))
                 self.graphHistory.currentIndex += 1;
-            self.importGraph(self.graphHistory[self.graphHistory.currentIndex]);
+            self.importGraph(self.graphHistory[self.graphHistory.currentIndex].graph);
             self.setPreviousNextButtons();
         }
 

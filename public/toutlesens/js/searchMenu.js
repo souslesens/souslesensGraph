@@ -7,7 +7,8 @@ var searchMenu = (function () {
         self.previousAction;
         self.dataTable = null;
         self.searchPanels=[];
-        self.searchPanels.index=0
+        self.searchPanels.index=0;
+
 
         var previousAction = "";
         self.init = function (schema) {
@@ -35,6 +36,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
 
         }
 
+
         self.resetQueryClauses = function () {
             $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
             $("#searchNavDiv").css('visibility', 'hidden');
@@ -45,6 +47,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
 
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
+         context.initGraphContext();
             //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
             //
             advancedSearch.clearClauses();
@@ -359,7 +362,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
                 });
             }
             else if (option == 'execute') {
-
+                context.addToGraphContext({graphType:previousAction})
                 toutlesensController.setGraphMessage("Working...")
                 eventsController.stopEvent = true;
 

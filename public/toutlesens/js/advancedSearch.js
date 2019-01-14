@@ -75,6 +75,7 @@ var advancedSearch = (function () {
            clause.title = clauseTextHuman;*/
         clause.title = clauseText.substring(clauseText, clauseText.indexOf(":"))
         self.searchClauses.push(clause);
+        context.addToGraphContext({searchClauses:clause});
         $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' onclick=advancedSearch.clearClause(" + (self.searchClauses.length - 1) + ")>" + clauseText + "</div>")
 
 

@@ -194,7 +194,7 @@ var toutlesensController = (function () {
                     $("#waitImg").css("visibility", "hidden");
                     tabsAnalyzePanel.tabs("enable", 0);
                     self.dispatchAction('nodeInfos');
-                    self.openFindAccordionPanel(false);
+                    self.openFindAccordionPanel(true);
 
                     if (callback) {
                         callback(err, data);
@@ -223,7 +223,7 @@ var toutlesensController = (function () {
                 $("#visJsSearchGraphButton").css("visibility: visible");
                 toutlesensData.prepareRawData(data, addToPreviousQuery, currentDisplayType, function (err, data, labels, relations) {
 
-                    self.openFindAccordionPanel(false);
+                    self.openFindAccordionPanel(true);
 
                     //   paint.init(data);
 
@@ -708,6 +708,8 @@ var toutlesensController = (function () {
                     applyFilters: false,
                     addToPreviousQuery: true
                 }
+
+                self.addToGraphContext({expandGraph:{sourceLabel:currentLabel,targetLabel:currentLabel}})
                 var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
                 if (collapseGraph)
                     options.clusterIntermediateNodes = true;
@@ -1446,18 +1448,7 @@ var toutlesensController = (function () {
             $( "#mainAccordion" ).accordion( "option", "active", 0 );
             else {
                 $( "#mainAccordion" ).accordion( "option", "active", 1 );
-
-             /*   try {
-                    tabsAnalyzePanel.tabs("option", "disabled", []);
-                    tabsAnalyzePanel.tabs("enable", 1);
-                    tabsAnalyzePanel.tabs("enable", 2);
-                }
-                catch (e) {
-
-                }*/
             }
-
-
         }
         self.increaseGraphLimit = function () {
             var increase = prompt("Enter new graph display limit");

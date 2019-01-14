@@ -73,3 +73,4 @@ logs/classifierManager.log
 logs/elastic.log
 logs/classifierManager.log
 *.log
+*.log
