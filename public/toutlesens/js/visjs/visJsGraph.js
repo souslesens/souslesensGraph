@@ -57,8 +57,12 @@ var visjsGraph = (function () {
             self.edges = new vis.DataSet(visjsData.edges);
 
             if (!_options.noHistory && self.nodes.length > 0) {// a graph is allready drawn we put  it into history if not allready imported graph
-                self.graphHistory.push({context:context.getGraphContext(),graph:self.exportGraph(), date: new Date()});
-                self.graphHistory.currentIndex =self.graphHistory.length-1
+                self.graphHistory.push({
+                    context: context.getGraphContext(),
+                    graph: self.exportGraph(),
+                    date: new Date()
+                });
+                self.graphHistory.currentIndex = self.graphHistory.length - 1
                 if (self.graphHistory.currentIndex > 0)
                     $("#previousGraphMenuButton").css("visibility", "visible");
 
@@ -234,6 +238,9 @@ var visjsGraph = (function () {
 
                 $("#graphPopup").css("visibility", "hidden");
                 if (params.edges.length == 0 && params.nodes.length == 0) {
+
+                    if(options.fixed)
+                        return;
                     self.physicsOn = !self.physicsOn;
                     network.setOptions({
                         physics: {enabled: self.physicsOn}
@@ -275,7 +282,7 @@ var visjsGraph = (function () {
                            if(delay<dblClickDuration) {//dbleclick*/
                         currentObject._graphPosition = params.pointer.DOM;
                         if (params.event.srcEvent.ctrlKey) {
-                           // toutlesensController.dispatchAction("expandNode", nodeId)
+                            // toutlesensController.dispatchAction("expandNode", nodeId)
 
                         }
                     }
@@ -834,14 +841,14 @@ var visjsGraph = (function () {
 
 
             nodes.forEach(addConnections);
-            var data={
-                nodes:nodes,
-                edges:self.edges._data
+            var data = {
+                nodes: nodes,
+                edges: self.edges._data
             }
             return data;
-          /*  var edges = self.edges._data;
-            nodes.edges = edges;
-            return nodes;*/
+            /*  var edges = self.edges._data;
+              nodes.edges = edges;
+              return nodes;*/
 
 
             // pretty print node data
@@ -856,9 +863,9 @@ var visjsGraph = (function () {
             for (var key in self.nodes._data) {
                 var node = self.nodes._data[key];
                 if (!labelNeo) {
-                    ids.push(parseInt(""+node.id))
+                    ids.push(parseInt("" + node.id))
                 } else if (node.labelNeo == labelNeo)
-                    ids.push(parseInt(""+node.id))
+                    ids.push(parseInt("" + node.id))
 
 
             }
@@ -935,7 +942,7 @@ var visjsGraph = (function () {
 
 
             function getEdgeData(data) {
-            var edges=[];
+                var edges = [];
                 for (var key in allEdges) {
                     edges.push(allEdges[key]);
                 }
@@ -945,16 +952,18 @@ var visjsGraph = (function () {
 
             var allEdges = inputData.edges;
             var allNodes = inputData.nodes;
-            if(allNodes.nodes)// correction bug graphSchema
-                allNodes=allNodes.nodes;
+            if (allNodes.nodes)// correction bug graphSchema
+                allNodes = allNodes.nodes;
             var data = {
                 nodes: getNodeData(allNodes),
                 edges: getEdgeData(allEdges)
             }
 
-           if(!options)
-           options={smooth:true};
-            options.noHistory=true;
+            if (!options)
+                options = {smooth: true};
+            if (!options.history)
+                options.noHistory = true;
+            options.fixed=true;
 
             self.draw("graphDiv", data, options);
             //  network = new vis.Network(container, data, {});
@@ -1245,10 +1254,10 @@ var visjsGraph = (function () {
             }
         }
 
-        self.exportPng=function(){
-          var canvasElement=this.network.canvas
-            var canvasElement=document.getElementsByTagName("canvas")[0]
-         //   var canvasElement = document.getElementById(id);
+        self.exportPng = function () {
+            var canvasElement = this.network.canvas
+            var canvasElement = document.getElementsByTagName("canvas")[0]
+            //   var canvasElement = document.getElementById(id);
 
             var MIME_TYPE = "image/png";
 

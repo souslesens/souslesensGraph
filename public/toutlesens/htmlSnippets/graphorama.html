@@ -24,18 +24,9 @@
 
         self.init = function () {
 
-            graphorama.loadAllRecordings();
+            graphorama.initGraphoramasTree();
 
 
-        }
-
-
-        self.startRecording = function () {
-            if (self.currentGraphorama.length > 0) {
-                return self.stopRecording();
-            } else
-                self.currentGraphorama = [];
-            $("#graphoramaAccordion").accordion("option", "active", 1);
         }
 
 
@@ -47,8 +38,6 @@
             }
             else {
                 var date = new Date();
-
-
                 self.currentGraphorama = {
                     name: name,
                     data: self.currentGraphorama,
@@ -59,10 +48,8 @@
                 toutlesensData.executeCypher(cypher, function (err, result) {
                     if (err)
                         console.log(err);
-
-
                     var x = result;
-                    debugger
+
                     $('#treeDivGraphorama').jstree(true).create_node("#", {text: name, id: result[0].id});
 
                 })
@@ -74,24 +61,58 @@
 
 
         self.addGraph = function () {
+            var graphoramaId = $('#treeDivGraphorama').jstree(true).get_selected()[0];
+            var parent = $("#treeDivGraphorama").jstree(true).get_parent({id: graphoramaId});
+
+            // on ajoute qu'au graphorama et non à un graphe
+            if (parent != "#")
+                graphoramaId = parent
             var name = prompt("enter graph title")
             if (!name || name == "")
                 return;
             var date = new Date();
-            var graphoramaId=$('#treeDivGraphorama').jstree(true).get_selected()[0];
-            debugger
+
             var graphData = visjsGraph.graphHistory[visjsGraph.graphHistory.currentIndex];
-            graphData = btoa(JSON.stringify(graphData));
-            var cypher="match(m:visjsGraphorama) where ID(m)="+graphoramaId +
-                " MERGE (n:visjsGraph  { subGraph:'users',name:'" + name + "',user:'" + self.user + "',date:'" + date + "',data:'" + graphData + "' }) " +
+            var graphData64 = btoa(JSON.stringify(graphData));
+            var cypher = "match(m:visjsGraphorama) where ID(m)=" + graphoramaId +
+                " MERGE (n:visjsGraph  { subGraph:'users',name:'" + name + "',user:'" + self.user + "',date:'" + date + "',data:'" + graphData64 + "' }) " +
                 "create (n)-[r:inGraphorama]->(m) return ID(n) as id"
 
             console.log(cypher)
             toutlesensData.executeCypher(cypher, function (err, result) {
                 if (err)
                     console.log(err);
-                $('#treeDivGraphorama').jstree(true).create_node(graphoramaId, {text: name, id: result[0].id});
+                $('#treeDivGraphorama').jstree(true).create_node(graphoramaId, {
+                    text: name,
+                    id: result[0].id,
+                    data: graphData
+                });
+                $('#treeDivGraphorama').jstree('open_node', graphoramaId);
 
+            })
+
+        }
+        self.updateGraph = function (id) {
+
+            var date = new Date();
+
+            var graphData = visjsGraph.graphHistory[visjsGraph.graphHistory.currentIndex];
+            var graph = visjsGraph.exportGraph();
+            graphData.graph = graph;
+            var description= $("#graphorama_slideDescriptionTA").val()
+
+            var graphData64 = btoa(JSON.stringify(graphData));
+            var cypher = "match(n:visjsGraph) where ID(n)=" + id +
+                " set n.data='" + graphData64 + "', n.date='" + date + "' , n.description='" + description + "'"
+         //   console.log(cypher)
+            toutlesensData.executeCypher(cypher, function (err, result) {
+                if (err)
+                    return console.log(err);
+              //  var xx= $('#treeDivGraphorama').jstree(true).get_node(id).data
+                $('#treeDivGraphorama').jstree(true).get_node(id).data.dscription=description;
+                $('#treeDivGraphorama').jstree(true).get_node(id).data.data=graphData;
+
+                alert("modification saved")
 
             })
 
@@ -100,8 +121,10 @@
 
         self.deleteGraphorama = function (id) {
             if (confirm("delete Graphorama  and all its slides ")) {
-                toutlesensData.executeCypher("MATCH (n:visjsGraph) where ID(n)=" + id + " delete n", function (err, result) {
-                    debugger
+                toutlesensData.executeCypher("MATCH (n:visjsGraphorama) where ID(n)=" + id + " detach delete n", function (err, result) {
+                    if (err)
+                        return console.log(err)
+
 
                     var ref = $('#treeDivGraphorama').jstree(true),
                         sel = ref.get_selected();
@@ -113,51 +136,91 @@
                 })
             }
         }
-        self.deleteSlide = function (parentId, id) {
+        self.deleteSlide = function (id) {
+            if (confirm("delete Graph ")) {
+                toutlesensData.executeCypher("MATCH (n:visjsGraph) where ID(n)=" + id + " detach delete n", function (err, result) {
+                    if (err)
+                        return console.log(err)
 
+
+                    var ref = $('#treeDivGraphorama').jstree(true),
+                        sel = ref.get_selected();
+                    if (!sel.length) {
+                        return false;
+                    }
+                    ref.delete_node(sel);
+
+                })
+            }
         }
 
 
-        self.loadAllRecordings = function () {
-            if (self.storageMode == "local") {
-                var keys = localStorage.getItem(localStorageKeys);
-                keys = JSON.parse(keys);
-                common.fillSelectOptionsWithStringArray(graphorama_recordSelect, keys)
-            }
-            else if (self.storageMode == "neo4j") {
-                toutlesensData.executeCypher("MATCH (n:visjsGraph) where n.subGraph='users' and n.user='" + self.user + "' return  n", function (err, result) {
-                    // common.fillSelectOptions(graphorama_recordSelect, result, "name", "name")
-                    treeData = []
-                    result.forEach(function (line) {
-                        treeData.push({text: line.n.properties.name, id: line.n._id, children: []})
-                    })
+        self.initGraphoramasTree = function () {
 
-                    var plugins = [];
-                    plugins.push("sort");
-                    plugins.push("types");
-                    plugins.push("contextmenu");
-                    plugins.push("dnd");
-
-
-                    $('#treeDivGraphorama').jstree({
-                        'core': {
-                            'check_callback': true,
-                            'data': treeData,
-
-
-                        }
-                        , 'contextmenu': {
-                            'items': graphorama.treeMenu
-                        },
-                        'plugins': plugins,
-                    }).on("select_node.jstree",
-                        function (evt, obj) {
-                            graphorama.onNodeSelect(obj.node);
-                        })
-
+            toutlesensData.executeCypher("MATCH (n:visjsGraphorama) where n.subGraph='users' and n.user='" + self.user + "' return  n", function (err, result) {
+                treeData = []
+                result.forEach(function (line) {
+                    treeData.push({text: line.n.properties.name, id: line.n._id, children: []})
                 })
 
-            }
+                var plugins = [];
+                plugins.push("sort");
+                plugins.push("types");
+                plugins.push("contextmenu");
+                plugins.push("dnd");
+
+
+                $('#treeDivGraphorama').jstree({
+                    'core': {
+                        'check_callback': true,
+                        'data': treeData,
+
+
+                    }
+                    , 'contextmenu': {
+                        'items': graphorama.treeMenu
+                    },
+                    'plugins': plugins,
+                }).on("select_node.jstree",
+                    function (evt, obj) {
+                        graphorama.onNodeSelect(obj.node);
+                    })
+
+            })
+
+        }
+        self.loadGraphorama = function (id) {
+            $("#toTextMenuButton").css("visibility","visible");
+            toutlesensData.executeCypher("MATCH (n:visjsGraphorama)-[r]-(m:visjsGraph) where ID(n)=" + id + " return m", function (err, result) {
+                if (err)
+                    return console.log(err);
+
+                result.forEach(function (line) {
+                        try {
+                            var graph = (line.m.properties)
+                            graph.data = JSON.parse(atob(graph.data))//base64 to str
+                            var childNode = {
+                                parent: id,
+                                text: graph.name,
+                                description: graph.description,
+                                id: line.m._id,
+                                data: graph.data,
+                                children: []
+                            }
+                            var position = 'last';
+                            var parent = $('#treeDivGraphorama').jstree('get_selected');
+
+                            $('#treeDivGraphorama').jstree('create_node', id, childNode, 'last', function (www) {
+                                $('#treeDivGraphorama').jstree('open_node', parent);
+                            });
+                        }
+
+                        catch (e) {
+                            console.log(e);
+                        }
+                    }
+                )
+            })
 
         }
 
@@ -180,89 +243,79 @@
                         self.deleteGraphorama(menuItemData.id)
 
                     } else {//slide
-                        self.deleteSlide(menuItemData.parentId, menuItemData.id)
+                        self.deleteSlide(menuItemData.id)
                     }
 
                 })
 
             };
+
+            if (menuItemData.parentId == "#") {//graphorama
+            }//slide
+            else {
+                items ["save"] = {
+                    label: "save",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+                        self.updateGraph(menuItemData.id);
+                    })
+                }
+            }
             return items;
 
         }
         self.onNodeSelect = function (obj) {
             if (obj.parent == "#") { // graphorama
                 if (obj.children.length == 0) {
-                    graphorama.loadGraphorama(obj.id, function (err, children) {
-                        if (err)
-                            return console.log(err);
-                        var position = 'last';
-                        var parent = $('#treeDivGraphorama').jstree('get_selected');
-                        children.forEach(function (child) {
-                                var childNode = {
-                                    parent: obj.id,
-                                    text: child.title,
-                                    id: child.title,
-                                    data: child.data,
-                                    children: []
-                                }
-                                $('#treeDivGraphorama').jstree('create_node', obj.id, childNode, 'last', function (www) {
-                                    $('#treeDivGraphorama').jstree('open_node', parent);
-                                });
-                            }
-                        )
-                    })
+                    self.loadGraphorama(obj.id);
                 }
             }
             else {//slide
-                var data = obj.data;
-                self.playSlide(data);
+             //   var data = obj.data;
+                self.playSlide(obj.id);
             }
 
         }
 
-        self.loadGraphorama = function (graphoramaId, callback) {
 
-            if (self.storageMode == "neo4j") {
-                toutlesensData.executeCypher("MATCH (n:visjsGraph) where ID(n)=" + graphoramaId + " return n", function (err, result) {
-                    if (err)
-                        return callback(err)
-                    var graphorama = (result[0].n.properties)
-                    graphorama.data = JSON.parse(atob(graphorama.data))//base64 to str
-                    self.currentGraphorama = graphorama;
-                    return callback(null, self.currentGraphorama.data)
+        self.playSlide = function (slideId) {
 
-                })
+            var cypher="MATCH (n:visjsGraph) where ID(n)=" + slideId + " return n"
+            console.log()
+            toutlesensData.executeCypher(cypher, function (err, result) {
+                if (err)
+                    return console.log(err);
+                try {
+                    var slide = (result[0].n.properties)
+                    slide.data = JSON.parse(atob(slide.data))//base64 to str
 
-            }
+                    //  var index = $("#graphorama_slidesSelect").prop('selectedIndex')
+                    visjsGraph.importGraph(slide.data.graph, {history: true})
 
-        }
-        self.playSlide = function (slide) {
+                    var context = slide.data.context;
+                    var description = slide.description;
+                    var html = "<ul>";
 
-            //  var index = $("#graphorama_slidesSelect").prop('selectedIndex')
-            visjsGraph.importGraph(slide.graph)
-
-            var context = slide.context;
-            var html = "<ul>";
-
-            for (var key in context) {
-                html += "<li>" + key + ":"
-                context[key].forEach(function (value, index) {
-                    if (index > 0)
-                        html += ",";
-                    html += value;
-                })
-                html += "</li>"
+                    for (var key in context) {
+                        html += "<li>" + key + ":"
+                        context[key].forEach(function (value, index) {
+                            if (index > 0)
+                                html += ",";
+                            html += value;
+                        })
+                        html += "</li>"
 
 
-            }
-            $("#graphorama_slideContentDiv").html(html)
-            if (slide.comment)
-                $("#graphorama_slideCommentTA").html(slide.comment)
+                    }
+                    $("#graphorama_slideContentDiv").html(html)
+                    if (slide.description)
+                        $("#graphorama_slideDescriptionTA").val(description)
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            })
 
-        }
-
-
-        self.updateSlide = function () {
 
         }
 
@@ -274,41 +327,19 @@
 
 </script>
 
-<button onclick="graphorama.createGraphorama()"> new Graphorama</button>
+
 <button onclick="graphorama.addGraph()"> add current Graph</button>
-<div id="treeDivGraphorama" style="width:400px;height: 400px;overflow: auto"></div>
+<button onclick="graphorama.createGraphorama()"> new Graphorama</button>
 
-
-comment <textarea id="graphorama_graphoramaCommentTA" cols="50" rows="5">
-    </textarea>
+<div id="treeDivGraphorama" style="width:400px;height: 250px;overflow: auto"></div>
 
 
 context
 <div id="graphorama_slideContentDiv"></div>
-comment
-<textarea id="graphorama_slideCommentTA" cols="50" rows="5">
+description
+<textarea id="graphorama_slideDescriptionTA" cols="50" rows="5">
 
 </textarea>
-<button onclick="self.updateSlide()">update Slide</button>
-</textarea>
-<button onclick="self.deleteSlide()">Delete Slide</button>
-
-<div id="graphorama_currentGraphoramasDiv">
-    <table>
-        <tr>
-            <td>
-                <button onclick="graphorama.addGraph()">add Graph</button>
-            </td>
-            <td>
-                <button onclick="graphorama.stopRecording()">stopRecording</button>
-            </td>
 
 
-        </tr>
-    </table>
-
-
-    <br>
-
-</div>
 
