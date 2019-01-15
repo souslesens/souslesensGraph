@@ -14,7 +14,7 @@
     <script>
 
         $(function () {
-            $("#graphSelectionButton").prop("disabled", "disabled");
+            $("#graphSelectionButton").css("display","none")
             $("#treeDivKeolis").width(rightPanelWidth - 40).height(totalHeight - 150).css("visibility", "visible")
         })
         var keolis = (function () {
@@ -27,7 +27,7 @@
             self.currentNode;
             self.initiated=false;
             self.loadJon = function (_type) {
-                $("#graphSelectionButton").prop("disabled", "disabled")
+                $("#graphSelectionButton").css("display","none")
                 type = _type
                 //   $("#treeDivKeolis").html("");
                 var file
@@ -168,6 +168,7 @@
 
 
             self.onNodeSelect = function (obj) {
+
                 if (obj.children.length == 0)
                     self.addChildrenNodes(obj);
             }
@@ -180,7 +181,7 @@
                 menuItemData.parentId = node.parent;
                 menuItemData.parents = node.parents;
                 self.currentNode = node;
-                $("#graphSelectionButton").removeAttr("disabled");
+                $("#graphSelectionButton").css("display","block")
                 items ["selectNode"] = {
                     label: "selectNode",
                     data: menuItemData,
@@ -195,8 +196,26 @@
                     label: "selectNodeAndChildren",
                     data: menuItemData,
                     action: (function (menuItem) {
+                        $(".jstree-anchor").css("color", "black");
+                        keolis.selection = [];
+                        $("#graphSelectionButton").css("display","block")
                         self.currentNode += " and children"
                         keolis.selection.push(node.id)
+                        $("#" + node.id + "_anchor").css("color", "red");
+                        node.children.forEach(function (child) {
+                            keolis.selection.push(child)
+                            $("#" + child + "_anchor").css("color", "red");
+                        })
+                    })
+
+                }
+                items ["addNodeAndChildrenToSelection"] = {
+                    label: "addNodeAndChildrenToSelection",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+                        self.currentNode += " and children"
+                        keolis.selection.push(node.id)
+                        $("#graphSelectionButton").css("display","block")
                         $("#" + node.id + "_anchor").css("color", "red");
                         node.children.forEach(function (child) {
                             keolis.selection.push(child)
@@ -211,19 +230,19 @@
                     action: (function (menuItem) {
                         $(".jstree-anchor").css("color", "black");
                         keolis.selection = [];
-                        $("#graphSelectionButton").prop("disabled", "disabled");
+                        $("#graphSelectionButton").css("display","none")
                     })
 
                 }
 
-                  items ["useSelection"] = {
+               /*   items ["useSelection"] = {
                    label: "use selection...",
                    data: menuItemData,
                    action: (function (menuItem) {
                        self.graphSelection();
                    })
 
-               }
+               }*/
 
 
                 return items;
@@ -273,7 +292,7 @@
             self.clearSelection=function(){
                 $(".jstree-anchor").css("color", "black");
                 keolis.selection = [];
-                $("#graphSelectionButton").prop("disabled", "disabled");
+                $("#graphSelectionButton").css("display","block")
             }
 
 
@@ -285,8 +304,8 @@
 <body>
 <button onclick="  keolis.loadJon('tags')">tags</button>
 <button onclick="  keolis.loadJon('categories')">categories</button>
-<button onclick="  keolis.clearSelection()">clear selection</button>
-<!--<button onclick="keolis.graphSelection()" id="graphSelectionButton" disabled>graphSelection</button>-->
+<!--<button onclick="  keolis.clearSelection()">clear selection</button>-->
+<button onclick="keolis.graphSelection()" id="graphSelectionButton" display="none">Use selection</button>
 
 <br>
 <div id="treeDivKeolis" style="width:400px;height: 800px;overflow: auto"></div>

@@ -137,8 +137,8 @@ var toutlesensController = (function () {
                   tabsAnalyzePanel.tabs("enable", 1);
                   tabsAnalyzePanel.tabs("enable", 2);*/
 
-                tabsAnalyzePanel
-                tabsAnalyzePanel.tabs("option", "disabled", []);
+
+               // tabsAnalyzePanel.tabs("option", "disabled", []);
                 tabsAnalyzePanel.tabs("enable", 1);
                 tabsAnalyzePanel.tabs("enable", 2);
                 // $("#tabs-analyzePanel").tabs("enable", 1);
@@ -223,7 +223,7 @@ var toutlesensController = (function () {
                 $("#visJsSearchGraphButton").css("visibility: visible");
                 toutlesensData.prepareRawData(data, addToPreviousQuery, currentDisplayType, function (err, data, labels, relations) {
 
-                    self.openFindAccordionPanel(true);
+                    self.openFindAccordionPanel(false);
 
                     //   paint.init(data);
 
@@ -1132,6 +1132,7 @@ var toutlesensController = (function () {
             $("#nodeDetailsDiv").html('<img id="largeImage" src="' + url + '" border="0" height="real_height" width="real_width" onload="resizeImg(this, null, ' + w + ');">')
 
         }
+
         self.restorePopupMenuNodeInfo = function () {
             $("#nodeInfoMenuDiv").html(popupMenuNodeInfoCache);
         }
@@ -1183,8 +1184,8 @@ var toutlesensController = (function () {
 
             //  paramsController.loadParams();
             var tabsanalyzePanelDisabledOptions = [];
-            tabsanalyzePanelDisabledOptions.push(1);//filters
-            tabsanalyzePanelDisabledOptions.push(2);//highlight
+          //  tabsanalyzePanelDisabledOptions.push(1);//filters
+          //  tabsanalyzePanelDisabledOptions.push(2);//highlight
             var tabsFindPanelDisabledOptions = [];
             // tabsFindPanelDisabledOptions.push(3)
 
@@ -1215,7 +1216,7 @@ var toutlesensController = (function () {
 
             }
             else {
-                tabsanalyzePanelDisabledOptions.push(3);
+                //tabsanalyzePanelDisabledOptions.push(3);
                 $("#infosHeaderDiv").css("visibility", "hidden");
                 treeController.userRole = "read"
                 cards.userRole = "read";

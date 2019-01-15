@@ -295,12 +295,14 @@
                     var context = slide.data.context;
                     var description = slide.description;
                     var html = "<ul>";
-
+debugger
                     for (var key in context) {
                         html += "<li>" + key + ":"
                         context[key].forEach(function (value, index) {
                             if (index > 0)
                                 html += ",";
+                            if( Array.isArray(value))
+                                value=value.toString()
                             html += value;
                         })
                         html += "</li>"

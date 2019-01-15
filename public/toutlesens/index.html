@@ -338,6 +338,9 @@
                 subGraph = Gparams.defaultSubGraph;
             functionalities.hideFunctionalities();
             lang.setLangage();
+            $("#analyzePanel").load("htmlSnippets/analyze.html", function () {
+
+            })
             eventsController.initInputEvents();
             eventsController.initcomponentEvents()
             savedQueries.loadQueryRuns();
@@ -678,44 +681,12 @@
 
                 </div>-->
         </div>
-        <div id="expandDiv"></div>
+
     </div>
 
-    <h3><b>Analyze</b></h3>
+  <h3><b>Analyze</b></h3>
     <div id="analyzePanel" class="mainAccordionPanel">
-        <div id="tabs-analyzePanel">
 
-            <ul>
-                <li><a href="#infosDiv"><span>Infos  </span></a></li>
-                <li><a href="#filterDiv"><span>Filter </span></a></li>
-              <!--  <li><a href="#expandDiv"><span>Expand </span></a></li>-->
-                <li><a href="#highlightDiv"><span>Highlight </span></a></li>
-                <!--  <li><a href="#graphOptionsDiv"><span >Graph </span></a></li>-->
-                <li><a href="#similarsDiv"><span>Similars </span></a></li>
-
-
-            </ul>
-            <div id="infosDiv">
-                <div id="nodeInfoMenuDiv"></div>
-            </div>
-            <div id="filterDiv">
-
-            </div>
-          <!--  <div id="expandDiv">
-
-            </div>-->
-
-            <div id="highlightDiv">
-
-            </div>
-
-            <!--   <div id="graphOptionsDiv">
-
-               </div>-->
-            <div id="similarsDiv">
-
-            </div>
-        </div>
 
     </div>
     <h3><b>Graphoramas</b></h3>
