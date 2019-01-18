@@ -552,9 +552,25 @@ var visjsGraph = (function () {
 
             });
         }
+    self.setNodesColor = function (nodeIds,color) {
+            var newNodes=[];
+            var nodeColor;
+        for (var key in  self.nodes._data) {
+            var node=self.nodes._data[key]
+            if(nodeIds.indexOf(key)>-1)
+                nodeColor=color;
+            else
+                nodeColor=node.initialColor;
+            newNodes.push({id:key,background: nodeColor});
+
+            }
+        self.nodes.update(newNodes);
 
 
-        self.paintNodes = function (nodeIds, color, otherNodesColor, radius, shape) {
+    }
+
+
+        self.paintNodes= function (nodeIds, color, otherNodesColor, radius, shape) {
             var nodes = [];
             if (!shape)
                 shape = "star";

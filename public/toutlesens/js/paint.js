@@ -390,7 +390,7 @@ var paint = (function () {
             var shapes = ["dot", "diamond", "triangle", "trangleDown", "square", "star"];
             var shapeIndex = 0;
             for (var i = 0; i < ticksColors.length; i++) {
-                var onClick = " onclick='paint.onLegendItemClick(\"" + ticksColors[i].tick + "\")'";
+                var onClick = " onclick='paint.onLegendItemClick(\"" + btoa(ticksColors[i].tick) + "\")'";
 
                 str += "<tr" + onClick + "><td><span  class='BIlegendSpan' id='BIlegendSpan_" + ticksColors[i].tick + "' style='background-color: " + ticksColors[i].color + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td>" + ticksColors[i].tick + "</td></tr>"
 
@@ -628,7 +628,7 @@ var paint = (function () {
             return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
         }
         self.onLegendItemClick = function (value) {
-
+value=atob(value)
             var selectedNodes = [];
             var nodes = visjsGraph.nodes.get();
             for (var i = 0; i < nodes.length; i++) {

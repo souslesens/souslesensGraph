@@ -17,7 +17,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
                 self.searchPanels.push($(this).attr("id"))
             })
 
-            $("#searchDialog_NodeLabelInput").val("");
+            context.querySourceLabel=""
             //  $("#searchDialog_NodeLabelInput").attr("size", 8);
             $("#searchDialog_propertySelect").append("<option selected='selected'>" + Schema.getNameProperty() + "</option>");
             $("#searchDialog_valueInput").keypress(function (event) {
@@ -35,7 +35,6 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
 
 
         }
-
 
         self.resetQueryClauses = function () {
             $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
@@ -67,7 +66,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
     }
 
 
-            $("#searchDialog_NodeLabelInput").val(value);
+            context.querySourceLabel=value;
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
@@ -143,6 +142,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             })
             var options = {targetNodesLabels: tagetLabels};
             self.setTargetWhereFilter();
+
             advancedSearch.searchNodes('matchStr', options, advancedSearch.graphNodesAndDirectRelations);
         }
 
@@ -218,6 +218,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             }
             else {
                 if (self.searchPanels.currentIndex == 0) {
+                    if(advancedSearch.searchClauses.length==0)
                     advancedSearch.addClauseUI();
                     $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
                 }
@@ -268,7 +269,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
 
            else if (option == "graphSomeNeighboursListLabels") {
                 self.nextPanel();
-                var currentLabel = $("#searchDialog_NodeLabelInput").val();
+                var currentLabel = context.querySourceLabel;
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
@@ -277,7 +278,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             else if (option == "treeMapSomeNeighboursListLabels") {
                 self.nextPanel();
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
-                var currentLabel = $("#searchDialog_NodeLabelInput").val();
+                var currentLabel = context.querySourceLabel;
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 

@@ -2,6 +2,9 @@ var context=(function(){
 
     var self={};
     var graphContext;
+    self.querySourceLabel="";
+
+
     self.initGraphContext=function(){
         graphContext={
             searchClauses :[],

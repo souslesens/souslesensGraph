@@ -1,6 +1,8 @@
 var algorithms = (function () {
     var self = {};
     self.currentAlgorithm;
+    var sharedTargets = {};
+    var sourceLabel;
     self.algorithms = {
         "relationsRanking": {},
 
@@ -30,8 +32,9 @@ var algorithms = (function () {
                 var labels = [];
                 var similarityScale = d3.scale.linear().domain([similarityCutoff, 1]).range([1, 10]);
                 var cntLimits = {min: 100000, max: 0}
-                var sharedTargets = {};
+
                 result.forEach(function (line, index0) {
+                    line.sharedTargets = line.sharedTargets.sort();
                     var sharedTargetsStr = line.sharedTargets.toString();
                     if (!sharedTargets[sharedTargetsStr]) {
                         sharedTargets[sharedTargetsStr] = [];
@@ -52,6 +55,7 @@ var algorithms = (function () {
                 var cntScale = d3.scale.linear().domain([cntLimits.min, cntLimits.max]).range([10, 40]);
                 for (var key in sharedTargets) {
                     var sharedId = "similar_" + (i++);
+
                     var targetNodeObj = {
                         labelNeo: "sharedSimilarity",// because visjs where label is the node name
                         background: "#d11",
@@ -97,10 +101,24 @@ var algorithms = (function () {
                             var nodeId = params.nodes[0];
                             var obj = visjsGraph.nodes._data[nodeId];
                             var point = params.pointer.DOM;
-                            $("#graphPopup").html(obj.neoAttrs.name)
-                            $("#graphPopup").css("visibility", "visible").css("top", point.y).css("left", point.x);
+                            var html = obj.neoAttrs.name;
+                            visjsGraph.setNodesColor([nodeId], "green");
+                            if (nodeId.indexOf("similar_") == 0) {// targetSimilar
+                                html += "<br> <a href='javascript:algorithms.useSelection(\"similars\",\"" + targetLabel + "\",\"" + obj.neoAttrs.name + "\");'> use similars selection...</a>";
+                                html += "<br> <a href='javascript:algorithms.useSelection(\"cluster\",\"" + targetLabel + "\",\"" + nodeId + "\");'> use clustered nodes selection...</a>";
+                                $("#graphPopup").html(html)
+                                $("#graphPopup").css("visibility", "visible").css("top", point.y).css("left", point.x);
+                            }
+                            else {
+                                currentObject.id = nodeId
+                                toutlesensController.dispatchAction("onNodeClick", nodeId);
+                                toutlesensController.showPopupMenu(point.x, point.y, "nodeInfo");
+                            }
 
 
+                        }
+                        else {
+                            $("#graphPopup").css("visibility", "hidden")
                         }
                     }
                 }
@@ -212,6 +230,73 @@ var algorithms = (function () {
         }
     }
 
+    self.useSelection = function (type, label, key) {
+
+
+        var coeff = 0.5;
+        var limit = 100;
+        var cypher = "";
+
+
+
+        function useSelection(ids){
+            toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
+                var where = result;
+
+                var clauseText = "[" + label + "] " + key;
+                advancedSearch.currentQueryNodeIds = ids;
+                var clause = {
+                    foundIds: ids.length,
+                    nodeLabel: sourceLabel,
+                    where: where,
+
+
+                }
+                searchMenu.onChangeSourceLabel(sourceLabel, "")
+                advancedSearch.clearClauses();
+                advancedSearch.addClause(clause, clauseText);
+
+
+                searchMenu.activatePanel("searchActionDiv");
+                toutlesensController.openFindAccordionPanel(true)
+                findTabs.tabs("option", "active", 0);
+            })
+        }
+
+
+
+
+
+        if (type == "similars") {// tous les noeuds source ayant le plus de noeud target en commun
+            var xx = key;
+            var targetKeysStr = "[\"" + key.replace(/,/g, "\",\"") + "\"]";
+
+
+            cypher = "WITH " + targetKeysStr + " as names\n" +
+                "MATCH (p:" + label + ")-[]-(m:" + sourceLabel + ")\n" +
+                "WHERE p.name in names\n" +
+                "WITH m, size(names) as inputCnt, count(DISTINCT p) as cnt\n" +
+                "WHERE cnt > inputCnt*" + coeff + "\n" +
+                " RETURN collect(id(m)) as ids, cnt order by cnt desc  limit " + limit
+
+            console.log(cypher);
+            toutlesensData.executeCypher(cypher, function (err, result) {
+                if (err)
+                    return console.log(err);
+                var ids = result[0].ids
+                useSelection(ids)
+
+            })
+        }
+        else if (type == "cluster") {// uniquement les noeuds du cluster
+
+            var clusteredNodes = visjsGraph.getConnectedNodes(key)
+                useSelection(clusteredNodes)
+        }
+
+
+    }
+
 
     self.initDialog = function (label) {
         $('.algorithmParam0').hide();
@@ -244,13 +329,16 @@ var algorithms = (function () {
         var algorithm = $("#searchDialog_algorithmSelect").val();
         self.currentAlgorithm = algorithm;
 
+        var query = advancedSearch.matchStrToObject(queryStr)
+        sourceLabel = query.nodeLabel;
+        var targetLabel = $("#searchDialog_AlgorithmsTargetLabelSelect").val();
 
         if (algorithm == "relationsRanking") {
-            var query = advancedSearch.matchStrToObject(queryStr)
-            var sourceLabel = query.nodeLabel;
-            var targetLabel = $("#searchDialog_AlgorithmsTargetLabelSelect").val();
             var limit = $("#searchDialog_AlgorithmsResultSize").val();
-            var cypher = "Match (n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ") return n, count (r) as cnt order by cnt desc limit " + limit;
+            var where=toutlesensData.whereFilter;
+            if(where && where!="")
+                where=" where "+where+ " ";
+            var cypher = "Match (n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ") "+where+" return n, count (r) as cnt order by cnt desc limit " + limit;
             toutlesensData.executeCypher(cypher, function (err, result) {
                     if (err)
                         console.log(err);
@@ -284,9 +372,6 @@ var algorithms = (function () {
         }
 
 
-        var query = advancedSearch.matchStrToObject(queryStr)
-        var sourceLabel = query.nodeLabel;
-        var targetLabel = $("#searchDialog_AlgorithmsTargetLabelSelect").val();
         var minCountTargetNode = $("#searchDialog_AlgorithmsMinCountTargetNodes").val();
         var resultSize = $("#searchDialog_AlgorithmsResultSize").val();
         var similarityCutoff = $("#searchDialog_AlgorithmsSimilarityCutoff").val();

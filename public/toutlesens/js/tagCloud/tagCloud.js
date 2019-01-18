@@ -24,7 +24,7 @@ var tagCloud = (function () {
 
 
     self.onTagClick = function (text) {
-        var label = $("#searchDialog_NodeLabelInput").val();
+        var label =context.querySourceLabel;
         var clauses = [{
             nodeLabel: "",
             where: "n.name=~'(?i).*" + text + ".*'"

@@ -466,6 +466,7 @@ var toutlesensData = (function () {
             toutlesensData.whereFilter = query;
             if (callback)
                 callback(null, query);
+            return query;
 
         }
 

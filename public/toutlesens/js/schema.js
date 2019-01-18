@@ -53,49 +53,24 @@ var Schema = (function () {
          * load schema from config/schemas dir
          * if no schema call schema configDialog
          */
-
         self.load = function (_subGraph, callback) {
             var subGraph = _subGraph;
-            if (!_subGraph)
-                subGraph = subGraph = queryParams.subGraph;
-            if (!subGraph) {
-                subGraph = Gparams.defaultSubGraph;
-            }
-            self.schema = {
-                labels: {},
-                relations: {},
-                properties: {},
-                mongoCollectionMapping: {},
-                fieldsSelectValues: {},
-                Gparams: {}
-            }
-            self.subGraph = subGraph;
-            var payload = {
-                retrieve: 1,
-                path: serverDir + subGraph + ".json",
-
-            }
-            $.ajax(self.serverRootUrl + '/jsonFileStorage', {
-                data: payload,
-                dataType: "json",
-                type: 'POST',
-
-
-                error: function (error, ajaxOptions, thrownError) {
-                    // if schema does not exist we create one by analyzing Neo4j db content
+            toutlesensData.executeCypher("MATCH (n:schema) where n.name='" + subGraph + "' return n", function (err, result) {
+                if (err || result.length == 0) {
                     console.log("no schema found, will create one");
                     self.createSchema();
 
-                    setTimeout(function () {
+                  /*  setTimeout(function () {
                         toutlesensController.dispatchAction('showSchemaConfigDialog');//({create:1});
-                    }, 2000)
-
-
-                },
-                success: function (_schema) {
-                    //if schema has been found and loaded
-                    self.initSchema(_schema, callback);
+                    }, 2000)*/
                 }
+                else {
+                    var schema = result[0].n.properties.data;
+                    schema = JSON.parse(atob(schema))
+                    self.initSchema(schema, callback);
+                }
+
+
             })
         }
 
@@ -107,6 +82,14 @@ var Schema = (function () {
 
 
         self.createSchema = function (callback) {
+            $("#dialog").html("this schema is regenerating : this can last more than one minute...<br> <img id=\"waitImg\" src=\"images/waitAnimated.gif\" width=\"40px\" \>")
+            dialog.dialog({title: ""});
+            dialog.dialog("open");
+
+
+
+                // location.reload()
+
             self.generateNeoImplicitSchema(subGraph, true, function (err, _schema) {
                 if (err) {
                     console.log(err)
@@ -120,71 +103,68 @@ var Schema = (function () {
 
 
                     self.initSchema(_schema);
-                    // self.save(subGraph);
+                    $("#dialog").html("new schema is ready : reload page to use it")
+                    dialog.dialog("close");
+
                     if (callback)
                         return callback(null, self.schema)
 
                 }
             })
         }
-        self.delete = function (confirmation) {
+
+
+        self.delete = function (confirmation, callback) {
             if (confirmation && confirm("delete  this schema ?")) {
-                var payload = {
-                    delete: 1,
-                    path: serverDir + subGraph + ".json",
-
-                }
-                $.ajax(self.serverRootUrl + '/jsonFileStorage', {
-                    data: payload,
-                    dataType: "json",
-                    type: 'POST',
-
-
-                    error: function (error, ajaxOptions, thrownError) {
-                        return console.log("error while deleting file :" + error);
-
-                    },
-                    success: function (result) {
-                        return console.log("file" + serverDir + subGraph + ".json  : DELETED");
-
-
+                toutlesensData.executeCypher("MATCH (n:schema) where n.name='" + subGraph + "' delete n", function (err, result) {
+                    if (callback)
+                        return callback(err, result)
+                    if (err) {
+                        return console.log(err);
                     }
+
+                    return console.log(subgraph + " schema deleted");
+
                 })
+
+                /*   var payload = {
+                       delete: 1,
+                       path: serverDir + subGraph + ".json",
+
+                   }
+                   $.ajax(self.serverRootUrl + '/jsonFileStorage', {
+                       data: payload,
+                       dataType: "json",
+                       type: 'POST',
+
+
+                       error: function (error, ajaxOptions, thrownError) {
+                           return console.log("error while deleting file :" + error);
+
+                       },
+                       success: function (result) {
+                           return console.log("file" + serverDir + subGraph + ".json  : DELETED");
+
+
+                       }
+                   })*/
             }
 
         }
 
         self.resetSchema = function () {
-            if (confirm("delete  this schema and recreate one from graph database ?")) {
+            var confirmMessage = "delete  this schema and recreate one from graph database ?";
+            self.delete(confirmMessage, function (err, result) {
+                if (err)
+                    return console.log(err);
 
-                var payload = {
-                    delete: 1,
-                    path: serverDir + subGraph + ".json",
-
-                }
-                $.ajax(self.serverRootUrl + '/jsonFileStorage', {
-                    data: payload,
-                    dataType: "json",
-                    type: 'POST',
+                self.createSchema() ;
 
 
-                    error: function (error, ajaxOptions, thrownError) {
 
-                        return console.log("error while deleting file :" + error);
-
-                    },
-                    success: function (result) {
-
-                        self.load(subGraph, function (err, result) {
-                            location.reload()
-                        })
+            })
 
 
-                    }
-
-
-                })
-            }
         }
 
 
@@ -283,6 +263,43 @@ var Schema = (function () {
         }
 
         self.save = function (subGraph, json, callback) {
+            if (!json)
+                json = self.schema;
+
+            //name  used in UI but not stored
+            for (var key in self.schema.relations) {
+                delete self.schema.relations[key].name
+            }
+
+            for (var key in self.schema.labels) {
+                if (!self.schema.properties[key])
+                    self.schema.properties[key] = {};
+                if (!self.schema.properties[key][self.schema.defaultNodeNameProperty])
+                    self.schema.properties[key][self.schema.defaultNodeNameProperty] = {
+                        "type": "text"
+                    }
+
+            }
+            var schemaData = btoa(JSON.stringify(json));
+var cypher="CREATE (n:schema{name:'" + subGraph + "',data:'" + schemaData + "'}) return  n.name"
+            console.log(cypher);
+            toutlesensData.executeCypher(cypher, function (err, result) {
+
+                if (err) {
+                    if (callback)
+                        return callback(err)
+                    return console.log(err)
+                }
+
+                self.schema = json;
+                if( callback) {
+                    return callback(null, json);
+                }
+            })
+        }
+
+
+        self.save_file = function (subGraph, json, callback) {
             if (!json)
                 json = self.schema;
 
