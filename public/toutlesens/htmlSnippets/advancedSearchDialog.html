@@ -1,8 +1,56 @@
+
+<!--https://css-tricks.com/snippets/css/a-guide-to-flexbox-->
 <style>
 
     .rightPanel {
+        display:flex;
+        flex-wrap: wrap;
+        justify-content: center;
         width: 350px;
     }
+
+    .complexQueries {
+        display:flex;
+        flex-wrap: wrap;
+        justify-content: left;
+        background-color: #7f9f7f;
+        margin-top: 200px;
+
+    }
+    .complexQueries-nodeDiv {
+        display:flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        background-color: #a9b7d1;
+        border-style: solid;
+        border-width: 2px;
+        border-radius: 5px;
+        padding: 5px;
+        margin: 5px;
+
+    }
+
+    .complexQueries-nodeInResultDiv {
+
+        background-color: #f8893f;
+    }
+    .complexQueries-partDiv {
+        width: 150px;
+        background-color: #a9b7d1;
+        border-style: solid;
+        border-width: 1px;
+        border-radius: 5px;
+
+        padding: 5px;
+        margin: 5px;
+        display:flex;
+        justify-content: center;
+
+
+    }
+
 
     .searchPanel {
 
@@ -99,7 +147,7 @@
     }
 </style>
 
-<div >
+<div  style="display:flex;justify-content: center">
     <div id="searchCriteriaDiv" style="overflow: hidden;display:table;align-content: center"
          class="searchPanel rightPanel">
 
@@ -124,11 +172,12 @@
                         <input id="searchDialog_valueInput" size="10"
                                onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_NextPanelButton').css('visibility', 'visible');">
 
-                        <select id="searchDialog_booleanOperator" onchange="advancedSearch.addClauseUI($(this).val())">
+                        <select  size="6"  style="overflow: hidden" id="searchDialog_booleanOperator" onchange="advancedSearch.addClauseUI($(this).val());$(this).val('');$('#searchDialog_valueInput').val('')">
                             <option></option>
                             <option>+</option>
                             <option>or</option>
                             <option>and</option>
+                            <option>link</option>
                         </select>
 
                     <!--    <input type="image" height="20px" src="images/erase.png"
@@ -148,7 +197,7 @@
         <!--  -->
 
     </div>
-    <div id="searchActionDiv" style="display: table-row" class="searchPanel rightPanel">
+    <div id="searchActionDiv" style="display: table-row;" class="searchPanel rightPanel">
         <b>Ouput type</b>
         <br>
         <div id="advancedSearchActionDiv" style="display: inline-grid">
@@ -212,7 +261,7 @@
 
     </div>
 
-    <div id="searchNeighboursLabelsDiv" class="searchPanel rightPanel">
+    <div id="searchNeighboursLabelsDiv" class="searchPanel rightPanel" style="flex-wrap:wrap;justify-content: center">
         <b>Neighbour Type</b>
         <input type="checkbox" id="graphNeighboursAllOptionsCbx"
                onchange="searchMenu.onGraphNeighboursAllOptionsCbx(this)"> All

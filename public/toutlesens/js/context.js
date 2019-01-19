@@ -1,39 +1,41 @@
-var context=(function(){
+var context = (function () {
 
-    var self={};
+    var self = {};
     var graphContext;
-    self.querySourceLabel="";
+    self.querySourceLabel = "";
+    self.queryObject = {
+        label: "",
+        property: "",
+        operator: "",
+        value: ""
+    };
 
 
-    self.initGraphContext=function(){
-        graphContext={
-            searchClauses :[],
-            graphType:[],
-            expandGraph:[],
+    self.initGraphContext = function () {
+        graphContext = {
+            searchClauses: [],
+            graphType: [],
+            expandGraph: [],
             highlight: []
 
         }
     }
-    self.addToGraphContext=function(obj){
-        var keys=Object.keys(obj);
-        keys.forEach(function(key) {
+    self.addToGraphContext = function (obj) {
+        var keys = Object.keys(obj);
+        keys.forEach(function (key) {
             if (!graphContext[key])
-                return alert("key "+key+" not exist in context")
+                return alert("key " + key + " not exist in context")
             else
                 graphContext[key].push(obj[key])
         })
 
     }
-    self.getGraphContext=function(){
+    self.getGraphContext = function () {
         return graphContext;
     }
 
 
-
-
-
     return self;
-
 
 
 })();

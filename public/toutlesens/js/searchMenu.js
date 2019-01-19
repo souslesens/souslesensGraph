@@ -6,18 +6,18 @@ var searchMenu = (function () {
         self.pathQuery = null;
         self.previousAction;
         self.dataTable = null;
-        self.searchPanels=[];
-        self.searchPanels.index=0;
+        self.searchPanels = [];
+        self.searchPanels.index = 0;
 
 
         var previousAction = "";
         self.init = function (schema) {
-$("#searchNavActionDiv").width(rightPanelWidth-50)
-            $(".searchPanel").each(function(){
+            $("#searchNavActionDiv").width(rightPanelWidth - 50)
+            $(".searchPanel").each(function () {
                 self.searchPanels.push($(this).attr("id"))
             })
 
-            context.querySourceLabel=""
+            context.querySourceLabel = ""
             //  $("#searchDialog_NodeLabelInput").attr("size", 8);
             $("#searchDialog_propertySelect").append("<option selected='selected'>" + Schema.getNameProperty() + "</option>");
             $("#searchDialog_valueInput").keypress(function (event) {
@@ -26,12 +26,8 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
                 }
             })
             self.activatePanel("searchCriteriaDiv");
-            self.currentPanelId="searchCriteriaDiv";
+            self.currentPanelId = "searchCriteriaDiv";
             self.initLabelDivs();
-
-
-
-
 
 
         }
@@ -46,7 +42,8 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
 
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
-         context.initGraphContext();
+            context.initGraphContext();
+            complexQueries.reset();
             //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
             //
             advancedSearch.clearClauses();
@@ -61,12 +58,12 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $(div).addClass("selectLabelDivSelected");
 
-       if(previousAction != 'path') {// reset recoding of saved queries except if choose target label
-        savedQueries.resetCurrentSearchRun();
-    }
+            if (previousAction != 'path') {// reset recoding of saved queries except if choose target label
+                savedQueries.resetCurrentSearchRun();
+            }
 
 
-            context.querySourceLabel=value;
+            context.querySourceLabel = value;
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             //if(searchMenu.previousAction!="path" || pathSourceSearchCriteria)
@@ -119,7 +116,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
                 });
             })
 
-          //  $("#advancedSearchNodeLabelsDiv").css("height",(labels.count*50/2));
+            //  $("#advancedSearchNodeLabelsDiv").css("height",(labels.count*50/2));
 
 
         }
@@ -161,18 +158,17 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             }
             var visibility = "visible";
             self.clearCurrentLabel();
-            self.searchPanels.currentIndex= self.searchPanels.indexOf(id);
+            self.searchPanels.currentIndex = self.searchPanels.indexOf(id);
             $(".searchPanel").hide();
-            $("#"+id).show();
+            $("#" + id).show();
 
-      //  $("#searchNavDiv").toggle().toggle();
+            //  $("#searchNavDiv").toggle().toggle();
         }
-
 
 
         self.previousPanel = function () {
             $("#searchDialog_newQueryButton").css('visibility', 'visible');
-            self.searchPanels.currentIndex-=1;
+            self.searchPanels.currentIndex -= 1;
 
 
             if (previousAction == 'algorithms') {
@@ -181,7 +177,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
 
             }
             if (previousAction == 'path') {
-                self.searchPanels.currentIndex=1;
+                self.searchPanels.currentIndex = 1;
 
             }
             else if (self.currentPanelId == 1) {
@@ -216,10 +212,15 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
                 });
 
             }
+            else if (searchMenu.previousAction == "link") {
+                complexQueries.executeQuery();
+
+
+            }
             else {
                 if (self.searchPanels.currentIndex == 0) {
-                    if(advancedSearch.searchClauses.length==0)
-                    advancedSearch.addClauseUI();
+                    if (advancedSearch.searchClauses.length == 0)
+                        advancedSearch.addClauseUI();
                     $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
                 }
 
@@ -232,7 +233,6 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             }
             $("#searchDialog_previousPanelButton").css('visibility', 'visible');
         }
-
 
 
         self.onPropertyKeyPressed = function (input) {
@@ -266,8 +266,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             }
 
 
-
-           else if (option == "graphSomeNeighboursListLabels") {
+            else if (option == "graphSomeNeighboursListLabels") {
                 self.nextPanel();
                 var currentLabel = context.querySourceLabel;
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
@@ -324,10 +323,12 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
             }
             else if (option == 'algorithms') {
                 advancedSearch.searchNodes('matchStr', null, function (err, result) {
-                    var matchObj = advancedSearch.matchStrToObject(result);
+                    //   var matchObj = advancedSearch.matchStrToObject(result);
 
                     previousAction = "algorithms"
-                    algorithms.initDialog(matchObj.nodeLabel)
+                    //  algorithms.initDialog(matchObj.nodeLabel)
+                    algorithms.initDialog(context.querySourceLabel)
+
                     self.activatePanel("algorithmsDiv");
                     $("#searchDialog_ExecuteButton").css('visibility', 'visible');
                     $("#searchDialog_newQueryButton").css('visibility', 'visible');
@@ -363,7 +364,7 @@ $("#searchNavActionDiv").width(rightPanelWidth-50)
                 });
             }
             else if (option == 'execute') {
-                context.addToGraphContext({graphType:previousAction})
+                context.addToGraphContext({graphType: previousAction})
                 toutlesensController.setGraphMessage("Working...")
                 eventsController.stopEvent = true;
 

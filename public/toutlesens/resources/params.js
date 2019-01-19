@@ -59,7 +59,7 @@ var Gparams = {
 
 //limits************************************
     maxResultSupported: 5000,
-    graphMaxDataLengthToDisplayGraphDirectly: 1000,
+    graphMaxDataLengthToDisplayGraphDirectly: 2000,
     bulkGraphViewMaxNodesToDrawLinks: 1000,
     listDisplayLimitMax: 1500,
     jsTreeMaxChildNodes: 1500,

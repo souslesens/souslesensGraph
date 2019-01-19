@@ -26,9 +26,35 @@ var advancedSearch = (function () {
 
     self.addClauseUI = function (booleanOperator) {
 
-        var clauseText = "";
+
+
         if (booleanOperator && booleanOperator == "")
             return;
+
+        var clauseText = "";
+        var value=$("#searchDialog_valueInput").val();
+        var property="";
+        var operator="";
+        if(value!=""){
+            property=$("#searchDialog_propertySelect").val();
+            operator=$("#searchDialog_operatorSelect").val()
+        }
+
+        context.queryObject={
+            label: context.querySourceLabel,
+            property:property,
+            operator:operator,
+            value:value
+
+        }
+
+        if(booleanOperator=="link"){
+
+
+            searchMenu.previousAction = "link";
+            complexQueries.addNodeQuery(context.queryObject)
+            return;
+        }
 
         self.searchNodes("matchSearchClause", null, function (err, clause) {
             clauseText = (clause.nodeLabel ? clause.nodeLabel : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
