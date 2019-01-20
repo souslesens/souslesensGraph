@@ -1,13 +1,14 @@
 var complexQueries = (function () {
     var self = {};
     self.currentDataset;
-    var currentDivIndex=-1;
+    var currentDivIndex = -1;
     var globalHtml = "<div class='complexQueries'>";
     var queryObjs = [];
 
 
     self.addNodeQuery = function (queryObj) {
         var index = queryObjs.length;
+        queryObj.inResult = true;
         queryObjs.push(queryObj)
         self.draw();
 
@@ -39,12 +40,12 @@ var complexQueries = (function () {
             classInResult = " complexQueries-nodeInResultDiv";
 
 
-        var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' complexQueries-nodeDiv " + classInResult +"'  onclick='self.setNodeDivIndex("+index+")'>" +
+        var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' complexQueries-nodeDiv " + classInResult + "'  onclick='self.setNodeDivIndex(" + index + ")'>" +
             " <div class='complexQueries-partDiv' style='background-color: " + color + "'><b>Label : " + queryObj.label + "</b></div>" +
             "<div class='complexQueries-partDiv'> Condition : " + queryText + "</div>" +
-            " <div class='complexQueries-partDiv'> <button onclick='complexQueries.includeInResult(" + index + ")'>in result</button> </div>" +
-            "<button onclick='complexQueries.removeQueryObj(" + index + ")'>X</button>" +
-
+            " <div class='complexQueries-partDiv'><button  id='complexQueries_inResultButton'  onclick='complexQueries.nodeInResult(" + index + ")'>not in result</button> </div>" +
+            // "<button onclick='complexQueries.removeQueryObj(" + index + ")'>X</button>" +
+            "<input type='image' height='10px'  title='remove node' onclick='complexQueries.removeQueryObj(\" + index + \")' src='images/trash.png'/>" +
             "</div>"
 
 
@@ -54,8 +55,8 @@ var complexQueries = (function () {
     }
 
 
-    self.setNodeDivIndex=function(index){
-        currentDivIndex=index;
+    self.setNodeDivIndex = function (index) {
+        currentDivIndex = index;
     }
     self.removeQueryObj = function (index) {
         queryObjs.splice(index, 1)
@@ -63,26 +64,29 @@ var complexQueries = (function () {
 
     }
 
-    self.includeInResult = function (index) {
+    self.nodeInResult = function (index) {
         if (!queryObjs[index].inResult) {
             $("#complexQuery_nodeDiv_" + index).addClass("complexQueries-nodeInResultDiv");
             queryObjs[index].inResult = true;
+            $(("#complexQueries_inResultButton")).html('Not in Result')
         } else {
             $("#complexQuery_nodeDiv_" + index).removeClass("complexQueries-nodeInResultDiv");
             queryObjs[index].inResult = false;
+            $(("#complexQueries_inResultButton")).html('In Result')
         }
     }
     self.clear = function () {
         queryObjs = [];
         self.draw();
-        currentDivIndex=-1
+        currentDivIndex = -1
     }
     self.reset = function () {
         queryObjs = [];
         $("#graphDiv").html("");
-        currentDivIndex=-1
+        currentDivIndex = -1
     }
     self.executeQuery = function () {
+        $("#searchDialog_previousPanelButton").css('visibility', 'visible');
         var countResults = self.countResults();
         if (countResults == 0) {
             return alert("you must least include on label in return clause of the query")
@@ -107,8 +111,7 @@ var complexQueries = (function () {
             if (countResults == 1)
                 html += "<button onclick='complexQueries.defineAsSet()'>define as set</button>"
             else {
-                html += "<button onclick='complexQueries.displayTable()'>table or stat</button>" +
-                    "<button onclick='complexQueries.displayGraph()'>Graph</button>";
+                html += "<button onclick='complexQueries.displayGraph()'>Graph</button>";
 
 
             }
@@ -174,9 +177,15 @@ var complexQueries = (function () {
     self.prepareDataset = function (neoResult) {
         var dataset = []
         var columns = [];
+        var labelSymbols = [];
+        var labels = [];
         neoResult.forEach(function (line) {// define columns and structure objects by line
-            var lineObj = {}
+            var lineObj = {};
+
             for (var key in line) {// each node type
+                if (labelSymbols.indexOf(key) < 0)
+                    labelSymbols.push(key);
+
                 var props = line[key].properties;
                 for (var keyProp in props) {
                     if (columns.indexOf(keyProp) < 0) {
@@ -184,7 +193,9 @@ var complexQueries = (function () {
                     }
                 }
                 props.neoId = line[key]._id;
-                props.labelNeo = line[key].labels[0]
+                props.labelNeo = line[key].labels[0];
+                if (labels.indexOf(props.labelNeo) < 0)
+                    labels.push(props.labelNeo);
                 var obj = {
                     id: line[key]._id,
                     neoAttrs: props,
@@ -196,7 +207,7 @@ var complexQueries = (function () {
             dataset.push(lineObj)
 
         })
-        return {columns: columns, data: dataset};
+        return {columns: columns, data: dataset, labelSymbols: labelSymbols, labels: labels};
 
 
     }
@@ -208,17 +219,31 @@ var complexQueries = (function () {
         self.currentDataset.data.forEach(function (line) {
             for (var nodeKey in line) {
                 var datasetLine = {};
+                datasetLine["label"] = line[nodeKey].neoAttrs["labelNeo"];
                 columns.forEach(function (col) {
-                    var value = line[nodeKey].neoAttrs[col];
-                    if (!value)
-                        value = "";
-                    datasetLine[col] = value;
+                    if (col != "labelNeo") {
+                        var value = line[nodeKey].neoAttrs[col];
+                        if (!value)
+                            value = "";
+                        datasetLine[col] = value;
+                    }
                 })
                 tableDataset.push(datasetLine);
             }
 
 
         })
+        tableDataset.sort(function (a, b) {
+            if (a.label > b.label) {
+                return 1;
+            }
+            if (a.label < b.label) {
+                return -1;
+            }
+            return 0;
+
+        })
+
         var xx = tableDataset;
         $("#dialog").load("htmlSnippets/exportDialog.html", function () {
             dialog.dialog("open");
@@ -233,6 +258,56 @@ var complexQueries = (function () {
 
     }
     self.displayGraph = function () {
+
+        var visjsData = {nodes: [], edges: [], labels: []};
+        visjsData.labels = self.currentDataset.labels;
+        var uniqueNodes = []
+        self.currentDataset.data.forEach(function (line, indexLine) {
+            for (var nodeKey in line) {
+                var nodeNeo = line[nodeKey];
+                if (uniqueNodes.indexOf(nodeNeo.id) < 0) {
+                    uniqueNodes.push(nodeNeo.id);
+                    var visjsNodeLabel = nodeNeo.neoAttrs[Schema.getNameProperty(nodeNeo.label)];
+                    var visjsNode = {
+                        labelNeo: nodeNeo.label,// because visjs where label is the node name
+                        color: nodeColors[nodeNeo.label],
+                        myId: nodeNeo.id,
+                        id: nodeNeo.id,
+                        children: [],
+                        neoAttrs: nodeNeo.neoAttrs,
+                        value: 8,
+                        endRel: "",
+                        label: visjsNodeLabel,
+                        title: visjsNodeLabel
+                    }
+                    visjsData.nodes.push(visjsNode);
+                }
+            }
+            var previousSymbol;
+            self.currentDataset.labelSymbols.forEach(function (symbol, indexSymbol) {
+                if (indexSymbol > 0) {
+                    var fromNode = line[previousSymbol];
+                    var toNode = line[symbol];
+                    var relObj = {
+                        from: fromNode.id,
+                        to: toNode.id,
+                        type: "NA",
+                        neoId: "" + fromNode.id + "_" + toNode.id,
+                        neoAttrs: {},
+                        color: "#555",
+                        width: 1
+
+                    }
+                    visjsData.edges.push(relObj)
+                }
+                previousSymbol = symbol;
+
+            })
+        })
+
+        visjsGraph.draw("graphDiv", visjsData, {}, function (err, result) {
+            var xx = err;
+        })
 
 
     }

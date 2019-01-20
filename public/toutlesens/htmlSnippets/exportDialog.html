@@ -20,6 +20,8 @@
                 var checked = "";
                 if (prop == "connectedTo" || prop == Schema.schema.defaultNodeNameProperty)
                     checked = "checked='checked'"
+                if (prop == "label")
+                    checked = "checked='checked'"
 
                 html += "<br><input type=checkbox class='exportDialog_propcbx' value='" + prop + "'" + checked + "> " + prop;
             })
@@ -39,7 +41,17 @@
                 }
             })
 
+            var filteredDataset=[];
+            var filter = $("#exportDialog_filterDiv").val();
             self.dataset.forEach(function (line, index) {
+                if (filter && filter != "") {
+                    if (line.label && line.label != filter)
+                      return;
+                    else if (line.labelNeo && line.labelNeo != filter)
+                    return;
+
+                }
+                var filteredLine={}
                 for (var key in line) {
 
                     if (key == "connectedTo") {
@@ -47,10 +59,11 @@
                             self.dataset[index][key] = line[key].substring(0, 200) + "...";
                     }
 
-                    if (checkedProperties.indexOf(key) < 0)
-                        delete  self.dataset[index][key];
+                    if (checkedProperties.indexOf(key) >-1)
+                        filteredLine[key]=line[key];
 
                 }
+                filteredDataset.push(filteredLine)
             })
             if (!toutlesensController.graphDataTable) {
                 toutlesensController.graphDataTable = new myDataTable();
@@ -68,7 +81,7 @@
             dialogLarge.load("htmlSnippets/dataTable.html", function () {
                 dialogLarge.dialog("open");
 
-                toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv", self.dataset, function (err, result) {
+                toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv",filteredDataset, function (err, result) {
 
 
                 }, 2000)
@@ -85,6 +98,9 @@
                     labels.push(line.label)
                 }
             })
+
+
+            common.fillSelectOptionsWithStringArray(exportDialog_filterDiv, labels, true)
             common.fillSelectOptionsWithStringArray(stats_sourceLabelSelect, labels, true)
             common.fillSelectOptionsWithStringArray(stats_targetLabelSelect, labels, true)
 
@@ -110,6 +126,7 @@
 
 
         </div>
+        filter<select id="exportDialog_filterDiv"></select>
         <button onclick="exportDialog.execute()">Show</button>
     </div>
 

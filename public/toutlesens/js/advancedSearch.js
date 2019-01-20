@@ -24,92 +24,12 @@ var advancedSearch = (function () {
     }
 
 
-    self.addClauseUI = function (booleanOperator) {
 
-
-
-        if (booleanOperator && booleanOperator == "")
-            return;
-
-        var clauseText = "";
-        var value=$("#searchDialog_valueInput").val();
-        var property="";
-        var operator="";
-        if(value!=""){
-            property=$("#searchDialog_propertySelect").val();
-            operator=$("#searchDialog_operatorSelect").val()
-        }
-
-        context.queryObject={
-            label: context.querySourceLabel,
-            property:property,
-            operator:operator,
-            value:value
-
-        }
-
-        if(booleanOperator=="link"){
-
-
-            searchMenu.previousAction = "link";
-            complexQueries.addNodeQuery(context.queryObject)
-            return;
-        }
-
-        self.searchNodes("matchSearchClause", null, function (err, clause) {
-            clauseText = (clause.nodeLabel ? clause.nodeLabel : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
-
-            if (err)
-                return;
-            $("#searchDialog_valueInput").val("");
-            for (var i = 0; i < self.searchClauses.length; i++) {
-                if (clause.nodeLabel != "" && self.searchClauses[i].nodeLabel != "" && clause.nodeLabel != self.searchClauses[i].nodeLabel)
-                    return alert("you cannot add criteria on different labels :" + clause.nodeLabel != "" && self.searchClauses[i].nodeLabel)
-            }
-            self.searchNodes("", {where: clause.where, resultType: "count"}, function (err, result) {
-                if (booleanOperator && booleanOperator == "and") {
-                    var newIds = [];
-                    result.forEach(function (line) {
-                        newIds.push(line.n._id);
-                    })
-
-                    function intersectArray(a, b) {
-                        return a.filter(Set.prototype.has, new Set(b));
-                    }
-
-                    self.currentQueryNodeIds = intersectArray(self.currentQueryNodeIds, newIds)
-                } else {
-                    result.forEach(function (line) {
-                        self.currentQueryNodeIds.push(line.n._id);
-                    });
-                }
-                clause.foundIds = self.currentQueryNodeIds.length;
-
-                clauseText += ": <b> " + clause.foundIds + "nodes </b>";
-                if (booleanOperator && booleanOperator != "+") {
-                    var oldClauseText = $("#searchDialog_Criteriatext").val();
-                    clauseText = oldClauseText + "<br>" + booleanOperator + "<br>" + clauseText;
-                    var oldWhere = self.searchClauses[0].where;
-                    clause.where = "(" + oldWhere + ") " + booleanOperator + " ( " + clause.where + ")";
-                }
-                toutlesensData.setWhereFilterWithArray("_id", self.currentQueryNodeIds, function (err, result) {
-                    self.searchClauses = [];
-                    self.addClause(clause, clauseText);
-                })
-
-
-            });
-
-
-            // clause.operator=operator;
-
-        })
-    }
 
 
     self.addClause = function (clause, clauseText) {
 
-        $("#searchDialog_NextPanelButton").css('visibility', 'visible');
+        $("#searchDialog_nextPanelButton").css('visibility', 'visible');
 
         clause.title = clauseText.substring(clauseText, clauseText.indexOf(":"))
         self.searchClauses.push(clause);

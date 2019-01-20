@@ -170,9 +170,9 @@
                         </select>
 
                         <input id="searchDialog_valueInput" size="10"
-                               onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_NextPanelButton').css('visibility', 'visible');">
+                               onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_nextPanelButton').css('visibility', 'visible');">
 
-                        <select  size="6"  style="overflow: hidden" id="searchDialog_booleanOperator" onchange="advancedSearch.addClauseUI($(this).val());$(this).val('');$('#searchDialog_valueInput').val('')">
+                        <select  size="6"  style="overflow: hidden" id="searchDialog_booleanOperator" onchange="searchMenu.addClauseUI($(this).val());$(this).val('');$('#searchDialog_valueInput').val('')">
                             <option></option>
                             <option>+</option>
                             <option>or</option>
@@ -392,8 +392,6 @@
 <div id="searchNavDiv" class="rightPanel rightPanel">
     <div id="searchNavActionDiv"
          style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
-        <!--  <button onclick="advancedSearch.addClauseUI()" id="searchCriteriaAddButton">+
-          </button>-->
         <button class="searchDialog_NavButton" style="visibility:hidden; float:left" id="searchDialog_newQueryButton"
                 onclick="searchMenu.activatePanel('searchCriteriaDiv');">
             new
@@ -404,7 +402,7 @@
         </button>
 
         <button class="searchDialog_NavButton" onclick="searchMenu.nextPanel();"
-                id="searchDialog_NextPanelButton">next
+                id="searchDialog_nextPanelButton">next
         </button>
 
         <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_ExecuteButton"
