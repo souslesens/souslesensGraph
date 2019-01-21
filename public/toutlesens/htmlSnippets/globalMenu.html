@@ -19,7 +19,7 @@ chma<table>
     <tr>
         <td>
           <button onclick=" toutlesensController.dispatchAction('showSchemaConfigDialog');$('#dialog').dialog('close');">Graph Schema...</button>
-            <button onclick="toutlesensController.dispatchAction('showSchema')">draw schema</button>
+            <button onclick="toutlesensController.dispatchAction('showSchema',true)">draw schema</button>
             <button onclick="Schema.resetSchema()">reset schema</button>
           <br>display version <select id="displayVersionsSelect" onchange="versionController.onDisplayVersionsSelect(this)"></select>
 

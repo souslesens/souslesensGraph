@@ -278,13 +278,14 @@ var importDataIntoNeo4j = {
                         return callbackSeries(err);
                     var message = "relation "+relationType+" import done : " + totalImported + "lines ";
                     journal+=message+"<br>"
+
+                    socket.message(message);
                     if(params.missingMappings.length>0){
                         var str=JSON.stringify(params.missingMappings,null,2)
                         message+="<br> relation missingMappings "+str;
-                        console.log(str);
+                        //   console.log(str);
                     }
-                    socket.message(message);
-                    console.log(message);
+                  //  console.log(message);
 
                     callbackSeries(null, message);
 
@@ -426,10 +427,12 @@ var importDataIntoNeo4j = {
         dataRaw.forEach(function (obj) {
             var sourceSourceField = obj[params.sourceSourceField]
             var sourceTargetField = obj[params.sourceTargetField]
+
+
             if (Array.isArray(sourceSourceField)) {
                 sourceSourceField.forEach(function (value) {
                     var obj2=JSON.parse(JSON.stringify(obj));
-                    obj[params.sourceSourceField]=value;
+                    obj2[params.sourceSourceField]=value;
                     data.push(obj2);
                 })
 
@@ -437,7 +440,7 @@ var importDataIntoNeo4j = {
             else if (Array.isArray(sourceTargetField)) {
                 sourceTargetField.forEach(function (value) {
                     var obj2=JSON.parse(JSON.stringify(obj));
-                    obj[params.sourceTargetField]=value;
+                    obj2[params.sourceTargetField]=value;
                     data.push(obj2);
                 })
 

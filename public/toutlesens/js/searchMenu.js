@@ -24,6 +24,7 @@ var searchMenu = (function () {
 
                 }
             })
+           // complexQueries.reset();
             self.activatePanel("searchCriteriaDiv");
             self.currentPanelId = "searchCriteriaDiv";
             self.initLabelDivs();
@@ -52,19 +53,14 @@ var searchMenu = (function () {
                 self.previousAction = "link";
                 complexQueries.addNodeQuery(context.queryObject);
 
-                var allowedLabels=Schema.getPermittedLabels(context.querySourceLabel,true,true);
-                $(".selectLabelDiv ").each(function () {
-                    if (allowedLabels.indexOf($(this).html())<0)
-                        $(this).css("visibility","hidden");
-                    else
-                        $(this).css("visibility","visible");
 
-                })
                 $("#searchDialog_newQueryButton").css('visibility', 'visible');
                 $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
+                self.setUIPermittedLabels(context.querySourceLabel);
 
                 return;
             }
+
 
             self.searchNodes("matchSearchClause", null, function (err, clause) {
                 clauseText = (clause.nodeLabel ? clause.nodeLabel : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
@@ -116,6 +112,21 @@ var searchMenu = (function () {
             })
         }
 
+        self.setUIPermittedLabels=function(label){
+            if(!label) {
+                return $(".selectLabelDiv ").css("visibility", "visible");
+
+            }
+            var allowedLabels=Schema.getPermittedLabels(label,true,true);
+            $(".selectLabelDiv ").each(function () {
+                if (allowedLabels.indexOf($(this).html())<0)
+                    $(this).css("visibility","hidden");
+                else
+                    $(this).css("visibility","visible");
+
+            })
+        }
+
         self.resetQueryClauses = function () {
             $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
             $("#searchNavDiv").css('visibility', 'hidden');
@@ -127,7 +138,7 @@ var searchMenu = (function () {
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             context.initGraphContext();
-            complexQueries.reset();
+           // complexQueries.reset();
             //if(searchMenu.self.previousAction!="path" || pathSourceSearchCriteria)
             //
             $(".selectLabelDiv ").css("visibility", "visible")
@@ -571,7 +582,7 @@ var searchMenu = (function () {
 
         self.execCypherMatchStatement = function () {
             var cypher = $("#searchMenu_cypherInput").val();
-            toutlesensData.executeCypher(cypher, function (err, result) {
+            Cypher.executeCypher(cypher, function (err, result) {
                 var xx = result
             })
 

@@ -56,9 +56,9 @@ var visjsGraph = (function () {
             self.nodes = new vis.DataSet(visjsData.nodes);
             self.edges = new vis.DataSet(visjsData.edges);
 
-            if (!_options.noHistory && self.nodes.length > 0) {// a graph is allready drawn we put  it into history if not allready imported graph
+            if ( typeof context !== 'undefined' && !_options.noHistory && self.nodes.length > 0) {// a graph is allready drawn we put  it into history if not allready imported graph
                 self.graphHistory.push({
-                    context: context.getGraphContext(),
+                    context: context || context.getGraphContext(),
                     graph: self.exportGraph(),
                     date: new Date()
                 });

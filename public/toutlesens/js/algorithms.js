@@ -280,7 +280,7 @@ var algorithms = (function () {
                 " RETURN collect(id(m)) as ids, cnt order by cnt desc  limit " + limit
 
             console.log(cypher);
-            toutlesensData.executeCypher(cypher, function (err, result) {
+            Cypher.executeCypher(cypher, function (err, result) {
                 if (err)
                     return console.log(err);
                 var ids = result[0].ids
@@ -339,7 +339,7 @@ var algorithms = (function () {
             if(where && where!="")
                 where=" where "+where+ " ";
             var cypher = "Match (n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ") "+where+" return n, count (r) as cnt order by cnt desc limit " + limit;
-            toutlesensData.executeCypher(cypher, function (err, result) {
+            Cypher.executeCypher(cypher, function (err, result) {
                     if (err)
                         console.log(err);
                     if (result.length == 0) {
@@ -388,7 +388,7 @@ var algorithms = (function () {
             algoStr = algoStr.replace(array[0], value);
         }
         console.log(algoStr)
-        toutlesensData.executeCypher(algoStr, function (err, result) {
+        Cypher.executeCypher(algoStr, function (err, result) {
             if (err)
                 console.log(err);
             if (result.length == 0) {

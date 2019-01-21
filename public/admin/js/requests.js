@@ -7,7 +7,7 @@ var requests = (function () {
     self.init = function (_subGraph) {
         subGraph = _subGraph;
         allParams = localStorage.getItem(localStorageKey)
-
+//console.log(allParams);
         if (!allParams) {
             allParams = {}
             allParams[subGraph] = {requests: {}};
@@ -24,15 +24,42 @@ var requests = (function () {
         self.loadSubGraphCSVsources()
         self.list(subGraph, requestsSelect);
       //  $("#importSourceType").val("localCSV");
+        if(allParams[subGraph])
         setCsvImportFields(allParams[subGraph]);
     }
 
     self.clearLocalStorage = function () {
         if (confirm("clear all requests for subGraph" + subGraph))
             delete  allParams[subGraph]
-        localStorage.setItem(localStorageKey, allParams)
+        localStorage.setItem(localStorageKey,  JSON.stringify(allParams, null, 2));
         self.init(subGraph)
     }
+
+
+    self.importParams=function(){
+        if(!allParams)
+            return alert("select a subGraph first")
+        var str=$("#savedQueries_importParamsTA").val()
+        var data=JSON.parse(str);
+        var subGraph=data.subGraph;
+        allParams[subGraph]=data;
+
+        localStorage.setItem(localStorageKey,  JSON.stringify(allParams, null, 2));
+        self.init(subGraph)
+
+    }
+    self.export = function (subGraph) {
+        if (!allParams)
+            self.init();
+        allParams[subGraph].subGraph=subGraph;
+      //  console.log(JSON.stringify(allParams[subGraph]));
+        $("#savedQueries_importParamsTA").val(JSON.stringify(allParams[subGraph]))
+        return allParams[subGraph];
+
+    }
+
+
+
     self.loadSubGraphCSVsources = function () {
         var files = [];
 
@@ -52,15 +79,16 @@ var requests = (function () {
 
     self.saveCSVsource = function (data) {
         source = data.name;
-        if (!allParams[data.subGraph])
+     if (!allParams[data.subGraph])
             allParams[data.subGraph] = {};
-        if (!allParams[data.subGraph][data.name]) {
+        /*   if (!allParams[data.subGraph][data.name]) {
             allParams[data.subGraph][data.name] = data;
-            allParams[data.subGraph][data.name].requests = [];
+            allParams[data.subGraph][data.name].requests = [];*/
+        allParams[data.subGraph][data.name]=data
             localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2))
             self.loadSubGraphCSVsources();
 
-        }
+       // }
     }
 
 
@@ -92,6 +120,7 @@ var requests = (function () {
         allParams[subGraph].requests[name] = json;
         allParams[subGraph][source].requests.push(name);
         localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2));
+        self.list(subGraph, requestsSelect);
         return;
 
     }
@@ -99,6 +128,8 @@ var requests = (function () {
         if (!allParams)
             self.init();
         var requests = []
+        if(!allParams[subGraph])
+            return;
         for (var key in allParams[subGraph].requests) {
             requests.push({value:key, label:key.replace(subGraph+".","")})
         }
@@ -135,25 +166,18 @@ var requests = (function () {
     }
 
 
-    self.export = function (subGraph) {
-        if (!allParams)
-            self.init();
-        console.log(JSON.stringify(allParams[subGraph]));
-        return allParams[subGraph];
-
-    }
 
 
 
 
-    self.loadRequest = function (name) {savedQueries
+    self.loadRequest = function (name) {
         var request = allParams[subGraph].requests[name];
         var header = allParams[subGraph][request.source].header;
         var obj = request;
 
         $("#exportMessageLinks").html("source : "+request.source)
         $("#sourceNode").val(request.source)
-
+        $("#sourceRel").val(request.source)
         admin.initImportDialogSelects(header)
 
         for (var key in obj) {
@@ -164,6 +188,7 @@ var requests = (function () {
             }
 
         }
+
         $("#sourceNode").val(obj.source);
         $("#neoTargetKey").html("").append('<option>' + obj["neoTargetKey"] + '</option>');
         $("#neoSourceKey").html("").append('<option>' + obj["neoSourceKey"] + '</option>');

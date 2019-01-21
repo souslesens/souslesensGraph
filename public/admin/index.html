@@ -39,8 +39,7 @@
     <script src="../common/js/jquery/jquery-ui.min.js"></script>
     <script src="../common/js/jquery/jquery.splitter.js"></script>
     <script src="../common/js/common.js"></script>
-    <script src="../common/js/commonOld.js"></script>
-    <script src="../common/js/devisuProxy.js"></script>
+    <script src="../common/js/cypher.js"></script>
     <script src="js/download.js"></script>
     <script src="js/socket.io.js"></script>
 
@@ -59,7 +58,6 @@
     <script src="../toutlesens/js/visjs/visJsGraph.js"></script>
     <script src="../common/js/connectors.js"></script>
     <script src="../toutlesens/js/schema.js"></script>
-    <link rel="stylesheet" type="text/css" href="js/visjs/vis-network.min.css.js"/>
     <script src="js/admin2.js"></script>
     <script src="js/requests.js"></script>
     <script src="../common/js/others/async.js"></script>
@@ -246,6 +244,8 @@
                         return;
                     }
                     var color = "green";
+
+
                     if (message.indexOf("ENOENT") > -1)
                         return;
 
@@ -333,6 +333,9 @@
         <button onclick="admin.drawVisjsGraph()">draw schema</button>
         </button>
         <div id="graphDiv" style="width:300px;height: 400px">
+            <div >
+                <textarea id="importJournalTA" cols="80" rows="5"></textarea>
+            </div>
         </div>
         <div id="popupMenu" style="z-index:20;visibility: hidden;position: absolute;background: #b3b6c2">
             <table>
@@ -465,6 +468,11 @@
             <h3>Import Neo database</h3>
             <div>
                 <div id="importGraphDbDiv" style="height:450px"></div>
+            </div>
+
+            <h3>admin</h3>
+            <div>
+                <div id="adminDiv" style="height:450px"></div>
             </div>
 
 

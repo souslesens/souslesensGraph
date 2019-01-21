@@ -31,13 +31,13 @@ var currentRequests;
 var importType = "LINK";
 var currentCsvObject;
 var subGraph;
-var nodeColors={};
-var toutlesensData=null;
-var currentObject=null;
-var toutlesensController=null;
-var messageDivId=null;
+var nodeColors = {};
+var toutlesensData = null;
+var currentObject = null;
+var toutlesensController = null;
+var messageDivId = null;
 
-var drag=false;
+var drag = false;
 var help = {
 
     sourceField: "field that will give its name attribute to the created node in Neo",
@@ -62,7 +62,7 @@ var help = {
 
 $(function () {
 
-   // loadSubgraphs("hist-antiq");
+    // loadSubgraphs("hist-antiq");
     $("#importSourceType").val("");
 
     $('form[name=new_post]').submit(function () {
@@ -92,7 +92,7 @@ function callsource(urlSuffix, payload, callback) {
         urlSuffix = "";
     $.ajax({
         type: "POST",
-        url:    "../../.."+ Gparams.mongoProxyUrl + urlSuffix,
+        url: "../../.." + Gparams.mongoProxyUrl + urlSuffix,
         data: payload,
         dataType: "json",
         success: function (data, textStatus, jqXHR) {
@@ -111,7 +111,7 @@ function callsource(urlSuffix, payload, callback) {
 
 function callExportToNeo(type, data, callback) {
     $("#message").val("Processing Import ...");
-    $("#waitImg").css("visibility","visible");
+    $("#waitImg").css("visibility", "visible");
     var subGraph = $("#subGraphSelect").val();
     var db = $("#dbSelect").val();
     var importSourceType = $("#importSourceType").val();
@@ -130,20 +130,20 @@ function callExportToNeo(type, data, callback) {
     };
     $.ajax({
         type: "POST",
-        url:  "../../.."+ Gparams.importDataIntoNeo4j,
+        url: "../../.." + Gparams.importDataIntoNeo4j,
         data: payload,
         dataType: "json",
         success: function (data, textStatus, jqXHR) {
             var xx = data;
             $("#message").html(data.result);
             $("#message").css("color", "green");
-            $("#waitImg").css("visibility","hidden");
+            $("#waitImg").css("visibility", "hidden");
             if (callback)
                 callback(null, data);
         },
         error: function (xhr, err, msg) {
 
-            $("#waitImg").css("visibility","hidden");
+            $("#waitImg").css("visibility", "hidden");
             console.log(xhr);
             console.log(err);
             console.log(msg);
@@ -162,14 +162,15 @@ function callExportToNeo(type, data, callback) {
     });
 
 }
+
 function callNeoMatch(match, url, callback) {
     $("#message").val("Processing  ...");
-    $("#waitImg").css("visibility","visible");
+    $("#waitImg").css("visibility", "visible");
     payload = {
         match: match
     };
     if (!url)
-        url =  "../../.."+ Gparams.neo4jProxyUrl;
+        url = "../../.." + Gparams.neo4jProxyUrl;
 
     $.ajax({
         type: "POST",
@@ -178,10 +179,10 @@ function callNeoMatch(match, url, callback) {
         dataType: "json",
         success: function (data, textStatus, jqXHR) {
             callback(data);
-            $("#waitImg").css("visibility","hidden");
+            $("#waitImg").css("visibility", "hidden");
         },
         error: function (xhr, err, msg) {
-            $("#waitImg").css("visibility","hidden");
+            $("#waitImg").css("visibility", "hidden");
             console.log(xhr);
             console.log(err);
             console.log(msg);
@@ -217,12 +218,13 @@ function initDBs() {
         }
     });
 }
+
 function onDBselect() {
     var dbName = $("#dbSelect").val();
     clearInputs('nodeInput');
     clearInputs('linkInput');
     var type = $("#importSourceType").val();
-    if (type.indexOf("CSV")>-1) {
+    if (type.indexOf("CSV") > -1) {
         loadRequests();
 
         return;
@@ -244,7 +246,7 @@ function onDBselect() {
 
 function onCollSelect() {
     var type = $("#importSourceType").val();
-    if (type.indexOf("CSV")>-1)  {
+    if (type.indexOf("CSV") > -1) {
         return;
     }
     var collectionName = $("#collSelect").val();
@@ -256,7 +258,7 @@ function onCollSelect() {
     callsource("", {listFields: 1, dbName: dbName, collectionName: collectionName}, function (data) {
 
         data.sort();
-        data.splice(0,0,"")
+        data.splice(0, 0, "")
         common.fillSelectOptionsWithStringArray(fieldSelect, data);
 
         /*  for (var i = 0; i < data.length; i++) {
@@ -294,6 +296,7 @@ function addToExportedFields() {
         $("#exportedFields").val(fieldSelect);
 
 }
+
 function setsourceField() {
     var fieldSelect = $("#fieldSelect").val();
     $("#sourceField").val(fieldSelect);
@@ -301,6 +304,7 @@ function setsourceField() {
 
 
 }
+
 function setsourceKey() {
     var fieldSelect = $("#fieldSelect").val();
     $("#sourceKey").val(fieldSelect);
@@ -308,11 +312,11 @@ function setsourceKey() {
 }
 
 function getRelLabelForField(fieldName) {// arevoir
-    return"";
+    return "";
     if (currentRequests) {
         for (var i = 0; i < currentRequests.length; i++) {
 
-            if (currentRequests[i].request.sourceField == fieldName){
+            if (currentRequests[i].request.sourceField == fieldName) {
                 return currentRequests[i].request.label;
             }
 
@@ -321,18 +325,20 @@ function getRelLabelForField(fieldName) {// arevoir
     }
     return "";
 }
+
 function setsourceSourceField() {
 
-    $("#neoSourceKey").val( $("#neoSourceField").val());
+    $("#neoSourceKey").val($("#neoSourceField").val());
 
 }
 
 function setsourceTargetField() {
-    $("#neoTargetKey").val( $("#neoTargetField").val());
+    $("#neoTargetKey").val($("#neoTargetField").val());
 }
+
 function setNeoRelAttributeField() {
     var fieldSelect = $("#fieldSelectRels").val();
-    var  exportedRelFields=$("#neoRelAttributeField").val();
+    var exportedRelFields = $("#neoRelAttributeField").val();
     if (exportedRelFields == "none" || exportedRelFields == "all")
         exportedRelFields = "";
 
@@ -341,6 +347,7 @@ function setNeoRelAttributeField() {
     else
         $("#neoRelAttributeField").val(fieldSelect);
 }
+
 function setNeoSourceLabel() {
     var labelSelect = $("#labelsSelect").val();
     $("#neoSourceLabel").val(labelSelect);
@@ -370,6 +377,7 @@ function validatesourceQuery(sourceQuery) {
         }
     }
 }
+
 function exportNeoNodes(execute, save) {
     importType = "NODE";
     var sourceDB = $("#dbSelect").val();
@@ -421,10 +429,10 @@ function exportNeoNodes(execute, save) {
     $("#exportParams").val(JSON.stringify(data).replace(/,/, ",\n"));
     if (save)
         requests.saveRequest(data);
-       // saveRequest(JSON.stringify(data).replace(/,/, ",\n"));
+    // saveRequest(JSON.stringify(data).replace(/,/, ",\n"));
     if (execute) {
         $("#exportResultDiv").html("");
-        callExportToNeo("node", data, function(err, result){
+        callExportToNeo("node", data, function (err, result) {
             loadLabels();
             admin.drawVisjsGraph();
         });
@@ -456,6 +464,7 @@ function clearImportFields() {
     $("#sourceQueryR").val("");
 
 }
+
 function exportNeoLinks(execute, save) {
     importType = "LINK";
     var sourceDB = $("#dbSelect").val();
@@ -508,7 +517,10 @@ function exportNeoLinks(execute, save) {
         requests.saveRequest(data);
     if (execute) {
         $("#exportResultDiv").html("");
-        callExportToNeo("relation", data,function(err, result){
+        callExportToNeo("relation", data, function (err, result) {
+            if (err)
+                $("#importJournalTA").val(err)
+            $("#importJournalTA").val(result)
             loadLabels();
             admin.drawVisjsGraph();
         });
@@ -534,10 +546,10 @@ function loadLabels(subGraphName) {
 
     if (!subGraphName)
         subGraphName = $('#subGraphSelect').val();
-    var whereSubGraph="";
-    if(subGraphName!="")
-        whereSubGraph=" where n.subGraph='" + subGraphName +"'"
-    var match = "Match (n) " +whereSubGraph
+    var whereSubGraph = "";
+    if (subGraphName != "")
+        whereSubGraph = " where n.subGraph='" + subGraphName + "'"
+    var match = "Match (n) " + whereSubGraph
         + " return distinct labels(n)[0] as label";
     callNeoMatch(match, null, function (data) {
 
@@ -550,7 +562,7 @@ function loadLabels(subGraphName) {
             }
             labels.splice(0, 0, "");
             common.fillSelectOptionsWithStringArray(labelsSelect, labels)
-            admin.labels=labels;
+            admin.labels = labels;
             admin.drawVisjsGraph()
 
         }
@@ -579,8 +591,6 @@ function loadSubgraphs(defaultSubGraph) {
 };
 
 
-
-
 function setRequestSubGraphFilterOptions() {
     loadLabels();
     var requestSubGraphs = [];
@@ -595,7 +605,7 @@ function setRequestSubGraphFilterOptions() {
 
     }
     requestSubGraphs.splice(0, 0, "")
- //   common.fillSelectOptionsWithStringArray(requestsFilter, requestSubGraphs);
+    //   common.fillSelectOptionsWithStringArray(requestsFilter, requestSubGraphs);
 }
 
 function filterRequests(select) {
@@ -610,8 +620,6 @@ function filterRequests(select) {
 }
 
 
-
-
 function deleteNeoSubgraph(subGraph) {
     if (!subGraph)
         subGraph = $("#subGraphSelect").val();
@@ -619,12 +627,12 @@ function deleteNeoSubgraph(subGraph) {
     if (!ok)
         return;
 
-    var whereSubGraph="";
-    if(subGraph!=Gparams.defaultSubGraph)
-        whereSubGraph=" where n.subGraph='" + subGraph +"'"
-    var match = 'MATCH (n)-[r]-(m) '+whereSubGraph+' delete  r';
+    var whereSubGraph = "";
+    if (subGraph != Gparams.defaultSubGraph)
+        whereSubGraph = " where n.subGraph='" + subGraph + "'"
+    var match = 'MATCH (n)-[r]-(m) ' + whereSubGraph + ' delete  r';
     callNeoMatch(match, null, function (data) {
-        var match = 'MATCH (n)'+whereSubGraph+' delete n';
+        var match = 'MATCH (n)' + whereSubGraph + ' delete n';
         callNeoMatch(match, null, function (data) {
             $("#message").html("subGraph=" + subGraph + "deleted");
             $("#message").css("color", "red");
@@ -715,7 +723,7 @@ function submitMatchNeo(query, callback) {
     console.log("QUERY----" + JSON.stringify(payload));
     $.ajax({
         type: "POST",
-        url:  "../../.."+Gparams.neo4jProxyUrl,
+        url: "../../.." + Gparams.neo4jProxyUrl,
         data: paramsObj,
         dataType: "json",
         success: function (data, textStatus, jqXHR) {
@@ -798,22 +806,25 @@ function onSubGraphSelect(select, showgraph) {
     $('#subGraph').val(value);
     if (value == "")
         return;
-    loadLabels($('#subGraphSelect').val());
-    requests.init(value);
     var subGraph = $("#subGraphSelect").val();
-    if (showgraph) {
-        admin.drawVisjsGraph()
-     //   drawNeoModel(subGraph);
-        $("#tabs-center").tabs({
-            active: 3
-        });
-    }
+    Schema.load(subGraph, function (err, result) {
+        loadLabels(subGraph);
+        requests.init(value);
+
+        if (showgraph) {
+            admin.drawVisjsGraph()
+            //   drawNeoModel(subGraph);
+            $("#tabs-center").tabs({
+                active: 3
+            });
+        }
+    })
 }
 
 function onLabelSelect(select) {
     var value = $(select).val();
     $('#label').val(value);
-    currentLabel=val();
+    currentLabel = val();
 
 }
 
@@ -827,13 +838,13 @@ function deleteLabel() {
     }
 
     if (confirm("delete all nodes and relations  with selected label?")) {
-        var whereSubGraph="";
-        var subGraphName=$("#subGraphSelect").val()
-        if(subGraphName!="")
-            whereSubGraph=" where n.subGraph='" + subGraphName +"'"
-        var match = "Match (n) " +whereSubGraph
+        var whereSubGraph = "";
+        var subGraphName = $("#subGraphSelect").val()
+        if (subGraphName != "")
+            whereSubGraph = " where n.subGraph='" + subGraphName + "'"
+        var match = "Match (n) " + whereSubGraph
             + " return distinct labels(n)[0] as label";
-        var match = "Match (n:" + label + ") "+whereSubGraph+" DETACH delete n";
+        var match = "Match (n:" + label + ") " + whereSubGraph + " DETACH delete n";
         callNeoMatch(match, null, function (data) {
             $("#message").html("nodes with label=" + label + "deleted");
             $("#message").css("color", "green");
@@ -846,6 +857,7 @@ function deleteLabel() {
 }
 
 function addSubGraph() {
+    requests.init();
     var newSubGraph = prompt("New Subgraph name ");
     if (!newSubGraph || newSubGraph.length == 0)
         return;
@@ -908,7 +920,7 @@ function setImportSourceType() {
         $('#dbSelect').empty();
         $('#collSelect').empty();
         $('#fieldSelect').empty();
-    $("#sourceSourceDiv").css("display", "inline");
+        $("#sourceSourceDiv").css("display", "inline");
         $("#importCSVdiv").css("visibility", "hidden");
         $("#importsourceDiv").css("visibility", "visible");
         $(".dbInfos").css("visibility", "visible");
@@ -925,32 +937,31 @@ function showHelp(fieldName) {
 }
 
 
-
 function setCsvImportFields(json) {
     currentCsvObject = json;
-json.header.splice(0,0,"")
+    if (!json.header)
+        return;
+    json.header.splice(0, 0, "")
     common.fillSelectOptionsWithStringArray(fieldSelect, json.header);
     //common.fillSelectOptionsWithStringArray(fieldSelectRels, json.header);
 
     admin.initImportDialogSelects(json.header)
 
 
-
-    common.fillSelectOptionsWithStringArray(collSelect,[json.name]);
+    common.fillSelectOptionsWithStringArray(collSelect, [json.name]);
     $("#collSelect").val(json.name);
     $("#sourceRel").val(json.name);
     $("#sourceNode").val(json.name);
 
-    common.fillSelectOptionsWithStringArray(dbSelect,  [json.name]);
+    common.fillSelectOptionsWithStringArray(dbSelect, [json.name]);
 //  $("#dbSelect").val('CSV');
     onCollSelect();
-    try{
+    try {
         loadRequests();
     }
-    catch(e){
+    catch (e) {
 
     }
-
 
 
 }

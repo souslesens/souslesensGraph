@@ -25,163 +25,163 @@
  *
  ******************************************************************************/
 
-var statistics = (function(){
- var self = {};
-    self.neo4jProxyUrl="../../.."+Gparams.neo4jProxyUrl;
+var statistics = (function () {
+    var self = {};
+    self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
 
 
- var statQueries = {
-    Relations_count: " MATCH (n:$sourceLabel)$incoming-[r]-$outgoing(m$targetLabel)  return DISTINCT n as node,labels(n) as sourceLabels,labels(m) as targetLabels, type(r) as relType ,count(type(r))as relCount order by relCount desc limit $limit",
-   // incomingRelsCount: "MATCH (m:$sourceLabel)-[r]->(n$targetLabel)  return DISTINCT n.name as node,labels(n) as nodeLabels,type(r) as relType ,count(type(r))as relCount order by relCount desc limit $limit",
-}
-
-
-   self.setCurrentQueriesSelect=function() {
-   var array = [];//[""];
-
-    for (var key in statQueries) {
-        array.push(key);
-common.fillSelectOptionsWithStringArray(currentQueriesSelect, array);
-
-    }
-}
-
-   self.initLabelsCurrentQueries=function() {
-toutlesensController.initLabels( "currentQueriesSourceLabelSelect");
-toutlesensController.initLabels( "currentQueriesTargetLabelSelect");
-}
-
-
-   self.onCurrentQueriesSelect=function() {
-    currentActionObj = {type: "frequentQuery"}
-}
-
-
-   self.executeFrequentQuery=function() {
-
-
-    var queryName = $("#currentQueriesDialogSelect").val();
-    var sourceLabel = $("#currentQueriesDialogSourceLabelSelect").val();
-    var targetLabel = $("#currentQueriesDialogTargetLabelSelect").val();
-    var direction = $("#currentQueriesDialogDirectionSelect").val();
-    var limit = parseInt($("#currentQueriesDialogLimit").val());
-
-    if(queryName=="") {
-        $("#message").html("choose a query")
-        return;
-    }
-    if(sourceLabel=="") {
-        $("#message").html("choose a sourceLabel")
-        return;
+    var statQueries = {
+        Relations_count: " MATCH (n:$sourceLabel)$incoming-[r]-$outgoing(m$targetLabel)  return DISTINCT n as node,labels(n) as sourceLabels,labels(m) as targetLabels, type(r) as relType ,count(type(r))as relCount order by relCount desc limit $limit",
+        // incomingRelsCount: "MATCH (m:$sourceLabel)-[r]->(n$targetLabel)  return DISTINCT n.name as node,labels(n) as nodeLabels,type(r) as relType ,count(type(r))as relCount order by relCount desc limit $limit",
     }
 
-    var query = statQueries[queryName];
-    query = query.replace("$sourceLabel", sourceLabel);
 
+    self.setCurrentQueriesSelect = function () {
+        var array = [];//[""];
 
-    if (targetLabel && targetLabel != "")
-        targetLabel = ":" + targetLabel;
-    else
-        targetLabel = "";
-    query = query.replace("$targetLabel", targetLabel);
+        for (var key in statQueries) {
+            array.push(key);
+            common.fillSelectOptionsWithStringArray(currentQueriesSelect, array);
 
-
-    if(direction=="any"){
-        query = query.replace("$incoming", "");
-        query = query.replace("$outgoing", "");
-    }
-    else   if(direction=="outgoing"){
-        query = query.replace("$incoming", "");
-        query = query.replace("$outgoing", ">");
-    }
-    else   if(direction=="incoming"){
-        query = query.replace("$incoming", "<");
-        query = query.replace("$outgoing", "");
+        }
     }
 
-    query = query.replace("$limit", limit);
-self.buildStatTree(queryName, query, function (jsonTree) {
+    self.initLabelsCurrentQueries = function () {
+        toutlesensController.initLabels("currentQueriesSourceLabelSelect");
+        toutlesensController.initLabels("currentQueriesTargetLabelSelect");
+    }
 
-        currentDataStructure = "tree";
-        currentDisplayType = "TREEMAP";
-        toutlesensDialogsController.hideAdvancedSearch();
-        toutlesensData.cachedResultTree = jsonTree;
-        toutlesensController.displayGraph(jsonTree, currentDisplayType, null)
-    })
 
-}
+    self.onCurrentQueriesSelect = function () {
+        currentActionObj = {type: "frequentQuery"}
+    }
 
-   self.buildStatTree=function(title, query, callback) {
 
-    var payload = {match: query};
+    self.executeFrequentQuery = function () {
 
-    console.log(query);
-    $.ajax({
-        type: "POST",
-        url: self.neo4jProxyUrl,
-        data: payload,
-        dataType: "json",
-        success: function (data, textStatus, jqXHR) {
-            $("#waitImg").css("visibility", "hidden");
-            $("#message").html("")
-            if (!data || data.length == 0) {
-                 common.setMessage("No results", blue);
+
+        var queryName = $("#currentQueriesDialogSelect").val();
+        var sourceLabel = $("#currentQueriesDialogSourceLabelSelect").val();
+        var targetLabel = $("#currentQueriesDialogTargetLabelSelect").val();
+        var direction = $("#currentQueriesDialogDirectionSelect").val();
+        var limit = parseInt($("#currentQueriesDialogLimit").val());
+
+        if (queryName == "") {
+            $("#message").html("choose a query")
+            return;
+        }
+        if (sourceLabel == "") {
+            $("#message").html("choose a sourceLabel")
+            return;
+        }
+
+        var query = statQueries[queryName];
+        query = query.replace("$sourceLabel", sourceLabel);
+
+
+        if (targetLabel && targetLabel != "")
+            targetLabel = ":" + targetLabel;
+        else
+            targetLabel = "";
+        query = query.replace("$targetLabel", targetLabel);
+
+
+        if (direction == "any") {
+            query = query.replace("$incoming", "");
+            query = query.replace("$outgoing", "");
+        }
+        else if (direction == "outgoing") {
+            query = query.replace("$incoming", "");
+            query = query.replace("$outgoing", ">");
+        }
+        else if (direction == "incoming") {
+            query = query.replace("$incoming", "<");
+            query = query.replace("$outgoing", "");
+        }
+
+        query = query.replace("$limit", limit);
+        self.buildStatTree(queryName, query, function (jsonTree) {
+
+            currentDataStructure = "tree";
+            currentDisplayType = "TREEMAP";
+            toutlesensDialogsController.hideAdvancedSearch();
+            toutlesensData.cachedResultTree = jsonTree;
+            toutlesensController.displayGraph(jsonTree, currentDisplayType, null)
+        })
+
+    }
+
+    self.buildStatTree = function (title, query, callback) {
+
+        var payload = {match: query};
+
+        console.log(query);
+        $.ajax({
+            type: "POST",
+            url: self.neo4jProxyUrl,
+            data: payload,
+            dataType: "json",
+            success: function (data, textStatus, jqXHR) {
                 $("#waitImg").css("visibility", "hidden");
-                return;
-            }
-            var errors = data.errors;
-
-            if (errors && errors.length > 0) {
-                var str = "ERROR :";
-                for (var i = 0; i < errors.length; i++) {
-                    str += errors[i].code + " : " + errors[i].message + "<br>"
-                        + JSON.stringify(paramsObj);
+                $("#message").html("")
+                if (!data || data.length == 0) {
+                    common.setMessage("No results", blue);
+                    $("#waitImg").css("visibility", "hidden");
+                    return;
                 }
-                 common.setMessage("!!! erreur de requete", red);
-                console.log(str);
-                return;
-            }
-            var root = {
-                name: title,
+                var errors = data.errors;
 
-                children: [],
-                valueField: "value"
-            }
-            for (var i = 0; i < data.length; i++) {
-                var name=data[i].node.properties.name;
-                if(!name){
-                    data[i].node.properties.name=data[i].node.properties[Gparams.defaultNodeNameProperty]
+                if (errors && errors.length > 0) {
+                    var str = "ERROR :";
+                    for (var i = 0; i < errors.length; i++) {
+                        str += errors[i].code + " : " + errors[i].message + "<br>"
+                            + JSON.stringify(paramsObj);
+                    }
+                    common.setMessage("!!! erreur de requete", red);
+                    console.log(str);
+                    return;
+                }
+                var root = {
+                    name: title,
+
+                    children: [],
+                    valueField: "value"
+                }
+                for (var i = 0; i < data.length; i++) {
+                    var name = data[i].node.properties.name;
+                    if (!name) {
+                        data[i].node.properties.name = data[i].node.properties[Gparams.defaultNodeNameProperty]
+                    }
+
+                    var neoAttrs = data[i].node.properties;
+                    neoAttrs.value = data[i].relCount;
+                    neoAttrs.relType = data[i].relType;
+
+
+                    var obj = {
+                        name: data[i].node.properties.name + " --" + data[i].relType + " (" + data[i].relCount + ") " + "--> " + data[i].targetLabels[0],
+                        label: data[i].targetLabels[0],
+                        id: data[i].node._id,
+                        neoAttrs: neoAttrs
+                    }
+                    root.children.push(obj);
                 }
 
-                var neoAttrs= data[i].node.properties;
-                neoAttrs.value= data[i].relCount;
-                neoAttrs.relType= data[i].relType;
+                callback(root)
 
 
-                var obj = {
-                    name: data[i].node.properties.name + " --" + data[i].relType +" ("+data[i].relCount+") "+ "--> " + data[i].targetLabels[0],
-                    label: data[i].targetLabels[0],
-                    id:data[i].node._id,
-                    neoAttrs: neoAttrs
-                }
-                root.children.push(obj);
-            }
+            },
+            error: function (xhr, err, msg) {
+                toutlesensController.onErrorInfo(xhr)
+                console.log(xhr);
 
-            callback(root)
+            },
+
+        })
 
 
-        },
-        error: function (xhr, err, msg) {
-            toutlesensController.onErrorInfo(xhr)
-            console.log(xhr);
-
-        },
-
-    })
+    }
 
 
-}
-
-
- return self;
+    return self;
 })()

@@ -47,7 +47,7 @@ var admin = (function () {
         if (subGraph == "") {
             return alert("select a Neo4j subGraph first")
         }
-        Schema.createSchema(function (err, result) {
+        Schema.createSchema(subGraph,function (err, result) {
             Schema.save(subGraph);
             self.labels = Schema.getAllLabelNames().sort();
             self.labels.splice(0, 0, "");
@@ -88,6 +88,11 @@ var admin = (function () {
         $("#exportGraphDbDiv").load("htmlSnippets/exportGraphDbDialog.html", function () {
             loadSubgraphs();
         })
+
+        $("#adminDiv").load("htmlSnippets/adminDialog.html", function () {
+
+        })
+
 
     }
 

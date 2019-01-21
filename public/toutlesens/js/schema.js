@@ -55,10 +55,10 @@ var Schema = (function () {
          */
         self.load = function (_subGraph, callback) {
             var subGraph = _subGraph;
-            toutlesensData.executeCypher("MATCH (n:schema) where n.name='" + subGraph + "' return n", function (err, result) {
+            Cypher.executeCypher("MATCH (n:schema) where n.name='" + subGraph + "' return n", function (err, result) {
                 if (err || result.length == 0) {
                     console.log("no schema found, will create one");
-                    self.createSchema();
+                    self.createSchema(subGraph);
 
                   /*  setTimeout(function () {
                         toutlesensController.dispatchAction('showSchemaConfigDialog');//({create:1});
@@ -81,10 +81,12 @@ var Schema = (function () {
          */
 
 
-        self.createSchema = function (callback) {
-            $("#dialog").html("this schema is regenerating : this can last more than one minute...<br> <img id=\"waitImg\" src=\"images/waitAnimated.gif\" width=\"40px\" \>")
-            dialog.dialog({title: ""});
-            dialog.dialog("open");
+        self.createSchema = function (subGraph,callback) {
+            if (typeof dialog !== 'undefined') {
+                $("#dialog").html("this schema is regenerating : this can last more than one minute...<br> <img id=\"waitImg\" src=\"images/waitAnimated.gif\" width=\"40px\" \>")
+                dialog.dialog({title: ""});
+                dialog.dialog("open");
+            }
 
 
 
@@ -103,8 +105,10 @@ var Schema = (function () {
 
 
                     self.initSchema(_schema);
-                    $("#dialog").html("new schema is ready : reload page to use it")
-                    dialog.dialog("close");
+                    if (typeof dialog !== 'undefined') {
+                        $("#dialog").html("new schema is ready : reload page to use it")
+                        dialog.dialog("close");
+                    }
 
                     if (callback)
                         return callback(null, self.schema)
@@ -116,7 +120,7 @@ var Schema = (function () {
 
         self.delete = function (confirmation, callback) {
             if (confirmation && confirm("delete  this schema ?")) {
-                toutlesensData.executeCypher("MATCH (n:schema) where n.name='" + subGraph + "' delete n", function (err, result) {
+                Cypher.executeCypher("MATCH (n:schema) where n.name='" + subGraph + "' delete n", function (err, result) {
                     if (callback)
                         return callback(err, result)
                     if (err) {
@@ -158,7 +162,7 @@ var Schema = (function () {
                 if (err)
                     return console.log(err);
 
-                self.createSchema() ;
+                self.createSchema(subGraph) ;
 
 
 
@@ -283,7 +287,7 @@ var Schema = (function () {
             var schemaData = btoa(JSON.stringify(json));
 var cypher="CREATE (n:schema{name:'" + subGraph + "',data:'" + schemaData + "'}) return  n.name"
             console.log(cypher);
-            toutlesensData.executeCypher(cypher, function (err, result) {
+            Cypher.executeCypher(cypher, function (err, result) {
 
                 if (err) {
                     if (callback)

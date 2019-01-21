@@ -169,7 +169,7 @@
     <script src="js/savedQueries.js"></script>
     <script src="js/searchMenu.js"></script>
 
-
+    <script src="../common/js/cypher.js"></script>
     <!-- <script src="js/d3graphCreation.js"></script>-->
     <script src="../common/js/others/async.js"></script>
 
@@ -358,7 +358,7 @@
             $("body").height(totalHeight);
 
 
-            rightPanelWidth =  Gparams.rightPanelWidth;
+            rightPanelWidth = Gparams.rightPanelWidth;
             filterDiv = "radarFiltersDiv";
             bcsTreeDiv = "#bcsTreeDiv";
             radarDiv = "#radarDiv";
@@ -373,10 +373,12 @@
                 customizeUI.customize,
                 toutlesensController.afterGraphInit,
                 statistics.initLabelsCurrentQueries,
+                functionalities.initFunctionalities
+
                 //  advancedSearch.patternInitLabels,
                 // advancedSearch.patternInitRelTypes,
                 // advancedDisplay.initDecorationDiv,
-                functionalities.initFunctionalities
+
 
             ]
 
@@ -404,6 +406,8 @@
                 Gparams.displayVersion = queryParams.displayVersion
             }
             versionController.applyVersion(version);
+
+
         })
 
 
@@ -686,7 +690,7 @@
 
     </div>
 
-  <h3><b>Analyze</b></h3>
+    <h3><b>Analyze</b></h3>
     <div id="analyzePanel" class="mainAccordionPanel">
 
 

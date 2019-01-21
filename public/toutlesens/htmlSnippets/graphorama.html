@@ -45,7 +45,7 @@
                 }
 
                 var cypher = 'MERGE (n:visjsGraphorama { subGraph:"users",name:"' + name + '",user:"' + self.user + '",date:"' + date + '" }) RETURN ID(n) as id;'
-                toutlesensData.executeCypher(cypher, function (err, result) {
+                Cypher.executeCypher(cypher, function (err, result) {
                     if (err)
                         console.log(err);
                     var x = result;
@@ -79,7 +79,7 @@
                 "create (n)-[r:inGraphorama]->(m) return ID(n) as id"
 
             console.log(cypher)
-            toutlesensData.executeCypher(cypher, function (err, result) {
+            Cypher.executeCypher(cypher, function (err, result) {
                 if (err)
                     console.log(err);
                 $('#treeDivGraphorama').jstree(true).create_node(graphoramaId, {
@@ -105,7 +105,7 @@
             var cypher = "match(n:visjsGraph) where ID(n)=" + id +
                 " set n.data='" + graphData64 + "', n.date='" + date + "' , n.description='" + description + "'"
          //   console.log(cypher)
-            toutlesensData.executeCypher(cypher, function (err, result) {
+            Cypher.executeCypher(cypher, function (err, result) {
                 if (err)
                     return console.log(err);
               //  var xx= $('#treeDivGraphorama').jstree(true).get_node(id).data
@@ -121,7 +121,7 @@
 
         self.deleteGraphorama = function (id) {
             if (confirm("delete Graphorama  and all its slides ")) {
-                toutlesensData.executeCypher("MATCH (n:visjsGraphorama) where ID(n)=" + id + " detach delete n", function (err, result) {
+                Cypher.executeCypher("MATCH (n:visjsGraphorama) where ID(n)=" + id + " detach delete n", function (err, result) {
                     if (err)
                         return console.log(err)
 
@@ -138,7 +138,7 @@
         }
         self.deleteSlide = function (id) {
             if (confirm("delete Graph ")) {
-                toutlesensData.executeCypher("MATCH (n:visjsGraph) where ID(n)=" + id + " detach delete n", function (err, result) {
+                Cypher.executeCypher("MATCH (n:visjsGraph) where ID(n)=" + id + " detach delete n", function (err, result) {
                     if (err)
                         return console.log(err)
 
@@ -157,7 +157,7 @@
 
         self.initGraphoramasTree = function () {
 
-            toutlesensData.executeCypher("MATCH (n:visjsGraphorama) where n.subGraph='users' and n.user='" + self.user + "' return  n", function (err, result) {
+            Cypher.executeCypher("MATCH (n:visjsGraphorama) where n.subGraph='users' and n.user='" + self.user + "' return  n", function (err, result) {
                 treeData = []
                 result.forEach(function (line) {
                     treeData.push({text: line.n.properties.name, id: line.n._id, children: []})
@@ -191,7 +191,7 @@
         }
         self.loadGraphorama = function (id) {
             $("#toTextMenuButton").css("visibility","visible");
-            toutlesensData.executeCypher("MATCH (n:visjsGraphorama)-[r]-(m:visjsGraph) where ID(n)=" + id + " return m", function (err, result) {
+            Cypher.executeCypher("MATCH (n:visjsGraphorama)-[r]-(m:visjsGraph) where ID(n)=" + id + " return m", function (err, result) {
                 if (err)
                     return console.log(err);
 
@@ -282,7 +282,7 @@
 
             var cypher="MATCH (n:visjsGraph) where ID(n)=" + slideId + " return n"
             console.log()
-            toutlesensData.executeCypher(cypher, function (err, result) {
+            Cypher.executeCypher(cypher, function (err, result) {
                 if (err)
                     return console.log(err);
                 try {

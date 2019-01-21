@@ -731,7 +731,7 @@ var toutlesensController = (function () {
                 var cypher = " match(n)-[]-(p)-[]-(m) where ID(n)=" + currentObject.fromNode.id + " AND ID(m)=" + currentObject.toNode.id + " return p";
 
 
-                toutlesensData.executeCypher(cypher, function (err, result) {
+                Cypher.executeCypher(cypher, function (err, result) {
                     var newNodes = [];
                     var newRelations = [];
                     var fromId = currentObject.fromNode.id
@@ -1021,6 +1021,21 @@ var toutlesensController = (function () {
 
             }
             else if (action == "showSchema") {
+
+                function generateSchemaGraph(){
+                    dataModel.getDBstats(subGraph, function () {
+                        var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
+                        visjsGraph.draw("graphDiv", data, graphOptions, function () {
+                            Schema.currentGraph = visjsGraph.exportGraph();
+                            var str = "{\"nodes\":" + JSON.stringify(Schema.currentGraph, null, 2) + ",\"edges\":" + JSON.stringify(Schema.currentGraph.edges, null, 2) + "}";
+                            localStorage.setItem("schemaGraph_" + subGraph, str);
+                        });
+                    });
+                }
+
+
+
+
                 var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
 
                 currentActionObj.graphType = "schema";
@@ -1055,6 +1070,11 @@ var toutlesensController = (function () {
                     }
                 };
 
+                if(objectId==true) {// reset
+                    localStorage.removeItem("schemaGraph_" + subGraph);
+                   return generateSchemaGraph();
+                }
+
 
                 if (Schema.currentGraph) {
 
@@ -1067,20 +1087,10 @@ var toutlesensController = (function () {
                     if (graphStr) {
                         Schema.currentGraph = JSON.parse(graphStr);
                         visjsGraph.importGraph(Schema.currentGraph, graphOptions);
-                      /*  dataModel.getDBstats(subGraph, function () {
-                            visjsGraph.importGraph(Schema.currentGraph, graphOptions);
-                        });*/
+
                     }
                     else {
-                        dataModel.getDBstats(subGraph, function () {
-                            var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
-                            self.openFindAccordionPanel(false);
-                            visjsGraph.draw("graphDiv", data, graphOptions, function () {
-                                Schema.currentGraph = visjsGraph.exportGraph();
-                                var str = "{\"nodes\":" + JSON.stringify(Schema.currentGraph, null, 2) + ",\"edges\":" + JSON.stringify(Schema.currentGraph.edges, null, 2) + "}";
-                                localStorage.setItem("schemaGraph_" + subGraph, str);
-                            });
-                        });
+                        generateSchemaGraph();
                     }
                 }
             }
@@ -1180,7 +1190,8 @@ var toutlesensController = (function () {
 
 
             currentActionObj = {graphType: "schema"};
-            self.dispatchAction("showSchema");
+            toutlesensController.dispatchAction("showSchema");
+
 
             //  paramsController.loadParams();
             var tabsanalyzePanelDisabledOptions = [];
@@ -1251,7 +1262,7 @@ var toutlesensController = (function () {
 
             $("#queryDiv").load("htmlSnippets/advancedSearchDialog.html", function () {
 
-                searchMenu.init(Schema);
+              searchMenu.init(Schema);
             });
             $("#filterDiv").load("htmlSnippets/filterDialog.html", function () {
 
@@ -1278,6 +1289,7 @@ var toutlesensController = (function () {
                 paint.initHighlight();
                 filters.setLabelsOrTypes("node");
             });
+
 
 
         }

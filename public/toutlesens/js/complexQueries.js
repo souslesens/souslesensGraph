@@ -25,7 +25,7 @@ var complexQueries = (function () {
             "<br><div id='complexQueries_cypherDiv'></div>" +
             "<br><div id='complexQueries_resultDiv'></div>" +
             "<br><div id='complexQueries_resultActionDiv'></div>"
-
+        $("#graphPopup").css("visibility", "hidden")
         $("#graphDiv").html(globalHtml)
 
     }
@@ -40,12 +40,12 @@ var complexQueries = (function () {
             classInResult = " complexQueries-nodeInResultDiv";
 
 
-        var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' complexQueries-nodeDiv " + classInResult + "'  onclick='self.setNodeDivIndex(" + index + ")'>" +
+        var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' complexQueries-nodeDiv " + classInResult + "'  onclick='complexQueries.onSelectNodeDiv(" + index + ")'>" +
             " <div class='complexQueries-partDiv' style='background-color: " + color + "'><b>Label : " + queryObj.label + "</b></div>" +
             "<div class='complexQueries-partDiv'> Condition : " + queryText + "</div>" +
             " <div class='complexQueries-partDiv'><button  id='complexQueries_inResultButton'  onclick='complexQueries.nodeInResult(" + index + ")'>not in result</button> </div>" +
             // "<button onclick='complexQueries.removeQueryObj(" + index + ")'>X</button>" +
-            "<input type='image' height='10px'  title='remove node' onclick='complexQueries.removeQueryObj(\" + index + \")' src='images/trash.png'/>" +
+            "<input type='image' height='10px'  title='remove node' onclick='complexQueries.removeQueryObj(" + index + ")' src='images/trash.png'/>" +
             "</div>"
 
 
@@ -55,12 +55,23 @@ var complexQueries = (function () {
     }
 
 
-    self.setNodeDivIndex = function (index) {
+    self.onSelectNodeDiv = function (index) {
         currentDivIndex = index;
+        $(".complexQueries-nodeDiv ").removeClass("complexQueries-nodeDivSelected")
+        $("#complexQuery_nodeDiv_" + index).addClass("complexQueries-nodeDivSelected")
+
     }
     self.removeQueryObj = function (index) {
+        if (index == 0) {
+            searchMenu.setUIPermittedLabels();
+            searchMenu.resetQueryClauses();
+            $("#graphDiv").html("");
+        }
+        else
+            searchMenu.setUIPermittedLabels(queryObjs[index - 1].label);
         queryObjs.splice(index, 1)
         self.draw();
+
 
     }
 
@@ -95,7 +106,7 @@ var complexQueries = (function () {
 
         var cypher = self.buildQuery();
         $("#complexQueries_cypherDiv").html(cypher)
-        toutlesensData.executeCypher(cypher, function (err, result) {
+        Cypher.executeCypher(cypher, function (err, result) {
             if (err) {
                 return $("#complexQueries_resultDiv").html(err)
             }
@@ -139,12 +150,13 @@ var complexQueries = (function () {
         var matchCypher = "";
         var whereCypher = "";
         var returnCypher = "";
+        var distinctWhere = "";
         var alphabet = "abcdefghijklmno"
         queryObjs.forEach(function (queryObj, index) {
-            var letter = alphabet.charAt(index)
+            var symbol = alphabet.charAt(index)
             if (index > 0)
                 matchCypher += "-[r" + index + "]-"
-            matchCypher += "(" + letter + ":" + queryObj.label + ")";
+            matchCypher += "(" + symbol + ":" + queryObj.label + ")";
 
             if (queryObj.value && queryObj.value != "") {
                 var where = ""
@@ -158,18 +170,23 @@ var complexQueries = (function () {
                 }
                 if (whereCypher.length > 0)
                     whereCypher += " and "
-                whereCypher += " " + letter + "." + where + " "
+                whereCypher += " " + symbol + "." + where + " "
             }
             if (queryObj.inResult) {
-                if (returnCypher.length > 0)
-                    returnCypher += ","
-                returnCypher += letter
+
+                if (returnCypher.length > 0) {
+                    returnCypher += ",";
+                    distinctWhere += "+'-'+"
+                }
+                returnCypher += symbol;
+                distinctWhere += "ID(" + symbol + ")";
             }
         })
         if (whereCypher.length > 0)
             whereCypher = " where " + whereCypher;
 
-        var cypher = " match " + matchCypher + " " + whereCypher + " return " + returnCypher + " limit " + Gparams.maxResultSupported;
+        distinctWhere = "distinct(" + distinctWhere + ") as distinctIds";// pour supprimer les doublons
+        var cypher = " match " + matchCypher + " " + whereCypher + " return " + distinctWhere + "," + returnCypher + " limit " + Gparams.maxResultSupported;
         return cypher;
     }
 
@@ -183,6 +200,8 @@ var complexQueries = (function () {
             var lineObj = {};
 
             for (var key in line) {// each node type
+                if (key == "distinctIds")
+                    continue;
                 if (labelSymbols.indexOf(key) < 0)
                     labelSymbols.push(key);
 
@@ -214,10 +233,32 @@ var complexQueries = (function () {
 
 
     self.displayTable = function () {
+
+        function getConnections(line) {
+            var connections = {}
+            var nodeKeys = Object.keys(line);
+            nodeKeys.forEach(function (key) {
+                connections[key] = "";
+                nodeKeys.forEach(function (key2, indexKey2) {
+                    if (key2 != key) {
+                        if (connections[key] != "")
+                            connections[key] += ","
+                        connections[key] += line[key2].neoAttrs[Schema.getNameProperty(line[key2].label)] + "[" + line[key2].label + "]"
+                    }
+
+                })
+            })
+            return connections;
+        }
+
+
         var tableDataset = [];
         var columns = self.currentDataset.columns;
         self.currentDataset.data.forEach(function (line) {
+
+            var connections = getConnections(line);
             for (var nodeKey in line) {
+
                 var datasetLine = {};
                 datasetLine["label"] = line[nodeKey].neoAttrs["labelNeo"];
                 columns.forEach(function (col) {
@@ -228,6 +269,10 @@ var complexQueries = (function () {
                         datasetLine[col] = value;
                     }
                 })
+                if (connections[nodeKey].length > 0)
+                    datasetLine.connectedTo = connections[nodeKey]
+
+
                 tableDataset.push(datasetLine);
             }
 
@@ -306,6 +351,7 @@ var complexQueries = (function () {
         })
 
         visjsGraph.draw("graphDiv", visjsData, {}, function (err, result) {
+            visjsGraph.drawLegendVisj(visjsData.labels);
             var xx = err;
         })
 
