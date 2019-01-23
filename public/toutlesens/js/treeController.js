@@ -84,10 +84,11 @@ var treeController = (function () {
             labels.sort();
 
 
-            if (nodesLabelsSelect)
+            if (typeof nodesLabelsSelect !="undefined") {
                 $("#nodesLabelsSelect").empty()
                     .append('<option value=""></option>')
-            common.fillSelectOptionsWithStringArray(nodesLabelsSelect, labels);
+                common.fillSelectOptionsWithStringArray(nodesLabelsSelect, labels);
+            }
 
 
         }
@@ -851,8 +852,8 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
 
 }*/
             currentLabel = node.text;
-            if (currentObject)
-                currentObject.id = null;
+            if (context.currentNode)
+                context.currentNode.id = null;
             return toutlesensController.generateGraph(null, {applyFilters: true});
         }
         currentLabel =null;
@@ -876,8 +877,8 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
             //   toutlesensController.addToHistory = true;
             toutlesensController.generateGraph(parentId, {});
           tabsAnalyzePanel.tabs("option", "active", 0);
-            currentObject=node;
-            currentObject.id=node.neoId;
+            context.currentNode=node;
+            context.currentNode.id=node.neoId;
             $("#nodeInfoMenuDiv").css("visibility","visible");
             toutlesensController.dispatchAction("nodeInfos", parentId);
 
@@ -893,8 +894,8 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
             return;
         }
         toutlesensController.checkMaxNumberOfNodeRelations(parentId, Gparams.jsTreeMaxChildNodes, function () {
-            currentObject = node.data;
-            currentObject.id = parentId;
+            context.currentNode = node.data;
+            context.currentNode.id = parentId;
 
             /*   if (node.data.label)
              var label = node.data.label;*/

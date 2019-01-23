@@ -76,7 +76,7 @@ var traversalController = (function () {
                 traversalController.context.start.queryObj = queryObj;
                 $("#dialog").dialog("close");
                 $("#pathes_sourceNode").html(JSON.stringify(queryObj));
-                graphicController.startLabel = queryObj.nodeLabel;
+            //    graphicController.startLabel = queryObj.nodeLabel;
 
                 $("#waitImg").css("visibility", "hidden")
                 $("#traversalFindDiv").css("visibility", "hidden");
@@ -192,7 +192,7 @@ var traversalController = (function () {
             } else {//pathes between two nodes
                 where = " ID(n)=" + self.context.start.id + " and ID(m)=" + self.context.end.id
             }
-            toutlesensData.whereFilter = where;
+            context.cypherMatchOptions.sourceNodeWhereFilter = where;
             var transitivityLevel;
             if (options=="incrementTransitivityLevel") {
                 transitivityLevel =currentTransitivityLevel+1;
@@ -227,7 +227,7 @@ var traversalController = (function () {
                   //  toutlesensData.matchStatement = "(n" + startLabelStr + ")-[r*" + transitivityLevel + "]-(m" + endLabelStr + ")";
 
                     $("#cypherDialog_matchInput").val(toutlesensData.matchStatement);
-                    $("#cypherDialog_whereInput").val(toutlesensData.whereFilter);
+                    $("#cypherDialog_whereInput").val(context.cypherMatchOptions.sourceNodeWhereFilter);
                     $("#shortestPathDistance").html("Transitivity level :" + transitivityLevel)
 
 
@@ -291,7 +291,7 @@ var traversalController = (function () {
             } else {//pathes between two nodes
                 where = " ID(n)=" + self.context.start.id + " and ID(m)=" + self.context.end.id
             }
-            toutlesensData.whereFilter = where;
+            context.cypherMatchOptions.sourceNodeWhereFilter = where;
             var transitivityLevel;
             if (options=="incrementTransitivityLevel") {
                 transitivityLevel =currentTransitivityLevel+1;
@@ -325,7 +325,7 @@ var traversalController = (function () {
                     toutlesensData.matchStatement = "(n" + startLabelStr + ")-[r*" + transitivityLevel + "]-(m" + endLabelStr + ")";
 
                     $("#cypherDialog_matchInput").val(toutlesensData.matchStatement);
-                    $("#cypherDialog_whereInput").val(toutlesensData.whereFilter);
+                    $("#cypherDialog_whereInput").val(context.cypherMatchOptions.sourceNodeWhereFilter);
                     $("#shortestPathDistance").html("Transitivity level :" + transitivityLevel)
 
 

@@ -1,13 +1,13 @@
 var searchUI = (function () {
     var self = {}
     self.authenticationUrl = "../../../authentication";
-    self.userIndexes=[];
+    self.userIndexes = [];
     self.doLogin = function (group) {
-        var login=$("#loginInput").val();
-        var password=$("#passwordInput").val();
+        var login = $("#loginInput").val();
+        var password = $("#passwordInput").val();
         // var match=password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
 
-        if(!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
+        if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)) {
             $("#loginMessage").html("invalid  login : Minimum eight characters, at least one uppercase letter, one lowercase letter and one number");
         }
         var payload = {
@@ -23,14 +23,13 @@ var searchUI = (function () {
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
 
-                if(!$.isArray(data))
+                if (!$.isArray(data))
                     return $("#loginMessage").html("invalid  login or password");
 
-                else if(data.length==0){
+                else if (data.length == 0) {
                     return $("#loginMessage").html("invalid  login or password");
 
                 }
-
 
 
                 $("#loginDiv").css("visibility", "hidden");
@@ -68,7 +67,7 @@ var searchUI = (function () {
 
                 for (var i = 0; i < self.userIndexes.length; i++) {
 
-                    indexesCxbs += "<li><input type='checkbox' checked='checked' onchange='searchUI.search()' name='indexesCbxes' value='" + self.userIndexes[i] + "'> <button class='indexCbxButton' onclick='searchUI.filterIndex(\"" + self.userIndexes[i]+ "\")'>O</button>" + self.userIndexes[i] + "<span id='indexCbxSpan_" + self.userIndexes[i] + "'></span></li>"
+                    indexesCxbs += "<li><input type='checkbox' checked='checked' onchange='searchUI.search()' name='indexesCbxes' value='" + self.userIndexes[i] + "'> <button class='indexCbxButton' onclick='searchUI.filterIndex(\"" + self.userIndexes[i] + "\")'>O</button>" + self.userIndexes[i] + "<span id='indexCbxSpan_" + self.userIndexes[i] + "'></span></li>"
                 }
                 indexesCxbs += "<ul>";
                 $("#sourcesDiv").html(indexesCxbs);
@@ -80,8 +79,8 @@ var searchUI = (function () {
     }
 
     self.search = function (options, callback) {
-        if(!options){
-            options={}
+        if (!options) {
+            options = {}
         }
 
         var from;
@@ -119,11 +118,11 @@ var searchUI = (function () {
 
         var index = $("#indexInput").val();
         var word = $("#searchInput").val().trim();
-        word=word.toLowerCase();
+        word = word.toLowerCase();
         var booleanSearchMode = $("#booleanSearchSelect").val();
 
         var addWordInput = $("#addWordInput").val();
-        addWordInput=addWordInput.toLowerCase();
+        addWordInput = addWordInput.toLowerCase();
 
         if (addWordInput && addWordInput.length > 0) {
             self.addAssociatedWord(addWordInput, true);
@@ -140,7 +139,6 @@ var searchUI = (function () {
                $("#resultDiv").html("Impossible to have a query with this pattern : xxx* yyy and a distance between the two words. remove * or set distance to 0");
                return;
            }*/
-
 
 
         var classifierSourceStr = $("#classifierSource").val();
@@ -168,10 +166,10 @@ var searchUI = (function () {
             }
         };
 
-        if(advancedSearch.queryObject.query){
-            payload.options.queryObject=advancedSearch.queryObject.query;
-            payload.options.indexName=advancedSearch.queryObject.indexName;
-            payload.options.getAssociatedWords.indexName=advancedSearch.queryObject.indexName;
+        if (advancedSearch.queryObject.query) {
+            payload.options.queryObject = advancedSearch.queryObject.query;
+            payload.options.indexName = advancedSearch.queryObject.indexName;
+            payload.options.getAssociatedWords.indexName = advancedSearch.queryObject.indexName;
 
 
         }
@@ -182,7 +180,7 @@ var searchUI = (function () {
         if (associatedWords.length > 0)
             payload.options.andWords = associatedWords;
 
-        if(options.format)
+        if (options.format)
             payload.options.format = options.format;
         var queryField = $("#queryFieldSelect").val();
         if (queryField != "") {
@@ -190,7 +188,7 @@ var searchUI = (function () {
         } else {
             $("#queryFieldSpan").css("visibility", "hidden");
         }
-
+        $("#waitImg").css("visibility", "visible");
         $.ajax({
             type: "POST",
             url: elasticUrl,
@@ -198,9 +196,11 @@ var searchUI = (function () {
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
                 self.processSearchResults(data, callback);
+                $("#waitImg").css("visibility", "hidden");
 
             }
-            , error: function ( err) {
+            , error: function (err) {
+                $("#waitImg").css("visibility", "hidden");
                 console.log(err.responseText)
                 if (callback) {
                     return callback(err)
@@ -212,7 +212,7 @@ var searchUI = (function () {
 
     }
 
-    self.processSearchResults=function(data, callback) {
+    self.processSearchResults = function (data, callback) {
         $("#infos").css("visibility", "visible");
         $(".rightPanelTd").css("visibility", "visible");
         $("#clearSearchInputsImg").css("visibility", "visible");
@@ -286,7 +286,6 @@ var searchUI = (function () {
                     str += "<a " + linkClass + "href='javascript:searchUI.search({start:" + (k - 1) * fetchSize + ",pageIncrement:0,pageOffset:" + k + "})'>" + k + "</a>&nbsp;&nbsp;"
                     k++;
                 }
-
 
 
                 if (i > maxPagesLinks * fetchSize) {
@@ -382,10 +381,8 @@ var searchUI = (function () {
     }
 
 
-
-
     self.addAssociatedWord = function (word, dontSearch) {
-        if(associatedWords.indexOf(word)<0)
+        if (associatedWords.indexOf(word) < 0)
             associatedWords.push(word);
         self.showAssociatedWordsBreadcrumb();
         if (!dontSearch)
@@ -544,11 +541,10 @@ var searchUI = (function () {
                     $("#dialog").load("htmlSnippets/showDocContent.html", function () {
                         $('#advancedSearchDialog_fieldInput').attr('disabled', 'disabled');
                         $("#dialogContentDiv").html(html);
-                        var title="";
-                        if(doc.title)
-                            title= doc.title;
+                        var title = "";
+                        if (doc.title)
+                            title = doc.title;
                         $("#detailsTitle").html(title);
-
 
 
                     })
@@ -759,7 +755,7 @@ var searchUI = (function () {
     }
 
     self.toCsv = function () {
-        self.search({format:"CSV"}, function (err, data) {
+        self.search({format: "CSV"}, function (err, data) {
             var csvFields = data.csvFields;
             data = data.docs;
             var str = "";
@@ -782,7 +778,7 @@ var searchUI = (function () {
 
                 }
             }
-            str +="source;"
+            str += "source;"
             for (var j = 1; j < keys.length; j++) {
                 str += keys[j] + ";"
 
@@ -911,14 +907,14 @@ var searchUI = (function () {
     }
 
     self.showIndexesStats = function (data) {
-        for(var i=0;i<self.userIndexes.length;i++){
+        for (var i = 0; i < self.userIndexes.length; i++) {
             $("#indexCbxSpan_" + self.userIndexes[i]).html(" (0)");
         }
         //  $("#sourcesDiv").html(indexesCxbs)
         for (var i = 0; i < data.length; i++) {
             // var str = + data[i].key
             $("#indexCbxSpan_" + data[i].key).html(" (" + data[i].count + ")");
-            $("[name=indexCbxSpan] [value="+data[i].key+"]").prop("checked",true);
+            $("[name=indexCbxSpan] [value=" + data[i].key + "]").prop("checked", true);
 
             //  indexesCxbs += "<li><input type='checkbox' checked='checked' name='indexesCbxes' value='" + data[i].key + "'>" + data[i].key+" ("+ data[i].count+")</li>"
         }

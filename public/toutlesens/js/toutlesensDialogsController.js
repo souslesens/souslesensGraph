@@ -140,11 +140,11 @@ self.getNodeInfoButtons=function(){
     self.setPopupMenuRelationInfoContent=function() {
 
        var str="";
-      str+= "relType :"+currentObject.type+"<br>";
-        str+= "["+currentObject.fromNode.labelNeo+"]"+currentObject.fromNode.label+"<br>";
-        str+= "--> ["+currentObject.toNode.labelNeo+"]"+currentObject.toNode.label;
+      str+= "relType :"+context.currentNode.type+"<br>";
+        str+= "["+context.currentNode.fromNode.labelNeo+"]"+context.currentNode.fromNode.label+"<br>";
+        str+= "--> ["+context.currentNode.toNode.labelNeo+"]"+context.currentNode.toNode.label;
  //  str+="<td> <input type='image' height='20px' title='infos'  onclick='toutlesensController.dispatchAction(\"deleteRelation\")' src='images/trash.png'/></td>";-->
-        if( currentObject.type=="composite") {
+        if( context.currentNode.type=="composite") {
 
             str += "<br><a href='javascript:toutlesensController.dispatchAction(\"showRelClusterIntermediateNodes\");'>show intermediateNodes</a>";
         }
@@ -154,14 +154,14 @@ self.getNodeInfoButtons=function(){
    self.setPopupMenuNodeInfoContent=function() {
        var name;
       var label;
-      if(currentObject.labelNeo)// because visjs where label is the node name
-          label=currentObject.labelNeo;
+      if(context.currentNode.labelNeo)// because visjs where label is the node name
+          label=context.currentNode.labelNeo;
       else
-          label=currentObject.label;
-       if(currentObject.neoAttrs)
-           name= currentObject.neoAttrs[Schema.schema.defaultNodeNameProperty]
+          label=context.currentNode.label;
+       if(context.currentNode.neoAttrs)
+           name= context.currentNode.neoAttrs[Schema.schema.defaultNodeNameProperty]
        else
-           name= currentObject[Schema.schema.defaultNodeNameProperty]
+           name= context.currentNode[Schema.schema.defaultNodeNameProperty]
  name=textOutputs.formatNode(name+"<br>");
 
 
@@ -178,15 +178,15 @@ self.getNodeInfoButtons=function(){
   str+="</td></tr><tr><td>"
 
     str+=   "<B><span style='color:" + nodeColors[label] + "'> [" + label + "]<span>" +"</B>"+name+"<br>";
-    var customInfo=customizeUI.customInfo(currentObject);
+    var customInfo=customizeUI.customInfo(context.currentNode);
 
        str+="</td></tr><tr><td>"
     if(customInfo && customInfo.length>0)
-       str +=customizeUI.customInfo(currentObject)+"<br>";
+       str +=customizeUI.customInfo(context.currentNode)+"<br>";
 
 
        if( true){// show properties
-           toutlesensData.getNodeInfos(currentObject.id, function (obj) {
+           toutlesensData.getNodeInfos(context.currentNode.id, function (obj) {
 
                str += textOutputs.formatNodeInfo(obj[0].n.properties);
                str += "<br>" + customizeUI.customInfo(obj);
@@ -196,8 +196,8 @@ self.getNodeInfoButtons=function(){
 
        }
        str+="</td>"
-       if( currentObject.neoAttrs && currentObject.neoAttrs.image ){
-           str+="<td> <img src='"+currentObject.neoAttrs.image+"' width='100px'></td>"
+       if( context.currentNode.neoAttrs && context.currentNode.neoAttrs.image ){
+           str+="<td> <img src='"+context.currentNode.neoAttrs.image+"' width='100px'></td>"
        }
        str+="<td>"
 

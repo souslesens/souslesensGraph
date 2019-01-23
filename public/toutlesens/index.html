@@ -85,7 +85,6 @@
     <script src="js/toutlesensController.js"></script>
     <script src="js/toutlesensData.js"></script>
     <script src="js/toutlesensDialogsController.js"></script>
-    <script src="js/graphicController.js"></script>
     <script src="js/filters.js"></script>
     <script src="js/paint.js"></script>
     <script src="js/traversalController.js"></script>
@@ -387,12 +386,12 @@
                     return setMessage("Error cannot load Schema");
                 // play init UI methods after schema is loaded
                 for (var i = 0; i < afterLoadModelTasks.length; i++) {
-                    try {
+                 //   try {
                         afterLoadModelTasks[i](subGraph);
-                    }
+                /*    }
                     catch (err) {
                         console.log("" + i + "  " + err);
-                    }
+                    }*/
                 }
 
                 toutlesensController.appInitEnded = true;
@@ -432,8 +431,7 @@
     <input type="image" title="<span id='lang_XX'>schema</span>" height="20px"
 
            id="schemaButton" src="images/cube.png"/>
-    <!-- <input type="image" title="<span id='lang_XX'>search</span>" height="20px" onclick="advancedSearch.showDialog({multipleClauses:true})"
-           id="searchButton2" src="images/advancedSearch2.png"/>-->
+
     <input type="image" title="display settings" height="20px"
            onclick="toutlesensController.dispatchAction('displaySettings')"
            id="displaySettingButton" src="images/display.png"/></td>
@@ -514,17 +512,6 @@
                                                    src="images/erase.png"></td>
 
 
-                                        <!--  <td><input type="image"   title="<span id='lang_XX'>search</span>"
-                                                     height="30px"
-                                                     id="advancedSearchButton"
-                                                     src="images/advancedSearch2.png"/>
-
-                                          <td><input type="image"   title="<span id='lang_XX'>tag cloud</span>"
-                                                     height="30px"
-                                                     id="tagCloudButton"
-                                                     src="images/tagCloud.png"/>
-
-                                                     -->
 
 
                                     </tr>

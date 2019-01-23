@@ -24,7 +24,7 @@ var tagCloud = (function () {
 
 
     self.onTagClick = function (text) {
-        var label =context.querySourceLabel;
+        var label =context.queryObject.Label;
         var clauses = [{
             nodeLabel: "",
             where: "n.name=~'(?i).*" + text + ".*'"

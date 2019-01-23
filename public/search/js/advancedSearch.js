@@ -224,13 +224,14 @@ var advancedSearch = (function () {
             }
         };
 
-
+        $("#waitImg2").css("visibility", "visible");
         $.ajax({
             type: "POST",
             url: elasticUrl,
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
+                $("#waitImg2").css("visibility", "hidden");
                 $("#dialog").css("visibility", "hidden");
                  $("#advancedSearchDialog_searchDiv").css("visibility", "hidden");
                 $("#queryTextDiv").html($("#advancedSearchDialog_criteriaDiv").html());
@@ -238,6 +239,7 @@ var advancedSearch = (function () {
 
             }
             , error: function (xhr, err, msg) {
+                $("#waitImg2").css("visibility", "hidden");
                 //   $("#dialog").css("visibility", "hidden");
                 //   $("#advancedSearchDialog_searchDiv").css("visibility", "hidden");
 

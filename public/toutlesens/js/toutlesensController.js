@@ -101,22 +101,22 @@ var toutlesensController = (function () {
             $("#" + self.displayButtons[currentDisplayType]).addClass("displayIcon-selected");
 
             if (currentDisplayType.indexOf("FORCE") > -1) {
-                currentObject.id = null;
+                context.currentNode.id = null;
                 if (Gparams.useVisjsNetworkgraph)
                     currentDisplayType = "VISJS-NETWORK"
 
             }
             else {
                 if (!id) {
-                    if (!currentObject.id && (currentDataStructure == "tree" || currentDisplayType == "CARDS" || currentDisplayType == "FORM")) {
+                    if (!context.currentNode.id && (currentDataStructure == "tree" || currentDisplayType == "CARDS" || currentDisplayType == "FORM")) {
                         self.setGraphMessage("A node must be selected for this graph type ", "stop");
                         if (callback)
                             return callback(null, {});
                         return;
                     }
-                    id = currentObject.id;
-                    if (!id && currentObject) {
-                        id = currentObject.id;
+                    id = context.currentNode.id;
+                    if (!id && context.currentNode) {
+                        id = context.currentNode.id;
                     }
 
                 }
@@ -124,11 +124,11 @@ var toutlesensController = (function () {
                     toutlesensData.setWhereFilterWithArray("_id", id);
                 }
                 else
-                    toutlesensData.whereFilter = "";
+                    context.cypherMatchOptions.sourceNodeWhereFilter = "";
             }
 
 
-            currentObject.id = id;
+            context.currentNode.id = id;
 
 
             if (options && options.applyFilters) {
@@ -138,7 +138,7 @@ var toutlesensController = (function () {
                   tabsAnalyzePanel.tabs("enable", 2);*/
 
 
-               // tabsAnalyzePanel.tabs("option", "disabled", []);
+                // tabsAnalyzePanel.tabs("option", "disabled", []);
                 tabsAnalyzePanel.tabs("enable", 1);
                 tabsAnalyzePanel.tabs("enable", 2);
                 // $("#tabs-analyzePanel").tabs("enable", 1);
@@ -328,10 +328,10 @@ var toutlesensController = (function () {
 
             if (type != "") {
                 if (property != "" && value != "") {
-                    toutlesensData.queryRelWhereFilter = "r." + property + operator + value;
+                    context.cypherMatchOptions.queryRelWhereFilter = "r." + property + operator + value;
                 }
-                toutlesensData.queryRelTypeFilters = ":" + type;
-                currentObject.id = null;
+                context.cypherMatchOptions.queryRelTypeFilters = ":" + type;
+                context.currentNode.id = null;
                 currentDisplayType = "VISJS-NETWORK";
                 self.generateGraph(null, {hideNodesWithoutRelations: true});
             }
@@ -375,73 +375,18 @@ var toutlesensController = (function () {
 
 //********************************************************
             if (Gparams.queryInElasticSearch) {
-
-
-                word += "*";
-                var payload = {
-                    elasticQuery2NeoNodes: 1,
-                    queryString: word,
-                    index: subGraph.toLowerCase(),
-                    resultSize: Gparams.ElasticResultMaxSize
-                }
-
-                $.ajax({
-                    type: "POST",
-                    url: "../../../neo2Elastic",
-                    data: payload,
-                    dataType: "json",
-                    success: function (data, textStatus, jqXHR) {
-                        if (data.length >= Gparams.ElasticResultMaxSize) {
-                            $("#searchResultMessage").html("cannot show all data : max :" + Gparams.ElasticResultMaxSize);
-                        }
-                        else {
-                            $("#searchResultMessage").html(data.length + " nodes found");
-                        }
-                        return treeController.loadTreeFromNeoResult("treeContainer", data, function (jsTree) {
-                            var xx = jsTree;
-                            setTimeout(function () {
-
-
-                                $('.jstree-leaf').each(function () {
-                                    var id = $(this).attr('id');
-                                    var text = $(this).children('a').text();
-                                    for (var i = 0; i < data.length; i++) {
-                                        var properties = data[i].n.properties;
-                                        //   console.log(id+"-"+text);
-                                        if (properties[Gparams.defaultNodeNameProperty] == text) {
-                                            for (var key in properties) {
-                                                if (properties[Gparams.defaultNodeNameProperty].toLowerCase().indexOf(word0) > -1)
-                                                    continue;
-                                                if (properties[key] && typeof properties[key] != "object" && properties[key].indexOf && properties[key].toLowerCase().indexOf(word0) > -1) {
-                                                    var xx = key;
-                                                    var yy = properties[key]
-                                                    //  console.log(xx+"-"+yy);
-                                                    //$("#"+treeController.jsTreeDivId).jstree().create_node(id ,  { "id" : (id+"_"+key), "text" : ("<span class='jstreeWordProp'">+xx+":"+yy+"</span>")}, "last", function(){
-                                                    $("#" + treeController.jsTreeDivId).jstree().create_node(id, {
-                                                        "id": (id + "_" + key),
-                                                        "text": (xx + ":" + yy),
-                                                        "type": "prop"
-                                                    }, "last", function () {
-
-
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                });
-                                $("#" + treeController.jsTreeDivId).jstree("open_all");
-                            }, 1000)
-                        });
-                    }, error: function (err) {
-                        return callback(err)
-                    }
-                });
+                advancedSearch.searchInElasticSearch(word, label, callback);
             }
             else {
-
-                toutlesensData.searchNodes(subGraph, label, word, resultType, limit, from, callback);
+                var options = {
+                    subGraph: subGraph,
+                    label: label,
+                    word: word,
+                    resultType: resultType,
+                    limit: limit,
+                    from: from
+                }
+                toutlesensData.searchNodesWithOption(options, callback);
             }
             setTimeout(function () {
                 $("#searchResultMessage").html("click on tree...")
@@ -466,8 +411,8 @@ var toutlesensController = (function () {
             var message = " <i><b>click on graph to stop animation</b></i><br>";
             if (currentLabel)
                 message += "Label : " + currentLabel + "<br>"
-            if (currentObject.id)
-                message += "Node : [" + currentObject.label + "]" + currentObject[Schema.getNameProperty(currentObject.label)] + "<br>";
+            if (context.currentNode.id)
+                message += "Node : [" + context.currentNode.label + "]" + context.currentNode[Schema.getNameProperty(context.currentNode.label)] + "<br>";
             message += filters.printRelationsFilters() + "<br>";
             message += filters.printPropertyFilters() + "<br>";
 
@@ -495,8 +440,8 @@ var toutlesensController = (function () {
 
             var str = "<br><br><p align='center' >"
             var name = "";
-            if (currentObject && currentObject.id)
-                name = "Node " + currentObject[Schema.getNameProperty(currentObject.label)];
+            if (context.currentNode && context.currentNode.id)
+                name = "Node " + context.currentNode[Schema.getNameProperty(context.currentNode.label)];
             else {
                 if (currentLabel)
                     name = "Label " + currentLabel;
@@ -563,17 +508,17 @@ var toutlesensController = (function () {
 
             var mode = $("#representationSelect").val();
             var id;
-            if (currentObject && currentObject.id)
-                id = currentObject.id;
+            if (context.currentNode && context.currentNode.id)
+                id = context.currentNode.id;
 
 
-            if (!currentObject.label && currentObject.nodeType) {
-                currentObject.label = currentObject.nodeType;
+            if (!context.currentNode.label && context.currentNode.nodeType) {
+                context.currentNode.label = context.currentNode.nodeType;
             }
 
             if (action == "onNodeClick") {
                 toutlesensController.dispatchAction("nodeInfos", id);
-                expandGraph.setSourceLabel(currentObject.labelNeo)
+                expandGraph.setSourceLabel(context.currentNode.labelNeo)
 
             }
 
@@ -581,21 +526,8 @@ var toutlesensController = (function () {
                 if (id) {
 
 
-                    if (currentObject.type && currentObject.type == "schema") {
-                        var str = "Label " + currentObject.label + "<br><table>"
-                        if (false) {
-                            if (currentObject.count < Gparams.jsTreeMaxChildNodes)
-                                str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"list\")'>List all nodes</a></td></tr>"
-                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"search\")'>Search nodes...</a>"
-                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"graph\")'>Graph  all neighbours</a>"
-
-
-                            str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-start-exec\")'>Graph from...</a></td></tr>"
-                            if (graphicController.startLabel) {
-                                str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"transitivePath-end-exec\")'>Graph to...</a></td></tr>"
-                                //    str += "<tr><td><a href='javascript:graphicController.dispatchAction(\"shortestPath\")'>Shortest Path</a></td></tr>"
-                            }
-                        }
+                    if (context.currentNode.type && context.currentNode.type == "schema") {
+                        var str = "Label " + context.currentNode.label + "<br><table>"
                         $("#graphPopup").html(str);
                         $("#nodeInfoMenuDiv").css("visibility", "visible");
                         $("#nodeInfoMenuDiv").html(str);
@@ -603,7 +535,7 @@ var toutlesensController = (function () {
 
                         return;
                     }
-                    if (currentObject.type == "cluster") {
+                    if (context.currentNode.type == "cluster") {
                         var str = "Cluster <br><table>"
 
                         str += "<tr><td><a href='javascript:paint.dispatchAction(\"openCluster\")'>open cluster</a>"
@@ -620,10 +552,10 @@ var toutlesensController = (function () {
                         return;
                     }
                     toutlesensData.getNodeInfos(id, function (obj) {
-                        currentObject = obj[0].n.properties;
-                        currentObject.id = obj[0].n._id;
-                        currentObject.label = obj[0].n.labels[0];
-                        var $currentObj = currentObject;
+                        context.currentNode = obj[0].n.properties;
+                        context.currentNode.id = obj[0].n._id;
+                        context.currentNode.label = obj[0].n.labels[0];
+                        var $currentObj = context.currentNode;
                         if (self.hasRightPanel) {
                             var str = "<input type='image' src='images/back.png' height='15px' title='back' onclick='toutlesensController.restorePopupMenuNodeInfo()' ><br>"
                             str += textOutputs.formatNodeInfo(obj[0].n.properties);
@@ -665,10 +597,13 @@ var toutlesensController = (function () {
 
             }
             else if (action == 'expandNode') {
-                toutlesensController.generateGraph(currentObject.id, {applyFilters: false, addToPreviousQuery: true});
+                toutlesensController.generateGraph(context.currentNode.id, {
+                    applyFilters: false,
+                    addToPreviousQuery: true
+                });
             }
             else if (action == 'expandNodeWithLabel') {
-                var labels = Schema.getPermittedLabels(currentObject.labelNeo, true, true);
+                var labels = Schema.getPermittedLabels(context.currentNode.labelNeo, true, true);
                 labels.splice(0, 0, "");
                 var str = "labels<br><select onchange=' toutlesensController.dispatchAction(\"expandNodeWithLabelExecute\",$(this).val())'>";
                 for (var i = 0; i < labels.length; i++) {
@@ -683,7 +618,7 @@ var toutlesensController = (function () {
                     currentLabel = objectId;
                 else
                     currentLabel = null;
-                toutlesensController.generateGraph(currentObject.id, {
+                toutlesensController.generateGraph(context.currentNode.id, {
                     applyFilters: false,
                     addToPreviousQuery: true
                 }, function (err, result) {
@@ -709,7 +644,7 @@ var toutlesensController = (function () {
                     addToPreviousQuery: true
                 }
 
-                context.addToGraphContext({expandGraph:{sourceLabel:currentLabel,targetLabel:currentLabel}})
+                context.addToGraphContext({expandGraph: {sourceLabel: currentLabel, targetLabel: currentLabel}})
                 var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
                 if (collapseGraph)
                     options.clusterIntermediateNodes = true;
@@ -727,15 +662,15 @@ var toutlesensController = (function () {
             else if (action == 'showRelClusterIntermediateNodes') {
 
                 var relationDepth = parseInt($("#searchDialog_pathDistanceInput").val());
-                var cypher = "match(n)-[r*1.." + relationDepth + "]-(m) where ID(n)=" + currentObject.fromNode.id + " AND ID(m)=" + currentObject.toNode.id + "return r";
-                var cypher = " match(n)-[]-(p)-[]-(m) where ID(n)=" + currentObject.fromNode.id + " AND ID(m)=" + currentObject.toNode.id + " return p";
+                var cypher = "match(n)-[r*1.." + relationDepth + "]-(m) where ID(n)=" + context.currentNode.fromNode.id + " AND ID(m)=" + context.currentNode.toNode.id + "return r";
+                var cypher = " match(n)-[]-(p)-[]-(m) where ID(n)=" + context.currentNode.fromNode.id + " AND ID(m)=" + context.currentNode.toNode.id + " return p";
 
 
                 Cypher.executeCypher(cypher, function (err, result) {
                     var newNodes = [];
                     var newRelations = [];
-                    var fromId = currentObject.fromNode.id
-                    var toId = currentObject.toNode.id
+                    var fromId = context.currentNode.fromNode.id
+                    var toId = context.currentNode.toNode.id
                     result.forEach(function (node) {
                         newNodes.push({
                             // x: 200,
@@ -774,21 +709,21 @@ var toutlesensController = (function () {
 
             else if (action == "setAsRootNode") {
                 if (self.currentSource == "RDF") {
-                    var name = currentObject.name;
+                    var name = context.currentNode.name;
                     var p = name.indexOf("#");
                     if (p > 0)
                         var name = name.substring(0, p);
                     rdfController.searchRDF(name);
                 }
-                else {// minus sign on currentObject.id see toutlesensData 148
-                    self.generateGraph(currentObject.id, {applyFilters: false});
+                else {// minus sign on context.currentNode.id see toutlesensData 148
+                    self.generateGraph(context.currentNode.id, {applyFilters: false});
                 }
             }
 
             else if (action == "linkSource") {
 
                 $("#linkActionDiv").css("visibility", "visible");
-                var sourceNode = JSON.parse(JSON.stringify(currentObject));
+                var sourceNode = JSON.parse(JSON.stringify(context.currentNode));
                 $("#linkSourceNode").val(sourceNode.name);
                 $("#linkSourceNode").css("color", nodeColors[sourceNode.label]);
                 $("#linkSourceLabel").html(sourceNode.label);
@@ -799,7 +734,7 @@ var toutlesensController = (function () {
             } else if (action == "linkTarget") {
                 //	selectLeftTab('#dataTab');
                 $("#linkActionDiv").css("visibility", "visible");
-                var targetNode = JSON.parse(JSON.stringify(currentObject));
+                var targetNode = JSON.parse(JSON.stringify(context.currentNode));
                 $("#linkTargetNode").val(targetNode.name);
                 $("#linkTargetNode").css("color", nodeColors[targetNode.label]);
                 $("#linkTargetLabel").html(targetNode.label);
@@ -822,7 +757,7 @@ var toutlesensController = (function () {
             } else if (action == "modifyNode") {
                 if (Gparams.readOnly == false) {
 
-                    var label = currentObject.labelNeo;
+                    var label = context.currentNode.labelNeo;
                     $("#dialog").dialog({modal: false});
                     $("#dialog").dialog("option", "title", " node " + label);
 
@@ -830,9 +765,9 @@ var toutlesensController = (function () {
                     $("#dialog").load("htmlSnippets/nodeForm.html", function () {
 
                         var attrObject = Schema.schema.properties[label];
-                        treeController.selectedNodeData = currentObject;
-                        treeController.selectedNodeData.neoId = currentObject.id
-                        treeController.setAttributesValue(label, attrObject, currentObject.neoAttrs);
+                        treeController.selectedNodeData = context.currentNode;
+                        treeController.selectedNodeData.neoId = context.currentNode.id
+                        treeController.setAttributesValue(label, attrObject, context.currentNode.neoAttrs);
                         treeController.drawAttributes(attrObject, "nodeFormDiv");
                         // self.openFindAccordionPanel();
 
@@ -843,15 +778,15 @@ var toutlesensController = (function () {
 
 
             } else if (action == "deleteRelation") {
-                treeController.deleteRelationById(currentObject.neoId, function (err, result) {
+                treeController.deleteRelationById(context.currentNode.neoId, function (err, result) {
                     if (err) {
                         return console.log(err);
                     }
-                    visjsGraph.deleteRelation(currentObject.id)
+                    visjsGraph.deleteRelation(context.currentNode.id)
                 })
             }
             else if (action == "addNode") {
-                currentObject = {}
+                context.currentNode = {}
 
                 if (Gparams.readOnly == false) {
                     $("#dialog").dialog({modal: false});
@@ -994,7 +929,7 @@ var toutlesensController = (function () {
             }
 
             else if (action == "showAll") {
-                currentObject.id = null;
+                context.currentNode.id = null;
                 currentLabel = null;
                 currentDisplayType = "VISJS-NETWORK";
                 // $("#showRelationTypesCbx").remove("checked");
@@ -1022,7 +957,7 @@ var toutlesensController = (function () {
             }
             else if (action == "showSchema") {
 
-                function generateSchemaGraph(){
+                function generateSchemaGraph() {
                     dataModel.getDBstats(subGraph, function () {
                         var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
                         visjsGraph.draw("graphDiv", data, graphOptions, function () {
@@ -1032,8 +967,6 @@ var toutlesensController = (function () {
                         });
                     });
                 }
-
-
 
 
                 var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
@@ -1055,10 +988,10 @@ var toutlesensController = (function () {
                         if (params.nodes.length == 1) {
                             var point = params.pointer.DOM;
                             var nodeId = params.nodes[0];
-                            currentObject = visjsGraph.nodes._data[nodeId];
+                            context.currentNode = visjsGraph.nodes._data[nodeId];
 
                             $(".selectLabelDiv ").each(function () {
-                                var label = currentObject.name
+                                var label = context.currentNode.name
                                 if ($(this).html() == label)
                                     searchMenu.onChangeSourceLabel(label, this);
                                 searchMenu.activatePanel("searchCriteriaDiv")
@@ -1070,9 +1003,9 @@ var toutlesensController = (function () {
                     }
                 };
 
-                if(objectId==true) {// reset
+                if (objectId == true) {// reset
                     localStorage.removeItem("schemaGraph_" + subGraph);
-                   return generateSchemaGraph();
+                    return generateSchemaGraph();
                 }
 
 
@@ -1119,18 +1052,17 @@ var toutlesensController = (function () {
             else if (action == "searchCypher") {
                 toutlesensData.matchStatement = $("#cypherDialog_matchInput").val();
                 var where = $("#cypherDialog_whereInput").val();
-                toutlesensData.whereFilter = where;
-                currentObject.id = null;
+                context.cypherMatchOptions.sourceNodeWhereFilter = where;
+                context.currentNode.id = null;
                 self.generateGraph(null, {});
             }
 
-            else if(action=="graphorama") {
+            else if (action == "graphorama") {
                 $("#dialog").load("htmlSnippets/graphorama.html", function () {
                     $("#dialog").dialog("option", "title", "graphorama");
                     $("#dialog").dialog("open");
                 })
             }
-
 
 
         }
@@ -1195,8 +1127,8 @@ var toutlesensController = (function () {
 
             //  paramsController.loadParams();
             var tabsanalyzePanelDisabledOptions = [];
-          //  tabsanalyzePanelDisabledOptions.push(1);//filters
-          //  tabsanalyzePanelDisabledOptions.push(2);//highlight
+            //  tabsanalyzePanelDisabledOptions.push(1);//filters
+            //  tabsanalyzePanelDisabledOptions.push(2);//highlight
             var tabsFindPanelDisabledOptions = [];
             // tabsFindPanelDisabledOptions.push(3)
 
@@ -1240,7 +1172,7 @@ var toutlesensController = (function () {
             });
 
             $("#graphoramasDiv").load("htmlSnippets/graphorama.html", function () {
-                    graphorama.init();
+                graphorama.init();
 
             })
             $("#similarsDiv").load("htmlSnippets/similarsDialog.html", function () {
@@ -1257,12 +1189,11 @@ var toutlesensController = (function () {
             $("#cypherQueryDiv").load("htmlSnippets/cypherDialog.html", function () {
 
 
-
             });
 
             $("#queryDiv").load("htmlSnippets/advancedSearchDialog.html", function () {
 
-              searchMenu.init(Schema);
+                searchMenu.init(Schema);
             });
             $("#filterDiv").load("htmlSnippets/filterDialog.html", function () {
 
@@ -1291,7 +1222,6 @@ var toutlesensController = (function () {
             });
 
 
-
         }
 
         /**
@@ -1317,7 +1247,8 @@ var toutlesensController = (function () {
                 url: self.neo4jProxyUrl,
                 data: payload,
                 dataType: "json",
-                success: function (data, textStatus, jqXHR) {savedQueries.addToCurrentSearchRun(matchStr,callback || null);
+                success: function (data, textStatus, jqXHR) {
+                    savedQueries.addToCurrentSearchRun(matchStr, callback || null);
 
                     var count = data[0].count;
                     if (count > Gparams.jsTreeMaxChildNodes) {
@@ -1385,7 +1316,7 @@ var toutlesensController = (function () {
             $(".rightPanel").css("with", rightPanelWidth);
 
             $("#mainPanel").width(totalWidth - (rightPanelWidth)).height(totalHeight)
-        //    $("#analyzePanel").width(rightPanelWidth - 50).height(totalHeight).css("position", "absolute").css("left", totalWidth - rightPanelWidth + 20).css("top", 20);
+            //    $("#analyzePanel").width(rightPanelWidth - 50).height(totalHeight).css("position", "absolute").css("left", totalWidth - rightPanelWidth + 20).css("top", 20);
 
 
             $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0)
@@ -1401,11 +1332,11 @@ var toutlesensController = (function () {
 
 
             // $("#graphLegendDiv").width(rightPanelWidth - 50).height(totalHeight)
-           // $("#findDiv").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20)
+            // $("#findDiv").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20)
             $("#mainAccordion").width(rightPanelWidth - 10).height((totalHeight)).css("position", "absolute").css("top", "0px").css("left", (totalWidth - rightPanelWidth) + 20);
-            $(".mainAccordionPanel").width(rightPanelWidth - 10).height((totalHeight-120))
-           /* $("#findDivInner").width(rightPanelWidth - 10).height((totalHeight))
-            $("#findTabs").width(rightPanelWidth - 10);*/
+            $(".mainAccordionPanel").width(rightPanelWidth - 10).height((totalHeight - 120))
+            /* $("#findDivInner").width(rightPanelWidth - 10).height((totalHeight))
+             $("#findTabs").width(rightPanelWidth - 10);*/
 
 
             $("#nodeInfoMenuDiv").width(rightPanelWidth - 40).css("visibility", "hidden")
@@ -1457,10 +1388,10 @@ var toutlesensController = (function () {
          * @param expandTree
          */
         self.openFindAccordionPanel = function (bool) {
-            if(bool)
-            $( "#mainAccordion" ).accordion( "option", "active", 0 );
+            if (bool)
+                $("#mainAccordion").accordion("option", "active", 0);
             else {
-                $( "#mainAccordion" ).accordion( "option", "active", 1 );
+                $("#mainAccordion").accordion("option", "active", 1);
             }
         }
         self.increaseGraphLimit = function () {
@@ -1471,7 +1402,7 @@ var toutlesensController = (function () {
             }
         }
         self.graphNodeNeighbours = function (obj) {
-            currentObject = obj;
+            context.currentNode = obj;
             self.dispatchAction("setAsRootNode");
             dialogLarge.dialog("close");
 

@@ -409,13 +409,14 @@
                         <!-- <button onclick="advancedSearch.showAdvancedQueryDialog()">advanced Query</button>-->
                     </td>
                     <td valign="middle">
-                        <input id="searchInput" fetchSize="40" onkeydown="if (event.keyCode == 13)
+                        <input id="searchInput" size="40" onkeydown="if (event.keyCode == 13)
                         document.getElementById('searchButton').click()">
                         &nbsp;
                         <button id="searchButton" onclick="searchUI.search()">Search</button>
                         <!--  <input type="image" title="search" height="30px"
                                  onclick="searchUI.search();" id="searchInputsImg"
                                  src="icons/search.png"/>-->
+                        <img id="waitImg" src="icons/waitAnimated.gif" width="20px" style="visibility: hidden;">
 
                     </td>
 

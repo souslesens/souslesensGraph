@@ -110,7 +110,7 @@ var algorithms = (function () {
                                 $("#graphPopup").css("visibility", "visible").css("top", point.y).css("left", point.x);
                             }
                             else {
-                                currentObject.id = nodeId
+                                context.currentNode.id = nodeId
                                 toutlesensController.dispatchAction("onNodeClick", nodeId);
                                 toutlesensController.showPopupMenu(point.x, point.y, "nodeInfo");
                             }
@@ -335,7 +335,7 @@ var algorithms = (function () {
 
         if (algorithm == "relationsRanking") {
             var limit = $("#searchDialog_AlgorithmsResultSize").val();
-            var where=toutlesensData.whereFilter;
+            var where=context.cypherMatchOptions.sourceNodeWhereFilter;
             if(where && where!="")
                 where=" where "+where+ " ";
             var cypher = "Match (n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ") "+where+" return n, count (r) as cnt order by cnt desc limit " + limit;

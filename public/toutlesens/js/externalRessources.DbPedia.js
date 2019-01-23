@@ -35,7 +35,7 @@ self.listDbPediaPerson({name:word },target)
 
 	
 	if (!obj){
-		console.error ("no currentObject");
+		console.error ("no context.currentNode");
 		return;
 	}
 		

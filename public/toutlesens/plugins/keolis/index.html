@@ -36,11 +36,11 @@
                 var file
                 if (type == 'tags') {
                     file = "tagsFR.csv.json"
-                    context.querySourceLabel="tag";
+                    context.queryObject.Label="tag";
                 }
                 else if (type == 'categories') {
                     file = 'categoriesFR.csv.json';
-                    context.querySourceLabel="categorieCommunaute";
+                    context.queryObject.Label="categorieCommunaute";
                 }
 
                 function customMenu(node) {
@@ -77,6 +77,10 @@
                             var parent;
                             if (type == "tags" && line.parent == "Classification") {
                                 ok = true;
+                                parent = (line.parent == "Classification") ? "#" : line.parentID;
+                            }
+                            if (type == "tags" && line.nom == "Tags") {
+                                ok = false;
                                 parent = (line.parent == "Classification") ? "#" : line.parentID;
                             }
                             if (type == "categories" && line.parent == "Communautés") {
@@ -277,6 +281,7 @@
 
             }
             self.addClauseByIdsArray = function (idKey, ids, label, callback) {
+
                 toutlesensData.setWhereFilterWithArray(idKey, ids, function (err, result) {
                     var where = result;
 

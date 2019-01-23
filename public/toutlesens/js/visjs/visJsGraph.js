@@ -226,7 +226,7 @@ var visjsGraph = (function () {
 
             network.on("doubleClick", function (params) {
                 /*        var nodeId = params.nodes[0];
-                        currentObject = self.nodesMap[nodeId];
+                        context.currentNode = self.nodesMap[nodeId];
                         toutlesensController.generateGraph(nodeId, {applyFilters: false});//NO !!! minus sign to search on m (see toutlesensData 148)*/
             })
             //stop animation
@@ -264,7 +264,7 @@ var visjsGraph = (function () {
                         //    var cluster =self.getClusterByClusterId(nodeId);
                         //  var cluster = self.nodes._data[nodeId];
                         clusterId = nodeId;
-                        currentObject = {
+                        context.currentNode = {
                             id: nodeId,
                             type: "cluster",
                             //  name:cluster.label
@@ -273,14 +273,14 @@ var visjsGraph = (function () {
 
                     else {
 
-                        currentObject = self.nodes._data[nodeId];
+                        context.currentNode = self.nodes._data[nodeId];
                         /*   var now=new Date().getTime();
                          //  console.log(params.event.timeStamp+" "+now.getTime())
                            var delay=Math.abs(now-lastClick)
                            lastClick=now;
                            console.log(delay);
                            if(delay<dblClickDuration) {//dbleclick*/
-                        currentObject._graphPosition = params.pointer.DOM;
+                        context.currentNode._graphPosition = params.pointer.DOM;
                         if (params.event.srcEvent.ctrlKey) {
                             // toutlesensController.dispatchAction("expandNode", nodeId)
 
@@ -300,9 +300,9 @@ var visjsGraph = (function () {
                 }
                 else if (params.edges.length == 1) {
                     var edgeId = params.edges[0];
-                    currentObject = self.edges._data[edgeId];
-                    currentObject.fromNode = self.nodes._data[currentObject.from]
-                    currentObject.toNode = self.nodes._data[currentObject.to]
+                    context.currentNode = self.edges._data[edgeId];
+                    context.currentNode.fromNode = self.nodes._data[context.currentNode.from]
+                    context.currentNode.toNode = self.nodes._data[context.currentNode.to]
                     toutlesensController.dispatchAction("relationInfos", nodeId);
                     var point = params.pointer.DOM;
                     toutlesensController.showPopupMenu(point.x, point.y, "relationInfos");
@@ -544,7 +544,7 @@ var visjsGraph = (function () {
 
                 var label = params.nodes[0];
                 /* currentLabel = label;
-                 currentObject.id == null;
+                 context.currentNode.id == null;
                  return toutlesensController.generateGraph(null, {applyFilters: true}, function (err, result) {
                      currentLabel = null;
                  });*/
@@ -1135,7 +1135,7 @@ var visjsGraph = (function () {
 
 
                     var node = self.nodes._data[key];
-                    if (currentObject && currentObject.id && currentObject.id == node.id)
+                    if (context.currentNode && context.currentNode.id && context.currentNode.id == node.id)
                         ;
                     else {
                         var connectedEdges = network.getConnectedEdges(key);

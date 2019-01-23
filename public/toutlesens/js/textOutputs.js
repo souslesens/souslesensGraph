@@ -200,8 +200,8 @@ var textOutputs = (function () {
             str=self.getCSV();
         }
 
-        if (currentObject)
-            fileName = "souslesens_" + currentObject.label + "_" + currentObject.name + "." + extension;
+        if (context.currentNode)
+            fileName = "souslesens_" + context.currentNode.label + "_" + context.currentNode.name + "." + extension;
         else
             fileName = "souslesens_" + new Date() + "." + extension;
         var element = document.createElement('a');
@@ -331,7 +331,7 @@ var textOutputs = (function () {
         }
 
 
-        currentObject = {
+        context.currentNode = {
             label: "export",
             name: "_sousLeSens"
         }
@@ -497,7 +497,7 @@ var textOutputs = (function () {
 
             str = sinequaLink + "<br>" + str;
         }
-        str += "<br> NeoId:" + currentObject.id;
+        str += "<br> NeoId:" + context.currentNode.id;
         return str;
 
     }

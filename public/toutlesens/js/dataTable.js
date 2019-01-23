@@ -162,7 +162,7 @@ var myDataTable = function () {
                     var idx = table.cell('.selected', 0).index();
                     // var data = table.row( idx.row ).data();
                     var line = dataSet[idx.row];
-                    currentObject = {id: line.id};
+                    context.currentNode = {id: line.id};
                     $("#datatablePopupDiv").html(toutlesensDialogsController.setPopupMenuNodeInfoContent);
                     $("#datatablePopupDiv").css("top",py).css("left",px);
 

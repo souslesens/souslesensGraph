@@ -810,11 +810,11 @@ value=atob(value)
 
             $("#graphPopup").css("visibility", "hidden");
             toutlesensController.hidePopupMenu();
-            if (!currentObject.id && currentObject.type != "cluster")
+            if (!context.currentNode.id && context.currentNode.type != "cluster")
                 return;
 
             if (action == "openCluster") {
-                visjsGraph.network.openCluster(currentObject.id, {
+                visjsGraph.network.openCluster(context.currentNode.id, {
                     releaseFunction: function (clusterPosition, containedNodesPositions) {
 
                         return containedNodesPositions;
@@ -822,7 +822,7 @@ value=atob(value)
                 })
             }
             else if (action == "graphClusterNodes") {
-                var nodeIds = visjsGraph.network.getNodesInCluster(currentObject.id)
+                var nodeIds = visjsGraph.network.getNodesInCluster(context.currentNode.id)
                 toutlesensData.setWhereFilterWithArray("_id", nodeIds, function (err, result) {
 
                     toutlesensController.generateGraph(null, {
@@ -839,7 +839,7 @@ value=atob(value)
                 })
             }
             else if (action == "listClusterNodes") {
-                var nodeIds = visjsGraph.network.getNodesInCluster(currentObject.id);
+                var nodeIds = visjsGraph.network.getNodesInCluster(context.currentNode.id);
 
 
                 var query = "match (n) where ID(n) in " + JSON.stringify(nodeIds).replace(/"/g, "") + " return n";

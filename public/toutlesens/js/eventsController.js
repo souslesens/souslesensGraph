@@ -19,9 +19,7 @@ var eventsController = (function () {
             });
 
 
-            $("#advancedSearchButton").click(function (e) {
-                advancedSearch.showDialog({multipleClauses: true});
-            });
+
 
             $("#tagCloudButton").click(function (e) {
                 toutlesensController.searchNodesUI('exec', null, null, tagCloud.drawCloud);
@@ -181,7 +179,7 @@ var eventsController = (function () {
                         }
 
                         if (index == 3) {
-                            advancedSearch.searchSimilars(currentObject);
+                            advancedSearch.searchSimilars(context.currentNode);
                         }
 
 

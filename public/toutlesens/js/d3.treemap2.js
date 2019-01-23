@@ -293,13 +293,13 @@ var treeMap = (function () {
                 }).attr("class", "leafRect").style("opacity",0.3).style("stroke-width",5)
                     .attr("class", "parent").call(rect).on("click", function (d) {
                     if (!d._children || d._children.length == 0) {
-                        currentObject = {id: d.neoAttrs.id};
+                        context.currentNode = {id: d.neoAttrs.id};
                         var px = d3.event.clientX;
                         var py = d3.event.clientY;
 
                         currentLabel = null;
                         toutlesensData.cachedResultArray = [];
-                        toutlesensController.dispatchAction("nodeInfos", currentObject.id);
+                        toutlesensController.dispatchAction("nodeInfos", context.currentNode.id);
                         toutlesensController.showPopupMenu(px, py, "nodeInfo");
 
                     }

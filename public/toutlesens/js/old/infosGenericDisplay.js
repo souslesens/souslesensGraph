@@ -812,8 +812,8 @@ var infosGenericDisplay = (function () {
         if (node.parent == "#") {//label node
 
             currentLabel = node.text;
-            if( currentObject)
-            currentObject.id = null;
+            if( context.currentNode)
+            context.currentNode.id = null;
             return toutlesensController.generateGraph(null, {applyFilters: true});
         }
 
@@ -831,8 +831,8 @@ var infosGenericDisplay = (function () {
 
 
         toutlesensController.checkMaxNumberOfNodeRelations(parentId, Gparams.jsTreeMaxChildNodes, function () {
-            currentObject = node.data;
-            currentObject.id = parentId;
+            context.currentNode = node.data;
+            context.currentNode.id = parentId;
 
 
             if (toutlesensController.currentActionObj.type == "findNode") {

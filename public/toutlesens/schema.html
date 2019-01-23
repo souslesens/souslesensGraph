@@ -91,10 +91,10 @@
 
 </style>
 <script>
- //  var d3schema.currentLabel;
+ //  var d3schema.currentLabel0;
     var currentProperty;
     var currentRelation;
-    var currentObject;
+    var context.currentNode;
     var currentType;
 
 
@@ -165,14 +165,14 @@ if(Gparams && Gparams.bigDialogSize) {
 
         $("#labelsSelect").on("change", function () {
 
-            d3schema.currentLabel = $("#labelsSelect").val();
+            d3schema.currentLabel0 = $("#labelsSelect").val();
 
             clearSelectOptions("#relationsSelect");
-            setJonTextArea(Schema.schema.labels[d3schema.currentLabel], "label");
+            setJonTextArea(Schema.schema.labels[d3schema.currentLabel0], "label");
             for (var key in Schema.schema.relations) {
                 var relation = Schema.schema.relations[key];
 
-                    if (relation.startLabel == d3schema.currentLabel) {
+                    if (relation.startLabel == d3schema.currentLabel0) {
                         var relName = relation.startLabel + "-[" + key + "]->" + relation.endLabel;
                         $("#relationsSelect").append($('<option>',
                             {
@@ -185,10 +185,10 @@ if(Gparams && Gparams.bigDialogSize) {
             }
 
             clearSelectOptions("#propertiesSelect");
-            if (!Schema.schema.properties[d3schema.currentLabel])
+            if (!Schema.schema.properties[d3schema.currentLabel0])
 
-                Schema.schema.properties[d3schema.currentLabel] = {};
-            for (var key in Schema.schema.properties[d3schema.currentLabel]) {
+                Schema.schema.properties[d3schema.currentLabel0] = {};
+            for (var key in Schema.schema.properties[d3schema.currentLabel0]) {
                 $("#propertiesSelect").append($('<option>',
                     {
                         value: key,
@@ -205,7 +205,7 @@ if(Gparams && Gparams.bigDialogSize) {
                 var label = {icon: "default.png"};
                 Schema.schema.labels[name] = label;
                 Schema.schema.properties[name] = {};
-                d3schema.currentLabel = name;
+                d3schema.currentLabel0 = name;
 
             }
             $("#labelsSelect2").append($('<option>',
@@ -219,9 +219,9 @@ if(Gparams && Gparams.bigDialogSize) {
 
         $("#deleteLabelButton").on("click", function () {
             if (confirm("delete  item")) {
-                delete Schema.schema.labels[d3schema.currentLabel];
-                $("#labelsSelect option[value=" + d3schema.currentLabel + "]").remove();
-                d3schema.currentLabel = null;
+                delete Schema.schema.labels[d3schema.currentLabel0];
+                $("#labelsSelect option[value=" + d3schema.currentLabel0 + "]").remove();
+                d3schema.currentLabel0 = null;
             }
 
 
@@ -230,7 +230,7 @@ if(Gparams && Gparams.bigDialogSize) {
 
         $("#propertiesSelect").on("change", function () {
             currentProperty = $("#propertiesSelect").val();
-            setJonTextArea(Schema.schema.properties[d3schema.currentLabel][currentProperty], "property");
+            setJonTextArea(Schema.schema.properties[d3schema.currentLabel0][currentProperty], "property");
         });
 
 
@@ -239,7 +239,7 @@ if(Gparams && Gparams.bigDialogSize) {
             if (name) {
                 var prop = {type: "text"};
 
-                Schema.schema.properties[d3schema.currentLabel][name] = prop;
+                Schema.schema.properties[d3schema.currentLabel0][name] = prop;
                 currentProperty = name;
                 setJonTextArea(prop, "property");
             }
@@ -325,9 +325,9 @@ if(Gparams && Gparams.bigDialogSize) {
                 return;
             }
             if (currentType === "label")
-                Schema.schema.labels[d3schema.currentLabel] = jsonFragment;
+                Schema.schema.labels[d3schema.currentLabel0] = jsonFragment;
             if (currentType === "property")
-                Schema.schema.properties[d3schema.currentLabel][currentProperty] = jsonFragment;
+                Schema.schema.properties[d3schema.currentLabel0][currentProperty] = jsonFragment;
             if (currentType === "relation") {
                 var strs = currentRelation.split("-");
                 var startLabel = strs[0];
@@ -377,7 +377,7 @@ if(Gparams && Gparams.bigDialogSize) {
     }
 
     function setJonTextArea(obj, type) {
-        currentObject = obj;
+        context.currentNode = obj;
         currentType = type;
         $("#jsonTextArea").val(JSON.stringify(obj, undefined, 4));
     }
@@ -422,7 +422,7 @@ if(Gparams && Gparams.bigDialogSize) {
             <tr>
 
                 <td>
-                    label <div class="editingObj" id="d3schema.currentLabelDiv"></div><br>
+                    label <div class="editingObj" id="d3schema.currentLabel0Div"></div><br>
                     <button onclick="d3schema.createLabel();"> create Label</button><br>
                     <button onclick="d3schema.modifyLabel();"> modify Label</button><br>
                     <button onclick="d3schema.deleteLabel();"> delete Label</button>

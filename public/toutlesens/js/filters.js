@@ -118,9 +118,9 @@ var filters = (function () {
      */
 
     self.removeAllFilters = function () {
-        toutlesensData.querynodeLabelFilters = "";
-        toutlesensData.whereFilter = "";
-        toutlesensData.querynodeLabelFilters = "";
+        context.cypherMatchOptions.querynodeLabelFilters = "";
+        context.cypherMatchOptions.sourceNodeWhereFilter = "";
+        context.cypherMatchOptions.querynodeLabelFilters = "";
     }
 
 
@@ -403,35 +403,35 @@ var filters = (function () {
                     value = "(?i).*" + value + ".*"
 
                 }
-                if (toutlesensData.whereFilter != "")
-                    toutlesensData.whereFilter += " AND ";
+                if (context.cypherMatchOptions.sourceNodeWhereFilter != "")
+                    context.cypherMatchOptions.sourceNodeWhereFilter += " AND ";
 
 
                 if (objectType == "relation") {
                     if (common.isNumber(value))
 
-                        toutlesensData.whereFilter += "r." + property + operator + value + " ";
+                        context.cypherMatchOptions.sourceNodeWhereFilter += "r." + property + operator + value + " ";
                     else
-                        toutlesensData.whereFilter += "r." + property + operator + "\"" + value + "\" ";
+                        context.cypherMatchOptions.sourceNodeWhereFilter += "r." + property + operator + "\"" + value + "\" ";
 
                 }
                 else if (objectType == "startNode") {
                     if (common.isNumber(value))
-                        toutlesensData.whereFilter += "node1." + property + operator + value + " ";
+                        context.cypherMatchOptions.sourceNodeWhereFilter += "node1." + property + operator + value + " ";
                     else
-                        toutlesensData.whereFilter += "node1." + property + operator + "\"" + value + "\" ";
+                        context.cypherMatchOptions.sourceNodeWhereFilter += "node1." + property + operator + "\"" + value + "\" ";
 
                 }
                 else if (objectType == "endNode" || objectType == "node") {
                     if (common.isNumber(value))
-                        toutlesensData.whereFilter += "m." + property + operator + value + " ";
+                        context.cypherMatchOptions.sourceNodeWhereFilter += "m." + property + operator + value + " ";
                     else
-                        toutlesensData.whereFilter += "m." + property + operator + "\"" + value + "\" ";
+                        context.cypherMatchOptions.sourceNodeWhereFilter += "m." + property + operator + "\"" + value + "\" ";
 
                 }
 
                 if (filter.booleanOp) {
-                    toutlesensData.whereFilter=" "+ filter.booleanOp+" ("+toutlesensData.whereFilter+") ";
+                    context.cypherMatchOptions.sourceNodeWhereFilter=" "+ filter.booleanOp+" ("+context.cypherMatchOptions.sourceNodeWhereFilter+") ";
                 }
             }
 
@@ -442,11 +442,11 @@ var filters = (function () {
             if (filter.booleanOp) {
                 notOp= " NOT "
             }
-            toutlesensData.querynodeLabelFilters = " and  "+notOp+"(" + allnodeLabelsStr + ") ";
+            context.cypherMatchOptions.querynodeLabelFilters = " and  "+notOp+"(" + allnodeLabelsStr + ") ";
         }
 
         if (allRelTypesStr.length > 0)
-            toutlesensData.queryRelTypeFilters = ":" + allRelTypesStr;
+            context.cypherMatchOptions.queryRelTypeFilters = ":" + allRelTypesStr;
 
         if (generateGraph) {
             toutlesensController.generateGraph(null, {useCurrentStatement: true});

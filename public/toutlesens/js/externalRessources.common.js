@@ -69,10 +69,10 @@ if(typeof fn === 'function') {
 
 	var source=$("#externalSourceSelect").val();
 	var word="";
-	if(currentObject && currentObject.name)
-	var word0= currentObject.name;
-	if(!word0 && currentObject && currentObject[Gparams.defaultNodeNameProperty])
-		var word0= currentObject[Gparams.defaultNodeNameProperty];
+	if(context.currentNode && context.currentNode.name)
+	var word0= context.currentNode.name;
+	if(!word0 && context.currentNode && context.currentNode[Gparams.defaultNodeNameProperty])
+		var word0= context.currentNode[Gparams.defaultNodeNameProperty];
 	var word=prompt ("chercher",word0);
 	if(source && source.length>0 && word && word.length>3){
 		var fnName="searchInTitle"+source;
@@ -162,7 +162,7 @@ self.generateExternalImg(src);
         var source = $("#externalSourceSelect").val();
         var prop = {};
         prop["uri_" + source] = currentExternalUri;
-        modifyData.updateProperties(currentObject, prop);
+        modifyData.updateProperties(context.currentNode, prop);
 
     }
 

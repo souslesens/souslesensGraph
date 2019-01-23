@@ -58,7 +58,7 @@ var filter=null;
 var filterValue=null;
 var isRadarReadOnly=true;
 var http="";
-var currentObject={};
+//var context.currentNode={};
 
 var canModifyRadarDetails=false;
 var rapahaelItemsSet=null;
@@ -247,6 +247,6 @@ var CSVWithLabel=true;
 var graphQueryTargetFilter="";
 
 var graphQueryUnionStatement="";
-var currentQueryParams=null;
+
 var totalNodesToDraw=0;
 var  whereStr="";

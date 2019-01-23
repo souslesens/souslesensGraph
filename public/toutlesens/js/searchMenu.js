@@ -16,7 +16,7 @@ var searchMenu = (function () {
                 self.searchPanels.push($(this).attr("id"))
             })
 
-            context.querySourceLabel = ""
+            context.queryObject.Label = ""
             //  $("#searchDialog_NodeLabelInput").attr("size", 8);
             $("#searchDialog_propertySelect").append("<option selected='selected'>" + Schema.getNameProperty() + "</option>");
             $("#searchDialog_valueInput").keypress(function (event) {
@@ -34,6 +34,14 @@ var searchMenu = (function () {
         self.addClauseUI = function (booleanOperator) {
             if (booleanOperator && booleanOperator == "")
                 return;
+
+            $("#searchDialog_nextPanelButton").css('visibility', 'visible');
+            $("#clearAllCreteriaButton").css("visibility", "visible");
+            $("#searchDialog_SaveQueryButton").css("visibility", "visible")
+            $("#searchDialog_Criteriatext").css("visibility", "visible");
+
+
+
             var clauseText = "";
             var value=$("#searchDialog_valueInput").val();
             var property="";
@@ -43,7 +51,7 @@ var searchMenu = (function () {
                 operator=$("#searchDialog_operatorSelect").val()
             }
             context.queryObject={
-                label: context.querySourceLabel,
+                label: context.queryObject.Label,
                 property:property,
                 operator:operator,
                 value:value
@@ -56,23 +64,23 @@ var searchMenu = (function () {
 
                 $("#searchDialog_newQueryButton").css('visibility', 'visible');
                 $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
-                self.setUIPermittedLabels(context.querySourceLabel);
+                self.setUIPermittedLabels(context.queryObject.Label);
 
                 return;
             }
 
 
-            self.searchNodes("matchSearchClause", null, function (err, clause) {
+            advancedSearch.searchNodes("matchSearchClause", null, function (err, clause) {
                 clauseText = (clause.nodeLabel ? clause.nodeLabel : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
 
                 if (err)
                     return;
                 $("#searchDialog_valueInput").val("");
-                for (var i = 0; i < self.searchClauses.length; i++) {
-                    if (clause.nodeLabel != "" && self.searchClauses[i].nodeLabel != "" && clause.nodeLabel != self.searchClauses[i].nodeLabel)
-                        return alert("you cannot add criteria on different labels :" + clause.nodeLabel != "" && self.searchClauses[i].nodeLabel)
+                for (var i = 0; i < advancedSearch.searchClauses.length; i++) {
+                    if (clause.nodeLabel != "" && advancedSearch.searchClauses[i].nodeLabel != "" && clause.nodeLabel != advancedSearch.searchClauses[i].nodeLabel)
+                        return alert("you cannot add criteria on different labels :" + clause.nodeLabel != "" && advancedSearch.searchClauses[i].nodeLabel)
                 }
-                self.searchNodes("", {where: clause.where, resultType: "count"}, function (err, result) {
+                advancedSearch.searchNodes("", {where: clause.where, resultType: "count"}, function (err, result) {
                     if (booleanOperator && booleanOperator == "and") {
                         var newIds = [];
                         result.forEach(function (line) {
@@ -83,24 +91,24 @@ var searchMenu = (function () {
                             return a.filter(Set.prototype.has, new Set(b));
                         }
 
-                        self.currentQueryNodeIds = intersectArray(self.currentQueryNodeIds, newIds)
+                        advancedSearch.currentQueryNodeIds = intersectArray(advancedSearch.currentQueryNodeIds, newIds)
                     } else {
                         result.forEach(function (line) {
-                            self.currentQueryNodeIds.push(line.n._id);
+                            advancedSearch.currentQueryNodeIds.push(line.n._id);
                         });
                     }
-                    clause.foundIds = self.currentQueryNodeIds.length;
+                    clause.foundIds = advancedSearch.currentQueryNodeIds.length;
 
                     clauseText += ": <b> " + clause.foundIds + "nodes </b>";
                     if (booleanOperator && booleanOperator != "+") {
                         var oldClauseText = $("#searchDialog_Criteriatext").val();
                         clauseText = oldClauseText + "<br>" + booleanOperator + "<br>" + clauseText;
-                        var oldWhere = self.searchClauses[0].where;
+                        var oldWhere = advancedSearch.searchClauses[0].where;
                         clause.where = "(" + oldWhere + ") " + booleanOperator + " ( " + clause.where + ")";
                     }
-                    toutlesensData.setWhereFilterWithArray("_id", self.currentQueryNodeIds, function (err, result) {
-                        self.searchClauses = [];
-                        self.addClause(clause, clauseText);
+                    toutlesensData.setWhereFilterWithArray("_id", advancedSearch.currentQueryNodeIds, function (err, result) {
+                        advancedSearch.searchClauses = [];
+                        advancedSearch.addClause(clause, clauseText);
                     })
 
 
@@ -159,7 +167,7 @@ var searchMenu = (function () {
             }
 
 
-            context.querySourceLabel = value;
+            context.queryObject.Label = value;
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             //if(searchMenu.self.previousAction!="path" || pathSourceSearchCriteria)
@@ -246,7 +254,7 @@ var searchMenu = (function () {
             var targetWhereClause = $("#neighboursWhere_propertySelect").val() + ":" + $("#neighboursWhere_operatorSelect").val() + " " + $("#neighboursWhere_valueInput").val();
 
             targetWhereClause = advancedSearch.getWhereProperty(targetWhereClause, "m")
-            toutlesensData.targetWhereFilter = targetWhereClause;
+            context.cypherMatchOptions.targetNodeWhereFilter = targetWhereClause;
         }
         self.activatePanel = function (id) {
             if (id == "searchCriteriaDiv") {
@@ -313,7 +321,7 @@ var searchMenu = (function () {
                 });
 
             }
-            else if (searchMenu.self.previousAction == "link") {
+            else if (self.previousAction == "link") {
                 complexQueries.executeQuery();
 
 
@@ -352,9 +360,9 @@ var searchMenu = (function () {
 
             if (option == 'path') {
 
-                advancedSearch.searchNodes('matchStr', null, function (err, result) {
-                    var matchObj = advancedSearch.matchStrToObject(result);
-                    self.pathQuery = {sourceQuery: matchObj};
+                advancedSearch.searchNodes('matchObject', null, function (err, result) {
+
+                    self.pathQuery = {sourceQuery: result};
                     self.previousAction = "pathSourceSearchCriteria"
                     //  self.currentAction.name = "pathTargetSearchCriteria";
                     self.activatePanel("searchCriteriaDiv");
@@ -369,7 +377,7 @@ var searchMenu = (function () {
 
             else if (option == "graphSomeNeighboursListLabels") {
                 self.nextPanel();
-                var currentLabel = context.querySourceLabel;
+                var currentLabel = context.queryObject.Label;
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
@@ -378,7 +386,7 @@ var searchMenu = (function () {
             else if (option == "treeMapSomeNeighboursListLabels") {
                 self.nextPanel();
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
-                var currentLabel = context.querySourceLabel;
+                var currentLabel = context.queryObject.Label;
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
@@ -424,11 +432,9 @@ var searchMenu = (function () {
             }
             else if (option == 'algorithms') {
                 advancedSearch.searchNodes('matchStr', null, function (err, result) {
-                    //   var matchObj = advancedSearch.matchStrToObject(result);
-
                     self.previousAction = "algorithms"
                     //  algorithms.initDialog(matchObj.nodeLabel)
-                    algorithms.initDialog(context.querySourceLabel)
+                    algorithms.initDialog(context.queryObject.Label)
 
                     self.activatePanel("algorithmsDiv");
                     $("#searchDialog_ExecuteButton").css('visibility', 'visible');
@@ -490,7 +496,7 @@ var searchMenu = (function () {
                         where += self.pathQuery.targetQuery.where.replace(/n\./, "m.");
                     }
                     where += "  and ID(n)<>ID(m)"
-                    toutlesensData.whereFilter = where;
+                    context.cypherMatchOptions.sourceNodeWhereFilter = where;
                     var options = {};
                     options.hideNodesWithoutRelations = 1;
                     if (collapseGraph)

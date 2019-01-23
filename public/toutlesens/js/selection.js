@@ -67,15 +67,15 @@ var selection = (function () {
             self.clearSelection();
         }
         else if (action == "defineAsLinkSourceNodes") {
-            currentObject = {};
-            currentObject.nodes = d3NodesSelection;
-            currentObject.name = "graphSelection"
+            context.currentNode = {};
+            context.currentNode.nodes = d3NodesSelection;
+            context.currentNode.name = "graphSelection"
             toutlesensController.dispatchAction("linkSource");
         }
         else if (action == "defineAsLinkTargetNodes") {
-            currentObject = {};
-            currentObject.nodes = d3NodesSelection;
-            currentObject.name = "graphSelection"
+            context.currentNode = {};
+            context.currentNode.nodes = d3NodesSelection;
+            context.currentNode.name = "graphSelection"
             toutlesensController.dispatchAction("linkTarget");
         }
         else if (action == "setAttributeDialog") {

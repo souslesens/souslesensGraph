@@ -34,7 +34,7 @@ self.initExpandWhere=function(){
         var targetWhereClause = $("#expandWhere_propertySelect").val() + ":" + $("#expandWhere_operatorSelect").val() + " " + $("#expandWhere_valueInput").val();
 
         targetWhereClause = advancedSearch.getWhereProperty(targetWhereClause, "m")
-        toutlesensData.targetWhereFilter = targetWhereClause;
+        context.cypherMatchOptions.targetNodeWhereFilter = targetWhereClause;
     }
 
 
