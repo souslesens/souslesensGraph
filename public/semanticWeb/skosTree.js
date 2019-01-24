@@ -1,6 +1,6 @@
 var skosTree = (function () {
     var self = {}
-
+var rdfUrl="../rdf"
 
     self.loadTree = function (treeDivId, skosInput) {
         var ontology = $("#" + skosInput).val();
@@ -31,7 +31,7 @@ var skosTree = (function () {
 
         $.ajax({
             type: "POST",
-            url: "/rdf",
+            url: rdfUrl,
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
@@ -57,7 +57,7 @@ var skosTree = (function () {
 
         $.ajax({
             type: "POST",
-            url: "/rdf",
+            url: rdfUrl,
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
