@@ -280,7 +280,7 @@
                 context.queryObject.text = clauseText;
                 context.queryObject.where = toutlesensData.getWhereClauseFromArray("iD", self.selection, "n");
                 var cypher = "MATCH (n:" + label + ") where " + context.queryObject.where + " RETURN collect(ID(n)) as ids ";
-debugger
+
                 Cypher.executeCypher(cypher, function (err, result) {
                     if (err) {
                         return console.log(err);
