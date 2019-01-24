@@ -21,11 +21,6 @@ var eventsController = (function () {
 
 
 
-            $("#tagCloudButton").click(function (e) {
-                toutlesensController.searchNodesUI('exec', null, null, tagCloud.drawCloud);
-                //  $("#findTabs").tabs({active:4});
-
-            });
 
             $("#graphDiv").click(function (e) {
                 var xx = e;
@@ -215,7 +210,7 @@ var eventsController = (function () {
                             toutlesensController.currentActionObj = {type: "relation"}
                         if (index == 3)
                             toutlesensController.currentActionObj = {type: "pathes"}
-                        if (index == 5) {// plugin
+                      /*  if (index == 5) {// plugin
                           $("#treeDivKeolis").css("visibility","visible")
                             $("#plugin:first-child").css("visibility","visible")
 
@@ -226,7 +221,7 @@ var eventsController = (function () {
                           $("#treeDivKeolis").css("visibility","hidden")
                             $("#plugin:first-child").css("visibility","hidden")
 
-                        }
+                        }*/
                     },
                     create: function (event, ui) {
                         toutlesensController.currentActionObj = {type: "findNode"}

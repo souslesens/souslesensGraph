@@ -24,13 +24,13 @@ var tagCloud = (function () {
 
 
     self.onTagClick = function (text) {
-        var label =context.queryObject.Label;
+        var label =context.queryObject.label;
         var clauses = [{
-            nodeLabel: "",
+            label: "",
             where: "n.name=~'(?i).*" + text + ".*'"
         },
             {
-                nodeLabel: "",
+                label: "",
                 where: "n.name=~'(?i).*" + $("#word").val() + ".*'"
             }
         ]
@@ -38,8 +38,9 @@ var tagCloud = (function () {
         $("#searchDialog_valueInput").focus();
 
         $("#filterOptionsDiv").html("");
-        //   advancedSearch.clearClauses();
-        advancedSearch.addClause(clauses[0]);
+
+      context.queryObject.label="";
+        context.queryObject.where=clauses[0].where;
 
 
         searchMenu.activatePanel("searchActionDiv");

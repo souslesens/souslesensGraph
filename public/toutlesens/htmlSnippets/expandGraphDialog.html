@@ -13,10 +13,10 @@ self.setSourceLabel=function(label){
 }
 
 self.onOK=function(){
-    self.setExpandWhereFilter();
+    var filter=self.getExpandWhereFilter();
 
 
-    toutlesensController.dispatchAction('expandGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())
+    toutlesensController.dispatchAction('expandGraphWithLabelExecute',{source:$('#expand_labelsSelectSource').val(),target:$('#expand_labelsSelectTarget').val(),filter, filter});
    self.setSourceLabel($('#expand_labelsSelectTarget').val());
 }
 
@@ -28,13 +28,14 @@ self.initExpandWhere=function(){
 
 }
 
-    self.setExpandWhereFilter = function () {
+    self.getExpandWhereFilter = function () {
         if ($("#expandWhere_propertySelect").val() == "")
             return;
         var targetWhereClause = $("#expandWhere_propertySelect").val() + ":" + $("#expandWhere_operatorSelect").val() + " " + $("#expandWhere_valueInput").val();
 
-        targetWhereClause = advancedSearch.getWhereProperty(targetWhereClause, "m")
-        context.cypherMatchOptions.targetNodeWhereFilter = targetWhereClause;
+       var  filter = advancedSearch.buildWhereClauseFromUI(targetWhereClause, "m");
+        return filter;
+
     }
 
 

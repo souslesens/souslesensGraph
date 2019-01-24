@@ -121,7 +121,7 @@ var toutlesensController = (function () {
 
                 }
                 else if (Array.isArray(id)) {
-                    toutlesensData.setWhereFilterWithArray("_id", id);
+                    toutlesensData.getWhereClauseFromArray("_id", id);
                 }
                 else
                     context.cypherMatchOptions.sourceNodeWhereFilter = "";
@@ -177,7 +177,8 @@ var toutlesensController = (function () {
             /*----------------------------------------------------------------------------------------------------*/
             $("#waitImg").css("visibility", "visible");
             $("#BIlegendDiv").html("");
-            toutlesensData.getNodeAllRelations(id, options, function (err, data) {
+            options.id = id;
+            toutlesensData.getNodeAllRelations(options, function (err, data) {
 
                 if (err) {
                     console.log(err);
@@ -382,11 +383,11 @@ var toutlesensController = (function () {
                     subGraph: subGraph,
                     label: label,
                     word: word,
-                    resultType: resultType,
                     limit: limit,
                     from: from
                 }
-                toutlesensData.searchNodesWithOption(options, callback);
+                var queryObj = toutlesensData.buildSearchNodeQuery(options);
+                return callback(null, queryObj);
             }
             setTimeout(function () {
                 $("#searchResultMessage").html("click on tree...")
@@ -626,36 +627,39 @@ var toutlesensController = (function () {
                 });
             }
             else if (action == 'expandGraphWithLabelExecute') {
-                var sourceLabel = "";
-                if (objectId != "" && objectId != "ALL")
-                    sourceLabel = objectId;
-                else
-                    sourceLabel = null;
+
+                if (objectId.source == "" || objectId.target == "")
+                    return;
+                var sourceLabel = objectId.source;
+                var targetLabel = objectId.target;
+                var filter = objectId.filter;
+
                 var ids = visjsGraph.getNodesNeoIdsByLabelNeo(currentLabel)
-                var targetLabel = "";
-                if (targetObjectId != "" && targetObjectId != "ALL")
-                    currentLabel = targetObjectId;
-                else
-                    currentLabel = null;
 
 
                 var options = {
                     applyFilters: false,
                     addToPreviousQuery: true
                 }
+                options.whereFilters = []
+                options.whereFilters.push(toutlesensData.getWhereClauseFromArray("_id", ids, "n"));
+                if (filter && filter != "")
+                    options.whereFilters.push(filter);
+                options.useStartLabels = [sourceLabel]
+                options.useEndLabels = [targetLabel]
 
-                context.addToGraphContext({expandGraph: {sourceLabel: currentLabel, targetLabel: currentLabel}})
+                //  context.addToGraphContext({expandGraph: {sourceLabel: currentLabel, targetLabel: currentLabel}})
                 var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
                 if (collapseGraph)
                     options.clusterIntermediateNodes = true;
-                options.hideNodesWithoutRelations = true
-                toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
-                    toutlesensController.generateGraph(null, options, function (err, result) {
-                        currentLabel = null;
-                    });
+                options.hideNodesWithoutRelations = true;
+
+                toutlesensData.getNodeAllRelations(options, function (err, result) {
+                    toutlesensController.displayGraph(result, {});
+                    $("#searchDialog_ExecuteButton").css('visibility', 'visible');
+
+
                 })
-
-
             }
 
 
@@ -1297,7 +1301,7 @@ var toutlesensController = (function () {
             }
             types.sort();
             types.splice(0, 0, "")
-            common.fillSelectOptionsWithStringArray(findRelationsTypeSelect, types);
+          //  common.fillSelectOptionsWithStringArray(findRelationsTypeSelect, types);
         }
 
 

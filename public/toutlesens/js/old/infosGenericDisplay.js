@@ -123,7 +123,7 @@ var infosGenericDisplay = (function () {
             matchStr = "MATCH (n:" + label + ") where n.subGraph='" + self.subGraph + "' return n limit " + limit;
         }
 
-        var payload = {match: matchStr, nodeLabel: label, query: {}, limit: limit};
+        var payload = {match: matchStr, label: label, query: {}, limit: limit};
 
         self.callAPIproxy(payload, "retrieve", function (error, data) {
             currentDisplayType = "FLOWER";
@@ -501,7 +501,7 @@ var infosGenericDisplay = (function () {
         var matchStr = "MATCH (n:" + currentMenuData.relation.endLabel + ") " + whereSubGraph + " return n order by n." + currentNameProperty;
         var payload = {
             match: matchStr,
-            nodeLabel: currentMenuData.relation.endLabel,
+            label: currentMenuData.relation.endLabel,
             orderBy: currentNameProperty,
             limit: limit,
             relation: currentMenuData.relation//for Mongo
@@ -589,7 +589,7 @@ var infosGenericDisplay = (function () {
         nameObj[currentNameProperty] = name;
         var payload = {
             setNodePrivateId: 1,
-            nodeLabel: currentMenuData.relation.endLabel,
+            label: currentMenuData.relation.endLabel,
             nodeSubGraph: self.subGraph,
             nodeAttrs: nameObj,
             sourceNodeQuery: {_id: currentMenuData.neoId},
@@ -631,7 +631,7 @@ var infosGenericDisplay = (function () {
         nameObj[currentNameProperty] = name;
         var payload = {
             setNodePrivateId: 1,
-            nodeLabel: label,
+            label: label,
             nodeSubGraph: self.subGraph,
             nodeAttrs: nameObj
         };
@@ -901,7 +901,7 @@ var infosGenericDisplay = (function () {
             node = data[0].n.properties;
             var label = data[0].n.labels[0];
             var attrObject = Schema.schema.properties[label];
-            $("#nodeLabel").html(label);
+            $("#label").html(label);
 
             self.setAttributesValue(label, attrObject, node);
             self.drawAttributes(attrObject, "nodeFormDiv");
@@ -1023,7 +1023,7 @@ var infosGenericDisplay = (function () {
             var payload = {
                 nodeAttrs: setObj,
                 nodeSubGraph: subGraph,
-                nodeLabel: self.currentLabel
+                label: self.currentLabel
             }
 
 
@@ -1056,7 +1056,7 @@ var infosGenericDisplay = (function () {
         if (confirm("delete editing node ?")) {
             var payload = {
                 nodeAttrs: {_id: self.selectedNodeData.neoId},
-                //  nodeLabel: self.selectedNodeData.label
+                //  label: self.selectedNodeData.label
             }
 
 

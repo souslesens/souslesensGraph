@@ -62,7 +62,7 @@ var traversalController = (function () {
         }
         /**
          *
-         * set queryObj in self.context for startNode
+         * set queryObject in self.context for startNode
          *
          *
          *
@@ -70,13 +70,13 @@ var traversalController = (function () {
 
         self.setStartLabelQuery = function () {
 
-            advancedSearch.searchNodes("matchObject",null, function (err, queryObj) {
+            advancedSearch.buildSearchNodeQueryFromUI({}, function (err, queryObject) {
                 if (err)
                     return console.log(err)
-                traversalController.context.start.queryObj = queryObj;
+                traversalController.context.start.queryObject = queryObject;
                 $("#dialog").dialog("close");
-                $("#pathes_sourceNode").html(JSON.stringify(queryObj));
-            //    graphicController.startLabel = queryObj.nodeLabel;
+                $("#pathes_sourceNode").html(JSON.stringify(queryObject));
+            //    graphicController.startLabel = queryObject.label;
 
                 $("#waitImg").css("visibility", "hidden")
                 $("#traversalFindDiv").css("visibility", "hidden");
@@ -102,11 +102,11 @@ var traversalController = (function () {
             else
                 self.context.clusterIntermediateNodes = false;
 
-            advancedSearch.searchNodes("matchObject",null, function (err, queryObj) {
+            advancedSearch.buildSearchNodeQueryFromUI({}, function (err, queryObject) {
                 if (err)
                     return console.log(err)
-                traversalController.context.end.queryObj = queryObj;
-                $("#pathes_targetNode").html(JSON.stringify(queryObj));
+                traversalController.context.end.queryObject = queryObject;
+                $("#pathes_targetNode").html(JSON.stringify(queryObject));
 
                 $("#dialog").dialog("close");
                 traversalController.searchAllTransitiveNodes(options);
@@ -177,16 +177,16 @@ var traversalController = (function () {
         self.searchAllTransitiveNodes = function (options) {
 
             var where = "";
-            if (self.context.start.queryObj) {//pathes with search query
-                self.context.start.label = self.context.start.queryObj.nodeLabel;
-                self.context.end.label = self.context.end.queryObj.nodeLabel;
+            if (self.context.start.queryObject) {//pathes with search query
+                self.context.start.label = self.context.start.queryObject.label;
+                self.context.end.label = self.context.end.queryObject.label;
 
-                where = self.context.start.queryObj.where;
-                if (self.context.end.queryObj.where != "") {
+                where = self.context.start.queryObject.where;
+                if (self.context.end.queryObject.where != "") {
 
                     if (where != "")
                         where += " and ";
-                    where += self.context.end.queryObj.where.replace(/n\./, "m.");
+                    where += self.context.end.queryObject.where.replace(/n\./, "m.");
                 }
 
             } else {//pathes between two nodes
@@ -276,16 +276,16 @@ var traversalController = (function () {
         self.searchAllTransitiveNodesOld = function (options) {
 
             var where = "";
-            if (self.context.start.queryObj) {//pathes with search query
-                self.context.start.label = self.context.start.queryObj.nodeLabel;
-                self.context.end.label = self.context.end.queryObj.nodeLabel;
+            if (self.context.start.queryObject) {//pathes with search query
+                self.context.start.label = self.context.start.queryObject.label;
+                self.context.end.label = self.context.end.queryObject.label;
 
-                where = self.context.start.queryObj.where;
-                if (self.context.end.queryObj.where != "") {
+                where = self.context.start.queryObject.where;
+                if (self.context.end.queryObject.where != "") {
 
                     if (where != "")
                         where += " and ";
-                    where += self.context.end.queryObj.where.replace(/n\./, "m.");
+                    where += self.context.end.queryObject.where.replace(/n\./, "m.");
                 }
 
             } else {//pathes between two nodes

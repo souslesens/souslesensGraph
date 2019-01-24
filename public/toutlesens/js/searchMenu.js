@@ -16,7 +16,7 @@ var searchMenu = (function () {
                 self.searchPanels.push($(this).attr("id"))
             })
 
-            context.queryObject.Label = ""
+            context.queryObject.label = ""
             //  $("#searchDialog_NodeLabelInput").attr("size", 8);
             $("#searchDialog_propertySelect").append("<option selected='selected'>" + Schema.getNameProperty() + "</option>");
             $("#searchDialog_valueInput").keypress(function (event) {
@@ -24,113 +24,26 @@ var searchMenu = (function () {
 
                 }
             })
-           // complexQueries.reset();
+            // complexQueries.reset();
             self.activatePanel("searchCriteriaDiv");
             self.currentPanelId = "searchCriteriaDiv";
             self.initLabelDivs();
 
 
         }
-        self.addClauseUI = function (booleanOperator) {
-            if (booleanOperator && booleanOperator == "")
-                return;
-
-            $("#searchDialog_nextPanelButton").css('visibility', 'visible');
-            $("#clearAllCreteriaButton").css("visibility", "visible");
-            $("#searchDialog_SaveQueryButton").css("visibility", "visible")
-            $("#searchDialog_Criteriatext").css("visibility", "visible");
 
 
-
-            var clauseText = "";
-            var value=$("#searchDialog_valueInput").val();
-            var property="";
-            var operator="";
-            if(value!=""){
-                property=$("#searchDialog_propertySelect").val();
-                operator=$("#searchDialog_operatorSelect").val()
-            }
-            context.queryObject={
-                label: context.queryObject.Label,
-                property:property,
-                operator:operator,
-                value:value
-
-            }
-            if(booleanOperator=="link"){
-                self.previousAction = "link";
-                complexQueries.addNodeQuery(context.queryObject);
-
-
-                $("#searchDialog_newQueryButton").css('visibility', 'visible');
-                $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
-                self.setUIPermittedLabels(context.queryObject.Label);
-
-                return;
-            }
-
-
-            advancedSearch.searchNodes("matchSearchClause", null, function (err, clause) {
-                clauseText = (clause.nodeLabel ? clause.nodeLabel : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
-
-                if (err)
-                    return;
-                $("#searchDialog_valueInput").val("");
-                for (var i = 0; i < advancedSearch.searchClauses.length; i++) {
-                    if (clause.nodeLabel != "" && advancedSearch.searchClauses[i].nodeLabel != "" && clause.nodeLabel != advancedSearch.searchClauses[i].nodeLabel)
-                        return alert("you cannot add criteria on different labels :" + clause.nodeLabel != "" && advancedSearch.searchClauses[i].nodeLabel)
-                }
-                advancedSearch.searchNodes("", {where: clause.where, resultType: "count"}, function (err, result) {
-                    if (booleanOperator && booleanOperator == "and") {
-                        var newIds = [];
-                        result.forEach(function (line) {
-                            newIds.push(line.n._id);
-                        })
-
-                        function intersectArray(a, b) {
-                            return a.filter(Set.prototype.has, new Set(b));
-                        }
-
-                        advancedSearch.currentQueryNodeIds = intersectArray(advancedSearch.currentQueryNodeIds, newIds)
-                    } else {
-                        result.forEach(function (line) {
-                            advancedSearch.currentQueryNodeIds.push(line.n._id);
-                        });
-                    }
-                    clause.foundIds = advancedSearch.currentQueryNodeIds.length;
-
-                    clauseText += ": <b> " + clause.foundIds + "nodes </b>";
-                    if (booleanOperator && booleanOperator != "+") {
-                        var oldClauseText = $("#searchDialog_Criteriatext").val();
-                        clauseText = oldClauseText + "<br>" + booleanOperator + "<br>" + clauseText;
-                        var oldWhere = advancedSearch.searchClauses[0].where;
-                        clause.where = "(" + oldWhere + ") " + booleanOperator + " ( " + clause.where + ")";
-                    }
-                    toutlesensData.setWhereFilterWithArray("_id", advancedSearch.currentQueryNodeIds, function (err, result) {
-                        advancedSearch.searchClauses = [];
-                        advancedSearch.addClause(clause, clauseText);
-                    })
-
-
-                });
-
-
-                // clause.operator=operator;
-
-            })
-        }
-
-        self.setUIPermittedLabels=function(label){
-            if(!label) {
+        self.setUIPermittedLabels = function (label) {
+            if (!label) {
                 return $(".selectLabelDiv ").css("visibility", "visible");
 
             }
-            var allowedLabels=Schema.getPermittedLabels(label,true,true);
+            var allowedLabels = Schema.getPermittedLabels(label, true, true);
             $(".selectLabelDiv ").each(function () {
-                if (allowedLabels.indexOf($(this).html())<0)
-                    $(this).css("visibility","hidden");
+                if (allowedLabels.indexOf($(this).html()) < 0)
+                    $(this).css("visibility", "hidden");
                 else
-                    $(this).css("visibility","visible");
+                    $(this).css("visibility", "visible");
 
             })
         }
@@ -146,11 +59,11 @@ var searchMenu = (function () {
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             context.initGraphContext();
-           // complexQueries.reset();
-            //if(searchMenu.self.previousAction!="path" || pathSourceSearchCriteria)
-            //
-            $(".selectLabelDiv ").css("visibility", "visible")
-            advancedSearch.clearClauses();
+            self.previousAction = "";
+
+            $(".selectLabelDiv ").css("visibility", "visible");
+            context.queryObject = {};
+
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
         }
 
@@ -167,13 +80,12 @@ var searchMenu = (function () {
             }
 
 
-            context.queryObject.Label = value;
+            context.queryObject = {}
+            context.queryObject.label = value;
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             //if(searchMenu.self.previousAction!="path" || pathSourceSearchCriteria)
             $("#searchDialog_nextPanelButton").css('visibility', 'visible');
-            advancedSearch.clearClauses();
-            //  self.resetQueryClauses()
             if (searchDialog_propertySelect) ;
             filters.initProperty(null, value, searchDialog_propertySelect);
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
@@ -226,6 +138,7 @@ var searchMenu = (function () {
         }
 
         self.clearCurrentLabel = function () {
+            self.previousAction = "";
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
             currentLabel = null;
@@ -234,28 +147,6 @@ var searchMenu = (function () {
         }
 
 
-        self.graphNeighboursWithLabels = function () {
-            var tagetLabels = [];
-            //  $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
-            $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
-                tagetLabels.push($(this).val())
-
-            })
-            var options = {targetNodesLabels: tagetLabels};
-            self.setTargetWhereFilter();
-
-            advancedSearch.searchNodes('matchStr', options, advancedSearch.graphNodesAndDirectRelations);
-        }
-
-
-        self.setTargetWhereFilter = function () {
-            if ($("#neighboursWhere_propertySelect").val() == "")
-                return;
-            var targetWhereClause = $("#neighboursWhere_propertySelect").val() + ":" + $("#neighboursWhere_operatorSelect").val() + " " + $("#neighboursWhere_valueInput").val();
-
-            targetWhereClause = advancedSearch.getWhereProperty(targetWhereClause, "m")
-            context.cypherMatchOptions.targetNodeWhereFilter = targetWhereClause;
-        }
         self.activatePanel = function (id) {
             if (id == "searchCriteriaDiv") {
                 self.resetQueryClauses()
@@ -307,9 +198,9 @@ var searchMenu = (function () {
 
             $("#searchDialog_newQueryButton").css('visibility', 'visible');
             if (self.previousAction == "path") {
-                advancedSearch.searchNodes('matchObject', null, function (err, result) {
+                advancedSearch.buildSearchNodeQueryFromUI(null, function (err, result) {
                     self.pathQuery.targetQuery = result;
-                    var relationDistance = Schema.getLabelsDistance(self.pathQuery.sourceQuery.nodeLabel, self.pathQuery.targetQuery.nodeLabel);
+                    var relationDistance = Schema.getLabelsDistance(self.pathQuery.sourceQuery.label, self.pathQuery.targetQuery.label);
                     if (!relationDistance)
                         relationDistance = 1;
                     self.previousAction == "executePath"
@@ -328,8 +219,7 @@ var searchMenu = (function () {
             }
             else {
                 if (self.searchPanels.currentIndex == 0) {
-                    if (advancedSearch.searchClauses.length == 0)
-                        searchMenu.addClauseUI();
+                    searchMenu.setNodeQueryUI();
                     $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
                 }
 
@@ -360,7 +250,7 @@ var searchMenu = (function () {
 
             if (option == 'path') {
 
-                advancedSearch.searchNodes('matchObject', null, function (err, result) {
+                advancedSearch.buildSearchNodeQueryFromUI(null, function (err, result) {
 
                     self.pathQuery = {sourceQuery: result};
                     self.previousAction = "pathSourceSearchCriteria"
@@ -377,7 +267,7 @@ var searchMenu = (function () {
 
             else if (option == "graphSomeNeighboursListLabels") {
                 self.nextPanel();
-                var currentLabel = context.queryObject.Label;
+                var currentLabel = context.queryObject.label;
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
@@ -386,7 +276,7 @@ var searchMenu = (function () {
             else if (option == "treeMapSomeNeighboursListLabels") {
                 self.nextPanel();
                 $("#graphNeighboursAllOptionsCbx").prop("checked", false)
-                var currentLabel = context.queryObject.Label;
+                var currentLabel = context.queryObject.label;
                 self.setPermittedLabelsCbxs(currentLabel, "neighboursTypesDiv");
                 $("#searchDialog_ExecuteButton").css('visibility', 'visible');
 
@@ -395,46 +285,24 @@ var searchMenu = (function () {
 
 
             else if (option == 'treeNodes') {
-                advancedSearch.searchNodes('matchStr', null, treeController.loadSearchResultIntree);
+                advancedSearch.buildSearchNodeQueryFromUI(null, treeController.loadSearchResultIntree);
                 $("#findTabs").tabs("option", "active", 1);
 
 
             }
             else if (option == 'tableNodes') {
-                advancedSearch.searchNodes('matchStr', null, function (err, query) {
-                    if (err)
-                        return console.log(err);
-                    if (!self.dataTable) {
-                        self.dataTable = new myDataTable();
-                    }
-                    //    self.dataTable.loadNodes(self.dataTable, "graphDiv", query, {});
-                    dialogLarge.load("htmlSnippets/dataTable.html", function () {
-                        dialogLarge.dialog("open");
-                        self.dataTable.loadNodes(self.dataTable, "dataTableDiv", query, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {
-
-                        })
-
-                    })
-
-                })
-
-            }
-
-
-            else if (option == 'graphNodes') {
-                advancedSearch.searchNodes('matchStr', null, self.graphNodesOnly);
-
-            }
-            else if (option == 'graphNeighbours') {
-                advancedSearch.searchNodes('matchStr', null, advancedSearch.graphNodesAndDirectRelations);
+                self.previousAction = 'tableNodes';
+                self.execute();
 
 
             }
+
+
             else if (option == 'algorithms') {
-                advancedSearch.searchNodes('matchStr', null, function (err, result) {
+                advancedSearch.buildSearchNodeQueryFromUI(null, function (err, result) {
                     self.previousAction = "algorithms"
-                    //  algorithms.initDialog(matchObj.nodeLabel)
-                    algorithms.initDialog(context.queryObject.Label)
+                    //  algorithms.initDialog(matchObj.label)
+                    algorithms.initDialog(context.queryObject.label)
 
                     self.activatePanel("algorithmsDiv");
                     $("#searchDialog_ExecuteButton").css('visibility', 'visible');
@@ -446,11 +314,11 @@ var searchMenu = (function () {
             }
 
             else if (option == 'graphSimilars') {
-                advancedSearch.searchNodes('matchStr', null, self.graphNodesAndSimilarNodes);
+                advancedSearch.buildSearchNodeQueryFromUI(null, self.graphNodesAndSimilarNodes);
                 // advancedSearch.graphOnly()
             }
             else if (option == 'tagCloud') {
-                advancedSearch.addClauseUI()
+                advancedSearch.setNodeQueryUI()
                 searchMenu.searchNodes('matchStr', null, function (err, query) {
                     var payload = {match: query};
                     $.ajax({
@@ -470,100 +338,219 @@ var searchMenu = (function () {
                     })
                 });
             }
-            else if (option == 'execute') {
+            self.previousAction = option;
+        }
+
+
+        self.execute = function () {
+
+            {
                 context.addToGraphContext({graphType: self.previousAction})
                 toutlesensController.setGraphMessage("Working...")
                 eventsController.stopEvent = true;
-
-
                 toutlesensController.openFindAccordionPanel(false);
-
                 paintAccordion.accordion("option", "active", 1)
-
-                // $("#tabs-analyzePanel").tabs("option", "active", 2);//highlight
                 tabsAnalyzePanel.tabs("option", "active", 2);//highlight
-
-                if (self.previousAction == 'path') {
-                    var relationDistance = parseInt($("#searchDialog_pathDistanceInput").val());
-                    var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
-                    toutlesensData.matchStatement = "allShortestPaths( (n:" + self.pathQuery.sourceQuery.nodeLabel + ")-[*.." + relationDistance + "]-(m:" + self.pathQuery.targetQuery.nodeLabel + ") ) "
-                    //      toutlesensData.matchStatement = "(n:" + self.pathQuery.sourceQuery.nodeLabel + ")-[r*" + relationDistance + "]-(m:" + self.pathQuery.targetQuery.nodeLabel + ")";
-                    var where = self.pathQuery.sourceQuery.where;
-                    if (self.pathQuery.targetQuery.where != "") {
-
-                        if (where != "")
-                            where += " and ";
-                        where += self.pathQuery.targetQuery.where.replace(/n\./, "m.");
-                    }
-                    where += "  and ID(n)<>ID(m)"
-                    context.cypherMatchOptions.sourceNodeWhereFilter = where;
-                    var options = {};
-                    options.hideNodesWithoutRelations = 1;
-                    if (collapseGraph)
-                        options.clusterIntermediateNodes = true;
-                    toutlesensController.generateGraph(null, options, function (err, data) {
-                        if (err)
-                            return err;
+            }
 
 
-                        self.previousAction = "graphPath";
-                        $("#searchDialog_PreviousPanelButton").css('visibility', 'visible');
-                        $("#searchDialog_ExecuteButton").css('visibility', 'visible');
-                        self.currentAction = "graphPath";
+            if (self.previousAction == 'tableNodes') {
+                if (!self.dataTable)
+                    self.dataTable = new myDataTable();
+
+                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.queryObject.nodeIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
+                dialogLarge.load("htmlSnippets/dataTable.html", function () {
+                    dialogLarge.dialog("open");
+                    self.dataTable.loadNodes(self.dataTable, "dataTableDiv", cypher, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {
+
                     })
 
 
-                }
+                })
+            }
 
+            if (self.previousAction == 'graphSomeNeighboursListLabels') {
 
-                if (self.previousAction == 'graphSomeNeighboursListLabels') {
-                    if ($("#graphNeighboursAllOptionsCbx").prop("checked")) {
-                        advancedSearch.searchNodes('matchStr', null, self.graphNodesOnly);
-                        $("#searchDialog_ExecuteButton").css('visibility', 'visible');
-                        return;
-                    }
+                var options = {useStartNodeSet: context.queryObject.nodeIds};
 
-
-                    self.currentAction = "graphSomeNeighbours";
-                    self.graphNeighboursWithLabels()
-                    //  advancedSearch.searchNodes('matchStr', {targetNodesLabels:true}, self.graphNodesAndDirectRelations);
-                    $("#searchDialog_ExecuteButton").css('visibility', 'visible');
-                }
-
-
-                if (self.previousAction == 'treeMapSomeNeighboursListLabels') {
-                    self.currentAction = "treeMapSomeNeighbours";
-                    var neighboursLabels = [];
+                if ($("#graphNeighboursAllOptionsCbx").prop("checked")) {// all neighbours
+                    ;
+                } else {// someNeighbours
+                    var targetLabels = [];
                     $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
-                        neighboursLabels.push($(this).val());
-                    });
-
-                    advancedSearch.searchNodes('matchStr', {targetNodesLabels: neighboursLabels}, function (err, query) {
-                        advancedSearch.graphNodesAndDirectRelations(err, query, treeMap.draw);
-                        paint.initHighlight();
-                        $("#searchDialog_ExecuteButton").css('visibility', 'visible');
-                        $("#searchDialog_PreviousPanelButton").css('visibility', 'visible');
-                    });
-                }
-
-                if (self.previousAction == 'algorithms') {
-                    advancedSearch.searchNodes('matchStr', null, function (err, query) {
-                        algorithms.execute(query);
-                        $("#searchDialog_ExecuteButton").css('visibility', 'visible');
-                        return;
+                        targetLabels.push($(this).val())
                     })
+                    options.useEndLabels = targetLabels;
+
+                    var targetNodeValue = $("#neighboursWhere_valueInput").val();
+                    if (targetNodeValue != "") {
+
+                        var targetWhereClause = $("#neighboursWhere_propertySelect").val() + ":" + $("#neighboursWhere_operatorSelect").val() + " " + $("#neighboursWhere_valueInput").val();
+                        options.whereFilters = [advancedSearch.buildWhereClauseFromUI(targetWhereClause, "m")];
+                    }
+
+
                 }
+                $("#waitImg").css("visibility", "visible");
+                toutlesensData.getNodeAllRelations(options, function (err, result) {
+                    $("#waitImg").css("visibility", "hidden");
+                    if (err) {
+                        return console.log(err);
+                    }
+
+                    toutlesensController.displayGraph(result, {});
+                    $("#searchDialog_ExecuteButton").css('visibility', 'visible');
+                    self.currentAction = "graphSomeNeighbours";
+
+
+                })
 
 
             }
 
 
-            if (option != 'execute') {
-                self.previousAction = option;
-                
+            else if (self.previousAction == 'path') {
+                var relationDistance = parseInt($("#searchDialog_pathDistanceInput").val());
+                var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
+                toutlesensData.matchStatement = "allShortestPaths( (n:" + self.pathQuery.sourceQuery.label + ")-[*.." + relationDistance + "]-(m:" + self.pathQuery.targetQuery.label + ") ) "
+                //      toutlesensData.matchStatement = "(n:" + self.pathQuery.sourceQuery.label + ")-[r*" + relationDistance + "]-(m:" + self.pathQuery.targetQuery.label + ")";
+                var where = self.pathQuery.sourceQuery.where;
+                if (self.pathQuery.targetQuery.where != "") {
+
+                    if (where != "")
+                        where += " and ";
+                    where += self.pathQuery.targetQuery.where.replace(/n\./, "m.");
+                }
+                where += "  and ID(n)<>ID(m)"
+                context.cypherMatchOptions.sourceNodeWhereFilter = where;
+                var options = {};
+                options.hideNodesWithoutRelations = 1;
+                if (collapseGraph)
+                    options.clusterIntermediateNodes = true;
+                toutlesensController.generateGraph(null, options, function (err, data) {
+                    if (err)
+                        return err;
+
+
+                    self.previousAction = "graphPath";
+                    $("#searchDialog_PreviousPanelButton").css('visibility', 'visible');
+                    $("#searchDialog_ExecuteButton").css('visibility', 'visible');
+                    self.currentAction = "graphPath";
+                })
+
+
             }
 
 
+            if (self.previousAction == 'treeMapSomeNeighboursListLabels') {
+                self.currentAction = "treeMapSomeNeighbours";
+                var neighboursLabels = [];
+                $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
+                    neighboursLabels.push($(this).val());
+                });
+
+                advancedSearch.buildSearchNodeQueryFromUI({targetNodesLabels: neighboursLabels}, function (err, queryObject) {
+                    advancedSearch.graphNodesAndDirectRelations(err, queryObject, treeMap.draw);
+                    paint.initHighlight();
+                    $("#searchDialog_ExecuteButton").css('visibility', 'visible');
+                    $("#searchDialog_PreviousPanelButton").css('visibility', 'visible');
+                });
+            }
+
+            if (self.previousAction == 'algorithms') {
+                advancedSearch.buildSearchNodeQueryFromUI(null, function (err, queryObject) {
+                    algorithms.execute(queryObject.cypher);
+                    $("#searchDialog_ExecuteButton").css('visibility', 'visible');
+                    return;
+                })
+            }
+
+
+        }
+// transform request in nodes ids stored in context.queryObject.where
+        self.setNodeQueryUI = function (booleanOperator) {
+            if (booleanOperator && booleanOperator == "")
+                return;
+            $("#searchDialog_nextPanelButton").css('visibility', 'visible');
+            $("#clearAllCreteriaButton").css("visibility", "visible");
+            $("#searchDialog_SaveQueryButton").css("visibility", "visible")
+            $("#searchDialog_Criteriatext").css("visibility", "visible");
+
+
+            var clauseText = "";
+            var value = $("#searchDialog_valueInput").val();
+            var property = "";
+            var operator = "";
+            if (value != "") {
+                property = $("#searchDialog_propertySelect").val();
+                operator = $("#searchDialog_operatorSelect").val()
+            }
+            var oldContextQueryObjectWhere = context.queryObject.where;
+            context.queryObject = {
+                label: context.queryObject.label,
+                property: property,
+                operator: operator,
+                value: value
+
+            }
+            if (booleanOperator && booleanOperator != "+") {
+                var oldClauseText = $("#searchDialog_Criteriatext").val();
+                clauseText = oldClauseText + "<br>" + booleanOperator + "<br>" + clauseText;
+
+                context.queryObject.where = "(" + oldContextQueryObjectWhere + ") " + booleanOperator + " ( " + context.queryObject.where + ")";
+            }
+            context.queryObject.text = (context.queryObject.label ? context.queryObject.label : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
+
+            if (booleanOperator == "link") {
+                self.previousAction = "link";
+                complexQueries.addNodeQuery(context.queryObject);
+
+                $("#searchDialog_newQueryButton").css('visibility', 'visible');
+                $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
+                self.setUIPermittedLabels(context.queryObject.label);
+
+                return;
+            }
+
+
+            advancedSearch.buildSearchNodeQueryFromUI(null, function (err, queryObject) {
+
+                if (err)
+                    return;
+                $("#searchDialog_valueInput").val("");
+                Cypher.executeCypher(queryObject.cypher, function (err, result) {
+
+                    if (booleanOperator && booleanOperator == "and") {
+                        var newIds = [];
+                        result.forEach(function (line) {
+                            newIds.push(line.n._id);
+                        })
+
+                        function intersectArray(a, b) {
+                            return a.filter(Set.prototype.has, new Set(b));
+                        }
+
+                        context.queryObject.nodeIds = intersectArray(context.queryObject.nodeIds, newIds)
+                    } else {
+                        if (!context.queryObject.nodeIds)
+                            context.queryObject.nodeIds = [];
+                        result.forEach(function (line) {
+                            context.queryObject.nodeIds.push(line.n._id);
+                        });
+                    }
+                    var foundIds = result.length;
+
+                    clauseText += ": <b> " + foundIds + "nodes </b>";
+
+                    //  toutlesensData.getWhereClauseFromArray("_id", context.queryObject.nodeIds);
+
+
+                });
+
+
+                // clause.operator=operator;
+
+            })
         }
 
 
@@ -582,7 +569,7 @@ var searchMenu = (function () {
             })
             if (state) {
                 state = "checked";
-                searchMenu.onSearchAction('execute')
+                searchMenu.execute()
             }
         }
 
@@ -605,4 +592,5 @@ var searchMenu = (function () {
 
         return self;
     }
-)()
+)
+()

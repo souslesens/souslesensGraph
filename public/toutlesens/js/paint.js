@@ -823,7 +823,7 @@ value=atob(value)
             }
             else if (action == "graphClusterNodes") {
                 var nodeIds = visjsGraph.network.getNodesInCluster(context.currentNode.id)
-                toutlesensData.setWhereFilterWithArray("_id", nodeIds, function (err, result) {
+                toutlesensData.getWhereClauseFromArray("_id", nodeIds, function (err, result) {
 
                     toutlesensController.generateGraph(null, {
                         applyFilters: true,

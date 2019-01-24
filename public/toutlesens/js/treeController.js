@@ -126,7 +126,7 @@ var treeController = (function () {
             matchStr = "MATCH (n:" + label + ") where n.subGraph='" + self.subGraph + "' return n limit " + limit;
         }
 
-        var payload = {match: matchStr, nodeLabel: label, query: {}, limit: limit};
+        var payload = {match: matchStr, label: label, query: {}, limit: limit};
 
         self.callAPIproxy(payload, "retrieve", function (error, data) {
             currentDisplayType = "FLOWER";
@@ -512,7 +512,7 @@ var treeController = (function () {
         var matchStr = "MATCH (n:" + currentMenuData.relation.endLabel + ") " + whereSubGraph + " return n order by n." + currentNameProperty;
         var payload = {
             match: matchStr,
-            nodeLabel: currentMenuData.relation.endLabel,
+            label: currentMenuData.relation.endLabel,
             orderBy: currentNameProperty,
             limit: limit,
             relation: currentMenuData.relation//for Mongo
@@ -600,7 +600,7 @@ var treeController = (function () {
         nameObj[currentNameProperty] = name;
         var payload = {
             setNodePrivateId: 1,
-            nodeLabel: currentMenuData.relation.endLabel,
+            label: currentMenuData.relation.endLabel,
             nodeSubGraph: self.subGraph,
             nodeAttrs: nameObj,
             sourceNodeQuery: {_id: currentMenuData.neoId},
@@ -642,7 +642,7 @@ var treeController = (function () {
         nameObj[currentNameProperty] = name;
         var payload = {
             setNodePrivateId: 1,
-            nodeLabel: label,
+            label: label,
             nodeSubGraph: self.subGraph,
             nodeAttrs: nameObj
         };
@@ -828,7 +828,7 @@ var treeController = (function () {
         var node = node;
 
         if (node.parent == "#") {
-            toutlesensData.setWhereFilterWithArray("_id", self.currentNodesSelection, function (err, result) {
+            toutlesensData.getWhereClauseFromArray("_id", self.currentNodesSelection, function (err, result) {
                 toutlesensController.generateGraph(null, {
                     applyFilters: true,
                     dragConnectedNodes: true
@@ -950,7 +950,7 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
             node = data[0].n.properties;
             var label = data[0].n.labels[0];
             var attrObject = Schema.schema.properties[label];
-            $("#nodeLabel").html(label);
+            $("#label").html(label);
 
             self.setAttributesValue(label, attrObject, node);
             self.drawAttributes(attrObject, "nodeFormDiv");
@@ -1075,7 +1075,7 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
             var payload = {
                 nodeAttrs: setObj,
                 nodeSubGraph: subGraph,
-                nodeLabel: self.currentLabel
+                label: self.currentLabel
             }
 
 
@@ -1108,7 +1108,7 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
         if (confirm("delete editing node ?")) {
             var payload = {
                 nodeAttrs: {_id: self.selectedNodeData.neoId},
-                //  nodeLabel: self.selectedNodeData.label
+                //  label: self.selectedNodeData.label
             }
 
 
@@ -1398,8 +1398,8 @@ for( var i=0;i<self.currentNodesSelection.length;i++){
     }
 
 
-    self.loadSearchResultIntree = (function (err, matchStr) {
-        self.loadTree(null, null, matchStr,null, true);
+    self.loadSearchResultIntree = (function (err, queryObject) {
+        self.loadTree(null, null, queryObject.cypher,null, true);
 
     });
 

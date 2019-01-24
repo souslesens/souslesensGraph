@@ -34,8 +34,6 @@ var toutlesensData = (function () {
         self.cachedResultTree = null;
 
 
-
-        self.matchStatement = null;
         self.currentStatement = null;
 
         self.queriesIds = [];
@@ -48,155 +46,87 @@ var toutlesensData = (function () {
             " EXTRACT(node IN nodes(path) | labels(node)) as labels "
             + ", EXTRACT(rel IN relationships(path) | labels(startNode(rel))) as startLabels";
 
+        self.getWhereClauseFromArray = function (property, _array, nodeSymbol) {
+            var array;
+            if (!nodeSymbol)
+                nodeSymbol = "n";
+            if (typeof _array == "string")
+                array = _array.split(",");
+            else
+                array = _array;
 
-
-
-
-        self.executeNeoQuery = function (queryType, str, successFunction) {
-
-            currentQueryType = queryType;
-            if (str.indexOf("DELETE") < 0 && str.toLowerCase().indexOf("limit ") < 0) {
-                str += " limit " + limitResult;
+            var query = nodeSymbol + "." + property + " in ["
+            if (property == "_id")
+                query = "ID(n) in ["
+            var quote = "";
+            for (var i = 0; i < array.length; i++) {
+                if (i > 0 && i < array.length)
+                    query += ","
+                else if ((typeof array[i] === 'string'))
+                    var quote = "\"";
+                query += quote + array[i] + quote;
             }
-
-            if (queryType == QUERY_TYPE_MATCH) {
-                var payload = {match: str};
-
-
-            }
-            var queryStr = JSON.stringify(payload);
-            if (Gparams.logLevel > 1)
-                console.log("QUERY----" + queryStr);
-            $("#neoQueriesTextArea").val(queryStr);
-            $("#neoQueriesHistoryId").prepend(queryStr + "<br><br>");
-            $.ajax({
-                type: "POST",
-                url: self.neo4jProxyUrl,
-                data: payload,
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    savedQueries.addToCurrentSearchRun(queryStr,successFunction || null);
-
-                    currentDataStructure = "flat";
-                    //  toutlesensData.cachedResultArray = data;
-                    if (!data || data.length == 0) {
-                        toutlesensController.setMessage("No results", "green");
-                        $("#waitImg").css("visibility", "hidden");
-                        return;
-                    }
-                    var errors = data.errors;
-
-                    if (errors && errors.length > 0) {
-                        var str = "ERROR :";
-                        for (var i = 0; i < errors.length; i++) {
-                            str += errors[i].code + " : " + errors[i].message + "<br>"
-
-                        }
-                        toutlesensController.setMessage(str, red);
-                        return;
-                    }
-
-                    if ($.isArray(data)) {// labels...
-                        if (successFunction) {
-                            successFunction(data);
-                            return;
-                        } else
-                            return data;
-                    }
-
-                    var results = data.results;
-
-                    if (results && results.length > 0) {// } && results[0].data.length >
-                        // 0) {// match..
-                        toutlesensController.completeResult(results);
-                        if (successFunction) {
-                            successFunction(results);
-                            return;
-                        } else {
-                            return results;
-                        }
-
-                    } else {
-
-                        toutlesensController.setMessage("No results", blue);
-                        $("#waitImg").css("visibility", "hidden");
-
-
-                        return -1;
-                    }
-
-                },
-                error: function (xhr, err, msg) {
-                    toutlesensController.onErrorInfo(xhr)
-                },
-
-            });
-
+            query += "] ";
+            return query;
         }
 
-        self.getNodeAllRelations = function (id, options, callback) {
+
+
+        self.getNodeAllRelations = function (options, callback) {
             if (!options.addToPreviousQuery) {
                 self.queriesIds = [];
                 self.cachedResultArray = [];
             }
-            self.queriesIds.push(id)
             var hasMclause = false;
-            excludedLabels = [];
-            currentRootId = Math.abs(id);
             legendnodeLabels = {}
             legendRelTypes = {};
 
             //*******************************************************where***********************************************
-            var subGraphWhere;
-            if (subGraph)
-                subGraphWhere = "  n.subGraph='" + subGraph + "' and m.subGraph='" + subGraph + "' ";
 
-            var whereStatement = "";
-            if (id && context.cypherMatchOptions.sourceNodeWhereFilter.indexOf("ID(n)") < 0) {
+            var whereStatements = [];
+            if (subGraph)
+                whereStatements.push("n.subGraph='" + subGraph + "' and m.subGraph='" + subGraph + "' ");
+
+
+            if (options.useStartNodeSet)
+                whereStatements.push(self.getWhereClauseFromArray("_id", options.useStartNodeSet, "n"));
+
+            if (options.useEndNodeSet)
+                whereStatements.push(self.getWhereClauseFromArray("_id", options.useEndNodeSet, "m"));
+
+
+            if (options.id && !options.useStartNodeSet) {
 
                 if (id > 0) {
-                    whereStatement = " WHERE (ID(n)=" + id + ")";//+" OR  ID(m)="+id+")"
+                    whereStatements.push("  (ID(n)=" + id + ")");
                     hasMclause = false;
                 }
                 else {
                     hasMclause = true;
-                    whereStatement = " WHERE (ID(m)=" + (-id) + ")";
+                    whereStatements.push("  (ID(m)=" + (-id) + ")");
 
                 }
             }
-            if (subGraphWhere) {
-                if (whereStatement.length > 0)
-                    whereStatement += " AND ";
-                else
-                    whereStatement += " WHERE ";
-                whereStatement += subGraphWhere;
 
-            }
-            if (context.cypherMatchOptions.sourceNodeWhereFilter != "") {
-                if (whereStatement == "")
-                    whereStatement += " WHERE ";
-                else
-                    whereStatement += " AND ";
-                whereStatement += context.cypherMatchOptions.sourceNodeWhereFilter + " ";
+            if (options.useStartLabels)
+                whereStatements.push("labels(n)[0] in " + JSON.stringify(options.useStartLabels));
+            if (options.useEndLabels)
+                whereStatements.push("labels(m)[0] in " + JSON.stringify(options.useEndLabels));
+            if (options.whereFilters) {
+                options.whereFilters.forEach(function (line) {
+                    whereStatements.push(line);
+                })
             }
 
-            if (context.cypherMatchOptions.queryRelWhereFilter != "") {
-                if (whereStatement == "")
-                    whereStatement += " WHERE ";
-                else
-                    whereStatement += " AND ";
-                whereStatement += context.cypherMatchOptions.queryRelWhereFilter + " ";
-            }
-            if (context.cypherMatchOptions.targetNodeWhereFilter != "") {
-                if (whereStatement == "")
-                    whereStatement += " WHERE ";
-                else
-                    whereStatement += " AND ";
-                if (context.cypherMatchOptions.targetNodeWhereFilter.indexOf("m.") > -1)
-                    whereStatement += context.cypherMatchOptions.targetNodeWhereFilter + " ";
-                else
-                    whereStatement += "m." + context.cypherMatchOptions.targetNodeWhereFilter + " ";
-            }
+
+            var whereStatement = "WHERE ";
+            console.log(JSON.stringify(whereStatements,null,2))
+            whereStatements.forEach(function (line, index) {
+                if (index > 0)
+                    whereStatement += " AND "
+                whereStatement += line;
+            })
+
 
             //*******************************************************return***********************************************
             var returnStatement;
@@ -220,43 +150,34 @@ var toutlesensData = (function () {
 
             //*******************************************************match***********************************************
 
-            var matchStatement;
-            if (self.matchStatement)
-                matchStatement = self.matchStatement;
+
+            // http://graphaware.com/graphaware/2015/05/19/neo4j-cypher-variable-length-relationships-by-example.html
+            var relCardinalityStr = "";
+
+            if (options.relationDepth && options.relationDepth > 1)
+                relCardinalityStr = "*.." + options.relationDepth;
             else {
-
-
-
-                // http://graphaware.com/graphaware/2015/05/19/neo4j-cypher-variable-length-relationships-by-example.html
-                var relCardinalityStr = "";
-
-                if (options.relationDepth && options.relationDepth > 1)
-                    relCardinalityStr = "*.." + options.relationDepth;
-                else {
-                    if (options.hideNodesWithoutRelations)
-                        relCardinalityStr = "*..1";
-                    if (options.hideNodesWithoutRelations || context.cypherMatchOptions.queryRelWhereFilter != "")
-                        relCardinalityStr = ""
-                    else
-                        relCardinalityStr = "*0..1";
-
-                }
-
-                var matchStatement = "(n" + node1Label
-                    + ")-[r"
-                    + context.cypherMatchOptions.queryRelTypeFilters
-                    + relCardinalityStr
-                    + "]-(m" + node2Label + ") "
+                if (options.hideNodesWithoutRelations)
+                    relCardinalityStr = "*..1";
+                if (options.hideNodesWithoutRelations )
+                    relCardinalityStr = ""
+                else
+                    relCardinalityStr = "*0..1";
 
             }
+
+            var matchStatement = "(n" + node1Label
+                + ")-[r"
+              //  + context.cypherMatchOptions.queryRelTypeFilters
+                + relCardinalityStr
+                + "]-(m" + node2Label + ") "
 
 
             //*******************************************************Global query***********************************************
             var statementBase = "MATCH path="
                 + matchStatement
                 + whereStatement
-                + graphQueryTargetFilter
-                + context.cypherMatchOptions.querynodeLabelFilters
+
 
 
             graphQueryUnionStatement = "";
@@ -268,10 +189,8 @@ var toutlesensData = (function () {
                 hasMclause = true;
 
 
-
-
-           /*   if (graphQueryUnionStatement)
-                  statement += " UNION " + graphQueryUnionStatement + returnStatement.replace("count(r)", 0);*/
+            /*   if (graphQueryUnionStatement)
+                   statement += " UNION " + graphQueryUnionStatement + returnStatement.replace("count(r)", 0);*/
 
             var limit = Gparams.maxResultSupported;
 
@@ -289,21 +208,19 @@ var toutlesensData = (function () {
 
             if (options.useCurrentStatement && self.currentStatement) {
                 var p = self.currentStatement.indexOf("WHERE")
-                if (p > -1 && context.cypherMatchOptions.sourceNodeWhereFilter.length > 0) {
+               // if (p > -1 && context.cypherMatchOptions.sourceNodeWhereFilter.length > 0) {
+                if (p > -1){
                     statement = self.currentStatement.substring(0, p) + " " + context.cypherMatchOptions.sourceNodeWhereFilter + " " + self.currentStatement.substring(p + 1);
 
                 }
 
 
-            } else
+            } else {
                 self.currentStatement = statement;
+            }
 
 
-            context.cypherMatchOptions.querynodeLabelFilters = "";
-            context.cypherMatchOptions.queryRelTypeFilters = "";
-            toutlesensData.matchStatement = "";
-            context.cypherMatchOptions.queryRelWhereFilter = "";
-            context.cypherMatchOptions.targetNodeWhereFilter = "";
+
 
             $("#searchMenu_cypherDiv").text(statement)
             var payload = {match: statement};
@@ -314,25 +231,27 @@ var toutlesensData = (function () {
                 data: payload,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
-                    savedQueries.addToCurrentSearchRun(statement,callback|| null);
+                    savedQueries.addToCurrentSearchRun(statement, callback || null);
 
                     if (data.length == 0 && options.addToPreviousQuery) {
                         data = [];
                     }
                     else if (data.length == 0) {
 
-                        if (id == null) {
+                        if (options.id == null) {
                             return callback(null, []);
                         }
-                        if (id > -1)// we retry with inverse relation
+                        if (options.id > -1) {// we retry with inverse relation
+                            options.id = -options.id
                             self.getNodeAllRelations(-id, options, callback);
+                        }
                         else {
-                            id = -id;
+                            options.id = -options.id
                             return callback(null, []);
                         }
 
                     }
-                    if (data.length  >= Gparams.maxResultSupported ) {// query too get the real number of relations
+                    if (data.length >= Gparams.maxResultSupported) {// query too get the real number of relations
                         var matchStr = "MATCH path=(n)-[r]->(m) " + statementBase.substring(statementBase.indexOf("WHERE")) + "return count(r) as countrels;";
                         console.log(matchStr)
                         var payload = {
@@ -373,13 +292,6 @@ var toutlesensData = (function () {
                                 var id = resultArray[i].nodes[j]._id;
                                 if (self.queriesIds.indexOf(id) > -1)
                                     resultArray[i].nodes[j].outline = true;
-
-                                /* var relTargetId=resultArray[i].ids[resultArray[i].rels.length-1];
-                                  var relSourceId=resultArray[i].ids[0];
-                                  if( self.queriesIds.indexOf(relSourceId)>-1){
-                                      resultArray[i].outlineRel = true;
-                                  }*/
-
                             }
 
                         }
@@ -413,32 +325,7 @@ var toutlesensData = (function () {
             return "";
 
         }
-        self.setWhereFilterWithArray = function (property, _array, callback) {
-            var array;
 
-            if (typeof _array == "string")
-                array = _array.split(",");
-            else
-                array = _array;
-
-            var query = "n." + property + " in ["
-            if (property == "_id")
-                query = "ID(n) in ["
-            var quote = "";
-            for (var i = 0; i < array.length; i++) {
-                if (i > 0 && i < array.length)
-                    query += ","
-                else if ((typeof array[i] === 'string'))
-                    var quote = "\"";
-                query += quote + array[i] + quote;
-            }
-            query += "] ";
-            context.cypherMatchOptions.sourceNodeWhereFilter = query;
-            if (callback)
-                callback(null, query);
-            return query;
-
-        }
 
         self.getPathes = function (startId, endId, depth, algo, callback) {
 
@@ -461,7 +348,7 @@ var toutlesensData = (function () {
                 data: paramsObj,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
-                   // savedQueries.addToCurrentSearchRun(statement,callback|| null);
+                    // savedQueries.addToCurrentSearchRun(statement,callback|| null);
                     if (!data || data.length == 0) {
                         $("#waitImg").css("visibility", "hidden");
                         return callback("No result")
@@ -589,194 +476,8 @@ var toutlesensData = (function () {
                 }
             }
 
-            if (!output)
-                output = currentDisplayType;
-            var json;
 
-            if (output == "SIMPLE_FORCE_GRAPH" || output == "SIMPLE_FORCE_GRAPH_BULK" || output == "VISJS-NETWORK") {
-                totalNodesToDraw = resultArray.length;
-                json = resultArray;
-            }
-            else//tree structure
-                json = self.toFlareJson(resultArray, addToPreviousQuery);
-
-            if (navigationPath.length > 0)
-                exploredTree = json;
-            else
-                exploredTree = null;
-
-            callback(null, json, labels, relations);
-
-
-        }
-        self.buildForceNodesAndLinks = function (resultArray) {
-            //  console.log("----------------------");
-            //    console.log(JSON.stringify(resultArray[0], null, 2))
-
-
-            currentDataStructure = "flat";
-            if (resultArray.currentActionObj)
-                currentActionObj = resultArray.currentActionObj;
-            var nodesMap = {};
-            var links = [];
-            var linksMap = {}
-            var linkId = 1000;
-            legendRelTypes = {};
-            legendnodeLabels = {}
-            var nodeIndex = 0;
-            var maxLevels = parseInt($("#depth").val());
-            var previousId;
-            for (var i = 0; i < resultArray.length; i++) {
-                var rels = resultArray[i].rels;
-                var relProperties = resultArray[i].relProperties;
-
-                var nodes = resultArray[i].nodes;
-                if (!nodes)
-                    continue;
-
-                var ids = resultArray[i].ids;
-                var legendRelIndex = 1;
-
-                for (var j = 0; j < nodes.length; j++) {
-
-                    var nodeNeo = nodes[j].properties;
-                    labels = nodes[j].labels;
-                    var nodeObj = {
-                        name: nodeNeo[Gparams.defaultNodeNameProperty],
-
-                        myId: nodeNeo.id,
-                        label: nodes[j].labels[0],
-                        id: nodes[j]._id,
-                        children: [],
-                        neoAttrs: nodeNeo,
-                        rels: [],
-                        invRels: [],
-                        nLinks: 0
-
-
-                    }
-                    if (!legendnodeLabels[nodeObj.label]) {
-                        legendnodeLabels[nodeObj.label] = {
-                            label: nodeObj.label
-                        }
-                    }
-                    if (!legendRelTypes[rels[j]]) {
-                        legendRelTypes[rels[j]] = {
-                            type: rels[j],
-
-                        }
-                    }
-
-                    if (nodes[j].decoration)
-                        nodeObj.decoration = nodes[j].decoration;
-
-                    if (!isAdvancedSearchDialogInitialized && j > maxLevels) {// noeud cachés au dernier niveau
-                        if (!nodesMap[previousId].hiddenChildren)
-                            nodesMap[previousId].hiddenChildren = []
-                        nodesMap[previousId].hiddenChildren.push(nodeObj);
-                        continue
-                    }
-
-                    if (!nodesMap[nodeObj.id]) {
-
-                        nodeObj.nodeIndex = nodeIndex++;
-                        nodesMap[nodeObj.id] = nodeObj;
-                        previousId = nodeObj.id;
-
-
-                    }
-
-
-                    var indexSource = 0;
-                    var indexTarget = 0;
-
-                    if (j > 0) {// rels
-
-                        if (filters.postFilter) {
-                            if (filters.postFilter.filterOnProperty) {
-                                if (!relProperties[j - 1].properties[filters.postFilter.filterOnProperty]) {
-                                    continue;
-                                }
-
-
-                            }
-                        }
-                        indexSource = nodesMap[ids[j - 1]].nodeIndex;
-                        indexTarget = nodesMap[ids[j]].nodeIndex;
-                        nodeObj.relType = rels[j - 1];
-                        var rel = {source: indexSource, target: indexTarget, id: linkId++};
-                        //nodesMap[nodeObj.id].links.push(rel);
-                        links.push(rel)
-                        linksMap[linkId] = {source: indexSource, target: indexTarget};
-                        nodesMap[ids[j]].rels.push(rel.id);
-                        nodesMap[ids[j - 1]].invRels.push(rel.id);
-                        nodesMap[ids[j]].nLinks++;
-                        nodesMap[ids[j - 1]].nLinks++;
-
-
-                        nodeObj.parent = ids[j - 1];
-
-                        /*   if (labels[j - 1] && dataModel.relations[labels[j - 1]]) {
-                               var modelRels = dataModel.relations[labels[j - 1][0]];
-                               if (modelRels && modelRels.length) {
-                                   for (var k = 0; k < modelRels.length; k++) {
-                                       if (modelRels[k].label2 == nodeObj.label) {
-                                           nodeObj.relDir = modelRels[k].direction;
-
-                                           break;
-                                       }
-                                   }
-                               }
-                           }*/
-                    }
-                    else {
-                        //nodeObj.isRoot=true;
-                    }
-
-                    if (nodeNeo.isRoot || nodes[j].isRoot)
-                        nodeObj.isRoot = true;
-                    if (nodeNeo.isSource || nodes[j].isSource)
-                        nodeObj.isSource = true;
-                    if (nodeNeo.isTarget || nodes[j].isTarget)
-                        nodeObj.isTarget = true;
-                    if (!nodeNeo.isRoot && context.currentNode && context.currentNode.id == nodeObj.id)
-                        nodeObj.isRoot = true;
-                    if (currentActionObj && currentActionObj.graphPathSourceNode && currentActionObj.graphPathSourceNode.nodeId && currentActionObj.graphPathSourceNode.nodeId == nodeObj.id) {
-                        nodeObj.isRoot = true;
-                        nodeObj.isSource = true;
-                    }
-
-                    if (currentActionObj && currentActionObj.graphPathTargetNode && currentActionObj.graphPathTargetNode.nodeId && currentActionObj.graphPathTargetNode.nodeId == nodeObj.id) {
-                        nodeObj.isRoot = true;
-                        nodeObj.isTarget = true;
-                    }
-
-
-                }
-                if (currentActionObj) {
-                    legendnodeLabels.currentActionObj = currentActionObj;
-                }
-            }
-
-            var nodes = [];
-
-            for (var key in nodesMap) {
-                //	nodesMap[key].nLinks=nodesMap[key].links.length;
-                nodes.push(nodesMap[key]);
-            }
-
-            nodes.sort(function (a, b) {
-                if (a.nodeIndex > b.nodeIndex)
-                    return 1;
-                if (a.nodeIndex < b.nodeIndex)
-                    return -1;
-                return 0;
-            })
-            /*  console.log("----------------------");
-             console.log(JSON.stringify(nodes[0],null,2))
-             console.log("----------------------");
-             console.log(JSON.stringify(links[0],null,2))*/
-            return {nodes: nodes, links: links, linksMap: linksMap}
+            callback(null, resultArray, labels, relations);
 
 
         }
@@ -784,176 +485,13 @@ var toutlesensData = (function () {
 
         self.getNodeInfos = function (id, callback) {
             query = "MATCH (n) WHERE ID(n) =" + id + " RETURN n ";
-
-            self.executeNeoQuery(QUERY_TYPE_MATCH, query, function (d) {
-                callback(d);
-
+            Cypher.executeCypher(query, function(err, result){
+                if(err)
+                    return callback(err);
+                return callback(result);
             });
 
-        }
 
-
-        self.toFlareJson = function (resultArray, addToPreviousQuery) {
-            currentDataStructure = "tree";
-            currentThumbnails = [];
-            currentThumbnails.ids = [];
-            currentThumbnails.currentIndex = 1;
-            var distinctNodeName = {};
-
-            var rootId;
-            if (!addToPreviousQuery)
-                linksToSkip = [];
-            if (!resultArray) {
-                resultArray = toutlesensData.cachedResultArray;
-            } else {
-
-            }
-
-            var nodesMap = {};
-
-            for (var i = 0; i < resultArray.length; i++) {
-                var rels = resultArray[i].rels;
-                var nodes = resultArray[i].nodes;
-                var ids = resultArray[i].ids;
-                var labels = resultArray[i].labels;
-                var startNodes = resultArray[i].startLabels;
-                var relProperties = resultArray[i].relProperties;
-
-                var legendRelIndex = 1;
-                //  console.log("------------\n")
-                for (var j = 0; j < nodes.length; j++) {
-
-                    var nodeNeo = nodes[j].properties;
-                    //  console.log(JSON.stringify(nodeNeo))
-                    if (distinctNodeName[nodeNeo[Gparams.defaultNodeNameProperty]] == null)
-                        distinctNodeName[nodeNeo[Gparams.defaultNodeNameProperty]] = 0;
-                    else {
-                        distinctNodeName[nodeNeo[Gparams.defaultNodeNameProperty]] += 1;
-                        nodeNeo[Gparams.defaultNodeNameProperty] = nodeNeo[Gparams.defaultNodeNameProperty] + "#" + distinctNodeName[nodeNeo[Gparams.defaultNodeNameProperty]];
-                    }
-
-                    var nodeObj = {
-                        name: nodeNeo[Gparams.defaultNodeNameProperty],
-                        myId: nodeNeo.id,
-                        label: labels[j][0],
-                        id: ids[j],
-                        children: [],
-                        hiddenChildren: [],
-                        neoAttrs: nodeNeo
-                    }
-                    if (nodes[j].show)
-                        nodeObj.show = true;
-                    if (nodeNeo.path) {
-                        if (currentThumbnails.ids.indexOf(nodeObj.id) < 0) {
-                            currentThumbnails.ids.push(nodeObj.id);
-                            var objT = {id: nodeObj.id, path: nodeNeo.path};
-                            if (nodeNeo.date)
-                                objT.date = nodeNeo.date;
-
-
-                            currentThumbnails.push(objT);
-
-                        }
-                    }
-                    if (nodes[j].decoration) {
-                        nodeObj.decoration = nodes[j].decoration
-                        if (nodes[j].decoration.groupOnGraph == true) {// le label de decoration remplace le label Neo4j
-                            nodeObj.label = nodes[j].decoration.value;
-
-                        }
-                    }
-
-
-                    /*
-                     * if (addToPreviousQuery && foldedTreeChildren.indexOf(nodeObj.myId) >
-                     * -1) {// noeud // repliés continue; }
-                     */
-
-                    if (j == 0) {
-                        nodeObj.parent = "root";
-                        rootId = nodeObj.id;
-                        nodeObj.neoAttrs = nodeNeo;
-                        nodesMap.root = nodeObj
-
-                    }
-
-                    else {
-                        if (addToPreviousQuery && nodeObj.id == currentRootId)
-                            nodeObj.isNewRoot = true;
-
-                        nodeObj.parent = ids[j - 1];
-                        nodeObj.relType = rels[j - 1];
-                        if (relProperties && relProperties[j - 1])
-                            nodeObj.relProperties = relProperties[j - 1].properties;
-                        else
-                            nodeObj.relProperties = {};
-                        var modelRels = dataModel.relations[labels[j - 1][0]];
-                        if (modelRels && modelRels.length) {
-                            for (var k = 0; k < modelRels.length; k++) {
-                                if (modelRels[k].label2 == nodeObj.label) {
-                                    nodeObj.relDir = modelRels[k].direction;
-                                    break;
-                                }
-                            }
-                        }
-
-                        var key = nodeObj.id + "_" + ids[j - 1];
-                        /*  if( nodesMap[key]){// create a new id if allready existing
-                         //    if( nodesMap[(-j*1000000000)+nodeObj.id]){// create a new id if allready existing
-                         nodeObj.id=(-j*1000000000)+nodeObj.id;
-                         ids[j]= nodeObj.id;
-                         }*/
-
-                        nodesMap[key] = nodeObj;
-
-
-                    }
-                    if (!legendRelTypes)
-                        legendRelTypes = {};
-                    if (!legendnodeLabels)
-                        legendnodeLabels = {};
-
-                    if (!legendRelTypes[nodeObj.relType]) {
-                        legendRelTypes[nodeObj.relType] = {
-                            type: nodeObj.relType,
-                            index: legendRelIndex++
-                        }
-                    }
-                    if (!legendnodeLabels[nodeObj.label]) {
-                        legendnodeLabels[nodeObj.label] = {
-                            label: nodeObj.label
-                        }
-                    }
-
-                }
-
-            }
-            if (resultArray.currentActionObj) {
-                legendnodeLabels.currentActionObj = currentActionObj;
-            }
-            foldedTreeChildren = [];
-            // removeExcludedLabels(nodesMap);
-            self.deleteRecursiveReferences(nodesMap);
-
-            self.setNodesIndexPath(nodesMap);
-            var root = nodesMap.root;
-            if (root)
-                root.isRoot = true;
-
-            maxEffectiveLevels = 1;
-            var maxLevels = $("#depth")
-            if (maxLevels === undefined)
-                maxLevels = Gparams.depth;
-            else
-                maxLevels = parseInt(maxLevels.val());
-//console.log(JSON.stringify(nodesMap))
-            self.addChildRecursive(root, nodesMap, 1, maxLevels);
-
-
-
-            // console.log (JSON.stringify(root));
-            toutlesensData.cachedResultTree = root;
-            return root;
         }
 
 
@@ -1163,7 +701,9 @@ var toutlesensData = (function () {
                 + value
                 + ".*' ] as doesMatch where size(doesMatch) > 0 return n limit "
                 + limit;
-            self.executeNeoQuery(QUERY_TYPE_MATCH, query, callback);
+
+            Cypher.executeCypher(query, callback);
+
         }
 
 // }
@@ -1245,20 +785,7 @@ var toutlesensData = (function () {
         }
 
 
-        self.searchNodes = function (subGraph, label, word, resultType, limit, from, callback) {
-            var options = {
-                subGraph: subGraph,
-                label: label,
-                word: word,
-                resultType: resultType,
-                limit: limit,
-                from: from
-            }
-            self.searchNodesWithOption(options, callback);
-        }
-
-
-        self.searchNodesWithOption = function (options, callback) {
+        self.buildSearchNodeQuery = function (options) {
 
             var subGraph = options.subGraph;
             var label = options.label;
@@ -1268,7 +795,6 @@ var toutlesensData = (function () {
             var from = options.from;
 
 
-         
             var str = "";
             var subGraphWhere = "";
             var returnStr = " RETURN n";
@@ -1292,7 +818,7 @@ var toutlesensData = (function () {
             if (options.where)
                 whereStr = options.where;
             else {
-                whereStr = advancedSearch.getWhereProperty(word, "n")
+                whereStr = advancedSearch.buildWhereClauseFromUI(word, "n")
                 if (subGraph) {
                     if (whereStr.length == 0)
                         subGraphWhere += " where  n.subGraph='" + subGraph + "'";
@@ -1301,90 +827,20 @@ var toutlesensData = (function () {
                 }
             }
 
-
             var whereStrRaw = whereStr;
             if (whereStr && whereStr.length > 0 && whereStr.toUpperCase().indexOf("WHERE") < 0)
                 whereStr = " WHERE " + whereStr;
-            str = "MATCH (n" + labelStr + ") " + whereStr + subGraphWhere + returnStr;
-            $("#searchMenu_cypherDiv").text("MATCH (n" + labelStr + ") " + whereStr + subGraphWhere)
+            str = "MATCH (n" + labelStr + ") " + whereStr + subGraphWhere + returnStr + cursorStr;
 
-            console.log(str);
-            if (resultType == "matchStr" && callback) {
-                return callback(null, str);
+            var queryObject = {
+                cypher: str,
+                label: label,
+                where: whereStr + subGraphWhere,
+                cursor: cursorStr
             }
-
-            else if ((resultType == "matchObject" || resultType == "matchSearchClause") && callback) {
-
-                var obj = {
-                    nodeLabel: label,
-                    where: whereStrRaw
-                }
-                return callback(null, obj);
-            }
-
-            str += cursorStr;
-
-            var payload = {match: str};
-
-
-            $.ajax({
-                type: "POST",
-                url: self.neo4jProxyUrl,
-                data: payload,
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    savedQueries.addToCurrentSearchRun(str,callback|| null);
-                    if (callback) {
-                        return callback(null, data);
-                    }
-                    if (resultType != "count")
-                        eventsController.startSearchNodesTime = null;
-                    if (!data || data.length == 0) {
-
-                        $("#waitImg").css("visibility", "hidden");
-                        toutlesensController.setMessage("No results", blue);
-                        return;
-                    }
-                    var errors = data.errors;
-
-                    if (errors && errors.length > 0) {
-                        var str = "ERROR :";
-                        for (var i = 0; i < errors.length; i++) {
-                            str += errors[i].code + " : " + errors[i].message + "<br>"
-                                + JSON.stringify(paramsObj);
-                        }
-                        toutlesensController.setMessage("!!! erreur de requete", red);
-                        console.log(str);
-                        return;
-                    }
-                    if (data.length > Gparams.listDisplayLimitMax) {
-                        alert("too many result : " + data.length + "> Max :" + Gparams.listDisplayLimitMax)
-                        return;
-                    }
-
-
-                },
-                error: function (xhr, err, msg) {
-                    toutlesensController.onErrorInfo(xhr);
-                    if (callback) {
-                        return callback(null);
-                    }
-                    if (!resultType == "count")
-                        eventsController.startSearchNodesTime = null;
-                    console.log(xhr);
-                    console.log(err);
-                    console.log(msg);
-                },
-
-            });
-
-            ;
+            return queryObject;
 
         }
-
-
-
-
 
 
         return self;

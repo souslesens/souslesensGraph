@@ -37,12 +37,12 @@ var neoToMongo = (function () {
         var mongoPayload = null;
 
         if (operation == "retrieve") {
-            if (neoParams.nodeLabel) {// find in object collection
+            if (neoParams.label) {// find in object collection
 
                 mongoPayload = {
                     find: 1,
                     dbName: self.dbName,
-                    collectionName: self.formatNamesForMongo(neoParams.nodeLabel),
+                    collectionName: self.formatNamesForMongo(neoParams.label),
                     mongoQuery: self.formatIdInQuery(neoParams.query)
                 }
                 self.callMongoRemote(mongoPayload, callback);
@@ -106,7 +106,7 @@ var neoToMongo = (function () {
             mongoPayload = {
                 insertOne: 1,
                 dbName: self.dbName,
-                collectionName: self.formatNamesForMongo(neoParams.nodeLabel),
+                collectionName: self.formatNamesForMongo(neoParams.label),
                 data: neoParams.nodeAttrs
             }
             self.callMongoRemote(mongoPayload, callback);
@@ -119,7 +119,7 @@ var neoToMongo = (function () {
             mongoPayload = {
                 delete: 1,
                 dbName: self.dbName,
-                collectionName: self.formatNamesForMongo(neoParams.nodeLabel),
+                collectionName: self.formatNamesForMongo(neoParams.label),
                 mongoQuery: self.formatIdInQuery(neoParams.nodeAttrs)
             }
             self.callMongoRemote(mongoPayload, callback);
@@ -155,7 +155,7 @@ var neoToMongo = (function () {
             mongoPayload = {
                 insertOne: 1,
                 dbName: self.dbName,
-                collectionName: self.formatNamesForMongo(neoParams.nodeLabel),
+                collectionName: self.formatNamesForMongo(neoParams.label),
                 data: neoParams.nodeAttrs
             }
             self.callMongoRemote(mongoPayload, function (err, result) {
@@ -171,7 +171,7 @@ var neoToMongo = (function () {
             mongoPayload = {
                 delete: 1,
                 dbName: self.dbName,
-                collectionName: self.formatNamesForMongo(neoParams.nodeLabel),
+                collectionName: self.formatNamesForMongo(neoParams.label),
                 data: [neoParams.nodeAttrs]
             }
             self.callMongoRemote(mongoPayload, callback);
@@ -219,12 +219,12 @@ var neoToMongo = (function () {
         name = name.replace(/[ -.]/g, "_");
         return name;
     }
-    self.formatIdInQuery = function (queryObj) {
-        for (var key in queryObj) {// ids Mongo
-            if (key.indexOf("id") > -1 && isNaN(queryObj[key]))
-                queryObj[key] = "ObjectId(" + queryObj[key] + ")";
+    self.formatIdInQuery = function (queryObject) {
+        for (var key in queryObject) {// ids Mongo
+            if (key.indexOf("id") > -1 && isNaN(queryObject[key]))
+                queryObject[key] = "ObjectId(" + queryObject[key] + ")";
         }
-        return queryObj;
+        return queryObject;
 
     }
     self.getRelationPayload = function (neoParams, operation) {

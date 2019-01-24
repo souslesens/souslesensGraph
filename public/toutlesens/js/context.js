@@ -2,11 +2,12 @@ var context = (function () {
 
     var self = {};
     self.graphContext = {};
-    self.querySourceLabel = "";
     self.queryObject = {};
-    self.cypherMatchOptions = {}
     self.currentNode = {}
-    self.currentSearchClauses = [];
+
+
+
+   // self.currentSearchClauses = [];
 
 
     self.initQueryObject = function () {
@@ -18,19 +19,8 @@ var context = (function () {
         };
     }
 
-    self.initCypherMatchOptions = function () {
-        self.cypherMatchOptions = {
-            sourceNodewhereFilter: "",
-            targetNodeWhereFilter: "",
-
-            querynodeLabelFilters: "",// a revoir supprimer?
-            queryRelTypeFilters: "",// a revoir supprimer?
-            queryRelWhereFilter: "",// a revoir supprimer?
 
 
-        }
-
-    }
     self.initGraphContext = function () {
         self.graphContext = {
             searchClauses: [],
@@ -55,7 +45,6 @@ var context = (function () {
     }
 
     self.initQueryObject();
-    self.initCypherMatchOptions();
     self.initGraphContext()
     return self;
 

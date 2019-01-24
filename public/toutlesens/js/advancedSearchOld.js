@@ -6,7 +6,7 @@ var advancedSearch = (function () {
     self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
     self.context = {}
     self.searchClauses = [];
-    self.currentQueryNodeIds = [];
+    self.context.queryObject.nodeIds = [];
     self.showDialog = function (options) {
         self.filterLabelWhere = "";
 
@@ -44,14 +44,7 @@ var advancedSearch = (function () {
 
     }
 
-    self.clearClauses = function () {
 
-        self.currentQueryNodeIds = [];
-        self.searchClauses = [];
-
-        $(".searchDialog_CriteriaDiv").remove();
-
-    }
     self.clearClause = function (_index) {
 
         if (searchMenu.currentPanelId > 1)
@@ -69,7 +62,7 @@ var advancedSearch = (function () {
 
     self.getMultiCriteriaClauses = function () {
         var whereStr = "";
-        var label = self.searchClauses[0].nodeLabel;
+        var label = self.searchClauses[0].label;
         if (subGraph)
             whereStr = "  n.subGraph=\"" + subGraph + "\" ";
 
@@ -83,7 +76,7 @@ var advancedSearch = (function () {
             }
         }
         $("#graphInfosDiv").html(whereStr);
-        return {where: whereStr, nodeLabel: label};
+        return {where: whereStr, label: label};
     }
 
 
@@ -91,7 +84,7 @@ var advancedSearch = (function () {
 
         var array = (/.*n:(.*)\) *WHERE *(.*) RETURN.* /).exec(str);
         return {
-            nodeLabel: array[1], where: array[2]
+            label: array[1], where: array[2]
         };
 
 
@@ -101,7 +94,7 @@ var advancedSearch = (function () {
     self.searchNodesWithClauses = function (options, callback) {
         var clauses = self.getMultiCriteriaClauses();
         var whereStr = clauses.where;
-        var label = clauses.nodeLabel;
+        var label = clauses.label;
         var labelStr = "";
         if (label && label.length > 0)
             labelStr = ":" + label;
@@ -153,14 +146,14 @@ var advancedSearch = (function () {
 
         if (self.searchClauses.length > 0) {
             var clauses = self.getMultiCriteriaClauses();
-            label = clauses.nodeLabel;
+            label = clauses.label;
             where = clauses.where;
             execGraph();
 
 
         } else {
             self.searchNodes("matchObject", null,function (err, result) {
-                label = result.nodeLabel;
+                label = result.label;
                 where = result.where;
                 execGraph();
             })
@@ -213,7 +206,7 @@ var advancedSearch = (function () {
         //    self.filterLabelWhere = "";
         var options = {};
 
-        searchObj.label = context.queryObject.Label;
+        searchObj.label = context.queryObject.label;
         searchObj.property = $("#searchDialog_propertySelect").val();
         searchObj.operator = $("#searchDialog_operatorSelect").val();
         searchObj.value = $("#searchDialog_valueInput").val();
@@ -239,10 +232,10 @@ var advancedSearch = (function () {
                 options.matchType = _options.matchType;
             if (_options.where)
                 options.where = _options.where;
-            if (!_options.where && self.currentQueryNodeIds.length > 0)
-                options.where = toutlesensData.setWhereFilterWithArray("_id", self.currentQueryNodeIds);
+            if (!_options.where && self.context.queryObject.nodeIds.length > 0)
+                options.where = toutlesensData.getWhereClauseFromArray("_id", self.context.queryObject.nodeIds);
 
-            toutlesensData.searchNodesWithOption(options, function (err, result) {
+            toutlesensData.buildSearchNodeQuery(options, function (err, result) {
                   if (callback) {
                     return callback(err, result);
                 }
@@ -270,7 +263,7 @@ var advancedSearch = (function () {
                 limit: Gparams.jsTreeMaxChildNodes,
                 from: 0
             }
-            toutlesensData.searchNodesWithOption(options, function (err, result) {
+            toutlesensData.buildSearchNodeQuery(options, function (err, result) {
                  if (callback) {
                     return callback(err, result);
                 }
@@ -296,7 +289,7 @@ var advancedSearch = (function () {
 
 
      */
-    self.getWhereProperty = function (str, nodeAlias) {
+    self.buildWhereClauseFromUI = function (str, nodeAlias) {
         if (!str)
             return "";
         var property = Gparams.defaultNodeNameProperty;
@@ -453,7 +446,7 @@ var advancedSearch = (function () {
 
     self.similarsGraphSimilars = function () {
         self.similarOptions.id = null;
-        toutlesensData.setWhereFilterWithArray("_id", self.self.similarOptions.similarNodes, function (err, result) {
+        toutlesensData.getWhereClauseFromArray("_id", self.self.similarOptions.similarNodes, function (err, result) {
 
             toutlesensController.generateGraph(null, null, function (err, result) {
                 var selectedNodes = []
@@ -664,7 +657,7 @@ var advancedSearch = (function () {
                 }
 
 
-                toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
+                toutlesensData.getWhereClauseFromArray("_id", ids, function (err, result) {
                     if (self.filterLabelWhere.length > 0) {
                         if (context.cypherMatchOptions.sourceNodeWhereFilter != "")
                             context.cypherMatchOptions.sourceNodeWhereFilter += " and " + self.filterLabelWhere;
@@ -751,7 +744,7 @@ var advancedSearch = (function () {
                 }
 
 
-                toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
+                toutlesensData.getWhereClauseFromArray("_id", ids, function (err, result) {
                     /*  if(context.cypherMatchOptions.sourceNodeWhereFilter!="")
                           context.cypherMatchOptions.sourceNodeWhereFilter+= " and " + self.filterLabelWhere;
                       else*/

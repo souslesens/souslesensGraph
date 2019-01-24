@@ -176,7 +176,7 @@
                         <input id="searchDialog_valueInput" size="10"
                                onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_nextPanelButton').css('visibility', 'visible');">
 
-                        <select  size="6"  style="overflow: hidden" id="searchDialog_booleanOperator" onchange="searchMenu.addClauseUI($(this).val());$(this).val('');$('#searchDialog_valueInput').val('')">
+                        <select  size="6"  style="overflow: hidden" id="searchDialog_booleanOperator" onchange="searchMenu.setNodeQueryUI($(this).val());$(this).val('');$('#searchDialog_valueInput').val('')">
                             <option></option>
                             <option>+</option>
                             <option>or</option>
@@ -248,20 +248,6 @@
 
         </div>
 
-        <!--   <select id='advancedSearchAction' size="10" onclick='searchMenu.onSearchAction($(this).val())'>
-
-
-               <option value='graphSomeNeighboursListLabels'>Graph neighbours</option>
-               <option value='path'>Pathes beetwen nodes</option>
-               <option value='treeNodes'>Tree</option>
-               <option value='tableNodes'>Table</option>
-               <option value='tagCloud'>Tag cloud</option>
-               <option value='treeMapSomeNeighboursListLabels'>Tree map</option>
-               <option value='graphNodes'>cards</option>
-               <option value='graphSimilars'>Graph similars</option>
-           </select>
-
-           -->
 
     </div>
 
@@ -410,7 +396,7 @@
         </button>
 
         <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_ExecuteButton"
-                onclick="searchMenu.onSearchAction('execute')">OK
+                onclick="searchMenu.execute()">OK
         </button>
     </div>
 

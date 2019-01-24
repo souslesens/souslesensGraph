@@ -15,7 +15,7 @@
     <script>
 
         $(function () {
-            $("#graphSelectionButton").css("display","none")
+            $("#graphSelectionButton").css("display", "none")
             $("#treeDivKeolis").width(rightPanelWidth - 40).height(totalHeight - 150).css("visibility", "visible")
         })
         var keolis = (function () {
@@ -27,20 +27,20 @@
             self.selection = [];
             self.selectionName = "";
             self.currentNode;
-            self.initiated=false;
+            self.initiated = false;
             self.loadJon = function (_type) {
-                $("#graphSelectionButton").css("display","none")
+                $("#graphSelectionButton").css("display", "none")
                 type = _type;
 
                 //   $("#treeDivKeolis").html("");
                 var file
                 if (type == 'tags') {
                     file = "tagsFR.csv.json"
-                    context.queryObject.Label="tag";
+                    context.queryObject.label = "tag";
                 }
                 else if (type == 'categories') {
                     file = 'categoriesFR.csv.json';
-                    context.queryObject.Label="categorieCommunaute";
+                    context.queryObject.label = "categorieCommunaute";
                 }
 
                 function customMenu(node) {
@@ -62,7 +62,6 @@
 
                     return items;
                 }
-
 
                 $.ajax({
                     type: "GET",
@@ -112,7 +111,7 @@
                             return;
                         }
 
-                        self.initiated=true;
+                        self.initiated = true;
                         //console.log(JSON.stringify(jsTreeData,null,2))
                         var plugins = [];
                         plugins.push("search");
@@ -190,9 +189,9 @@
                 var menuItemData = {}
                 menuItemData.parentId = node.parent;
                 menuItemData.parents = node.parents;
-                menuItemData.text=node.text
+                menuItemData.text = node.text
                 self.currentNode = node;
-                $("#graphSelectionButton").css("display","block")
+                $("#graphSelectionButton").css("display", "block")
                 items ["selectNode"] = {
                     label: "selectNode",
                     data: menuItemData,
@@ -200,7 +199,7 @@
 
                         keolis.selection.push(node.id)
                         $("#" + node.id + "_anchor").css("color", "blue");
-                        self.selectionName= "["+type+"] "+ menuItemData.text
+                        self.selectionName = "[" + type + "] " + menuItemData.text
                     })
 
                 }
@@ -210,11 +209,11 @@
                     action: (function (menuItem) {
                         $(".jstree-anchor").css("color", "black");
                         keolis.selection = [];
-                        $("#graphSelectionButton").css("display","block")
+                        $("#graphSelectionButton").css("display", "block")
                         self.currentNode += " and children"
                         keolis.selection.push(node.id)
                         $("#" + node.id + "_anchor").css("color", "blue");
-                        self.selectionName= "["+type+"]  and children "+menuItemData.text
+                        self.selectionName = "[" + type + "]  and children " + menuItemData.text
                         node.children.forEach(function (child) {
                             keolis.selection.push(child)
                             $("#" + child + "_anchor").css("color", "blue");
@@ -228,11 +227,11 @@
                     action: (function (menuItem) {
                         self.currentNode += " and children"
                         keolis.selection.push(node.id)
-                        $("#graphSelectionButton").css("display","block")
+                        $("#graphSelectionButton").css("display", "block")
                         $("#" + node.id + "_anchor").css("color", "blue");
-                        if(  self.selectionName.length>0)
-                            self.selectionName+=" , "
-                        self.selectionName+= "["+type+"]  and children "+menuItemData.text
+                        if (self.selectionName.length > 0)
+                            self.selectionName += " , "
+                        self.selectionName += "[" + type + "]  and children " + menuItemData.text
                         node.children.forEach(function (child) {
                             keolis.selection.push(child)
                             $("#" + child + "_anchor").css("color", "blue");
@@ -246,20 +245,20 @@
                     action: (function (menuItem) {
                         $(".jstree-anchor").css("color", "black");
                         keolis.selection = [];
-                        self.selectionName=""
-                        $("#graphSelectionButton").css("display","none")
+                        self.selectionName = ""
+                        $("#graphSelectionButton").css("display", "none")
                     })
 
                 }
 
-               /*   items ["useSelection"] = {
-                   label: "use selection...",
-                   data: menuItemData,
-                   action: (function (menuItem) {
-                       self.graphSelection();
-                   })
+                /*   items ["useSelection"] = {
+                    label: "use selection...",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+                        self.graphSelection();
+                    })
 
-               }*/
+                }*/
 
 
                 return items;
@@ -273,44 +272,32 @@
                     label = "categorieCommunaute"
                 else if (type == "tags")
                     label = "tag"
-                self.addClauseByIdsArray("iD", self.selection, label, function (err, result) {
 
 
-                });
-
-
-            }
-            self.addClauseByIdsArray = function (idKey, ids, label, callback) {
-
-                toutlesensData.setWhereFilterWithArray(idKey, ids, function (err, result) {
-                    var where = result;
-
-                    var clauseText = self.selectionName;
-                    advancedSearch.currentQueryNodeIds = ids;
-                    var clause = {
-                        foundIds: ids.length,
-                        nodeLabel: label,
-                        where: where,
-
-
+                context.queryObject={};
+                var clauseText = self.selectionName;
+                context.queryObject.label = label;
+                context.queryObject.text = clauseText;
+                context.queryObject.where = toutlesensData.getWhereClauseFromArray("iD", self.selection, "n");
+                var cypher = "MATCH (n:" + label + ") where " + context.queryObject.where + " RETURN collect(ID(n)) as ids ";
+debugger
+                Cypher.executeCypher(cypher, function (err, result) {
+                    if (err) {
+                        return console.log(err);
                     }
-                    advancedSearch.clearClauses();
-                    advancedSearch.addClause(clause, clauseText);
+                    context.queryObject.nodeIds = result[0].ids;
+
                     searchMenu.activatePanel("searchActionDiv")
                     findTabs.tabs("option", "active", 0);
-
-                    if (callback)
-                        callback(err, clauseText);
-
-
                 })
+
 
             }
 
-            self.clearSelection=function(){
+            self.clearSelection = function () {
                 $(".jstree-anchor").css("color", "black");
                 keolis.selection = [];
-                $("#graphSelectionButton").css("display","block")
+                $("#graphSelectionButton").css("display", "block")
             }
 
 

@@ -6,18 +6,18 @@ var complexQueries = (function () {
     var queryObjs = [];
 
 
-    self.addNodeQuery = function (queryObj) {
+    self.addNodeQuery = function (queryObject) {
         var index = queryObjs.length;
-        queryObj.inResult = true;
-        queryObjs.push(queryObj)
+        queryObject.inResult = true;
+        queryObjs.push(queryObject)
         self.draw();
 
 
     }
     self.draw = function () {
         globalHtml = "<div class='complexQueries'>";
-        queryObjs.forEach(function (queryObj, index) {
-            globalHtml += self.getNodeDivHtml(queryObj, index);
+        queryObjs.forEach(function (queryObject, index) {
+            globalHtml += self.getNodeDivHtml(queryObject, index);
         })
         globalHtml += "</div>" +
             "<button onclick='complexQueries.executeQuery()'>execute query </button>" +
@@ -30,18 +30,18 @@ var complexQueries = (function () {
 
     }
 
-    self.getNodeDivHtml = function (queryObj, index) {
+    self.getNodeDivHtml = function (queryObject, index) {
         var queryText = "";
-        if (queryObj.value && queryObj.value != "")
-            queryText = queryObj.property + " " + queryObj.operator + " " + queryObj.value;
-        var color = nodeColors[queryObj.label];
+        if (queryObject.value && queryObject.value != "")
+            queryText = queryObject.property + " " + queryObject.operator + " " + queryObject.value;
+        var color = nodeColors[queryObject.label];
         var classInResult = "";
-        if (queryObj.inResult)
+        if (queryObject.inResult)
             classInResult = " complexQueries-nodeInResultDiv";
 
 
         var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' complexQueries-nodeDiv " + classInResult + "'  onclick='complexQueries.onSelectNodeDiv(" + index + ")'>" +
-            " <div class='complexQueries-partDiv' style='background-color: " + color + "'><b>Label : " + queryObj.label + "</b></div>" +
+            " <div class='complexQueries-partDiv' style='background-color: " + color + "'><b>Label : " + queryObject.label + "</b></div>" +
             "<div class='complexQueries-partDiv'> Condition : " + queryText + "</div>" +
             " <div class='complexQueries-partDiv'><button  id='complexQueries_inResultButton'  onclick='complexQueries.nodeInResult(" + index + ")'>not in result</button> </div>" +
             // "<button onclick='complexQueries.removeQueryObj(" + index + ")'>X</button>" +
@@ -136,8 +136,8 @@ var complexQueries = (function () {
     self.countResults = function () {
         var count = 0;
 
-        queryObjs.forEach(function (queryObj, index) {
-            if (queryObj.inResult)
+        queryObjs.forEach(function (queryObject, index) {
+            if (queryObject.inResult)
                 count += 1;
         })
         return count;
@@ -152,27 +152,27 @@ var complexQueries = (function () {
         var returnCypher = "";
         var distinctWhere = "";
         var alphabet = "abcdefghijklmno"
-        queryObjs.forEach(function (queryObj, index) {
+        queryObjs.forEach(function (queryObject, index) {
             var symbol = alphabet.charAt(index)
             if (index > 0)
                 matchCypher += "-[r" + index + "]-"
-            matchCypher += "(" + symbol + ":" + queryObj.label + ")";
+            matchCypher += "(" + symbol + ":" + queryObject.label + ")";
 
-            if (queryObj.value && queryObj.value != "") {
+            if (queryObject.value && queryObject.value != "") {
                 var where = ""
-                if (queryObj.operator == "contains")
-                    where = queryObj.property + "=~" + "'(?i).*" + queryObj.value.trim() + ".*'";
+                if (queryObject.operator == "contains")
+                    where = queryObject.property + "=~" + "'(?i).*" + queryObject.value.trim() + ".*'";
                 else {
-                    var value = queryObj.value;
+                    var value = queryObject.value;
                     if (!(/^-?\d+\.?\d*$/).test(value))//not number
                         value = "\"" + value + "\"";
-                    where = queryObj.property + queryObj.operator + value + ".*'";
+                    where = queryObject.property + queryObject.operator + value + ".*'";
                 }
                 if (whereCypher.length > 0)
                     whereCypher += " and "
                 whereCypher += " " + symbol + "." + where + " "
             }
-            if (queryObj.inResult) {
+            if (queryObject.inResult) {
 
                 if (returnCypher.length > 0) {
                     returnCypher += ",";

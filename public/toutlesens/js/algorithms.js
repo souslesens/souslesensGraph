@@ -240,21 +240,22 @@ var algorithms = (function () {
 
 
         function useSelection(ids){
-            toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
+            toutlesensData.getWhereClauseFromArray("_id", ids, function (err, result) {
                 var where = result;
 
                 var clauseText = "[" + label + "] " + key;
-                advancedSearch.currentQueryNodeIds = ids;
-                var clause = {
+                context.queryObject.nodeIds = ids;
+                context.queryObject={
                     foundIds: ids.length,
-                    nodeLabel: sourceLabel,
+                    label: sourceLabel,
                     where: where,
+                    text:clauseText
 
 
                 }
-                searchMenu.onChangeSourceLabel(sourceLabel, "")
-                advancedSearch.clearClauses();
-                advancedSearch.addClause(clause, clauseText);
+                searchMenu.onChangeSourceLabel(sourceLabel, "");
+
+
 
 
                 searchMenu.activatePanel("searchActionDiv");
@@ -330,7 +331,7 @@ var algorithms = (function () {
         self.currentAlgorithm = algorithm;
 
         var query = advancedSearch.matchStrToObject(queryStr)
-        sourceLabel = query.nodeLabel;
+        sourceLabel = query.label;
         var targetLabel = $("#searchDialog_AlgorithmsTargetLabelSelect").val();
 
         if (algorithm == "relationsRanking") {

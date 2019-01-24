@@ -112,7 +112,7 @@ var specialQueries=(function(){
 
     self.similarsGraphSimilars = function () {
         self.similarOptions.id = null;
-        toutlesensData.setWhereFilterWithArray("_id", self.self.similarOptions.similarNodes, function (err, result) {
+        toutlesensData.getWhereClauseFromArray("_id", self.self.similarOptions.similarNodes, function (err, result) {
 
             toutlesensController.generateGraph(null, null, function (err, result) {
                 var selectedNodes = []
@@ -292,11 +292,11 @@ var specialQueries=(function(){
 
     }
 
-    self.graphNodesAndSimilarNodes = function (err, query) {
+    self.graphNodesAndSimilarNodes = function (err, queryObject) {
         if (err)
             return console.log(err);
         var payload = {
-            match: query
+            match: queryObject.cypher
         }
 
         $.ajax({
@@ -305,14 +305,14 @@ var specialQueries=(function(){
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
-                savedQueries.addToCurrentSearchRun(query);
+                savedQueries.addToCurrentSearchRun(queryObject.cypher);
                 var ids = [];
                 for (var i = 0; i < data.length; i++) {
                     ids.push(data[i].n._id)
                 }
 
 
-                toutlesensData.setWhereFilterWithArray("_id", ids, function (err, result) {
+                toutlesensData.getWhereClauseFromArray("_id", ids, function (err, result) {
                     /*  if(context.cypherMatchOptions.sourceNodeWhereFilter!="")
                           context.cypherMatchOptions.sourceNodeWhereFilter+= " and " + self.filterLabelWhere;
                       else*/
@@ -394,11 +394,11 @@ var specialQueries=(function(){
 
     }
 
-    self.graphNodesOnly = function (err, query) {
+    self.graphNodesOnly = function (err, queryObject) {
         if (err)
             return console.log(err);
         var payload = {
-            match: query
+            match: queryObject.cypher
         }
 
         return cards.drawCards("domain", null, "cards")
@@ -409,7 +409,7 @@ var specialQueries=(function(){
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
-                savedQueries.addToCurrentSearchRun(query);
+                savedQueries.addToCurrentSearchRun(queryObject.cypher);
                 var nodes = [];
                 var labels = [];
                 var data2 = [];
