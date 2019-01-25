@@ -176,6 +176,7 @@ var skos = {
             var parser = new xml2js.Parser();
             parser.parseString("" + data, function (err, result) {
                 if (err) {
+                    console.log(err)
                     if (callback)
                         return callback(err);
 

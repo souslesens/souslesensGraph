@@ -95,8 +95,13 @@ var advancedSearch = (function () {
                 // console.log("!!!!invalid query");
                 // return "";
             }
-
-            if (operator == "~" || operator == "contains") {
+            if (operator == "!=" ) {
+                operator="<>"
+            }
+            if (operator == "notContains" ) {
+                operator="<>"
+            }
+            else if (operator == "~" || operator == "contains"  || operator == "notContains") {
                 operator = "=~"
                 // value = "'.*" + value.trim() + ".*'";
                 value = "'(?i).*" + value.trim() + ".*'";

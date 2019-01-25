@@ -2,15 +2,36 @@ var fs = require('fs');
 var path = require('path');
 var jsonxml = require('jsontoxml');
 
-var file = path.resolve(__dirname , "D:\\GitHub\\souslesensGraph\\souslesensGraph\\public\\toutlesens\\plugins\\keolis\\tagsFR.csv.json");
+var filePrams=[
+    {
+        fileName: "tagsFR.csv.json",
+        urlName: "keosphereTags",
+        rdfName: "keosphereTags",
+    },
+    {
+        fileName: "categoriesFR.csv.json",
+        urlName: "keosphereCategories",
+        rdfName: "keosphereCategories",
+    },
+    {
+        fileName: "categoriesFR.csv.json",
+        urlName: "keosphereCategories2",
+        rdfName: "keosphereCategories2",
+    }
+]
+var currentFileParamIndex=2;
+
+
+
+var file = path.resolve(__dirname , "D:\\GitHub\\souslesensGraph\\souslesensGraph\\public\\toutlesens\\plugins\\keolis\\"+filePrams[currentFileParamIndex].fileName);
 fs.readFile(file, function (err, data) {
-    var thesaurusUri = "http://keolis.com/keosphereTags/";
+    var thesaurusUri = "http://keolis.com/"+filePrams[currentFileParamIndex].urlName+"/";
 
     var parentsMap={}
     var json = JSON.parse("" + data);
     json.data.forEach(function(line) {
         if(!parentsMap[line.parentID])
-            parentsMap[line.parentID]={name:line.parent,id:line.parentID,children:[]}
+            parentsMap[line.parentID]={nom:line.parent,iD:line.parentID,children:[]}
         parentsMap[line.parentID].children.push (line);
     })
 
@@ -18,8 +39,19 @@ fs.readFile(file, function (err, data) {
 
 
 
+    var uniqueNodes={};
+var checkUniques=function(node){
+    if(true) {
+        if (!uniqueNodes[node.nom]) {
+            uniqueNodes[node.nom] = node.iD;
+        } else {
+            node.iD= uniqueNodes[node.nom];
 
-
+        }
+        return node;
+    }
+    return node;
+}
 
     var xx=parentsMap;
 
@@ -27,20 +59,24 @@ fs.readFile(file, function (err, data) {
     for (var key in parentsMap){
         var parent=parentsMap[key]
 
+        parent=checkUniques(parent);
+
+
         var concept = {
             name: "skos:Concept",
             attrs: {"rdf:about": thesaurusUri+key}
             , children: [
                 {
                     name: "skos:prefLabel",
-                    text: parent.name
+                    text: parent.nom
                 },
 
 
             ]
         }
         parent.children.forEach(function(child){
-           var  childConcept = {
+            child=checkUniques(child);
+            var  childConcept = {
                 name: "skos:Concept",
                 attrs: {"rdf:about": thesaurusUri+child.iD}
                 , children: [
@@ -75,7 +111,8 @@ fs.readFile(file, function (err, data) {
         '>'
 
     xml = xml.replace('<rdf:RDF>', header);
-    var file = path.resolve(__dirname , "../../config/thesaurii/keosphereTags.rdf");
+    xml=xml.replace(/&/g,"and")
+    var file = path.resolve(__dirname , "../../config/thesaurii/"+filePrams[currentFileParamIndex].rdfName+".rdf");
     fs.writeFile(file, xml, {}, function (err, xml) {
         if (err)
             return console.log(err);

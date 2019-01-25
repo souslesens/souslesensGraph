@@ -343,7 +343,7 @@ var searchMenu = (function () {
 
 
         self.execute = function () {
-
+            $("#toTextMenuButton").css("visibility","visible")
             {
                 context.addToGraphContext({graphType: self.previousAction})
                 toutlesensController.setGraphMessage("Working...")
