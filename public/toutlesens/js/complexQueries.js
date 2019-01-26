@@ -190,6 +190,7 @@ var complexQueries = (function () {
         return cypher;
     }
 
+ //var union=   "match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where  a.name=~'(?i).*art.*' and  cntR> 5 match(a)-[r]-(b2) return a , collect(id(b2)) as bx limit 100 union match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where cntR<5 match(a)-[r]-(b2) return a,b2 as bx limit 100"
 
     self.prepareDataset = function (neoResult) {
         var dataset = []
@@ -302,6 +303,8 @@ var complexQueries = (function () {
     self.defineAsSet = function () {
 
     }
+
+
     self.displayGraph = function () {
 
         var visjsData = {nodes: [], edges: [], labels: []};
@@ -340,7 +343,7 @@ var complexQueries = (function () {
                         neoId: "" + fromNode.id + "_" + toNode.id,
                         neoAttrs: {},
                         color: "#555",
-                        width: 1
+                        width: 1,
 
                     }
                     visjsData.edges.push(relObj)

@@ -1,48 +1,7 @@
 
 <script>
 
-var expandGraph=(function(){
-    var self={};
-self.setSourceLabel=function(label){
-    $("#expandWhereDiv").hide()
-    $('#expand_labelsSelectSource').val(label);
-    $("#expandWhere_propertySelect").val("");
-    var targetLabels=Schema.getPermittedLabels(label,true,true);
-    common.fillSelectOptionsWithStringArray(expand_labelsSelectTarget,targetLabels,true);
 
-}
-
-self.onOK=function(){
-    var filter=self.getExpandWhereFilter();
-
-
-    toutlesensController.dispatchAction('expandGraphWithLabelExecute',{source:$('#expand_labelsSelectSource').val(),target:$('#expand_labelsSelectTarget').val(),filter, filter});
-   self.setSourceLabel($('#expand_labelsSelectTarget').val());
-}
-
-self.initExpandWhere=function(){
-    $("#expandWhereDiv").show()
-    var label = $("#expand_labelsSelectTarget").val();
-    var props = Object.keys(Schema.schema.properties[label]);
-    common.fillSelectOptionsWithStringArray(expandWhere_propertySelect, props, true)
-
-}
-
-    self.getExpandWhereFilter = function () {
-        if ($("#expandWhere_propertySelect").val() == "")
-            return;
-        var targetWhereClause = $("#expandWhere_propertySelect").val() + ":" + $("#expandWhere_operatorSelect").val() + " " + $("#expandWhere_valueInput").val();
-
-       var  filter = advancedSearch.buildWhereClauseFromUI(targetWhereClause, "m");
-        return filter;
-
-    }
-
-
-
-    return self;
-
-})()
 
 
 
@@ -55,8 +14,11 @@ self.initExpandWhere=function(){
 
 
 from <select id="expand_labelsSelectSource" onchange="expandGraph.setSourceLabel($(this).val())"></select>
-<br>
+
 to <select id="expand_labelsSelectTarget"  onchange="expandGraph.initExpandWhere()"></select>
+<br>
+cluster nodes limit <input id="expand_clusterMinLimit" value="5">
+
 
 
 
@@ -74,7 +36,6 @@ to <select id="expand_labelsSelectTarget"  onchange="expandGraph.initExpandWhere
                     <option>&gt;</option>
                     <option selected="selected">contains</option>
                 </select>
-
                 <input id="expandWhere_valueInput" size="10" >
 
 
@@ -85,7 +46,7 @@ to <select id="expand_labelsSelectTarget"  onchange="expandGraph.initExpandWhere
     </table>
 </div>
 
-<button onclick="expandGraph.onOK()">expand</button>
+<button onclick="expandGraph.execute()">expand</button>
 <!--<button onclick="toutlesensController.dispatchAction('collapseGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())">collapse</button>-->
 <script>
     common.fillSelectOptionsWithStringArray(expand_labelsSelectSource, Schema.getAllLabelNames(),true);

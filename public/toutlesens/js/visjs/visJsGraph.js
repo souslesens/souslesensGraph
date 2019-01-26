@@ -20,6 +20,8 @@ var visjsGraph = (function () {
         self.dragRect = {x: 0, y: 0, w: 0, h: 0};
         self.graphHistory = [];
         self.graphHistory.currentIndex = 0;
+        self.legendLabels=[];
+
 
         var stopPhysicsTimeout = 5000;
         var lastClick = new Date();
@@ -480,12 +482,9 @@ var visjsGraph = (function () {
 
 
         self.drawLegend = function (labels, relTypes) {
-            var nodes = [];
-            var x = 10;
-            var y = -50;
-            var y = 10;
+          self.legendLabels=labels;
             var html = "<table>";
-            var onClick = ""// onclick=\"filters.filterOnProperty(null,'not') ";
+            var onClick=""
             for (var i = 0; i < labels.length; i++) {
                 var label = labels[i];
                 if (!nodeColors[label])
@@ -501,6 +500,7 @@ var visjsGraph = (function () {
 
 
         self.drawLegendVisj = function (labels, relTypes) {
+            self.legendLabels=labels;
             var nodes = [];
             var x = 10;
             var y = -50;
@@ -1302,6 +1302,76 @@ var visjsGraph = (function () {
 
             }*/
 
+
+
+        self.clusterTyTargetNodesCount=function(loweLimit){
+
+            function setCardinalities(loweLimit){
+                var clusterdNodes=[]
+               for(var key in  data.nodes._data){
+                   var node=data.nodes._data[key];
+                   var connectedNodes = network.getConnectedNodes(node.id);
+                   var labels={};
+                  connectedNodes.forEach(function(connectedNodeId){
+                      var connectedNode=data.nodes._data[connectedNodeId]
+                      if(!labels[connectedNode.labelNeo])
+                          labels[connectedNode.labelNeo]=[];
+
+                          labels[connectedNode.labelNeo].push(connectedNodeId);
+                  })
+
+                  for(var labelKey in labels){
+                      if(labels[labelKey].length>loweLimit){
+                          labels[labelKey].forEach(function(connectedNode){
+                              clusterdNodes.push({id:connectedNode,clusterId:node.id+"_"+labelKey})
+                          })
+                      }
+
+                  }
+
+               }
+                self.nodes.update(clusterdNodes);
+
+            }
+
+
+       //     setCardinalities(4);
+
+            var clusterSize = 0;
+
+            var clusterByConnection  = {
+                joinCondition: function (options,childOptions) {
+                    if(options.clusterId)
+                        var xx=options
+
+                    return false;// the color is fully defined in the node.
+
+                },
+                processProperties: function (clusterOptions, childNodes, childEdges) {
+                    var totalMass = 0;
+                    for (var i = 0; i < childNodes.length; i++) {
+                        totalMass += childNodes[i].mass;
+                    }
+                    clusterOptions.mass = totalMass;
+
+                    return clusterOptions;
+                },
+
+
+                clusterNodeProperties: {
+                    id: 'cluster:' ,
+                    // borderWidth: 3,
+                    shape: 'dot',
+                    color: 'blue',
+                    label: 'aaa',
+                    size: 30
+                }
+            };
+           visjsGraph.network.cluster(clusterByConnection);
+
+
+
+        }
 
         return self;
 

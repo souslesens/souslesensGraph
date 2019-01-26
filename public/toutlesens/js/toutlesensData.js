@@ -831,7 +831,7 @@ var toutlesensData = (function () {
             if (whereStr && whereStr.length > 0 && whereStr.toUpperCase().indexOf("WHERE") < 0)
                 whereStr = " WHERE " + whereStr;
             str = "MATCH (n" + labelStr + ") " + whereStr + subGraphWhere + returnStr + cursorStr;
-
+console.log(str)
             var queryObject = {
                 cypher: str,
                 label: label,

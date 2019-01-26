@@ -81,6 +81,7 @@ var advancedSearch = (function () {
             var p = str.indexOf(":");
             var operator;
             var value;
+
             if (p > -1) {
                 property = str.substring(0, p);
                 str = str.substring(p + 1);
@@ -95,16 +96,17 @@ var advancedSearch = (function () {
                 // console.log("!!!!invalid query");
                 // return "";
             }
+            var not=(operator == "notContains")?"NOT ":"";
             if (operator == "!=" ) {
                 operator="<>"
             }
-            if (operator == "notContains" ) {
-                operator="<>"
-            }
+
             else if (operator == "~" || operator == "contains"  || operator == "notContains") {
+
                 operator = "=~"
                 // value = "'.*" + value.trim() + ".*'";
                 value = "'(?i).*" + value.trim() + ".*'";
+
             }
             else {
                 //if ((/[\s\S]+/).test(value))
@@ -118,7 +120,10 @@ var advancedSearch = (function () {
                 propStr = "(any(prop in keys(n) where n[prop]" + operator + value + "))";
 
             else {
-                propStr = nodeAlias + "." + property + operator + value.trim();
+
+
+
+                propStr = not+ nodeAlias + "." + property + operator + value.trim();
             }
             return propStr;
 
