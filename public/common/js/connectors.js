@@ -41,7 +41,7 @@ var connectors = (function () {
                             continue;
 
                     }
-                    var hideLabel = false || resultArray.length < Gparams.showLabelsMaxNumOfNodes || !options || !options.clusterIntermediateNodes || options.showNodesLabel;
+                    var hideLabel = true ;//|| resultArray.length < Gparams.showLabelsMaxNumOfNodes || !options || !options.clusterIntermediateNodes || options.showNodesLabel;
                     var neoId = nodes[j]._id;
                     var rel = rels[0];
                     if (!nodesMap[neoId]) {
@@ -154,7 +154,10 @@ var connectors = (function () {
 
             if (!hideLabel) {
                 nodeObj.label = labelVisjs;
-                nodeObj.title = labelVisjs;
+               // nodeObj.title = labelVisjs;
+            }
+            else{
+                nodeObj.hiddenLabel = labelVisjs;
             }
 
 

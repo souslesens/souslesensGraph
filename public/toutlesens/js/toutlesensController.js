@@ -539,9 +539,15 @@ var toutlesensController = (function () {
                     if (context.currentNode.type == "cluster") {
                         var str = "Cluster <br><table>"
 
-                        str += "<tr><td><a href='javascript:paint.dispatchAction(\"openCluster\")'>open cluster</a>"
+
+                        str += "<tr><td><a href='javascript:expandGraph.openCluster()'>open cluster</a>"
+                        str += "<tr><td><a href='javascript:expandGraph.listClusterNodes()'>list nodes of cluster</a>"
+                      //  str += "<tr><td><a href='javascript:expand.graphClusterNodes()'>Graph  neighbours nodes of cluster</a>"
+
+
+                    /*    str += "<tr><td><a href='javascript:paint.dispatchAction(\"openCluster\")'>open cluster</a>"
                         str += "<tr><td><a href='javascript:paint.dispatchAction(\"listClusterNodes\")'>list nodes of cluster</a>"
-                        str += "<tr><td><a href='javascript:paint.dispatchAction(\"graphClusterNodes\")'>Graph  neighbours nodes of cluster</a>"
+                        str += "<tr><td><a href='javascript:paint.dispatchAction(\"graphClusterNodes\")'>Graph  neighbours nodes of cluster</a>"*/
                         // str += "<tr><td><a href='javascript:paint.dispatchAction(\"queryClusterNodes\")'>query cluster</a>"
 
 

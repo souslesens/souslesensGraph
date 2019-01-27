@@ -182,7 +182,7 @@
                             <option>+</option>
                             <option>or</option>
                             <option>and</option>
-                            <option>link</option>
+
                         </select>
 
                     <!--    <input type="image" height="20px" src="images/erase.png"
@@ -383,6 +383,9 @@
 <div id="searchNavDiv" class="rightPanel rightPanel">
     <div id="searchNavActionDiv"
          style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
+        <button class="searchDialog_NavButton" onclick="searchMenu.setNodeQueryUI('complexQueryUI');$('#searchDialog_valueInput').val('');"
+                id="searchDialog_complexQueryUIButton">...
+        </button>
         <button class="searchDialog_NavButton" style="visibility:hidden; float:left" id="searchDialog_newQueryButton"
                 onclick="searchMenu.activatePanel('searchCriteriaDiv');">
             new
@@ -399,6 +402,7 @@
         <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_ExecuteButton"
                 onclick="searchMenu.execute()">OK
         </button>
+
     </div>
 
 

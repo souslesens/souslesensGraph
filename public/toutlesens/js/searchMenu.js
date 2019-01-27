@@ -54,6 +54,8 @@ var searchMenu = (function () {
             $("#searchNavActionDiv").css('visibility', 'hidden');
             $(".searchDialog_NavButton").css('visibility', 'hidden');
             $(".selectLabelDiv").removeClass("selectLabelDivSelected")
+            $("#searchDialog_complexQueryUIButton").css('visibility', 'visible');
+
 
 
             $("#searchDialog_valueInput").val();
@@ -166,7 +168,7 @@ var searchMenu = (function () {
             self.searchPanels.currentIndex -= 1;
 
 
-            if (self.previousAction == 'link') {
+            if (self.previousAction == 'complexQueryUI') {
                 complexQueries.draw();
                 return;
 
@@ -263,6 +265,12 @@ var searchMenu = (function () {
 
                 })
             }
+            else if (option == "graphNodes") {
+                self.previousAction = 'graphNodes';
+                self.execute();
+
+
+            }
 
 
             else if (option == "graphSomeNeighboursListLabels") {
@@ -342,19 +350,26 @@ var searchMenu = (function () {
         }
 
 
-        self.execute = function () {
-            $("#toTextMenuButton").css("visibility","visible")
-            {
-                context.addToGraphContext({graphType: self.previousAction})
-                toutlesensController.setGraphMessage("Working...")
-                eventsController.stopEvent = true;
-                toutlesensController.openFindAccordionPanel(false);
-                paintAccordion.accordion("option", "active", 1)
-                tabsAnalyzePanel.tabs("option", "active", 2);//highlight
-            }
+        self.onExecuteGraphQuery = function () {
+
+            context.addToGraphContext({graphType: self.previousAction})
+            expandGraph.initSourceLabel()
+            eventsController.stopEvent = true;
+            toutlesensController.openFindAccordionPanel(false);
+            paintAccordion.accordion("option", "active", 1)
+            tabsAnalyzePanel.tabs("option", "active", 2);//highlight
+        }
+
+        self.execute = function (action) {
+            if(!action)
+                action=self.previousAction;
+
+            $("#toTextMenuButton").css("visibility", "visible");
+            toutlesensController.setGraphMessage("Working...")
+            self.onExecuteGraphQuery();
 
 
-            if (self.previousAction == 'tableNodes') {
+            if (action == 'tableNodes') {
                 if (!self.dataTable)
                     self.dataTable = new myDataTable();
 
@@ -369,7 +384,14 @@ var searchMenu = (function () {
                 })
             }
 
-            if (self.previousAction == 'graphSomeNeighboursListLabels') {
+            if (action == 'graphNodes') {
+                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.queryObject.nodeIds, "n") + ' RETURN n ' + Schema.getNameProperty();
+                //   Cypher.
+
+
+            }
+
+            if (action == 'graphSomeNeighboursListLabels') {
 
                 var options = {useStartNodeSet: context.queryObject.nodeIds};
 
@@ -409,7 +431,7 @@ var searchMenu = (function () {
             }
 
 
-            else if (self.previousAction == 'path') {
+            else if (action == 'path') {
                 var relationDistance = parseInt($("#searchDialog_pathDistanceInput").val());
                 var collapseGraph = $("#searchDialog_CollapseGraphCbx").prop("checked");
                 toutlesensData.matchStatement = "allShortestPaths( (n:" + self.pathQuery.sourceQuery.label + ")-[*.." + relationDistance + "]-(m:" + self.pathQuery.targetQuery.label + ") ) "
@@ -442,7 +464,7 @@ var searchMenu = (function () {
             }
 
 
-            if (self.previousAction == 'treeMapSomeNeighboursListLabels') {
+            if (action == 'treeMapSomeNeighboursListLabels') {
                 self.currentAction = "treeMapSomeNeighbours";
                 var neighboursLabels = [];
                 $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
@@ -457,7 +479,7 @@ var searchMenu = (function () {
                 });
             }
 
-            if (self.previousAction == 'algorithms') {
+            if (action == 'algorithms') {
                 advancedSearch.buildSearchNodeQueryFromUI(null, function (err, queryObject) {
                     algorithms.execute(queryObject.cypher);
                     $("#searchDialog_ExecuteButton").css('visibility', 'visible');
@@ -501,8 +523,8 @@ var searchMenu = (function () {
             }
             context.queryObject.text = (context.queryObject.label ? context.queryObject.label : "") + " " + $("#searchDialog_propertySelect").val() + " " + $("#searchDialog_operatorSelect").val() + " " + $("#searchDialog_valueInput").val();
 
-            if (booleanOperator == "link") {
-                self.previousAction = "link";
+            if (booleanOperator == "complexQueryUI") {
+                self.previousAction = "complexQueryUI";
                 complexQueries.addNodeQuery(context.queryObject);
 
                 $("#searchDialog_newQueryButton").css('visibility', 'visible');

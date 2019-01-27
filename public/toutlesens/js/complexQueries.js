@@ -121,11 +121,11 @@ var complexQueries = (function () {
             var html = "<button onclick='complexQueries.displayTable()'>table or stat</button>"
             if (countResults == 1)
                 html += "<button onclick='complexQueries.defineAsSet()'>define as set</button>"
-            else {
+           // else {
                 html += "<button onclick='complexQueries.displayGraph()'>Graph</button>";
 
 
-            }
+          //  }
             $("#complexQueries_resultActionDiv").html(html)
 
         })
@@ -306,7 +306,7 @@ var complexQueries = (function () {
 
 
     self.displayGraph = function () {
-
+        toutlesensController.setGraphMessage("Working...")
         var visjsData = {nodes: [], edges: [], labels: []};
         visjsData.labels = self.currentDataset.labels;
         var uniqueNodes = []
@@ -325,8 +325,9 @@ var complexQueries = (function () {
                         neoAttrs: nodeNeo.neoAttrs,
                         value: 8,
                         endRel: "",
-                        label: visjsNodeLabel,
-                        title: visjsNodeLabel
+                     //   label: visjsNodeLabel,
+                        hiddenLabel: visjsNodeLabel,
+                       // title: visjsNodeLabel
                     }
                     visjsData.nodes.push(visjsNode);
                 }
@@ -353,10 +354,13 @@ var complexQueries = (function () {
             })
         })
 
-        visjsGraph.draw("graphDiv", visjsData, {}, function (err, result) {
-            visjsGraph.drawLegendVisj(visjsData.labels);
-            var xx = err;
-        })
+        visjsGraph.draw("graphDiv", visjsData, {});
+        visjsGraph.drawLegendVisj(visjsData.labels);
+        $("#toTextMenuButton").css("visibility","visible");
+        searchMenu.onExecuteGraphQuery()
+
+
+
 
 
     }
