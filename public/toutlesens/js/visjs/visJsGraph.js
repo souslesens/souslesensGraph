@@ -196,8 +196,10 @@ var visjsGraph = (function () {
                 physics: {enabled: false},
 
             });
-            if (!_options.scale)
+            if (!_options.scale) {
                 network.fit();
+                self.setLabelsVisibility()
+            }
             if (_options.onFinishDraw) {
 
                 var fn = _options["onFinishDraw"];
@@ -355,17 +357,17 @@ var visjsGraph = (function () {
 
 
         network.on("selectEdge", function (params) {
-            console.log('selectEdge Event:', params);
+          //  console.log('selectEdge Event:', params);
         });
         network.on("deselectNode", function (params) {
-            console.log('deselectNode Event:', params);
+           // console.log('deselectNode Event:', params);
         });
         network.on("deselectEdge", function (params) {
-            console.log('deselectEdge Event:', params);
+          //  console.log('deselectEdge Event:', params);
         });
         network.on(" afterDrawing", function (params) {
             onVisjsGraphReady();
-            console.log('graph loaded Event');
+          //  console.log('graph loaded Event');
         });
 
         if (false) {// rightclick drag to select by rect drag
@@ -473,8 +475,10 @@ var visjsGraph = (function () {
     }
 
 
+
     self.drawLegend = function (labels, relTypes) {
         self.legendLabels = labels;
+        expandGraph.initSourceLabel(labels)
         var html = "<table>";
         var onClick = ""
         for (var i = 0; i < labels.length; i++) {
@@ -488,11 +492,14 @@ var visjsGraph = (function () {
         $("#graphLegendDiv").html(html);
 
 
+
     }
 
     self.setLabelsVisibility = function () {
         var scale = network.getScale();
-    if (!self.currentScale || Math.abs(scale - self.currentScale) > .1) {
+        if(scale==1)
+            return;
+    if (!self.currentScale || Math.abs(scale - self.currentScale) > .01) {
 
         $("#graphInfosSpan").html(" scale " + Math.round(scale * 100) + "%");
         //  if (_options.showNodesLabel == false && scale > self.scaleToShowLabels) {
@@ -1114,9 +1121,10 @@ self.toList = function () {
         var str = "";
         var connectionsCountMap = {}
         node.connections.forEach(function (id, index) {
+
             if (index > 0)
                 str += ","
-            str += map[id].label + "[" + map[id].labelNeo + "]"
+            str += (map[id].label || map[id].hiddenLabel) + "[" + map[id].labelNeo + "]"
             if (!connectionsCountMap[map[id].labelNeo])
                 connectionsCountMap[map[id].labelNeo] = 0;
             connectionsCountMap[map[id].labelNeo] += 1;

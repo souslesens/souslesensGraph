@@ -177,13 +177,20 @@
                         <input id="searchDialog_valueInput" size="10"
                                onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_nextPanelButton').css('visibility', 'visible');">
 
-                        <select  size="6"  style="overflow: hidden" id="searchDialog_booleanOperator" onchange="searchMenu.setNodeQueryUI($(this).val());$(this).val('');$('#searchDialog_valueInput').val('')">
-                            <option></option>
-                            <option>+</option>
-                            <option>or</option>
-                            <option>and</option>
 
-                        </select>
+                        <div  style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
+                            <button  onclick="advancedSearch.setNodeQueryUI('+');">
+                                 +...
+                            </button>
+                            <button  onclick="advancedSearch.setNodeQueryUI('and');">
+                                AND
+                            </button>
+                            <button onclick="advancedSearch.setNodeQueryUI('or');">
+                                OR
+                            </button>
+
+
+                        </div>
 
                     <!--    <input type="image" height="20px" src="images/erase.png"
                                onclick="$('#searchDialog_valueInput').val('')">-->
@@ -239,6 +246,12 @@
                                                                         src="images/treemapSmall.png">
                 Algorithms
             </div>
+            <div style="display:inline-list-item" class="actionSelectDiv "
+                 onclick="complexQueries.show(true)"><img align="center"
+                                                                        src="images/path.png">
+                Build path
+            </div>
+
 
             <div style="display:inline-list-item" class="actionSelectDiv actionSelectDivHidden"
                  onclick="searchMenu.onSearchAction('graphSimilars')"><img
@@ -383,9 +396,7 @@
 <div id="searchNavDiv" class="rightPanel rightPanel">
     <div id="searchNavActionDiv"
          style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
-        <button class="searchDialog_NavButton" onclick="searchMenu.setNodeQueryUI('complexQueryUI');$('#searchDialog_valueInput').val('');"
-                id="searchDialog_complexQueryUIButton">...
-        </button>
+
         <button class="searchDialog_NavButton" style="visibility:hidden; float:left" id="searchDialog_newQueryButton"
                 onclick="searchMenu.activatePanel('searchCriteriaDiv');">
             new
@@ -402,6 +413,7 @@
         <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_ExecuteButton"
                 onclick="searchMenu.execute()">OK
         </button>
+
 
     </div>
 

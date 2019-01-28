@@ -3,20 +3,37 @@ var complexQueries = (function () {
     self.currentDataset;
     var currentDivIndex = -1;
     var globalHtml = "<div class='complexQueries'>";
-    var queryObjs = [];
+    self.queryObjs = [];
 
+
+
+
+    self.show=function(addQueryObject){
+
+            searchMenu.previousAction = "complexQueryUI";
+            complexQueries.addNodeQuery(context.queryObject);
+            $("#searchDialog_newQueryButton").css('visibility', 'visible');
+            $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
+            searchMenu.setUIPermittedLabels(context.queryObject.label);
+            searchMenu.activatePanel("searchCriteriaDiv");
+            if(addQueryObject){
+                self.addNodeQuery(context.queryObject);
+            }
+            return;
+    }
 
     self.addNodeQuery = function (queryObject) {
-        var index = queryObjs.length;
+        var index = self.queryObjs.length;
         queryObject.inResult = true;
-        queryObjs.push(queryObject)
+        self.queryObjs.push(queryObject)
         self.draw();
 
 
     }
+
     self.draw = function () {
         globalHtml = "<div class='complexQueries'>";
-        queryObjs.forEach(function (queryObject, index) {
+        self.queryObjs.forEach(function (queryObject, index) {
             globalHtml += self.getNodeDivHtml(queryObject, index);
         })
         globalHtml += "</div>" +
@@ -59,6 +76,10 @@ var complexQueries = (function () {
         currentDivIndex = index;
         $(".complexQueries-nodeDiv ").removeClass("complexQueries-nodeDivSelected")
         $("#complexQuery_nodeDiv_" + index).addClass("complexQueries-nodeDivSelected")
+        $(".selectLabelDiv").css("visibility","visible");
+
+        searchMenu.onChangeSourceLabel(self.queryObjs[index].label);
+        context.queryObject=self.queryObjs[index];
 
     }
     self.removeQueryObj = function (index) {
@@ -68,31 +89,31 @@ var complexQueries = (function () {
             $("#graphDiv").html("");
         }
         else
-            searchMenu.setUIPermittedLabels(queryObjs[index - 1].label);
-        queryObjs.splice(index, 1)
+            searchMenu.setUIPermittedLabels(self.queryObjs[index - 1].label);
+        self.queryObjs.splice(index, 1)
         self.draw();
 
 
     }
 
     self.nodeInResult = function (index) {
-        if (!queryObjs[index].inResult) {
+        if (!self.queryObjs[index].inResult) {
             $("#complexQuery_nodeDiv_" + index).addClass("complexQueries-nodeInResultDiv");
-            queryObjs[index].inResult = true;
+            self.queryObjs[index].inResult = true;
             $(("#complexQueries_inResultButton")).html('Not in Result')
         } else {
             $("#complexQuery_nodeDiv_" + index).removeClass("complexQueries-nodeInResultDiv");
-            queryObjs[index].inResult = false;
+            self.queryObjs[index].inResult = false;
             $(("#complexQueries_inResultButton")).html('In Result')
         }
     }
     self.clear = function () {
-        queryObjs = [];
+        self.queryObjs = [];
         self.draw();
         currentDivIndex = -1
     }
     self.reset = function () {
-        queryObjs = [];
+        self.queryObjs = [];
         $("#graphDiv").html("");
         currentDivIndex = -1
     }
@@ -121,11 +142,11 @@ var complexQueries = (function () {
             var html = "<button onclick='complexQueries.displayTable()'>table or stat</button>"
             if (countResults == 1)
                 html += "<button onclick='complexQueries.defineAsSet()'>define as set</button>"
-           // else {
-                html += "<button onclick='complexQueries.displayGraph()'>Graph</button>";
+            // else {
+            html += "<button onclick='complexQueries.displayGraph()'>Graph</button>";
 
 
-          //  }
+            //  }
             $("#complexQueries_resultActionDiv").html(html)
 
         })
@@ -136,7 +157,7 @@ var complexQueries = (function () {
     self.countResults = function () {
         var count = 0;
 
-        queryObjs.forEach(function (queryObject, index) {
+        self.queryObjs.forEach(function (queryObject, index) {
             if (queryObject.inResult)
                 count += 1;
         })
@@ -144,15 +165,15 @@ var complexQueries = (function () {
     }
 
     self.buildQuery = function () {
-        if (queryObjs.length == 0)
-            return console.log("queryObjs is empty")
+        if (self.queryObjs.length == 0)
+            return console.log("self.queryObjs is empty")
 
         var matchCypher = "";
         var whereCypher = "";
         var returnCypher = "";
         var distinctWhere = "";
         var alphabet = "abcdefghijklmno"
-        queryObjs.forEach(function (queryObject, index) {
+        self.queryObjs.forEach(function (queryObject, index) {
             var symbol = alphabet.charAt(index)
             if (index > 0)
                 matchCypher += "-[r" + index + "]-"
@@ -190,7 +211,7 @@ var complexQueries = (function () {
         return cypher;
     }
 
- //var union=   "match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where  a.name=~'(?i).*art.*' and  cntR> 5 match(a)-[r]-(b2) return a , collect(id(b2)) as bx limit 100 union match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where cntR<5 match(a)-[r]-(b2) return a,b2 as bx limit 100"
+    //var union=   "match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where  a.name=~'(?i).*art.*' and  cntR> 5 match(a)-[r]-(b2) return a , collect(id(b2)) as bx limit 100 union match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where cntR<5 match(a)-[r]-(b2) return a,b2 as bx limit 100"
 
     self.prepareDataset = function (neoResult) {
         var dataset = []
@@ -325,9 +346,9 @@ var complexQueries = (function () {
                         neoAttrs: nodeNeo.neoAttrs,
                         value: 8,
                         endRel: "",
-                     //   label: visjsNodeLabel,
+                        //   label: visjsNodeLabel,
                         hiddenLabel: visjsNodeLabel,
-                       // title: visjsNodeLabel
+                        // title: visjsNodeLabel
                     }
                     visjsData.nodes.push(visjsNode);
                 }
@@ -356,11 +377,8 @@ var complexQueries = (function () {
 
         visjsGraph.draw("graphDiv", visjsData, {});
         visjsGraph.drawLegendVisj(visjsData.labels);
-        $("#toTextMenuButton").css("visibility","visible");
+        $("#toTextMenuButton").css("visibility", "visible");
         searchMenu.onExecuteGraphQuery()
-
-
-
 
 
     }

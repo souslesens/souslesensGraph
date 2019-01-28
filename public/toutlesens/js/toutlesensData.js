@@ -120,7 +120,7 @@ var toutlesensData = (function () {
 
 
             var whereStatement = "WHERE ";
-            console.log(JSON.stringify(whereStatements,null,2))
+         //   console.log(JSON.stringify(whereStatements,null,2))
             whereStatements.forEach(function (line, index) {
                 if (index > 0)
                     whereStatement += " AND "
@@ -709,138 +709,10 @@ var toutlesensData = (function () {
 // }
 
 
-        self.flatResultToTree = function (data, withAttrs) {
-
-            var str = "";
-            var label = "";
-            var color = "black";
-            var nodes = {};
-            for (var i = 0; i < data.length; i++) {
-                if (!data[i].nodes)
-                    continue;
-                for (var j = 0; j < data[i].nodes.length; j++) {
 
 
-                    var node = {
-                        id: data[i].ids[j]
-                    }
-
-                    if (!nodes[node.id]) {
-                        node.neoAttrs = data[i].nodes[j].properties;
-                        if (!node.neoAttrs.name)
-                            node.neoAttrs.name = node.neoAttrs[Gparams.defaultNodeNameProperty];
-                        node.name = node.neoAttrs.name;
-                        node.label = data[i].labels[j][0]
-
-                        node.children = [];
-
-                        nodes[node.id] = node;
-
-                        if (j == 0)
-                            node.isSubRoot = true;
-
-                        if (j > 0) {
-                            node.rel = data[i].rels[j - 1];
-
-                            var previousId = data[i].ids[j - 1];
-                            if (nodes[previousId]) {
-                                /*  var add = true;
-                                 for (var k = 0; k < nodes[previousId].children.length; k++) {
-                                 if (nodes[previousId].children[k] == node.id) {
-                                 add = false;
-                                 break;
-                                 }
-
-                                 }
-                                 if (add)*/
-                                nodes[previousId].children.push(node);
-                            }
-
-                        }
-                    }
 
 
-                }
-
-            }
-            var keys = []
-            for (var key in  nodes) {
-                if (nodes[key].isSubRoot)
-                    keys.push(key)
-            }
-            keys.sort();
-            var root = {
-                name: "root",
-                id: -1,
-                label: "root",
-                children: []
-            }
-            for (var i = 0; i < keys.length; i++) {
-                root.children.push(nodes[keys[i]]);
-            }
-
-            return root;
-
-
-        }
-
-
-        self.buildSearchNodeQuery = function (options) {
-
-            var subGraph = options.subGraph;
-            var label = options.label;
-            var word = options.word;
-            var resultType = options.resultType;
-            var limit = options.limit;
-            var from = options.from;
-
-
-            var str = "";
-            var subGraphWhere = "";
-            var returnStr = " RETURN n";
-            var cursorStr = "";
-            if (resultType == "count")
-                returnStr = " RETURN count(n) as count";
-            else
-                cursorStr += " ORDER BY n." + Gparams.defaultNodeNameProperty;
-            if (from && resultType != "allNodes")
-                cursorStr += " SKIP " + from;
-            if (limit && resultType != "allNodes")
-                cursorStr += " LIMIT " + limit;
-
-
-            var labelStr = "";
-            if (label && label.length > 0)
-                labelStr = ":" + label;
-
-            var whereStr = "";
-
-            if (options.where)
-                whereStr = options.where;
-            else {
-                whereStr = advancedSearch.buildWhereClauseFromUI(word, "n")
-                if (subGraph) {
-                    if (whereStr.length == 0)
-                        subGraphWhere += " where  n.subGraph='" + subGraph + "'";
-                    else
-                        subGraphWhere += " and  n.subGraph='" + subGraph + "'";
-                }
-            }
-
-            var whereStrRaw = whereStr;
-            if (whereStr && whereStr.length > 0 && whereStr.toUpperCase().indexOf("WHERE") < 0)
-                whereStr = " WHERE " + whereStr;
-            str = "MATCH (n" + labelStr + ") " + whereStr + subGraphWhere + returnStr + cursorStr;
-console.log(str)
-            var queryObject = {
-                cypher: str,
-                label: label,
-                where: whereStr + subGraphWhere,
-                cursor: cursorStr
-            }
-            return queryObject;
-
-        }
 
 
         return self;

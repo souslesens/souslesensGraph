@@ -11,13 +11,29 @@
 
 
 
+<table>
+    <tr>
+        <td>
+            from label
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <select id="expand_labelsSelectSource" style="width: 150px" size="10" onchange="expandGraph.setSourceLabel($(this).val())"></select>
+        </td>
+        <td>
+            <select id="expand_labelsSelectTarget"  style="width: 150px" size="10" onchange="expandGraph.initExpandWhere()"></select>
+        </td>
+    </tr>
+
+</table>
 
 
-from <select id="expand_labelsSelectSource" onchange="expandGraph.setSourceLabel($(this).val())"></select>
 
-<br>to <select id="expand_labelsSelectTarget"  onchange="expandGraph.initExpandWhere()"></select>
 
-<br>cluster nodes limit <input id="expand_clusterMinLimit" value="5">
 
 
 
@@ -46,11 +62,13 @@ from <select id="expand_labelsSelectSource" onchange="expandGraph.setSourceLabel
     </table>
 </div>
 
+<br>cluster nodes limit <input id="expand_clusterMinLimit" value="5"><br>
+<br>show all relations<input type="checkbox" id="expand_showAllrelationsCbx"><br>
 <button onclick="expandGraph.execute()">expand</button>
-<button onclick="expandGraph.closeCluster(expandGraph.openedClusterId)">collapse</button>
+<button onclick="expandGraph.closeClusters()">collapse</button>
 <!--<button onclick="toutlesensController.dispatchAction('collapseGraphWithLabelExecute',$('#expand_labelsSelectSource').val(),$('#expand_labelsSelectTarget').val())">collapse</button>-->
 <script>
- expandGraph.initSourceLabel();
+
 
 
 </script>

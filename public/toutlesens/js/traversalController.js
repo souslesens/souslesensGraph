@@ -70,7 +70,7 @@ var traversalController = (function () {
 
         self.setStartLabelQuery = function () {
 
-            advancedSearch.buildSearchNodeQueryFromUI({}, function (err, queryObject) {
+            advancedSearch.setQueryObjectCypher({}, function (err, queryObject) {
                 if (err)
                     return console.log(err)
                 traversalController.context.start.queryObject = queryObject;
@@ -102,7 +102,7 @@ var traversalController = (function () {
             else
                 self.context.clusterIntermediateNodes = false;
 
-            advancedSearch.buildSearchNodeQueryFromUI({}, function (err, queryObject) {
+            advancedSearch.setQueryObjectCypher({}, function (err, queryObject) {
                 if (err)
                     return console.log(err)
                 traversalController.context.end.queryObject = queryObject;

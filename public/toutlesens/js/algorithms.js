@@ -55,14 +55,15 @@ var algorithms = (function () {
                 var cntScale = d3.scale.linear().domain([cntLimits.min, cntLimits.max]).range([10, 40]);
                 for (var key in sharedTargets) {
                     var sharedId = "similar_" + (i++);
-
+                    var label = sharedTargets[key].cnt + "" + targetLabel;
                     var targetNodeObj = {
                         labelNeo: "sharedSimilarity",// because visjs where label is the node name
                         background: "#d11",
                         shape: "square",
                         size: cntScale(sharedTargets[key].cnt),
                         id: sharedId,
-                        label: "",
+                        label: label,
+                        hiddenLabel: label,
                         neoAttrs: {name: key},
                     }
                     nodes.push(targetNodeObj);
@@ -76,6 +77,7 @@ var algorithms = (function () {
                                 background: nodeColors[props.label],
                                 id: node._id,
                                 label: props.name,
+                                hiddenLabel: props.name,
                                 neoAttrs: props,
                             }
                             nodes.push(nodeObj);
@@ -161,11 +163,13 @@ var algorithms = (function () {
                             var label = line.sourceNode.labels[0];
                             if (labels.indexOf(label) < 0)
                                 labels.push(label);
+                            var label = line.sourceNode.properties[nodeNameVal];
                             var nodeObj = {
                                 labelNeo: label,// because visjs where label is the node name
                                 background: nodeColors[label],
                                 id: line.sourceNode._id,
-                                label: line.sourceNode.properties[nodeNameVal],
+                                label: label,
+                                hiddenLabel: label,
                                 neoAttrs: line.sourceNode.properties,
                             }
                             nodes.push(nodeObj);
@@ -176,11 +180,14 @@ var algorithms = (function () {
                             var label = line.targetNode.labels[0];
                             if (labels.indexOf(label) < 0)
                                 labels.push(label);
+                            var label = line.targetNode.properties[nodeNameVal];
                             var nodeObj = {
                                 labelNeo: label,// because visjs where label is the node name
                                 background: nodeColors[label],
                                 id: line.targetNode._id,
-                                label: line.targetNode.properties[nodeNameVal],
+                                label: label,
+                                hiddenLabel: label,
+
                                 neoAttrs: line.targetNode.properties,
                             }
                             nodes.push(nodeObj);
@@ -238,34 +245,20 @@ var algorithms = (function () {
         var cypher = "";
 
 
+        function useSelection(ids) {
+            context.queryObject = {
+                label: sourceLabel,
+                where: toutlesensData.getWhereClauseFromArray("_id", ids, "n"),
+                nodeIds: ids,
+                clauseText: "[" + label + "] " + key
+            }
 
-        function useSelection(ids){
-            toutlesensData.getWhereClauseFromArray("_id", ids, function (err, result) {
-                var where = result;
+            searchMenu.activatePanel("searchActionDiv");
+            $("#graphPopup").css("visibility", "hidden");
+            toutlesensController.openFindAccordionPanel(true)
+            findTabs.tabs("option", "active", 0);
 
-                var clauseText = "[" + label + "] " + key;
-                context.queryObject.nodeIds = ids;
-                context.queryObject={
-                    foundIds: ids.length,
-                    label: sourceLabel,
-                    where: where,
-                    text:clauseText
-
-
-                }
-                searchMenu.onChangeSourceLabel(sourceLabel, "");
-
-
-
-
-                searchMenu.activatePanel("searchActionDiv");
-                toutlesensController.openFindAccordionPanel(true)
-                findTabs.tabs("option", "active", 0);
-            })
         }
-
-
-
 
 
         if (type == "similars") {// tous les noeuds source ayant le plus de noeud target en commun
@@ -280,7 +273,7 @@ var algorithms = (function () {
                 "WHERE cnt > inputCnt*" + coeff + "\n" +
                 " RETURN collect(id(m)) as ids, cnt order by cnt desc  limit " + limit
 
-            console.log(cypher);
+            // console.log(cypher);
             Cypher.executeCypher(cypher, function (err, result) {
                 if (err)
                     return console.log(err);
@@ -292,7 +285,7 @@ var algorithms = (function () {
         else if (type == "cluster") {// uniquement les noeuds du cluster
 
             var clusteredNodes = visjsGraph.getConnectedNodes(key)
-                useSelection(clusteredNodes)
+            useSelection(clusteredNodes)
         }
 
 
@@ -326,20 +319,16 @@ var algorithms = (function () {
 
     }
 
-    self.execute = function (queryStr) {
+    self.execute = function (queryObject) {
         var algorithm = $("#searchDialog_algorithmSelect").val();
         self.currentAlgorithm = algorithm;
 
-        var query = advancedSearch.matchStrToObject(queryStr)
-        sourceLabel = query.label;
+        sourceLabel = queryObject.label;
         var targetLabel = $("#searchDialog_AlgorithmsTargetLabelSelect").val();
 
         if (algorithm == "relationsRanking") {
             var limit = $("#searchDialog_AlgorithmsResultSize").val();
-            var where=context.cypherMatchOptions.sourceNodeWhereFilter;
-            if(where && where!="")
-                where=" where "+where+ " ";
-            var cypher = "Match (n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ") "+where+" return n, count (r) as cnt order by cnt desc limit " + limit;
+
             Cypher.executeCypher(cypher, function (err, result) {
                     if (err)
                         console.log(err);
@@ -376,9 +365,9 @@ var algorithms = (function () {
         var minCountTargetNode = $("#searchDialog_AlgorithmsMinCountTargetNodes").val();
         var resultSize = $("#searchDialog_AlgorithmsResultSize").val();
         var similarityCutoff = $("#searchDialog_AlgorithmsSimilarityCutoff").val();
-        var where = query.where;
+        var where = toutlesensData.getWhereClauseFromArray("_id", queryObject.nodeIds, "n")
         if (where && where.length > 0)
-            where = " where " + where
+            where = " WHERE " + where
 
 
         var algoStr = self.algorithms[algorithm].cypher;

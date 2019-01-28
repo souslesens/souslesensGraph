@@ -1,197 +1,190 @@
 var advancedSearch = (function () {
 
-    var self = {};
+        var self = {};
 
-    self.similarOptions = {};
-    self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
-
-
-
-
-
-
-
-
-    /**
-     *
-     *
-     * @param resultType "string" or "object"
-     * @param callback
-     */
-
-    self.buildSearchNodeQueryFromUI = function ( options, callback) {
-        if (!options)
-            options = {}
-
-        if (!self.similarOptions)
-            self.similarOptions = {}
-        self.similarOptions.id = null;
-
-        var searchObj = {};
-        searchObj.label = context.queryObject.label;
-        searchObj.property = $("#searchDialog_propertySelect").val();
-        searchObj.operator = $("#searchDialog_operatorSelect").val();
-        searchObj.value = $("#searchDialog_valueInput").val();
-
-        //if  no value consider that there is no property set
-        if (searchObj.value == "")
-            searchObj.property = "";
-
-        if (searchObj.value == "") {// only  search on label or type
-            var options = {
-                subGraph: subGraph,
-                label: searchObj.label,
-                word: null,
-                limit: Gparams.jsTreeMaxChildNodes,
-                from: 0,
-
-            }
-            /*   if (!options.where && self.context.queryObject.nodeIds.length > 0)
-                   options.where = toutlesensData.getWhereClauseFromArray("_id", self.context.queryObject.nodeIds);*/
-        } else {
-            if (searchObj.operator == "contains")
-                searchObj.operator = "~";
-            var value = searchObj.property + ":" + searchObj.operator + " " + searchObj.value;
-            var options = {
-                subGraph: subGraph,
-                label: searchObj.label,
-                word: value,
-                limit: Gparams.jsTreeMaxChildNodes,
-                from: 0
-            }
-
-        }
-        var queryObj=toutlesensData.buildSearchNodeQuery(options);
-        return callback(null,queryObj);
-
-    }
+        self.similarOptions = {};
+        self.neo4jProxyUrl = "../../.." + Gparams.neo4jProxyUrl;
 
 
         /**
-         if @str simple word return regex of the word  for the property defaultNodeNameProperty
-         else
-         @str form property:operator value
-
-
+         *
+         *
+         * @param callback
          */
-        self.buildWhereClauseFromUI = function (str, nodeAlias) {
-            if (!str)
-                return "";
-            var property = Gparams.defaultNodeNameProperty;
-            var p = str.indexOf(":");
-            var operator;
-            var value;
 
-            if (p > -1) {
-                property = str.substring(0, p);
-                str = str.substring(p + 1);
-                var q = str.indexOf(" ");
-                operator = str.substring(0, q);
-                value = str.substring(q + 1);
-            }
-            else {
-                property = Gparams.defaultNodeNameProperty
-                operator = "~";
-                value = str;
-                // console.log("!!!!invalid query");
-                // return "";
-            }
-            var not=(operator == "notContains")?"NOT ":"";
-            if (operator == "!=" ) {
-                operator="<>"
+
+        // transform request in nodes ids stored in context.queryObject.where
+        self.setNodeQueryUI = function (booleanOperator) {
+            if (booleanOperator && booleanOperator == "")
+                return;
+            var value = $("#searchDialog_valueInput").val();
+            if (!booleanOperator && value == "")
+                return;
+
+            $("#searchDialog_nextPanelButton").css('visibility', 'visible');
+            $("#clearAllCreteriaButton").css("visibility", "visible");
+            $("#searchDialog_SaveQueryButton").css("visibility", "visible")
+            $("#searchDialog_Criteriatext").css("visibility", "visible");
+            $("#searchDialog_newQueryButton").css('visibility', 'visible');
+
+
+            var property = "";
+            var operator = "";
+            if (value != "") {
+                property = $("#searchDialog_propertySelect").val();
+                operator = $("#searchDialog_operatorSelect").val()
             }
 
-            else if (operator == "~" || operator == "contains"  || operator == "notContains") {
+            var text = booleanOperator + "  " + (context.queryObject.label ? context.queryObject.label : "") + " " + property + " " + operator + " " + value;
 
+            if (booleanOperator != "and" && booleanOperator != "or") {
+                context.queryObject = {
+                    label: context.queryObject.label,
+                    property: property,
+                    operator: operator,
+                    value: value,
+                    text: text
+                }
+
+            } else {
+                if (!context.queryObject.subQueries)
+                    context.queryObject.subQueries = [];
+                context.queryObject.subQueries.push({
+                    label: context.queryObject.label,
+                    property: property,
+                    operator: operator,
+                    value: value,
+                    text: text,
+                    booleanOperator: booleanOperator
+                });
+
+            }
+            /*  if (booleanOperator && booleanOperator == "+") {
+                  return;
+              }*/
+
+
+            advancedSearch.setQueryObjectCypher(context.queryObject, function (err, queryObject) {
+
+                if (err)
+                    return;
+
+                $("#searchDialog_valueInput").val("");
+                Cypher.executeCypher(queryObject.cypher, function (err, result) {
+
+                    if (booleanOperator && booleanOperator == "and") {
+                        var newIds = [];
+                        result.forEach(function (line) {
+                            newIds.push(line.n._id);
+                        })
+
+                        function intersectArray(a, b) {
+                            return a.filter(Set.prototype.has, new Set(b));
+                        }
+
+                        context.queryObject.nodeIds = intersectArray(context.queryObject.nodeIds, newIds)
+                    } else {
+                        if (!context.queryObject.nodeIds)
+                            context.queryObject.nodeIds = [];
+                        result.forEach(function (line) {
+                            context.queryObject.nodeIds.push(line.n._id);
+                        });
+                    }
+                    var foundIds = result.length;
+
+
+                    text += ": <b> " + foundIds + "nodes </b>"
+                    $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' >" + text + "</div>")
+
+
+
+                });
+
+
+            })
+        }
+
+        self.setQueryObjectCypher = function (queryObject, callback) {
+            if (!queryObject)
+                queryObject = {}
+
+            if (!self.similarOptions)
+                self.similarOptions = {}
+            self.similarOptions.id = null;
+
+
+            //if  no value consider that there is no property set
+            if (queryObject.value == "")
+                queryObject.property = "";
+
+            queryObject.subGraph = subGraph;
+            queryObject.limit = Gparams.jsTreeMaxChildNodes;
+            queryObject.from = 0;
+
+
+            var subGraphWhere = "";
+            var returnStr = " RETURN n";
+            var cursorStr = "";
+
+            cursorStr += " ORDER BY n." + Gparams.defaultNodeNameProperty;
+            if (queryObject.from)
+                cursorStr += " SKIP " + queryObject.from;
+            if (queryObject.limit)
+                cursorStr += " LIMIT " + queryObject.limit;
+            var labelStr = "";
+            if (queryObject.label && queryObject.label.length > 0)
+                labelStr = ":" + queryObject.label;
+
+            var whereStr = "";
+            whereStr = self.buildWhereClauseFromUI(queryObject, "n");
+
+
+            if (context.queryObject.subQueries) {
+                context.queryObject.subQueries.forEach(function (suqQuery) {
+                    whereStr += " " + suqQuery.booleanOperator + " " + self.buildWhereClauseFromUI(suqQuery, "n");
+                })
+
+
+            }
+            var cypher = "MATCH (n" + labelStr + ")  WHERE " + whereStr + " RETURN n" + cursorStr;
+            queryObject.cypher = cypher;
+            return callback(null, queryObject);
+
+        }
+
+
+        self.buildWhereClauseFromUI = function (queryObject, nodeAlias) {
+            var property = queryObject.property;
+            var operator = queryObject.operator;
+            var value = queryObject.value;
+
+            var not = (operator == "notContains") ? "NOT " : "";
+            if (operator == "!=") {
+                operator = "<>"
+            }
+
+            else if (operator == "~" || operator == "contains" || operator == "notContains") {
                 operator = "=~"
                 // value = "'.*" + value.trim() + ".*'";
                 value = "'(?i).*" + value.trim() + ".*'";
-
             }
             else {
                 //if ((/[\s\S]+/).test(value))
                 if (!(/^-?\d+\.?\d*$/).test(value))//not number
                     value = "\"" + value + "\"";
-
-
             }
             var propStr = "";
             if (property == "any")
                 propStr = "(any(prop in keys(n) where n[prop]" + operator + value + "))";
 
             else {
-
-
-
-                propStr = not+ nodeAlias + "." + property + operator + value.trim();
+                propStr = not + nodeAlias + "." + property + operator + value.trim();
             }
             return propStr;
 
         }
 
 
-
-
-        /**
-         * execute node query to get ids ans then build a graph query and display it
-         *
-         *
-
-         * @param query
-         */
-        self.graphNodesAndDirectRelations = function (err, queryObject, callback) {
-
-            if (err)
-                return console.log(err);
-
-            var payload = {
-                match: queryObject.cypher
-            }
-            console.log(queryObject.cypher);
-            $.ajax({
-                type: "POST",
-                url: self.neo4jProxyUrl,
-                data: payload,
-                dataType: "json",
-                error: function (err) {
-                    console.log(err.responseText);
-
-                },
-                success: function (data, textStatus, jqXHR) {
-                    savedQueries.addToCurrentSearchRun(queryObject.cypher, callback || null);
-                    var ids = [];
-                    for (var i = 0; i < data.length; i++) {
-                        ids.push(data[i].n._id)
-                    }
-
-
-                    toutlesensData.getWhereClauseFromArray("_id", ids, function (err, result) {
-                        if (self.filterLabelWhere.length > 0) {
-                            if (context.cypherMatchOptions.sourceNodeWhereFilter != "")
-                                context.cypherMatchOptions.sourceNodeWhereFilter += " and " + self.filterLabelWhere;
-                            else
-                                context.cypherMatchOptions.sourceNodeWhereFilter = self.filterLabelWhere;
-                        }
-                        if (callback) {
-                            return callback();
-                        }
-                        toutlesensController.generateGraph(null, {
-                            applyFilters: true,
-                            dragConnectedNodes: true
-                        }, function () {
-
-                            $("#filtersDiv").html("");
-                            $("#graphMessage").html("");
-
-
-                        });
-
-                    })
-                }
-            })
-
-
-        }
         self.searchInElasticSearch = function (word, label, callback) {
 
             word += "*";
@@ -261,4 +254,5 @@ var advancedSearch = (function () {
         return self;
 
     }
-)()
+)
+()

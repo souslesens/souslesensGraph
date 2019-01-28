@@ -108,19 +108,90 @@ var treeMap = (function () {
             }]
         }]
     }];
-    self.draw = function (err, query) {
+
+    self.flatResultToTree = function (data, withAttrs) {
+
+        var str = "";
+        var label = "";
+        var color = "black";
+        var nodes = {};
+        for (var i = 0; i < data.length; i++) {
+            if (!data[i].nodes)
+                continue;
+            for (var j = 0; j < data[i].nodes.length; j++) {
+
+
+                var node = {
+                    id: data[i].ids[j]
+                }
+
+                if (!nodes[node.id]) {
+                    node.neoAttrs = data[i].nodes[j].properties;
+                    if (!node.neoAttrs.name)
+                        node.neoAttrs.name = node.neoAttrs[Gparams.defaultNodeNameProperty];
+                    node.name = node.neoAttrs.name;
+                    node.label = data[i].labels[j][0]
+
+                    node.children = [];
+
+                    nodes[node.id] = node;
+
+                    if (j == 0)
+                        node.isSubRoot = true;
+
+                    if (j > 0) {
+                        node.rel = data[i].rels[j - 1];
+
+                        var previousId = data[i].ids[j - 1];
+                        if (nodes[previousId]) {
+                            /*  var add = true;
+                             for (var k = 0; k < nodes[previousId].children.length; k++) {
+                             if (nodes[previousId].children[k] == node.id) {
+                             add = false;
+                             break;
+                             }
+
+                             }
+                             if (add)*/
+                            nodes[previousId].children.push(node);
+                        }
+
+                    }
+                }
+
+
+            }
+
+        }
+        var keys = []
+        for (var key in  nodes) {
+            if (nodes[key].isSubRoot)
+                keys.push(key)
+        }
+        keys.sort();
+        var root = {
+            name: "root",
+            id: -1,
+            label: "root",
+            children: []
+        }
+        for (var i = 0; i < keys.length; i++) {
+            root.children.push(nodes[keys[i]]);
+        }
+
+        return root;
+
+
+    }
+    self.draw = function (err, json) {
 
 
         var divId = "graphDiv"
         $("#" + divId).html("<br><br><br>");
 
 
-        toutlesensData.cachedResultArray = null;
 
-        toutlesensData.getNodeAllRelations(null, {}, function (err, json) {
-            filters.init(json);
-            paint.initHighlight(json);
-            treeJson = toutlesensData.flatResultToTree(json);
+            treeJson = self.flatResultToTree(json);
             treeJson = formatTreemapData(treeJson);
             //   console.log(JSON.stringify(treeJson,null,2))
             //  treeJson = treeMapTestData2;
@@ -422,7 +493,7 @@ var treeMap = (function () {
             }
 
 
-        })
+
     }
     return self;
 })()
