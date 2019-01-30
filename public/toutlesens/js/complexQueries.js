@@ -6,20 +6,21 @@ var complexQueries = (function () {
     self.queryObjs = [];
 
 
+    self.show = function (addQueryObject) {
 
+        searchMenu.previousAction = "complexQueryUI";
+        $("#searchDialog_newQueryButton").css('visibility', 'visible');
+        $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
+        searchMenu.setUIPermittedLabels(context.queryObject.label);
 
-    self.show=function(addQueryObject){
-
-            searchMenu.previousAction = "complexQueryUI";
-            complexQueries.addNodeQuery(context.queryObject);
-            $("#searchDialog_newQueryButton").css('visibility', 'visible');
-            $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
-            searchMenu.setUIPermittedLabels(context.queryObject.label);
-            searchMenu.activatePanel("searchCriteriaDiv");
-            if(addQueryObject){
-                self.addNodeQuery(context.queryObject);
-            }
-            return;
+        if (currentDivIndex > -1 && context.queryObject.label == self.queryObjs[currentDivIndex].label) {// updateNodeQuery
+            self.updateNodeQuery(currentDivIndex,context.queryObject);
+        }
+        else if (addQueryObject) {
+            advancedSearch.setNodeQueryUI();
+            self.addNodeQuery(context.queryObject);
+        }
+        return;
     }
 
     self.addNodeQuery = function (queryObject) {
@@ -27,6 +28,15 @@ var complexQueries = (function () {
         queryObject.inResult = true;
         self.queryObjs.push(queryObject)
         self.draw();
+
+
+    }
+
+    self.updateNodeQuery = function (index,queryObject) {
+
+        self.queryObjs[index]=queryObject;
+
+        $("#complexQuery_nodeConditionDiv_"+index).html(queryObject.globalText)
 
 
     }
@@ -59,7 +69,7 @@ var complexQueries = (function () {
 
         var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' complexQueries-nodeDiv " + classInResult + "'  onclick='complexQueries.onSelectNodeDiv(" + index + ")'>" +
             " <div class='complexQueries-partDiv' style='background-color: " + color + "'><b>Label : " + queryObject.label + "</b></div>" +
-            "<div class='complexQueries-partDiv'> Condition : " + queryText + "</div>" +
+            "<div id='complexQuery_nodeConditionDiv_"  + index + "' class='complexQueries-partDiv'> Condition : " + queryText + "</div>" +
             " <div class='complexQueries-partDiv'><button  id='complexQueries_inResultButton'  onclick='complexQueries.nodeInResult(" + index + ")'>not in result</button> </div>" +
             // "<button onclick='complexQueries.removeQueryObj(" + index + ")'>X</button>" +
             "<input type='image' height='10px'  title='remove node' onclick='complexQueries.removeQueryObj(" + index + ")' src='images/trash.png'/>" +
@@ -76,10 +86,13 @@ var complexQueries = (function () {
         currentDivIndex = index;
         $(".complexQueries-nodeDiv ").removeClass("complexQueries-nodeDivSelected")
         $("#complexQuery_nodeDiv_" + index).addClass("complexQueries-nodeDivSelected")
-        $(".selectLabelDiv").css("visibility","visible");
+        $(".selectLabelDiv").css("visibility", "visible");
 
-        searchMenu.onChangeSourceLabel(self.queryObjs[index].label);
-        context.queryObject=self.queryObjs[index];
+        context.queryObject = self.queryObjs[index];
+        searchMenu.previousAction = "complexQueryNodeSelected";
+
+        searchMenu.activatePanel("searchCriteriaDivFromComplexQueries");
+
 
     }
     self.removeQueryObj = function (index) {
@@ -180,19 +193,16 @@ var complexQueries = (function () {
             matchCypher += "(" + symbol + ":" + queryObject.label + ")";
 
             if (queryObject.value && queryObject.value != "") {
-                var where = ""
-                if (queryObject.operator == "contains")
-                    where = queryObject.property + "=~" + "'(?i).*" + queryObject.value.trim() + ".*'";
-                else {
-                    var value = queryObject.value;
-                    if (!(/^-?\d+\.?\d*$/).test(value))//not number
-                        value = "\"" + value + "\"";
-                    where = queryObject.property + queryObject.operator + value + ".*'";
+
+                 whereCypher = advancedSearch.buildWhereClauseFromUI(queryObject, symbol);
+
+                if (context.queryObject.subQueries) {
+                    context.queryObject.subQueries.forEach(function (suqQuery) {
+                        whereCypher += " " + suqQuery.booleanOperator + " " + advancedSearch.buildWhereClauseFromUI(suqQuery, symbol);
+                    })
                 }
-                if (whereCypher.length > 0)
-                    whereCypher += " and "
-                whereCypher += " " + symbol + "." + where + " "
             }
+
             if (queryObject.inResult) {
 
                 if (returnCypher.length > 0) {
@@ -376,7 +386,7 @@ var complexQueries = (function () {
         })
 
         visjsGraph.draw("graphDiv", visjsData, {});
-        visjsGraph.drawLegendVisj(visjsData.labels);
+        visjsGraph.drawLegend(visjsData.labels);
         $("#toTextMenuButton").css("visibility", "visible");
         searchMenu.onExecuteGraphQuery()
 

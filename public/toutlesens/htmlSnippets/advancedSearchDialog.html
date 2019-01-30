@@ -178,14 +178,18 @@
                                onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_nextPanelButton').css('visibility', 'visible');">
 
 
-                        <div  style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
-                            <button  onclick="advancedSearch.setNodeQueryUI('+');">
+                       <!-- <div  style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">-->
+                            <div  style="padding :3px" class="rightPanel">
+                                <input type="image" title="Build path" height="20px"
+                                       onclick="complexQueries.show(true)" id="toTextMenuButton" src="images/path.png"
+                                       class=""/>
+                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="advancedSearch.setNodeQueryUI('+');">
                                  +...
                             </button>
-                            <button  onclick="advancedSearch.setNodeQueryUI('and');">
+                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="advancedSearch.setNodeQueryUI('and');">
                                 AND
                             </button>
-                            <button onclick="advancedSearch.setNodeQueryUI('or');">
+                            <button  style="font-size: 10px;background-color:#7f9f7f" onclick="advancedSearch.setNodeQueryUI('or');">
                                 OR
                             </button>
 
@@ -203,8 +207,7 @@
             <input type="hidden" id="searchDialog_ObjectTypeInput" value="node">
          <!--   <input type="hidden" id="searchDialog_NodeLabelInput" value="">-->
             <input type="hidden" id="searchDialog_NodeLabelInut" value="">
-            <!--   <select id="searchDialog_NodeLabelInput"
-                       onclick="advancedSearch.onChangeSourceLabel($(this).val())"></select>-->
+
         </div>
         <!--  -->
 
@@ -217,10 +220,9 @@
                  onclick="searchMenu.onSearchAction('graphSomeNeighboursListLabels')"><img
                     align="center" src="images/graphSmall.png"> Graph neighbours
             </div>
-            <div style="display:inline-list-item" class="actionSelectDiv" onclick="searchMenu.onSearchAction('path')">
-                <img align="center"
-                     src="images/graphSmall.png"> Pathes beetwen nodes
-            </div>
+
+
+
             <div style="display:inline-list-item" class="actionSelectDiv "
                  onclick="searchMenu.onSearchAction('treeNodes')"><img align="center"
                                                                        src="images/graphSmall.png">
@@ -246,11 +248,11 @@
                                                                         src="images/treemapSmall.png">
                 Algorithms
             </div>
-            <div style="display:inline-list-item" class="actionSelectDiv "
-                 onclick="complexQueries.show(true)"><img align="center"
-                                                                        src="images/path.png">
-                Build path
+            <div style="display:inline-list-item  " class="actionSelectDiv actionSelectDivHidden" onclick="searchMenu.onSearchAction('path')">
+                <img align="center"
+                     src="images/graphSmall.png"> Pathes beetwen nodes
             </div>
+
 
 
             <div style="display:inline-list-item" class="actionSelectDiv actionSelectDivHidden"
@@ -393,14 +395,15 @@
 
 
 
-<div id="searchNavDiv" class="rightPanel rightPanel">
+<div id="searchNavDiv" class="rightPanel">
     <div id="searchNavActionDiv"
          style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
 
-        <button class="searchDialog_NavButton" style="visibility:hidden; float:left" id="searchDialog_newQueryButton"
+        <button class="searchDialog_NavButton_visible" style="visibility:visible; float:left" id="searchDialog_newQueryButton"
                 onclick="searchMenu.activatePanel('searchCriteriaDiv');">
             new
         </button>
+
 
         <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_previousPanelButton"
                 onclick="searchMenu.previousPanel();">previous

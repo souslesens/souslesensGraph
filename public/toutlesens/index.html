@@ -431,22 +431,21 @@
 
 <div id="mainButtons">
     <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
-    <input type="image" title="<span id='lang_XX'>schema</span>" height="20px"
 
-           id="schemaButton" src="images/cube.png"/>
 
-    <input type="image" title="display settings" height="20px"
-           onclick="toutlesensController.dispatchAction('displaySettings')"
-           id="displaySettingButton" src="images/display.png"/></td>
-    &nbsp;<input type="image" title="Display all nodes" height="20px"
-                 onclick="toutlesensController.dispatchAction('showAll')"
-                 id="searchAllButton" src="images/all.png"/></td>
-    <input type="image" title="Graph menu" height="20px"
-           onclick="toutlesensController.dispatchAction('showGlobalMenu');" id="parametersMenuButton"
-           src="images/parameters.png"/>
+
+
+
+
     <input type="image" title="Export to text" height="20px"
-           onclick="toutlesensController.dispatchAction('showGraphTable')" id="toTextMenuButton" src="images/text.png"
+           onclick=toutlesensController.dispatchAction('showGraphTable')" id="ComplexQueriesMenuButton" src="images/text.png"
            class="graphDisplayed"/>
+
+
+    <input type="image" title="<span id='lang_XX'>schema</span>" height="20px" id="schemaButton" src="images/cube.png"/>
+
+
+
     <input type="image" title="Zoom on node" height="20px" onclick="toutlesensController.dispatchAction('zoomOnNode')"
            id="zoomOnNodeMenuButton"
            src="images/zoom.png" class="graphDisplayed"/>
@@ -462,7 +461,15 @@
            src="images/next.jpg"/>
     <input type="image" title="Next display" height="20px" onclick="toutlesensController.dispatchAction('addNode')"
            class="canModify" ; id="newNodeButton" src="images/newNode.png"/>
-
+    <input type="image" title="display settings" height="20px"
+           onclick="toutlesensController.dispatchAction('displaySettings')"
+           id="displaySettingButton" src="images/display.png"/></td>
+    &nbsp;<input type="image" title="Display all nodes" height="20px"
+                 onclick="toutlesensController.dispatchAction('showAll')"
+                 id="searchAllButton" src="images/all.png"/></td>
+    <input type="image" title="Graph menu" height="20px"
+           onclick="toutlesensController.dispatchAction('showGlobalMenu');" id="parametersMenuButton"
+           src="images/parameters.png"/>
     <br><span id="graphInfosSpan" style="font-size:8px"></span>
 
 </div>

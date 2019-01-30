@@ -35,15 +35,20 @@ var advancedSearch = (function () {
                 operator = $("#searchDialog_operatorSelect").val()
             }
 
-            var text = booleanOperator + "  " + (context.queryObject.label ? context.queryObject.label : "") + " " + property + " " + operator + " " + value;
+            var booleanOperatorStr=booleanOperator || "";
 
-            if (booleanOperator != "and" && booleanOperator != "or") {
+            var text = booleanOperatorStr + "  " + (context.queryObject.label ? context.queryObject.label : "") + " " + property + " " + operator + " " + value;
+
+
+          //  if ((booleanOperator != "and" && booleanOperator != "or")  ) {
+            if(!context.queryObject.nodeIds){
                 context.queryObject = {
                     label: context.queryObject.label,
                     property: property,
                     operator: operator,
                     value: value,
-                    text: text
+                    text: text,
+                    globalText:text
                 }
 
             } else {
@@ -55,8 +60,11 @@ var advancedSearch = (function () {
                     operator: operator,
                     value: value,
                     text: text,
-                    booleanOperator: booleanOperator
+                    booleanOperator: booleanOperator,
+
                 });
+                var booleanOperatorStr=booleanOperator || "";
+                context.queryObject.globalText+= " "+booleanOperatorStr+" "+ text
 
             }
             /*  if (booleanOperator && booleanOperator == "+") {
@@ -135,8 +143,11 @@ var advancedSearch = (function () {
             if (queryObject.label && queryObject.label.length > 0)
                 labelStr = ":" + queryObject.label;
 
-            var whereStr = "";
-            whereStr = self.buildWhereClauseFromUI(queryObject, "n");
+
+            var whereStr = self.buildWhereClauseFromUI(queryObject, "n");
+            if(whereStr && whereStr!="")
+                whereStr= " WHERE "+whereStr
+
 
 
             if (context.queryObject.subQueries) {
@@ -146,7 +157,7 @@ var advancedSearch = (function () {
 
 
             }
-            var cypher = "MATCH (n" + labelStr + ")  WHERE " + whereStr + " RETURN n" + cursorStr;
+            var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN n" + cursorStr;
             queryObject.cypher = cypher;
             return callback(null, queryObject);
 
@@ -158,6 +169,8 @@ var advancedSearch = (function () {
             var operator = queryObject.operator;
             var value = queryObject.value;
 
+            if(!value || value=="")
+                return null;
             var not = (operator == "notContains") ? "NOT " : "";
             if (operator == "!=") {
                 operator = "<>"
