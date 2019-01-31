@@ -89,8 +89,8 @@
     <script src="js/paint.js"></script>
     <script src="js/traversalController.js"></script>
     <script src="js/algorithms.js"></script>
-    <script src="js/complexQueries.js"></script>
-    <script src="js/ex.js"></script>
+    <script src="js/buildPaths.js"></script>
+
 
 
     <script src="js/paramsController.js"></script>
@@ -155,7 +155,7 @@
     <script src="./js/neoToMongo.js"></script>
 
 
-    <script src="js/advancedSearch.js"></script>
+
     <script src="../common/js/others/tableFlip.js"></script>
 
 
@@ -167,7 +167,7 @@
     <script src="js/versionController.js"></script>
     <script src="js/eventsController.js"></script>
     <script src="js/savedQueries.js"></script>
-    <script src="js/searchMenu.js"></script>
+    <script src="js/searchNodes.js"></script>
 
     <script src="../common/js/cypher.js"></script>
     <!-- <script src="js/d3graphCreation.js"></script>-->
@@ -322,6 +322,11 @@
             min-height: 200px;
 
         }
+        #configVisjs {
+            float:left;
+            width: 400px;
+            height: 600px;
+        }
 
 
     </style>
@@ -377,8 +382,8 @@
                 statistics.initLabelsCurrentQueries,
                 functionalities.initFunctionalities
 
-                //  advancedSearch.patternInitLabels,
-                // advancedSearch.patternInitRelTypes,
+                //  searchNodes.patternInitLabels,
+                // searchNodes.patternInitRelTypes,
                 // advancedDisplay.initDecorationDiv,
 
 
@@ -433,12 +438,14 @@
     <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
 
 
-
+    <input type="image" title="Build path" height="20px"
+           onclick="buildPaths.show()" id="BuilPathButton" src="images/path.png"
+           class=""/>
 
 
 
     <input type="image" title="Export to text" height="20px"
-           onclick=toutlesensController.dispatchAction('showGraphTable')" id="ComplexQueriesMenuButton" src="images/text.png"
+           onclick=toutlesensController.dispatchAction('showGraphTable') id="textMenuButton" src="images/text.png"
            class="graphDisplayed"/>
 
 
@@ -693,6 +700,8 @@
 
 <div id="dialog" title="dialog"></div>
 <div id="dialogLarge"></div>
+
+
 <div id="controlPanelShowHide">
 
     <input type="image" title="Graph menu" height="20px"

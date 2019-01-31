@@ -233,7 +233,7 @@ var myDataTable = function () {
 
         $.ajax({
             type: "POST",
-            url: advancedSearch.neo4jProxyUrl,
+            url: searchNodes.neo4jProxyUrl,
             data: payload,
             dataType: "json",
             success: function (json, textStatus, jqXHR) {

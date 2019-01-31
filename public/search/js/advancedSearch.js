@@ -1,4 +1,4 @@
-var advancedSearch = (function () {
+var searchNodes = (function () {
 
     self = {};
     self.userMappings = {};
@@ -10,8 +10,8 @@ var advancedSearch = (function () {
         self.queryObject={};
         $("#searchInput").val("");
         $("#dialog").css("visibility", "visible");
-        $("#dialog").load("htmlSnippets/advancedSearch.html", function () {
-            $('#advancedSearchDialog_fieldInput').attr('disabled', 'disabled');
+        $("#dialog").load("htmlSnippets/searchNodes.html", function () {
+            $('#searchNodesDialog_fieldInput').attr('disabled', 'disabled');
             var data = [];
 
             for (var key in  self.userMappings) {
@@ -47,7 +47,7 @@ var advancedSearch = (function () {
 
             }).on('select_node.jstree', function (node, selected, event) {
 
-                self.advancedSearchOnFieldSelect(selected.node);
+                self.searchNodesOnFieldSelect(selected.node);
             })
 
 
@@ -59,15 +59,15 @@ var advancedSearch = (function () {
         })
     }
 
-    self.advancedSearchOnFieldSelect = function (node) {
+    self.searchNodesOnFieldSelect = function (node) {
 
         if (node.parent != self.currentField.parent)
             self.clearAllCriteria()
         self.currentField = node;
 
-        $("#advancedSearchDialog_valueInput").val("")
-        $("#advancedSearchDialog_valueInput").focus()
-        $("#advancedSearchDialog_fieldInput").val(node.text)
+        $("#searchNodesDialog_valueInput").val("")
+        $("#searchNodesDialog_valueInput").focus()
+        $("#searchNodesDialog_fieldInput").val(node.text)
         var operators = [];
         if (node.data && node.data.type) {
             var type = node.data.type;
@@ -96,34 +96,34 @@ var advancedSearch = (function () {
                 operators.push("=");
 
                 /*   $(function () {
-                       $("#advancedSearchDialog_valueInput").datepicker();
+                       $("#searchNodesDialog_valueInput").datepicker();
                    });*/
             }
-            document.getElementById("advancedSearchDialog_operatorSelect").options.length = 0;
+            document.getElementById("searchNodesDialog_operatorSelect").options.length = 0;
             for (var i = 0; i < operators.length; i++) {
-                $("#advancedSearchDialog_operatorSelect").append("<option>" + operators[i] + "</option>");
+                $("#searchNodesDialog_operatorSelect").append("<option>" + operators[i] + "</option>");
             }
 
         }
 
     }
     self.addCriterion = function () {
-        $("#advancedSearchDialog_searchDiv").css("visibility", "visible")
+        $("#searchNodesDialog_searchDiv").css("visibility", "visible")
         var criterion = {
             index: self.currentField.parent,
             field: self.currentField.text,
             type: self.currentField.data.type,
-            operator: $("#advancedSearchDialog_operatorSelect").val(),
-            value: $("#advancedSearchDialog_valueInput").val()
+            operator: $("#searchNodesDialog_operatorSelect").val(),
+            value: $("#searchNodesDialog_valueInput").val()
         }
         var criterionStr="";
-        var str=$("#advancedSearchDialog_criteriaDiv").html();
+        var str=$("#searchNodesDialog_criteriaDiv").html();
         if(str!="")
             criterionStr+=" AND "
         else
             criterionStr="Source "+ criterion.index + "<br>"
-         criterionStr += $("#advancedSearchDialog_fieldInput").val() + " " + criterion.operator + " " + criterion.value + "<br>"
-        $("#advancedSearchDialog_criteriaDiv").append(criterionStr);
+         criterionStr += $("#searchNodesDialog_fieldInput").val() + " " + criterion.operator + " " + criterion.value + "<br>"
+        $("#searchNodesDialog_criteriaDiv").append(criterionStr);
         //   if (criterion.type == "date") {
         criterion.value=criterion.value.toLowerCase();
         self.criteria.push(criterion);
@@ -132,8 +132,8 @@ var advancedSearch = (function () {
     }
 
     self.clearAllCriteria = function () {
-        $("#advancedSearchDialog_searchDiv").css("visibility", "hidden")
-        $("#advancedSearchDialog_criteriaDiv").html("");
+        $("#searchNodesDialog_searchDiv").css("visibility", "hidden")
+        $("#searchNodesDialog_criteriaDiv").html("");
         self.criteria = []
     }
     self.executeSearchQuery = function () {
@@ -233,15 +233,15 @@ var advancedSearch = (function () {
             success: function (data, textStatus, jqXHR) {
                 $("#waitImg2").css("visibility", "hidden");
                 $("#dialog").css("visibility", "hidden");
-                 $("#advancedSearchDialog_searchDiv").css("visibility", "hidden");
-                $("#queryTextDiv").html($("#advancedSearchDialog_criteriaDiv").html());
+                 $("#searchNodesDialog_searchDiv").css("visibility", "hidden");
+                $("#queryTextDiv").html($("#searchNodesDialog_criteriaDiv").html());
                 searchUI.processSearchResults(data);
 
             }
             , error: function (xhr, err, msg) {
                 $("#waitImg2").css("visibility", "hidden");
                 //   $("#dialog").css("visibility", "hidden");
-                //   $("#advancedSearchDialog_searchDiv").css("visibility", "hidden");
+                //   $("#searchNodesDialog_searchDiv").css("visibility", "hidden");
 
                 return (err);
             }

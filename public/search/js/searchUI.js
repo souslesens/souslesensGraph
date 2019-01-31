@@ -57,7 +57,7 @@ var searchUI = (function () {
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
-                advancedSearch.userMappings = data;
+                searchNodes.userMappings = data;
                 self.userIndexes = []
                 for (var key in data) {
                     self.userIndexes.push(key);
@@ -166,10 +166,10 @@ var searchUI = (function () {
             }
         };
 
-        if (advancedSearch.queryObject.query) {
-            payload.options.queryObject = advancedSearch.queryObject.query;
-            payload.options.indexName = advancedSearch.queryObject.indexName;
-            payload.options.getAssociatedWords.indexName = advancedSearch.queryObject.indexName;
+        if (searchNodes.queryObject.query) {
+            payload.options.queryObject = searchNodes.queryObject.query;
+            payload.options.indexName = searchNodes.queryObject.indexName;
+            payload.options.getAssociatedWords.indexName = searchNodes.queryObject.indexName;
 
 
         }
@@ -539,7 +539,7 @@ var searchUI = (function () {
 
                     $("#dialog").css("visibility", "visible");
                     $("#dialog").load("htmlSnippets/showDocContent.html", function () {
-                        $('#advancedSearchDialog_fieldInput').attr('disabled', 'disabled');
+                        $('#searchNodesDialog_fieldInput').attr('disabled', 'disabled');
                         $("#dialogContentDiv").html(html);
                         var title = "";
                         if (doc.title)

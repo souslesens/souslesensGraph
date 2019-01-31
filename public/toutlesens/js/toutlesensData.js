@@ -268,7 +268,7 @@ var toutlesensData = (function () {
                             success: function (data, textStatus, jqXHR) {
                                 var message = "<br><span class='importantMessage'>" + data[0].countrels + "  relations found . Only " + Gparams.maxResultSupported + " are currently displayed</span> "
                                 message += "<a href='javascript:toutlesensController.increaseGraphLimit()'>increase Graph display limit</a> (display can be slower)";
-                                message += "<br> <a href='$(\"#propertiesSelectionDialog_NodeLabelInput\").val(\"\");javascript:advancedSearch.showDialog()'>or set a filter on nodes or relations</a>";
+                                message += "<br> <a href='$(\"#propertiesSelectionDialog_NodeLabelInput\").val(\"\");javascript:searchNodes.showDialog()'>or set a filter on nodes or relations</a>";
 
                                 $("#graphCommentDiv").html(message);
                             }

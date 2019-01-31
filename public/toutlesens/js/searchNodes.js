@@ -1,4 +1,4 @@
-var searchMenu = (function () {
+var searchNodes = (function () {
     var self = {};
     self.currentPanelId = null;
     self.currentAction = null;
@@ -8,6 +8,7 @@ var searchMenu = (function () {
     self.dataTable = null;
     self.searchPanels = [];
     self.searchPanels.index = 0;
+        self.similarOptions = {};
 
 
     self.init = function (schema) {
@@ -24,7 +25,7 @@ var searchMenu = (function () {
 
             }
         })
-        // complexQueries.reset();
+        // buildPaths.reset();
         self.activatePanel("searchCriteriaDiv");
         self.currentPanelId = "searchCriteriaDiv";
         self.initLabelDivs();
@@ -91,7 +92,7 @@ var searchMenu = (function () {
 
     $("#searchDialog_valueInput").val();
     $('#searchDialog_valueInput').focus();
-    //if(searchMenu.self.previousAction!="path" || pathSourceSearchCriteria)
+    //if(searchNodes.self.previousAction!="path" || pathSourceSearchCriteria)
     $("#searchDialog_nextPanelButton").css('visibility', 'visible');
     if (searchDialog_propertySelect) ;
     filters.initProperty(null, value, searchDialog_propertySelect);
@@ -104,12 +105,12 @@ self.setPermittedLabelsCbxs = function (label, selectId) {
     var labels = Schema.getPermittedLabels(label, true, true);
     for (var i = 0; i < labels.length; i++) {
         var label2 = labels[i];//.replace(/^-/,"");
-        labelsCxbs += "<tr><td><input type='checkbox' class='advancedSearchDialog_LabelsCbx' name='advancedSearchDialog_LabelsCbx' onclick='searchMenu.initNeighboursTargetWhere($(this))' value='" + label2 + "'></td><td>" + label2 + "</td></tr>"
+        labelsCxbs += "<tr><td><input type='checkbox' class='searchNodesDialog_LabelsCbx' name='searchNodesDialog_LabelsCbx' onclick='searchNodes.initNeighboursTargetWhere($(this))' value='" + label2 + "'></td><td>" + label2 + "</td></tr>"
     }
     labelsCxbs += "</table>";
     $("#" + selectId).html(labelsCxbs).promise().done(function () {
 
-        $(".advancedSearchDialog_LabelsCbx").bind("click", function (cbx) {// uncheck all cbx if a cbx is changed
+        $(".searchNodesDialog_LabelsCbx").bind("click", function (cbx) {// uncheck all cbx if a cbx is changed
             var state = $(this).attr("checked");
             $("#graphNeighboursAllOptionsCbx").prop("checked", false);
 
@@ -125,13 +126,13 @@ self.initLabelDivs = function () {
     var labels = Schema.getAllLabelNames();
     labels.sort();
     var str = "";
-    var parentWidth = $("#advancedSearchNodeLabelsDiv").width() - 10;
-    var parentTop = $("#advancedSearchNodeLabelsDiv").css("top");
+    var parentWidth = $("#searchNodesNodeLabelsDiv").width() - 10;
+    var parentTop = $("#searchNodesNodeLabelsDiv").css("top");
     labels.forEach(function (label) {
         var color = nodeColors[label];
-        str += ' <div class="selectLabelDiv"   id="selectLabelDiv_' + label + '" style=" background-color: ' + color + '" onclick="searchMenu.onChangeSourceLabel(\'' + label + '\',true)">' + label + '</div>'
+        str += ' <div class="selectLabelDiv"   id="selectLabelDiv_' + label + '" style=" background-color: ' + color + '" onclick="searchNodes.onChangeSourceLabel(\'' + label + '\',true)">' + label + '</div>'
     })
-    $("#advancedSearchNodeLabelsDiv").html(str).promise().done(function () {
+    $("#searchNodesNodeLabelsDiv").html(str).promise().done(function () {
 
         $(".selectLabelDiv").click(function (event) {
             event.stopPropagation();
@@ -139,7 +140,7 @@ self.initLabelDivs = function () {
         });
     })
 
-    //  $("#advancedSearchNodeLabelsDiv").css("height",(labels.count*50/2));
+    //  $("#searchNodesNodeLabelsDiv").css("height",(labels.count*50/2));
 
 
 }
@@ -157,9 +158,9 @@ self.clearCurrentLabel = function () {
 self.activatePanel = function (id) {
     if (id == "searchCriteriaDiv") {
         self.resetQueryClauses();
-        complexQueries.clear();
+        buildPaths.clear();
     }
-    if (id == "searchCriteriaDivFromComplexQueries") {
+    if (id == "searchCriteriaDivFrombuildPaths") {
         if(!context.queryObject.label){
             return;
         }
@@ -182,12 +183,12 @@ self.previousPanel = function () {
 
 
     if (self.previousAction == 'complexQueryUI') {
-        complexQueries.draw();
+        buildPaths.draw();
         return;
 
     }
     if (self.previousAction == 'algorithms') {
-        self.activatePanel("advancedSearchActionDiv");
+        self.activatePanel("searchNodesActionDiv");
         return;
 
     }
@@ -213,7 +214,7 @@ self.nextPanel = function () {
 
     $("#searchDialog_newQueryButton").css('visibility', 'visible');
     if (self.previousAction == "path") {
-        advancedSearch.setQueryObjectCypher(context.queryObject, function (err, result) {
+        searchNodes.setQueryObjectCypher(context.queryObject, function (err, result) {
             self.pathQuery.targetQuery = result;
             var relationDistance = Schema.getLabelsDistance(self.pathQuery.sourceQuery.label, self.pathQuery.targetQuery.label);
             if (!relationDistance)
@@ -228,13 +229,13 @@ self.nextPanel = function () {
 
     }
     else if (self.previousAction == "link") {
-        complexQueries.executeQuery();
+        buildPaths.executeQuery();
 
 
     }
     else {
         if (self.searchPanels.currentIndex == 0) {
-            advancedSearch.setNodeQueryUI();
+            searchNodes.setNodeQueryUI();
             $("#searchDialog_criteriaDiv").css('visibility', 'hidden');
         }
 
@@ -255,7 +256,7 @@ self.onPropertyKeyPressed = function (input) {
 }
 
 self.onSearchAction = function (option) {
-    advancedSearch.filterLabelWhere = "";
+    searchNodes.filterLabelWhere = "";
     self.currentAction = option;
     if (option == '')
         return;
@@ -265,7 +266,7 @@ self.onSearchAction = function (option) {
 
     if (option == 'path') {
 
-        advancedSearch.setQueryObjectCypher(context.queryObject, function (err, result) {
+        searchNodes.setQueryObjectCypher(context.queryObject, function (err, result) {
 
             self.pathQuery = {sourceQuery: result};
             self.previousAction = "pathSourceSearchCriteria"
@@ -306,7 +307,7 @@ self.onSearchAction = function (option) {
 
 
     else if (option == 'treeNodes') {
-        advancedSearch.setQueryObjectCypher(context.queryObject, treeController.loadSearchResultIntree);
+        searchNodes.setQueryObjectCypher(context.queryObject, treeController.loadSearchResultIntree);
         $("#findTabs").tabs("option", "active", 1);
 
 
@@ -320,7 +321,7 @@ self.onSearchAction = function (option) {
 
 
     else if (option == 'algorithms') {
-        advancedSearch.setQueryObjectCypher(context.queryObject, function (err, result) {
+        searchNodes.setQueryObjectCypher(context.queryObject, function (err, result) {
             self.previousAction = "algorithms"
             //  algorithms.initDialog(matchObj.label)
             algorithms.initDialog(context.queryObject.label)
@@ -335,16 +336,16 @@ self.onSearchAction = function (option) {
     }
 
     else if (option == 'graphSimilars') {
-        advancedSearch.setQueryObjectCypher(context.queryObject, self.graphNodesAndSimilarNodes);
-        // advancedSearch.graphOnly()
+        searchNodes.setQueryObjectCypher(context.queryObject, self.graphNodesAndSimilarNodes);
+        // searchNodes.graphOnly()
     }
     else if (option == 'tagCloud') {
-        advancedSearch.setNodeQueryUI()
-        searchMenu.searchNodes('matchStr', null, function (err, query) {
+        searchNodes.setNodeQueryUI()
+        searchNodes.searchNodes('matchStr', null, function (err, query) {
             var payload = {match: query};
             $.ajax({
                 type: "POST",
-                url: advancedSearch.neo4jProxyUrl,
+                url: searchNodes.neo4jProxyUrl,
                 data: payload,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
@@ -414,7 +415,7 @@ self.execute = function (action) {
             ;
         } else {// someNeighbours
             var targetLabels = [];
-            $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
+            $('.searchNodesDialog_LabelsCbx:checked').each(function () {
                 targetLabels.push($(this).val())
             })
             options.useEndLabels = targetLabels;
@@ -428,7 +429,7 @@ self.execute = function (action) {
                     value: $("#neighboursWhere_valueInput").val()
                 }
 
-                options.whereFilters = [advancedSearch.buildWhereClauseFromUI(queryobject, "m")];
+                options.whereFilters = [searchNodes.buildWhereClauseFromUI(queryobject, "m")];
             }
 
 
@@ -487,7 +488,7 @@ self.execute = function (action) {
     if (action == 'treeMapSomeNeighboursListLabels') {
         self.currentAction = "treeMapSomeNeighbours";
         var neighboursLabels = [];
-        $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
+        $('.searchNodesDialog_LabelsCbx:checked').each(function () {
             neighboursLabels.push($(this).val());
         });
 
@@ -528,13 +529,13 @@ self.onGraphNeighboursAllOptionsCbx = function (cbx) {
     $("#neighboursWhereDiv").hide()
 
 
-    $('.advancedSearchDialog_LabelsCbx').each(function () {
+    $('.searchNodesDialog_LabelsCbx').each(function () {
         $(this).prop("checked", state);
 
     })
     if (state) {
         state = "checked";
-        searchMenu.execute()
+        searchNodes.execute()
     }
 }
 
@@ -554,6 +555,262 @@ self.initNeighboursTargetWhere = function (cbx) {
 
 }
 
+        /**
+         *
+         *
+         * @param callback
+         */
+
+
+        // transform request in nodes ids stored in context.queryObject.where
+        self.setNodeQueryUI = function (booleanOperator) {
+            if (booleanOperator && booleanOperator == "")
+                return;
+            var value = $("#searchDialog_valueInput").val();
+            if (!booleanOperator && value == "")
+                return;
+
+            $("#searchDialog_nextPanelButton").css('visibility', 'visible');
+            $("#clearAllCreteriaButton").css("visibility", "visible");
+            $("#searchDialog_SaveQueryButton").css("visibility", "visible")
+            $("#searchDialog_Criteriatext").css("visibility", "visible");
+            $("#searchDialog_newQueryButton").css('visibility', 'visible');
+
+
+            var property = "";
+            var operator = "";
+            if (value != "") {
+                property = $("#searchDialog_propertySelect").val();
+                operator = $("#searchDialog_operatorSelect").val()
+            }
+
+            var booleanOperatorStr=booleanOperator || "";
+
+            var text = (context.queryObject.label ? context.queryObject.label : "") + " " + property + " " + operator + " " + value;
+
+
+            //  if ((booleanOperator != "and" && booleanOperator != "or")  ) {
+            if(!context.queryObject.nodeIds){
+                context.queryObject = {
+                    label: context.queryObject.label,
+                    property: property,
+                    operator: operator,
+                    value: value,
+                    text: text,
+                    globalText:text
+                }
+
+            } else {
+                if (!context.queryObject.subQueries)
+                    context.queryObject.subQueries = [];
+                context.queryObject.subQueries.push({
+                    label: context.queryObject.label,
+                    property: property,
+                    operator: operator,
+                    value: value,
+                    text: text,
+                    booleanOperator: booleanOperator,
+
+                });
+                var booleanOperatorStr=booleanOperator || "";
+                context.queryObject.globalText+= " <b>"+booleanOperatorStr+"</b> "+ text
+
+            }
+            /*  if (booleanOperator && booleanOperator == "+") {
+                  return;
+              }*/
+
+
+            searchNodes.setQueryObjectCypher(context.queryObject, function (err, queryObject) {
+
+                if (err)
+                    return;
+
+                $("#searchDialog_valueInput").val("");
+                Cypher.executeCypher(queryObject.cypher, function (err, result) {
+
+                    if (booleanOperator && booleanOperator == "and") {
+                        var newIds = [];
+                        result.forEach(function (line) {
+                            newIds.push(line.n._id);
+                        })
+
+                        function intersectArray(a, b) {
+                            return a.filter(Set.prototype.has, new Set(b));
+                        }
+
+                        context.queryObject.nodeIds = intersectArray(context.queryObject.nodeIds, newIds)
+                    } else {
+                        if (!context.queryObject.nodeIds)
+                            context.queryObject.nodeIds = [];
+                        result.forEach(function (line) {
+                            context.queryObject.nodeIds.push(line.n._id);
+                        });
+                    }
+                    var foundIds = result.length;
+
+
+                    text += ": <b> " + foundIds + "nodes </b>"
+                    $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' >" + text + "</div>")
+
+
+
+                });
+
+
+            })
+        }
+
+        self.setQueryObjectCypher = function (queryObject, callback) {
+            if (!queryObject)
+                queryObject = {}
+
+            if (!self.similarOptions)
+                self.similarOptions = {}
+            self.similarOptions.id = null;
+
+
+            //if  no value consider that there is no property set
+            if (queryObject.value == "")
+                queryObject.property = "";
+
+            queryObject.subGraph = subGraph;
+            queryObject.limit = Gparams.jsTreeMaxChildNodes;
+            queryObject.from = 0;
+
+
+            var subGraphWhere = "";
+            var returnStr = " RETURN n";
+            var cursorStr = "";
+
+            cursorStr += " ORDER BY n." + Gparams.defaultNodeNameProperty;
+            if (queryObject.from)
+                cursorStr += " SKIP " + queryObject.from;
+            if (queryObject.limit)
+                cursorStr += " LIMIT " + queryObject.limit;
+            var labelStr = "";
+            if (queryObject.label && queryObject.label.length > 0)
+                labelStr = ":" + queryObject.label;
+
+
+            var whereStr = self.buildWhereClauseFromUI(queryObject, "n");
+            if(whereStr && whereStr!="")
+                whereStr= " WHERE "+whereStr
+
+
+
+            if (context.queryObject.subQueries) {
+                context.queryObject.subQueries.forEach(function (suqQuery) {
+                    whereStr += " " + suqQuery.booleanOperator + " " + self.buildWhereClauseFromUI(suqQuery, "n");
+                })
+
+
+            }
+            var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN n" + cursorStr;
+            queryObject.cypher = cypher;
+            return callback(null, queryObject);
+
+        }
+
+
+        self.buildWhereClauseFromUI = function (queryObject, nodeAlias) {
+            var property = queryObject.property;
+            var operator = queryObject.operator;
+            var value = queryObject.value;
+
+            if(!value || value=="")
+                return null;
+            var not = (operator == "notContains") ? "NOT " : "";
+            if (operator == "!=") {
+                operator = "<>"
+            }
+
+            else if (operator == "~" || operator == "contains" || operator == "notContains") {
+                operator = "=~"
+                // value = "'.*" + value.trim() + ".*'";
+                value = "'(?i).*" + value.trim() + ".*'";
+            }
+            else {
+                //if ((/[\s\S]+/).test(value))
+                if (!(/^-?\d+\.?\d*$/).test(value))//not number
+                    value = "\"" + value + "\"";
+            }
+            var propStr = "";
+            if (property == "any")
+                propStr = "(any(prop in keys(n) where n[prop]" + operator + value + "))";
+
+            else {
+                propStr = not + nodeAlias + "." + property + operator + value.trim();
+            }
+            return propStr;
+
+        }
+
+
+        self.searchInElasticSearch = function (word, label, callback) {
+
+            word += "*";
+            var payload = {
+                elasticQuery2NeoNodes: 1,
+                queryString: word,
+                index: subGraph.toLowerCase(),
+                resultSize: Gparams.ElasticResultMaxSize
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "../../../neo2Elastic",
+                data: payload,
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {
+                    if (data.length >= Gparams.ElasticResultMaxSize) {
+                        $("#searchResultMessage").html("cannot show all data : max :" + Gparams.ElasticResultMaxSize);
+                    }
+                    else {
+                        $("#searchResultMessage").html(data.length + " nodes found");
+                    }
+                    return treeController.loadTreeFromNeoResult("treeContainer", data, function (jsTree) {
+                        var xx = jsTree;
+                        setTimeout(function () {
+
+
+                            $('.jstree-leaf').each(function () {
+                                var id = $(this).attr('id');
+                                var text = $(this).children('a').text();
+                                for (var i = 0; i < data.length; i++) {
+                                    var properties = data[i].n.properties;
+                                    //   console.log(id+"-"+text);
+                                    if (properties[Gparams.defaultNodeNameProperty] == text) {
+                                        for (var key in properties) {
+                                            if (properties[Gparams.defaultNodeNameProperty].toLowerCase().indexOf(word0) > -1)
+                                                continue;
+                                            if (properties[key] && typeof properties[key] != "object" && properties[key].indexOf && properties[key].toLowerCase().indexOf(word0) > -1) {
+                                                var xx = key;
+                                                var yy = properties[key]
+                                                //  console.log(xx+"-"+yy);
+                                                //$("#"+treeController.jsTreeDivId).jstree().create_node(id ,  { "id" : (id+"_"+key), "text" : ("<span class='jstreeWordProp'">+xx+":"+yy+"</span>")}, "last", function(){
+                                                $("#" + treeController.jsTreeDivId).jstree().create_node(id, {
+                                                    "id": (id + "_" + key),
+                                                    "text": (xx + ":" + yy),
+                                                    "type": "prop"
+                                                }, "last", function () {
+
+
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+
+                            });
+                            $("#" + treeController.jsTreeDivId).jstree("open_all");
+                        }, 1000)
+                    });
+                }, error: function (err) {
+                    return callback(err)
+                }
+            });
+        }
 
 return self;
 }

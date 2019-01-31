@@ -14,14 +14,14 @@ scope<select id="pivotsDialogScopeSelect">
     <option>All</option>
     <option>currentGraph</option>
 </select>
-<button onclick='advancedSearch.searchLabelsPivots($("#pivotsDialogSourceLabelsSelect").val(),$("#pivotsDialogPivotLabelsSelect").val(),null,parseInt($("#pivotsDialogPivotNodesNumber").val()),pivotsDialogMessageDiv)'>
+<button onclick='searchNodes.searchLabelsPivots($("#pivotsDialogSourceLabelsSelect").val(),$("#pivotsDialogPivotLabelsSelect").val(),null,parseInt($("#pivotsDialogPivotNodesNumber").val()),pivotsDialogMessageDiv)'>
     search
 </button>
 
 <br>
 filter source node
 <select id="pivotsDialogSourceNodeSelect"
-        onchange='advancedSearch.searchLabelsPivots($("#pivotsDialogSourceLabelsSelect").val(),$("#pivotsDialogPivotLabelsSelect").val(),$(this).val(),parseInt($("#pivotsDialogPivotNodesNumber").val()),pivotsDialogMessageDiv)'></select>
+        onchange='searchNodes.searchLabelsPivots($("#pivotsDialogSourceLabelsSelect").val(),$("#pivotsDialogPivotLabelsSelect").val(),$(this).val(),parseInt($("#pivotsDialogPivotNodesNumber").val()),pivotsDialogMessageDiv)'></select>
 
 
 <div id="pivotsDialogMessageDiv"></div>

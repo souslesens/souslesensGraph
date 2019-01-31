@@ -1,6 +1,6 @@
 <style>
 
-    #advancedSearchDialog_criteriaDiv {
+    #searchNodesDialog_criteriaDiv {
         font-size: 14px;
         font-weight: normal;
 
@@ -50,32 +50,32 @@
         </td>
 
         <td valign="top">
-            <input id="advancedSearchDialog_fieldInput">
-            <select id="advancedSearchDialog_operatorSelect">
+            <input id="searchNodesDialog_fieldInput">
+            <select id="searchNodesDialog_operatorSelect">
 
 
             </select>
 
-            <input id="advancedSearchDialog_valueInput" onkeydown="if (event.keyCode == 13)
-                        document.getElementById('advancedSearchDialog_addCriterionButton').click()";>
+            <input id="searchNodesDialog_valueInput" onkeydown="if (event.keyCode == 13)
+                        document.getElementById('searchNodesDialog_addCriterionButton').click()";>
 
-            <button id="advancedSearchDialog_addCriterionButton" onclick="advancedSearch.addCriterion()">Add</button>
+            <button id="searchNodesDialog_addCriterionButton" onclick="searchNodes.addCriterion()">Add</button>
 
 
 
             <br>
             <br>
             <br>
-            <div id="advancedSearchDialog_criteriaDiv"></div>
+            <div id="searchNodesDialog_criteriaDiv"></div>
             <br>
             <br>
 
-            <div id="advancedSearchDialog_searchDiv" style="visibility: hidden;">
+            <div id="searchNodesDialog_searchDiv" style="visibility: hidden;">
 
 
-                <button id="advancedSearchDialog_searchButton" onclick="advancedSearch.executeSearchQuery()">Search</button>
+                <button id="searchNodesDialog_searchButton" onclick="searchNodes.executeSearchQuery()">Search</button>
                 &nbsp;  <img id="waitImg2" src="icons/waitAnimated.gif" width="20px" style="visibility: hidden;">
-                <button id="advancedSearchDialog_clearAllCriteriaButton" onclick="advancedSearch.clearAllCriteria()">Clear
+                <button id="searchNodesDialog_clearAllCriteriaButton" onclick="searchNodes.clearAllCriteria()">Clear
                 </button>
             </div>
         </td>

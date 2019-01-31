@@ -253,7 +253,7 @@ var algorithms = (function () {
                 clauseText: "[" + label + "] " + key
             }
 
-            searchMenu.activatePanel("searchActionDiv");
+            searchNodes.activatePanel("searchActionDiv");
             $("#graphPopup").css("visibility", "hidden");
             toutlesensController.openFindAccordionPanel(true)
             findTabs.tabs("option", "active", 0);

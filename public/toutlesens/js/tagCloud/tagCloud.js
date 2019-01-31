@@ -43,7 +43,7 @@ var tagCloud = (function () {
         context.queryObject.where=clauses[0].where;
 
 
-        searchMenu.activatePanel("searchActionDiv");
+        searchNodes.activatePanel("searchActionDiv");
         toutlesensController.openFindAccordionPanel(true);
         $("#findDiv").tabs("active", 2);
 

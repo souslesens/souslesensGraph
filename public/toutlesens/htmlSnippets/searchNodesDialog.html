@@ -9,7 +9,7 @@
         width: 350px;
     }
 
-    .complexQueries {
+    .buildPaths {
         display:flex;
         flex-wrap: wrap;
         justify-content: left;
@@ -17,7 +17,7 @@
         margin-top: 200px;
 
     }
-    .complexQueries-nodeDiv {
+    .buildPaths-nodeDiv {
         display:flex;
         flex-wrap: wrap;
         flex-direction: column;
@@ -31,16 +31,16 @@
         margin: 5px;
 
     }
-    .complexQueries-nodeDivSelected{
+    .buildPaths-nodeDivSelected{
         border-width: 5px;
         border-color: #0000cc;
     }
 
-    .complexQueries-nodeInResultDiv {
+    .buildPaths-nodeInResultDiv {
 
         background-color: #f8893f;
     }
-    .complexQueries-partDiv {
+    .buildPaths-partDiv {
         width: 150px;
         background-color: #a9b7d1;
         border-style: solid;
@@ -85,7 +85,7 @@
 
     }
 
-    #advancedSearchNodeLabelsDiv {
+    #searchNodesNodeLabelsDiv {
         display: block;
         overflow: auto;
 
@@ -156,7 +156,7 @@
          class="searchPanel rightPanel">
 
         <h4>Nodes with label</h4>
-        <div id="advancedSearchNodeLabelsDiv" onclick="searchMenu.clearCurrentLabel()"></div>
+        <div id="searchNodesNodeLabelsDiv" onclick="searchNodes.clearCurrentLabel()"></div>
 
         <div id="searchDialog_criteriaDiv" style="align-self: center;visibility: hidden" class="rightPanel">
             <table>
@@ -181,15 +181,15 @@
                        <!-- <div  style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">-->
                             <div  style="padding :3px" class="rightPanel">
                                 <input type="image" title="Build path" height="20px"
-                                       onclick="complexQueries.show(true)" id="toTextMenuButton" src="images/path.png"
+                                       onclick="buildPaths.show(true)" id="toTextMenuButton" src="images/path.png"
                                        class=""/>
-                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="advancedSearch.setNodeQueryUI('+');">
+                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="searchNodes.setNodeQueryUI('+');">
                                  +...
                             </button>
-                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="advancedSearch.setNodeQueryUI('and');">
+                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="searchNodes.setNodeQueryUI('and');">
                                 AND
                             </button>
-                            <button  style="font-size: 10px;background-color:#7f9f7f" onclick="advancedSearch.setNodeQueryUI('or');">
+                            <button  style="font-size: 10px;background-color:#7f9f7f" onclick="searchNodes.setNodeQueryUI('or');">
                                 OR
                             </button>
 
@@ -215,40 +215,40 @@
     <div id="searchActionDiv" style="display: table-row;" class="searchPanel rightPanel">
         <b>Ouput type</b>
         <br>
-        <div id="advancedSearchActionDiv" style="display: inline-grid">
+        <div id="searchNodesActionDiv" style="display: inline-grid">
             <div style="display:inline-list-item" class="actionSelectDiv"
-                 onclick="searchMenu.onSearchAction('graphSomeNeighboursListLabels')"><img
+                 onclick="searchNodes.onSearchAction('graphSomeNeighboursListLabels')"><img
                     align="center" src="images/graphSmall.png"> Graph neighbours
             </div>
 
 
 
             <div style="display:inline-list-item" class="actionSelectDiv "
-                 onclick="searchMenu.onSearchAction('treeNodes')"><img align="center"
+                 onclick="searchNodes.onSearchAction('treeNodes')"><img align="center"
                                                                        src="images/graphSmall.png">
                 Tree
             </div>
             <div style="display:inline-list-item" class="actionSelectDiv "
-                 onclick="searchMenu.onSearchAction('tableNodes')"><img align="center"
+                 onclick="searchNodes.onSearchAction('tableNodes')"><img align="center"
                                                                         src="images/tableSmall.png">
                 Table
             </div>
             <div style="display:inline-list-item" class="actionSelectDiv actionSelectDivHidden"
-                 onclick="searchMenu.onSearchAction('tagCloud')"><img
+                 onclick="searchNodes.onSearchAction('tagCloud')"><img
                     align="center"
                     src="images/graphSmall.png"> Tag cloud
             </div>
             <div style="display:inline-list-item" class="actionSelectDiv "
-                 onclick="searchMenu.onSearchAction('treeMapSomeNeighboursListLabels')"><img
+                 onclick="searchNodes.onSearchAction('treeMapSomeNeighboursListLabels')"><img
                     align="center"
                     src="images/treemapSmall.png"> Tree map
             </div>
             <div style="display:inline-list-item" class="actionSelectDiv "
-                 onclick="searchMenu.onSearchAction('algorithms')"><img align="center"
+                 onclick="searchNodes.onSearchAction('algorithms')"><img align="center"
                                                                         src="images/treemapSmall.png">
                 Algorithms
             </div>
-            <div style="display:inline-list-item  " class="actionSelectDiv actionSelectDivHidden" onclick="searchMenu.onSearchAction('path')">
+            <div style="display:inline-list-item  " class="actionSelectDiv actionSelectDivHidden" onclick="searchNodes.onSearchAction('path')">
                 <img align="center"
                      src="images/graphSmall.png"> Pathes beetwen nodes
             </div>
@@ -256,7 +256,7 @@
 
 
             <div style="display:inline-list-item" class="actionSelectDiv actionSelectDivHidden"
-                 onclick="searchMenu.onSearchAction('graphSimilars')"><img
+                 onclick="searchNodes.onSearchAction('graphSimilars')"><img
                     align="center"
                     src="images/graphSmall.png"> Graph similars
             </div>
@@ -270,7 +270,7 @@
     <div id="searchNeighboursLabelsDiv" class="searchPanel rightPanel" style="flex-wrap:wrap;justify-content: center">
         <b>Neighbour Type</b>
         <input type="checkbox" id="graphNeighboursAllOptionsCbx"
-               onchange="searchMenu.onGraphNeighboursAllOptionsCbx(this)"> All
+               onchange="searchNodes.onGraphNeighboursAllOptionsCbx(this)"> All
         <div id='neighboursTypesDiv'
              style="max-height: 180px;width:320px;overflow: auto"></div>
 
@@ -359,7 +359,7 @@
             </tr>
             <!-- <tr>
                  <td>
-                     <button onclick="searchMenu.addLabelToPath()">add label to path</button>
+                     <button onclick="searchNodes.addLabelToPath()">add label to path</button>
 
                  </td>
              </tr>-->
@@ -400,21 +400,21 @@
          style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
 
         <button class="searchDialog_NavButton_visible" style="visibility:visible; float:left" id="searchDialog_newQueryButton"
-                onclick="searchMenu.activatePanel('searchCriteriaDiv');">
+                onclick="searchNodes.activatePanel('searchCriteriaDiv');">
             new
         </button>
 
 
         <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_previousPanelButton"
-                onclick="searchMenu.previousPanel();">previous
+                onclick="searchNodes.previousPanel();">previous
         </button>
 
-        <button class="searchDialog_NavButton" onclick="searchMenu.nextPanel();"
+        <button class="searchDialog_NavButton" onclick="searchNodes.nextPanel();"
                 id="searchDialog_nextPanelButton">next
         </button>
 
         <button class="searchDialog_NavButton" style="visibility:hidden" id="searchDialog_ExecuteButton"
-                onclick="searchMenu.execute()">OK
+                onclick="searchNodes.execute()">OK
         </button>
 
 
@@ -435,7 +435,7 @@
    <div style="height: 450px;overflow: auto">
        Match statement
        <br><textarea id="searchMenu_cypherInput" cols="40" rows="10"></textarea><br>
-       <button onclick="searchMenu.execCypherMatchStatement()">next</button>
+       <button onclick="searchNodes.execCypherMatchStatement()">next</button>
    </div>-->
 
 

@@ -143,13 +143,13 @@ var paint = (function () {
             context.addToGraphContext({highlight:{property:_property}})
             function getData() {
                 var data = []
-                if(!searchMenu.currentAction)
-                    searchMenu.currentAction="graph"
-                if(!searchMenu.previousAction)
-                    searchMenu.previousAction="graph"
+                if(!searchNodes.currentAction)
+                    searchNodes.currentAction="graph"
+                if(!searchNodes.previousAction)
+                    searchNodes.previousAction="graph"
 
-               // if (searchMenu.currentAction.indexOf("graph") > -1)  {
-                    if (searchMenu.currentAction.indexOf("treeMap") <0) {
+               // if (searchNodes.currentAction.indexOf("graph") > -1)  {
+                    if (searchNodes.currentAction.indexOf("treeMap") <0) {
                     $("#paint_unClusterButton").css("visibility", "visible");
                     $("#paint_clusterButton").css("visibility", "visible");
                     self.unClusterByClass();
@@ -166,7 +166,7 @@ var paint = (function () {
 
                 }
 
-                else if (searchMenu.currentAction.indexOf("treeMap") > -1) {
+                else if (searchNodes.currentAction.indexOf("treeMap") > -1) {
                   //  var xx = d3.selectAll(".child").select("rect")
                     d3.selectAll(".leafGroup").each(function (d) {
                         if (d.neoAttrs[self.currentBIproperty]) {
@@ -298,7 +298,7 @@ var paint = (function () {
 
             }
 
-            if (searchMenu.previousAction.indexOf("graph") >-1) {
+            if (searchNodes.previousAction.indexOf("graph") >-1) {
                 var neutralColor = "#eee";
                 var neutralSize = 3;
                 var neutralShape = "square";
@@ -321,7 +321,7 @@ var paint = (function () {
                 $("#paint_clusterButton").css("visibility", "visible")
 
             }
-            else if (searchMenu.previousAction.indexOf("treeMap") > -1) {
+            else if (searchNodes.previousAction.indexOf("treeMap") > -1) {
                d3.selectAll(".leafGroup1").each(function (d) {
                       if (d.neoAttrs[self.currentBIproperty]) {
                           var index = targetIds.indexOf("R_"+ d.neoAttrs.id);

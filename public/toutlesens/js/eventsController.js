@@ -174,7 +174,7 @@ var eventsController = (function () {
                         }
 
                         if (index == 3) {
-                            advancedSearch.searchSimilars(context.currentNode);
+                            searchNodes.searchSimilars(context.currentNode);
                         }
 
 
@@ -195,7 +195,7 @@ var eventsController = (function () {
                         var index = ui.newTab.index();
                         if (index == 0) {
                             toutlesensController.currentActionObj = {type: "findNode"}
-                            advancedSearch.context = {pathType: "neighbour"};
+                            searchNodes.context = {pathType: "neighbour"};
                             var nodeDivDetach = $("#nodeDivDetachable").detach();
 
                             $("#nodeDiv").append(nodeDivDetach);

@@ -39,7 +39,7 @@ var propertyRange=null;
 var intPattern=/-?[0-9]+/;
 var rangePattern=/-?[0-9]+~-?[0-9]+/;
 var decorationObjs=null;
-//*************advancedSearch.js
+//*************searchNodes.js
 var currentCypherQueryTextArea="";
 var currentNodeRole=null;
 var matchIndex=0;
@@ -224,7 +224,7 @@ var selectedObject=null;
 var subGraph=null;
 var d3tree=null;
 var isAdvancedDisplayDialogInitialized=false;
-var isAdvancedSearchDialogInitialized=false;
+var issearchNodesDialogInitialized=false;
 var isGanttDialogInitialized=false;
 var popupMenuNodeInfoCache=null;
 var currentDataStructure=null;

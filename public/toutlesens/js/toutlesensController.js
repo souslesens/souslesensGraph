@@ -376,7 +376,7 @@ var toutlesensController = (function () {
 
 //********************************************************
             if (Gparams.queryInElasticSearch) {
-                advancedSearch.searchInElasticSearch(word, label, callback);
+                searchNodes.searchInElasticSearch(word, label, callback);
             }
             else {
                 var options = {
@@ -1003,8 +1003,8 @@ var toutlesensController = (function () {
                             $(".selectLabelDiv ").each(function () {
                                 var label = context.currentNode.name
                                 if ($(this).html() == label)
-                                    searchMenu.onChangeSourceLabel(label,true);
-                                searchMenu.activatePanel("searchCriteriaDiv")
+                                    searchNodes.onChangeSourceLabel(label,true);
+                                searchNodes.activatePanel("searchCriteriaDiv")
                             })
 
                             toutlesensController.dispatchAction("nodeInfos", nodeId);
@@ -1201,17 +1201,17 @@ var toutlesensController = (function () {
 
             });
 
-            $("#queryDiv").load("htmlSnippets/advancedSearchDialog.html", function () {
+            $("#queryDiv").load("htmlSnippets/searchNodesDialog.html", function () {
 
-                searchMenu.init(Schema);
+                searchNodes.init(Schema);
             });
             $("#filterDiv").load("htmlSnippets/filterDialog.html", function () {
 
-                //  searchMenu.init(Schema);
+                //  searchNodes.init(Schema);
             });
             $("#expandDiv").load("htmlSnippets/expandGraphDialog.html", function () {
 
-                //  searchMenu.init(Schema);
+                //  searchNodes.init(Schema);
             });
 
 
@@ -1335,6 +1335,8 @@ var toutlesensController = (function () {
             $("#graphInfosDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("top", 50).css("background-color", "#eee");
             $("#BIlegendDiv").css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 80).css("top", 80).css("background-color", "#eee");
             $("#graphInfosDiv").css("visibility", "hidden")
+
+
 
 
             $("#treeContainer").width(rightPanelWidth - 15);

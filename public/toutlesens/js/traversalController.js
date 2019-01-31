@@ -44,8 +44,8 @@ var traversalController = (function () {
             if (traversalController.context.start.id && traversalController.context.end.id) {
 
                 if (toutlesensController.currentActionObj.type == 'allTransitivePaths') {
-                    var str = " <button id=\"advancedSearchDialog_searchButton\" onclick=\"traversalController.setEndLabelQuery({clusterIntermediateNodes:1})\">Graph only start and end</button><br>";
-                    str += " <button id=\"advancedSearchDialog_searchButton\" onclick=\"traversalController.setEndLabelQuery({})\">Graph all nodes</button>";
+                    var str = " <button id=\"searchNodesDialog_searchButton\" onclick=\"traversalController.setEndLabelQuery({clusterIntermediateNodes:1})\">Graph only start and end</button><br>";
+                    str += " <button id=\"searchNodesDialog_searchButton\" onclick=\"traversalController.setEndLabelQuery({})\">Graph all nodes</button>";
 
                     $("#pathes_buttonsDiv").html(str);
 
@@ -70,7 +70,7 @@ var traversalController = (function () {
 
         self.setStartLabelQuery = function () {
 
-            advancedSearch.setQueryObjectCypher({}, function (err, queryObject) {
+            searchNodes.setQueryObjectCypher({}, function (err, queryObject) {
                 if (err)
                     return console.log(err)
                 traversalController.context.start.queryObject = queryObject;
@@ -85,8 +85,8 @@ var traversalController = (function () {
 
         self.setEndLabelQuery = function () {
             var str = "";
-            str += " <button id=\"advancedSearchDialog_searchButton\" onclick=\"traversalController.execTransitivePathQuery({clusterIntermediateNodes:1})\">Graph only start and end</button>";
-            str += " <button id=\"advancedSearchDialog_searchButton\" onclick=\"traversalController.execTransitivePathQuery({})\">Graph all nodes</button>";
+            str += " <button id=\"searchNodesDialog_searchButton\" onclick=\"traversalController.execTransitivePathQuery({clusterIntermediateNodes:1})\">Graph only start and end</button>";
+            str += " <button id=\"searchNodesDialog_searchButton\" onclick=\"traversalController.execTransitivePathQuery({})\">Graph all nodes</button>";
             $("#pathes_buttonsDiv").html(str);
             $("#traversalFindDiv").css("visibility", "hidden");
             $("#dialog").dialog("close");
@@ -102,7 +102,7 @@ var traversalController = (function () {
             else
                 self.context.clusterIntermediateNodes = false;
 
-            advancedSearch.setQueryObjectCypher({}, function (err, queryObject) {
+            searchNodes.setQueryObjectCypher({}, function (err, queryObject) {
                 if (err)
                     return console.log(err)
                 traversalController.context.end.queryObject = queryObject;
@@ -118,7 +118,7 @@ var traversalController = (function () {
         self.showSearchMenu = function (target) {
             $("#traversalFindDiv").css("visibility", "visible");
             var pathType = $("#pathType").val();
-            advancedSearch.context = {pathType: pathType, target: target};
+            searchNodes.context = {pathType: pathType, target: target};
             toutlesensController.currentActionObj = {type: pathType, stage: target}
             if(pathType=="shortestPath") {
 
@@ -128,7 +128,7 @@ var traversalController = (function () {
                 $("#word").focus();
             }
             else    if(pathType=="allTransitivePaths") {
-                advancedSearch.showDialog({multipleClauses:true});
+                searchNodes.showDialog({multipleClauses:true});
             }
 
         }

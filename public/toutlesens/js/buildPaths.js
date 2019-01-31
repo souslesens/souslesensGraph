@@ -1,26 +1,35 @@
-var complexQueries = (function () {
+var buildPaths = (function () {
     var self = {};
     self.currentDataset;
     var currentDivIndex = -1;
-    var globalHtml = "<div class='complexQueries'>";
+    var globalHtml = "<div class='buildPaths'>";
     self.queryObjs = [];
+    self.isEditing=false;
 
 
     self.show = function (addQueryObject) {
-
-        searchMenu.previousAction = "complexQueryUI";
+        self.isEditing=true;
+        searchNodes.previousAction = "complexQueryUI";
         $("#searchDialog_newQueryButton").css('visibility', 'visible');
         $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
-        searchMenu.setUIPermittedLabels(context.queryObject.label);
+
+        searchNodes.activatePanel("searchCriteriaDiv")
+        searchNodes.setUIPermittedLabels(context.queryObject.label);
 
         if (currentDivIndex > -1 && context.queryObject.label == self.queryObjs[currentDivIndex].label) {// updateNodeQuery
             self.updateNodeQuery(currentDivIndex,context.queryObject);
         }
         else if (addQueryObject) {
-            advancedSearch.setNodeQueryUI();
+            searchNodes.setNodeQueryUI();
             self.addNodeQuery(context.queryObject);
         }
-        return;
+
+        $("#dialogLarge").html(globalHtml);
+        $("#dialogLarge").dialog("option", "modal", false );
+        $("#dialogLarge").dialog( "option", "position", { of: $('#graphDiv') } );
+
+        $("#dialogLarge").dialog("open");
+
     }
 
     self.addNodeQuery = function (queryObject) {
@@ -42,18 +51,18 @@ var complexQueries = (function () {
     }
 
     self.draw = function () {
-        globalHtml = "<div class='complexQueries'>";
+        globalHtml = "<div class='buildPaths' id='buildPaths' style='visibility:visible'>";
         self.queryObjs.forEach(function (queryObject, index) {
             globalHtml += self.getNodeDivHtml(queryObject, index);
         })
         globalHtml += "</div>" +
-            "<button onclick='complexQueries.executeQuery()'>execute query </button>" +
-            "<button onclick='complexQueries.clear()'>clear all </button>" +
-            "<br><div id='complexQueries_cypherDiv'></div>" +
-            "<br><div id='complexQueries_resultDiv'></div>" +
-            "<br><div id='complexQueries_resultActionDiv'></div>"
+            "<button onclick='buildPaths.executeQuery()'>execute query </button>" +
+            "<button onclick='buildPaths.clear()'>clear all </button>" +
+            "<br><div id='buildPaths_cypherDiv'></div>" +
+            "<br><div id='buildPaths_resultDiv'></div>" +
+            "<br><div id='buildPaths_resultActionDiv'></div>"
         $("#graphPopup").css("visibility", "hidden")
-        $("#graphDiv").html(globalHtml)
+        $("#buildPaths").html(globalHtml)
 
     }
 
@@ -64,15 +73,15 @@ var complexQueries = (function () {
         var color = nodeColors[queryObject.label];
         var classInResult = "";
         if (queryObject.inResult)
-            classInResult = " complexQueries-nodeInResultDiv";
+            classInResult = " buildPaths-nodeInResultDiv";
 
 
-        var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' complexQueries-nodeDiv " + classInResult + "'  onclick='complexQueries.onSelectNodeDiv(" + index + ")'>" +
-            " <div class='complexQueries-partDiv' style='background-color: " + color + "'><b>Label : " + queryObject.label + "</b></div>" +
-            "<div id='complexQuery_nodeConditionDiv_"  + index + "' class='complexQueries-partDiv'> Condition : " + queryText + "</div>" +
-            " <div class='complexQueries-partDiv'><button  id='complexQueries_inResultButton'  onclick='complexQueries.nodeInResult(" + index + ")'>not in result</button> </div>" +
-            // "<button onclick='complexQueries.removeQueryObj(" + index + ")'>X</button>" +
-            "<input type='image' height='10px'  title='remove node' onclick='complexQueries.removeQueryObj(" + index + ")' src='images/trash.png'/>" +
+        var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' buildPaths-nodeDiv " + classInResult + "'  onclick='buildPaths.onSelectNodeDiv(" + index + ")'>" +
+            " <div class='buildPaths-partDiv' style='background-color: " + color + "'><b>Label : " + queryObject.label + "</b></div>" +
+            "<div id='complexQuery_nodeConditionDiv_"  + index + "' class='buildPaths-partDiv'> Condition : " + queryText + "</div>" +
+            " <div class='buildPaths-partDiv'><button  id='buildPaths_inResultButton'  onclick='buildPaths.nodeInResult(" + index + ")'>not in result</button> </div>" +
+            // "<button onclick='buildPaths.removeQueryObj(" + index + ")'>X</button>" +
+            "<input type='image' height='10px'  title='remove node' onclick='buildPaths.removeQueryObj(" + index + ")' src='images/trash.png'/>" +
             "</div>"
 
 
@@ -84,25 +93,25 @@ var complexQueries = (function () {
 
     self.onSelectNodeDiv = function (index) {
         currentDivIndex = index;
-        $(".complexQueries-nodeDiv ").removeClass("complexQueries-nodeDivSelected")
-        $("#complexQuery_nodeDiv_" + index).addClass("complexQueries-nodeDivSelected")
+        $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
+        $("#complexQuery_nodeDiv_" + index).addClass("buildPaths-nodeDivSelected")
         $(".selectLabelDiv").css("visibility", "visible");
 
         context.queryObject = self.queryObjs[index];
-        searchMenu.previousAction = "complexQueryNodeSelected";
+        searchNodes.previousAction = "complexQueryNodeSelected";
 
-        searchMenu.activatePanel("searchCriteriaDivFromComplexQueries");
+        searchNodes.activatePanel("searchCriteriaDivFrombuildPaths");
 
 
     }
     self.removeQueryObj = function (index) {
         if (index == 0) {
-            searchMenu.setUIPermittedLabels();
-            searchMenu.resetQueryClauses();
-            $("#graphDiv").html("");
+            searchNodes.setUIPermittedLabels();
+            searchNodes.resetQueryClauses();
+            $("#buildPaths").html("");
         }
         else
-            searchMenu.setUIPermittedLabels(self.queryObjs[index - 1].label);
+            searchNodes.setUIPermittedLabels(self.queryObjs[index - 1].label);
         self.queryObjs.splice(index, 1)
         self.draw();
 
@@ -111,23 +120,24 @@ var complexQueries = (function () {
 
     self.nodeInResult = function (index) {
         if (!self.queryObjs[index].inResult) {
-            $("#complexQuery_nodeDiv_" + index).addClass("complexQueries-nodeInResultDiv");
+            $("#complexQuery_nodeDiv_" + index).addClass("buildPaths-nodeInResultDiv");
             self.queryObjs[index].inResult = true;
-            $(("#complexQueries_inResultButton")).html('Not in Result')
+            $(("#buildPaths_inResultButton")).html('Not in Result')
         } else {
-            $("#complexQuery_nodeDiv_" + index).removeClass("complexQueries-nodeInResultDiv");
+            $("#complexQuery_nodeDiv_" + index).removeClass("buildPaths-nodeInResultDiv");
             self.queryObjs[index].inResult = false;
-            $(("#complexQueries_inResultButton")).html('In Result')
+            $(("#buildPaths_inResultButton")).html('In Result')
         }
     }
     self.clear = function () {
         self.queryObjs = [];
+        globalHtml="";
         self.draw();
         currentDivIndex = -1
     }
     self.reset = function () {
         self.queryObjs = [];
-        $("#graphDiv").html("");
+        $("#buildPaths").html("");
         currentDivIndex = -1
     }
     self.executeQuery = function () {
@@ -139,28 +149,29 @@ var complexQueries = (function () {
 
 
         var cypher = self.buildQuery();
-        $("#complexQueries_cypherDiv").html(cypher)
+        $("#buildPaths_cypherDiv").html(cypher)
         Cypher.executeCypher(cypher, function (err, result) {
             if (err) {
-                return $("#complexQueries_resultDiv").html(err)
+                return $("#buildPaths_resultDiv").html(err)
             }
             if (result.length == 0)
-                return $("#complexQueries_resultDiv").html("no result")
+                return $("#buildPaths_resultDiv").html("no result")
             if (false && result.length > Gparams.graphMaxDataLengthToDisplayGraphDirectly)
-                return $("#complexQueries_resultDiv").html("too many results" + result.length);
+                return $("#buildPaths_resultDiv").html("too many results" + result.length);
 
             self.currentDataset = self.prepareDataset(result);
-            $("#complexQueries_resultDiv").html(+result.length + " pathes found")
+            $("#buildPaths_resultDiv").html(+result.length + " pathes found")
 
-            var html = "<button onclick='complexQueries.displayTable()'>table or stat</button>"
+            var html = "<button onclick='buildPaths.displayTable()'>table or stat</button>"
             if (countResults == 1)
-                html += "<button onclick='complexQueries.defineAsSet()'>define as set</button>"
+                html += "<button onclick='buildPaths.defineAsSet()'>define as set</button>"
             // else {
-            html += "<button onclick='complexQueries.displayGraph()'>Graph</button>";
+            html += "<button onclick='buildPaths.displayGraph()'>Graph</button>";
 
 
             //  }
-            $("#complexQueries_resultActionDiv").html(html)
+            globalHtml+=html
+            $("#buildPaths_resultActionDiv").html(html)
 
         })
 
@@ -194,11 +205,11 @@ var complexQueries = (function () {
 
             if (queryObject.value && queryObject.value != "") {
 
-                 whereCypher = advancedSearch.buildWhereClauseFromUI(queryObject, symbol);
+                 whereCypher = searchNodes.buildWhereClauseFromUI(queryObject, symbol);
 
                 if (context.queryObject.subQueries) {
                     context.queryObject.subQueries.forEach(function (suqQuery) {
-                        whereCypher += " " + suqQuery.booleanOperator + " " + advancedSearch.buildWhereClauseFromUI(suqQuery, symbol);
+                        whereCypher += " " + suqQuery.booleanOperator + " " + searchNodes.buildWhereClauseFromUI(suqQuery, symbol);
                     })
                 }
             }
@@ -262,6 +273,10 @@ var complexQueries = (function () {
 
 
     }
+    self.hide=function() {
+        self.isEditing = false;
+        $("#dialogLarge").dialog("close");
+    }
 
 
     self.displayTable = function () {
@@ -283,7 +298,7 @@ var complexQueries = (function () {
             return connections;
         }
 
-
+       self.hide();
         var tableDataset = [];
         var columns = self.currentDataset.columns;
         self.currentDataset.data.forEach(function (line) {
@@ -324,6 +339,7 @@ var complexQueries = (function () {
         var xx = tableDataset;
         $("#dialog").load("htmlSnippets/exportDialog.html", function () {
             dialog.dialog("open");
+
             dialog.dialog({title: "Select table columns"});
             exportDialog.init(tableDataset)
 
@@ -337,6 +353,8 @@ var complexQueries = (function () {
 
 
     self.displayGraph = function () {
+        self.hide()
+
         toutlesensController.setGraphMessage("Working...")
         var visjsData = {nodes: [], edges: [], labels: []};
         visjsData.labels = self.currentDataset.labels;
@@ -388,7 +406,7 @@ var complexQueries = (function () {
         visjsGraph.draw("graphDiv", visjsData, {});
         visjsGraph.drawLegend(visjsData.labels);
         $("#toTextMenuButton").css("visibility", "visible");
-        searchMenu.onExecuteGraphQuery()
+        searchNodes.onExecuteGraphQuery()
 
 
     }

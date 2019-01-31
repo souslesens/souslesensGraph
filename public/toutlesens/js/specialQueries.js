@@ -71,8 +71,8 @@ var specialQueries=(function(){
                     }
                 }
                 str += "</ul>"
-                var str2 = data[0].sourceNode.properties[Schema.getNameProperty()] + " :<b>Most similar nodes</b><button onclick='advancedSearch.similarsDialogShowRefineDialog()'>Refine</button>";
-                str2 += "&nbsp;<button onclick='advancedSearch.similarsGraphSimilars()'>Graph</button>"
+                var str2 = data[0].sourceNode.properties[Schema.getNameProperty()] + " :<b>Most similar nodes</b><button onclick='searchNodes.similarsDialogShowRefineDialog()'>Refine</button>";
+                str2 += "&nbsp;<button onclick='searchNodes.similarsGraphSimilars()'>Graph</button>"
                 str2 += "<br>" + str
                 $("#similarsDialogSimilarsDiv").html(str2);
             },
@@ -90,11 +90,11 @@ var specialQueries=(function(){
         var labelsCxbs = "Select aspects of the similarities<ul>"
         for (var i = 0; i < self.self.similarOptions.similarLabels.length; i++) {
             var label2 = self.self.similarOptions.similarLabels[i];
-            labelsCxbs += "<li><input type='checkbox' checked='checked' name='advancedSearchDialog_LabelsCbx' value='" + label2 + "'>" + label2 + "</li>"
+            labelsCxbs += "<li><input type='checkbox' checked='checked' name='searchNodesDialog_LabelsCbx' value='" + label2 + "'>" + label2 + "</li>"
         }
         labelsCxbs += "<ul>";
 
-        var str = labelsCxbs + "<br><button onclick='advancedSearch.similarsDialogExecRefine()'>refine</button>";
+        var str = labelsCxbs + "<br><button onclick='searchNodes.similarsDialogExecRefine()'>refine</button>";
         $("#dialog").html(str);
         $("#dialog").dialog({modal: false});
         $("#dialog").dialog("option", "title", "Refine similar");
@@ -103,7 +103,7 @@ var specialQueries=(function(){
     }
     self.similarsDialogExecRefine = function () {
         var similarityTypes = [];
-        $('.advancedSearchDialog_LabelsCbx:checked').each(function () {
+        $('.searchNodesDialog_LabelsCbx:checked').each(function () {
             similarityTypes.push($(this).val());
         });
         self.searchSimilars(self.similarOptions, similarityTypes);

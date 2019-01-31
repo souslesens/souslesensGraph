@@ -5,6 +5,7 @@ var visjsGraph = (function () {
         var self = {};
         var network;
 
+
         self.nodes = [];
         self.edges = [];
         self.physicsOn = true;
@@ -24,6 +25,22 @@ var visjsGraph = (function () {
         self.graphHistory = [];
         self.graphHistory.currentIndex = 0;
         self.legendLabels = [];
+
+
+        var physicsTimeStep = 0.5;
+        /* if (data.length < 2000)
+             physicsTimeStep = 0.2*/
+        self.physics = {
+
+            "barnesHut": {
+                "gravitationalConstant": -39950,
+                "centralGravity": 0
+            },
+            "minVelocity": 0.75,
+            stabilization: false,
+            timestep: physicsTimeStep,
+
+        }
 
 
         var stopPhysicsTimeout = 5000;
@@ -83,14 +100,12 @@ var visjsGraph = (function () {
             else
                 stopPhysicsTimeout = Math.pow(10, x);
             //   console.log("x" + x + " stopPhysicsTimeout: " + self.edges.length + " time " + stopPhysicsTimeout)
-            data = {
+            var data = {
                 nodes: self.nodes,
                 edges: self.edges
             };
 
-            var physicsTimeStep = 0.5;
-            if (data.length < 2000)
-                physicsTimeStep = 0.2
+
             options = {
 
 
@@ -159,15 +174,34 @@ var visjsGraph = (function () {
             }
             else {
                 self.physicsOn = true;
-                options.physics = {
-                    stabilization: false,
-                    timestep: physicsTimeStep
-                }
+                self.physics.enabled = true;
+                options.physics = self.physics
+
             }
             var firstNode = data.nodes._data[Object.keys(data.nodes._data)[0]];
             // var firstNode=data.nodes._data.values().next().value
             if (firstNode && firstNode.x)
                 self.physicsOn = false;
+
+
+            var wrapper = $(".vis-configuration-wrapper")
+            if (!wrapper.length) {
+                options.configure = {
+
+                    filter: function (option, path) {
+                        if (path.indexOf('physics') !== -1) {
+                            return true;
+                        }
+                        if (path.indexOf('smooth') !== -1 || option === 'smooth') {
+                            return true;
+                        }
+                        return false;
+                    },
+                    container: document.getElementById('configVisjs')
+                }
+            }
+
+
             network = new vis.Network(container, data, options);
             //  network.dragView=false;
             self.network = network;
@@ -192,10 +226,11 @@ var visjsGraph = (function () {
 
 
             window.setTimeout(function () {
-                network.setOptions({
-                    physics: {enabled: false},
+                self.physics.enabled = false;
+                network.setOptions(
+                    self.physics
+                );
 
-                });
                 if (!_options.scale) {
                     network.fit();
                     self.setLabelsVisibility()
@@ -213,12 +248,10 @@ var visjsGraph = (function () {
                 self.setLabelsVisibility()
 
             });
-            network.on("configChange", function () {
-                // this will immediately fix the height of the configuration
-                // wrapper to prevent unecessary scrolls in chrome.
-                // see https://github.com/almende/vis/issues/1568
-                var div = container.getElementsByClassName('vis-configuration-wrapper')[0];
-                div.style["height"] = div.getBoundingClientRect().height + "px";
+            network.on("configChange", function (params) {
+                self.physic = params;
+                network.setOptions(self.physic)
+
             });
 
             network.on("doubleClick", function (params) {
@@ -489,6 +522,7 @@ var visjsGraph = (function () {
             }
             html += "</table>"
             $("#graphLegendDiv").html(html);
+            $("#textMenuButton").css("visibility", "visible")
 
 
         }

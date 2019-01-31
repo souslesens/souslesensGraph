@@ -69,13 +69,13 @@ self.getAllpropertiesDialogContent("setSearchNodeReturnFilterVal()");
 }
 
 
-   self.showAdvancedSearchDialog=function() {
-    if (!isAdvancedSearchDialogInitialized) {
-        isAdvancedSearchDialogInitialized = true;
-        $("#advancedSearchIframe").prop("src", "./advancedSearchDialog.html?subGraph=" + subGraph);
+   self.showsearchNodesDialog=function() {
+    if (!issearchNodesDialogInitialized) {
+        issearchNodesDialogInitialized = true;
+        $("#searchNodesIframe").prop("src", "./searchNodesDialog.html?subGraph=" + subGraph);
     }
 
-    $("#dialogAdvancedSearch").dialog("open").position({my: 'center', at: 'center', of: '#tabs-analyzePanel'});
+    $("#dialogsearchNodes").dialog("open").position({my: 'center', at: 'center', of: '#tabs-analyzePanel'});
 }
 
    self.showGanttDialog=function() {
@@ -103,8 +103,8 @@ self.getAllpropertiesDialogContent("setSearchNodeReturnFilterVal()");
 }
 
 
-   self.hideAdvancedSearch=function() {
-    $("#dialogAdvancedSearch").dialog("close");
+   self.hidesearchNodes=function() {
+    $("#dialogsearchNodes").dialog("close");
 
 }
 

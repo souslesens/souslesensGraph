@@ -306,7 +306,7 @@ var expandGraph = (function () {
             nodeIds: clusterIds
         }
 
-        searchMenu.execute("tableNodes")
+        searchNodes.execute("tableNodes")
 
 
     }
@@ -357,7 +357,7 @@ var expandGraph = (function () {
             operator: $("#expandWhere_operatorSelect").val(),
             value: $("#expandWhere_valueInput").val()
         }
-        var filter = advancedSearch.buildWhereClauseFromUI(queryobject, "m");
+        var filter = searchNodes.buildWhereClauseFromUI(queryobject, "m");
         return filter;
 
     }

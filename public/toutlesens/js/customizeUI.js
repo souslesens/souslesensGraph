@@ -107,7 +107,7 @@ var customizeUI = (function () {
         else {
             toutlesensController.setResponsiveDimensions(rightPanelWidth);
             if (Gparams.startWithBulkGraphView)
-                advancedSearch.showBulkGraph(subGraph);
+                searchNodes.showBulkGraph(subGraph);
         }
 
 

@@ -60,9 +60,9 @@ var Schema = (function () {
                     console.log("no schema found, will create one");
                     self.createSchema(subGraph);
 
-                  /*  setTimeout(function () {
-                        toutlesensController.dispatchAction('showSchemaConfigDialog');//({create:1});
-                    }, 2000)*/
+                    /*  setTimeout(function () {
+                          toutlesensController.dispatchAction('showSchemaConfigDialog');//({create:1});
+                      }, 2000)*/
                 }
                 else {
                     var schema = result[0].n.properties.data;
@@ -81,7 +81,7 @@ var Schema = (function () {
          */
 
 
-        self.createSchema = function (subGraph,callback) {
+        self.createSchema = function (subGraph, callback) {
             if (typeof dialog !== 'undefined') {
                 $("#dialog").html("this schema is regenerating : this can last more than one minute...<br> <img id=\"waitImg\" src=\"images/waitAnimated.gif\" width=\"40px\" \>")
                 dialog.dialog({title: ""});
@@ -89,8 +89,7 @@ var Schema = (function () {
             }
 
 
-
-                // location.reload()
+            // location.reload()
 
             self.generateNeoImplicitSchema(subGraph, true, function (err, _schema) {
                 if (err) {
@@ -162,8 +161,7 @@ var Schema = (function () {
                 if (err)
                     return console.log(err);
 
-                self.createSchema(subGraph) ;
-
+                self.createSchema(subGraph);
 
 
             })
@@ -285,20 +283,29 @@ var Schema = (function () {
 
             }
             var schemaData = btoa(JSON.stringify(json));
-var cypher="CREATE (n:schema{name:'" + subGraph + "',data:'" + schemaData + "'}) return  n.name"
-            console.log(cypher);
-            Cypher.executeCypher(cypher, function (err, result) {
-
+            var cypherDelete = "MATCH(n:schema{name:'" + subGraph + "'}) DETACH DELETE n";
+            Cypher.executeCypher(cypherDelete, function (err, result) {
                 if (err) {
                     if (callback)
                         return callback(err)
                     return console.log(err)
                 }
 
-                self.schema = json;
-                if( callback) {
-                    return callback(null, json);
-                }
+                var cypher = "CREATE (n:schema{name:'" + subGraph + "',data:'" + schemaData + "'}) return  n.name"
+                //  console.log(cypher);
+                Cypher.executeCypher(cypher, function (err, result) {
+
+                    if (err) {
+                        if (callback)
+                            return callback(err)
+                        return console.log(err)
+                    }
+
+                    self.schema = json;
+                    if (callback) {
+                        return callback(null, json);
+                    }
+                })
             })
         }
 

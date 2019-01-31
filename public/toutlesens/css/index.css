@@ -123,13 +123,13 @@ input {
     overflow: hidden;
 }
 
-#advancedSearchIframe, #advancedDisplayIframe, #dialogGanttIframe {
+#searchNodesIframe, #advancedDisplayIframe, #dialogGanttIframe {
     height: 100%;
     width: 100%;
     overflow: hidden;
 }
 
-#dialogAdvancedSearch, #dialogAdvancedDisplay {
+#dialogsearchNodes, #dialogAdvancedDisplay {
     z-index: 1000;
     overflow: hidden;
 

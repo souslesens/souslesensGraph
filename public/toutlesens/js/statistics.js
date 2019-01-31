@@ -104,7 +104,7 @@ var statistics = (function () {
 
             currentDataStructure = "tree";
             currentDisplayType = "TREEMAP";
-            toutlesensDialogsController.hideAdvancedSearch();
+            toutlesensDialogsController.hidesearchNodes();
             toutlesensData.cachedResultTree = jsonTree;
             toutlesensController.displayGraph(jsonTree, currentDisplayType, null)
         })
