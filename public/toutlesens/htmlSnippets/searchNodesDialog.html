@@ -183,13 +183,11 @@
                                 <input type="image" title="Build path" height="20px"
                                        onclick="buildPaths.show(true)" id="toTextMenuButton" src="images/path.png"
                                        class=""/>
-                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="searchNodes.setNodeQueryUI('+');">
-                                 +...
-                            </button>
-                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="searchNodes.setNodeQueryUI('and');">
+
+                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="buildPaths.show('and');">
                                 AND
                             </button>
-                            <button  style="font-size: 10px;background-color:#7f9f7f" onclick="searchNodes.setNodeQueryUI('or');">
+                            <button  style="font-size: 10px;background-color:#7f9f7f" onclick="buildPaths.show('or');">
                                 OR
                             </button>
 
@@ -409,7 +407,10 @@
                 onclick="searchNodes.previousPanel();">previous
         </button>
 
-        <button class="searchDialog_NavButton" onclick="searchNodes.nextPanel();"
+      <!--  <button class="searchDialog_NavButton" onclick="searchNodes.nextPanel();"
+                id="searchDialog_nextPanelButton">next
+        </button>-->
+        <button class="searchDialog_NavButton" onclick="buildPaths.show('only');"
                 id="searchDialog_nextPanelButton">next
         </button>
 

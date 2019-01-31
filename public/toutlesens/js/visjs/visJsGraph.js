@@ -34,7 +34,7 @@ var visjsGraph = (function () {
 
             "barnesHut": {
                 "gravitationalConstant": -39950,
-                "centralGravity": 0
+                "centralGravity": 0.35
             },
             "minVelocity": 0.75,
             stabilization: false,
@@ -170,9 +170,11 @@ var visjsGraph = (function () {
                 options.layout = {improvedLayout: false}
 
             if (_options.fixed) {
+                options.physics={}
                 options.physics = false;
             }
             else {
+
                 self.physicsOn = true;
                 self.physics.enabled = true;
                 options.physics = self.physics
@@ -227,9 +229,15 @@ var visjsGraph = (function () {
 
             window.setTimeout(function () {
                 self.physics.enabled = false;
-                network.setOptions(
-                    self.physics
-                );
+                if (_options.fixed) {
+                    _options.physics={}
+                    _options.physics = false;
+                }
+                else {
+                    network.setOptions(
+                        self.physics
+                    );
+                }
 
                 if (!_options.scale) {
                     network.fit();
