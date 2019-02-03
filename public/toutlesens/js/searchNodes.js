@@ -91,7 +91,6 @@ var searchNodes = (function () {
             self.configBooleanOperatorsUI();
 
 
-
         }
 
         self.onChangeSourceLabel = function (value, clearContext) {
@@ -107,7 +106,7 @@ var searchNodes = (function () {
             }
 
 
-self.configBooleanOperatorsUI();
+            self.configBooleanOperatorsUI();
 
 
             $("#searchDialog_criteriaDiv").css('visibility', 'visible');
@@ -128,7 +127,7 @@ self.configBooleanOperatorsUI();
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
         }
 
-        self.configBooleanOperatorsUI=function(){
+        self.configBooleanOperatorsUI = function () {
             if (context.queryObject.nodeIds) {
                 $("#searchDialog_booleanOperatorsAnd").css("visibility", "visible")
                 $("#searchDialog_booleanOperatorsOr").css("visibility", "visible")
@@ -431,7 +430,7 @@ self.configBooleanOperatorsUI();
                 if (!self.dataTable)
                     self.dataTable = new myDataTable();
 
-                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentSet.nodeIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentObject.nodeSetIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
                 dialogLarge.load("htmlSnippets/dataTable.html", function () {
                     dialogLarge.dialog("open");
                     self.dataTable.loadNodes(self.dataTable, "dataTableDiv", cypher, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {
@@ -443,7 +442,7 @@ self.configBooleanOperatorsUI();
             }
 
             if (action == 'graphNodes') {
-                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentSet.nodeIds, "n") + ' RETURN n ' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentObject.nodeSetIds, "n") + ' RETURN n ' + Schema.getNameProperty();
                 //   Cypher.
 
 
@@ -451,7 +450,7 @@ self.configBooleanOperatorsUI();
 
             if (action == 'graphSomeNeighboursListLabels') {
 
-                var options = {useStartNodeSet: context.currentSet.nodeIds};
+                var options = {useStartNodeSet: context.currentObject.nodeSetIds};
 
                 if ($("#graphNeighboursAllOptionsCbx").prop("checked")) {// all neighbours
                     ;
@@ -536,7 +535,7 @@ self.configBooleanOperatorsUI();
 
 
                 var options = {
-                    useStartNodeSet: context.currentSet.nodeIds,
+                    useStartNodeSet: context.currentObject.nodeSetIds,
                     useStartLabels: [context.queryObject.label],
                     useEndLabels: neighboursLabels,
                 }
@@ -683,7 +682,7 @@ self.configBooleanOperatorsUI();
                             return a.filter(Set.prototype.has, new Set(b));
                         }
 
-                        context.queryObject.nodeIds = intersectArray(context.currentSet.nodeIds, newIds)
+                        context.queryObject.nodeIds = intersectArray(context.currentObject.nodeSetIds, newIds)
                     } else {
                         if (!context.queryObject.nodeIds)
                             context.queryObject.nodeIds = [];
@@ -760,6 +759,8 @@ self.configBooleanOperatorsUI();
 
 
         self.buildWhereClauseFromUI = function (queryObject, nodeAlias) {
+
+
             var property = queryObject.property;
             var operator = queryObject.operator;
             var value = queryObject.value;

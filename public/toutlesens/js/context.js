@@ -4,7 +4,7 @@ var context = (function () {
     self.graphContext = {};
     self.queryObject = {};
     self.currentNode = {};
-    self.currentSet={}
+
 
 
 
@@ -17,6 +17,7 @@ var context = (function () {
             property: "",
             operator: "",
             value: "",
+            nodeSetIds:"" // in case of sets
         };
     }
 

@@ -125,7 +125,7 @@ var eventsController = (function () {
                         activate: function (event, ui) {
                             var panelId=ui.newPanel[0].id;
                             if(panelId=="findDiv"){
-                                buildPaths.expandCollapse()
+                                buildPaths.expandCollapse(true)
                             }
 
                         }

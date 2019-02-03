@@ -5,7 +5,7 @@ var nodeSets = (function () {
         var data={nodeIds:ids,cypher:cypher}
        data = btoa(JSON.stringify(data));
 
-        var cypher = "CREATE (n:nodeSet{name:'" + name + "',label:'" + label + "',comment:'" + comment + "',subGraph:'" + subGraph + "',data:'" + data + "'}) return  n.name as name"
+        var cypher = "MERGE (n:nodeSet{name:'" + name + "',label:'" + label + "',comment:'" + comment + "',subGraph:'" + subGraph + "',data:'" + data + "'}) return  n.name as name"
         //  console.log(cypher);
         Cypher.executeCypher(cypher, function (err, result) {
             if (err) {

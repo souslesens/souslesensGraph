@@ -28,7 +28,7 @@ var buildPaths = (function () {
         globalHtml = "<div class='buildPaths' id='buildPaths_matchNodesWrapper'  onclick='buildPaths.onUnSelectNodeDiv()' style='visibility:visible'>" +
             globalHtmlButtons +
             "<div style='width: 100%;visibility:hidden' id='buildPath_moreParamsDiv'> choose label <select class='buildPathsButtons' id='buildPaths_labelSelect'></select><button class='buildPathsButtons' onclick=buildPaths.executeQuery('set') >ok</button>" +
-            "<span style='visibility:hidden' id='buildPath_moreParamsSetDiv'>set name<inputclass='buildPathsButtons' id='buildPaths_setName'> comment<textarea class='buildPathsButtons' id='buildPaths_setCommentTA'></textarea></textarea></span> </div>" +
+            "<span style='visibility:hidden' id='buildPath_moreParamsSetDiv'>set name<input class='buildPathsButtons' id='buildPaths_setName'> comment<textarea rows='1'cols='50' class='buildPathsButtons' id='buildPaths_setCommentTA'></textarea></textarea></span> </div>" +
 
 
             "</div>"
@@ -44,23 +44,7 @@ var buildPaths = (function () {
             init()
 
 
-        if (booleanOperator) {
-            searchNodes.setContextNodeQueryObjectFromUI(booleanOperator, function () {
-                if (currentDivIndex > -1 && context.queryObject.label == self.queryObjs[currentDivIndex].label) // updateNodeQuery
-                    self.updateNodeQuery(currentDivIndex, context.queryObject);
-                else
-                    self.addNodeQuery(context.queryObject);
 
-            });
-        }
-        else {
-
-            searchNodes.activatePanel("searchCriteriaDivFrombuildPaths")
-
-        }
-
-
-        searchNodes.setUIPermittedLabels(context.queryObject.label);
         $("#graphPopup").css("visibility", "hidden")
         $("#searchDialog_newQueryButton").css('visibility', 'visible');
         $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
@@ -69,26 +53,43 @@ var buildPaths = (function () {
         $("#buildGraphDiv").html(globalHtml);
         $("#buildGraphDiv").css("visibility", "visible")
 
-        /*  $("#dialogLarge").html(globalHtml);
-          $("#dialogLarge").dialog("option", "modal", false);
-          $("#dialogLarge").dialog("option", "position", {of: $('#graphDiv')});
+        if (context.queryObject.nodeSetIds ) {// cas we use a nodeSet
+            context.queryObject.nodeIds=context.queryObject.nodeSetIds;
+            self.addQueryObjectDiv();
+        }else if (booleanOperator) {
+            searchNodes.setContextNodeQueryObjectFromUI(booleanOperator, function () {
+                if (currentDivIndex > -1 && context.queryObject.label == self.queryObjs[currentDivIndex].label) // updateNodeQuery
+                    self.updateQueryDiv(currentDivIndex, context.queryObject);
+                else
+                    self.addQueryObjectDiv();
 
-          $("#dialogLarge").dialog("open");*/
+            });
+        }
+        else {
+
+            searchNodes.activatePanel("searchCriteriaDivFrombuildPaths")
+
+        }
+        searchNodes.setUIPermittedLabels(context.queryObject.label);
+
+
+
+
 
     }
 
 
-    self.addNodeQuery = function (queryObject) {
-        var index = self.queryObjs.length;
-        queryObject.inResult = true;
-        self.queryObjs.push(queryObject)
+    self.addQueryObjectDiv = function () {
+
+        context.queryObject.inResult = true;
+        self.queryObjs.push(JSON.parse(JSON.stringify(context.queryObject)));//clone
         self.drawNodeQueryDivs();
         //   self.onSelectNodeDiv(index);
 
 
     }
 
-    self.updateNodeQuery = function (index, queryObject) {
+    self.updateQueryDiv = function (index, queryObject) {
 
         self.queryObjs[index] = queryObject;
 
@@ -159,6 +160,7 @@ var buildPaths = (function () {
         else
             visibility = "hidden"
         $('#buildPaths_cypherTA').css('visibility', visibility);
+        $('#buildPaths_cypherTA').val(self.cypher)
     }
     self.onUnSelectNodeDiv = function () {
         currentDivIndex = -1;
@@ -237,17 +239,26 @@ var buildPaths = (function () {
 
     }
     self.showMoreParams = function (type) {
-        currentSetType = type
+        currentSetType = type;
         var labels = [];
         self.queryObjs.forEach(function (queryObject, index) {
             labels.push({label: (queryObject.label + "-" + index), index: index})
         })
-        common.fillSelectOptions(buildPaths_labelSelect, labels, "label", "index", true)
+        if (labels.length > 1)
+            common.fillSelectOptions(buildPaths_labelSelect, labels, "label", "index", true)
+        else {
+            common.fillSelectOptions(buildPaths_labelSelect, labels, "label", "index", false);
+            $("#buildPaths_labelSelect").val(labels[0].index)
+
+        }
+
 
         if (type == "others" || type == "set") {
             $("#buildPath_moreParamsDiv").css("visibility", "visible")
             if (type == "set")
                 $("#buildPath_moreParamsSetDiv").css("visibility", "visible")
+            else
+                $("#buildPath_moreParamsSetDiv").css("visibility", "hidden")
 
 
         }
@@ -307,22 +318,27 @@ var buildPaths = (function () {
                 if (currentSetType == "set") {
                     currentSetType = null;
                     var name = $("#buildPaths_setName").val();
+                    if (!name || name == "")
+                        return alert('enter set name')
                     var comment = $("#buildPaths_setCommentTA").val();
+                    if (!comment)
+                        comment = ""
                     nodeSets.create(name, queryObj.label, comment, self.cypher, result[0].setIds, function (err, resultSet) {
                         var message = "";
                         if (err)
                             message = "ERROR " + err;
                         else
-                            message = "Set " + name + "created :" + result[0].set.length + " nodes"
+                            message = "Set " + name + "created :" + result[0].setIds.length + " nodes"
                         $("#buildPaths_resultDiv").html(message)
 
                     })
 
                 }
-                else if(currentSetType=="others"){
-                    if(!context.currentSet)
-                        context.currentSet={}
-                        context.currentSet.nodeIds= result[0].setIds;
+                else if (currentSetType == "others") {
+
+                    context.currentObject.nodeSetIds = result[0].setIds;
+                    context.queryObject = queryObj;
+                    self.expandCollapse()
 
 
                     searchNodes.activatePanel("searchActionDiv");
@@ -362,8 +378,12 @@ var buildPaths = (function () {
             if (index > 0)
                 matchCypher += "-[r" + index + "]-"
             matchCypher += "(" + symbol + ":" + queryObject.label + ")";
-
-            if (queryObject.value && queryObject.value != "") {
+            if(queryObject.nodeSetIds){//nodeSet
+                if (whereCypher != "")
+                    whereCypher += " AND "
+                whereCypher += "id("+symbol+") in ["+queryObject.nodeSetIds.toString()+"]";
+            }
+            else if (queryObject.value && queryObject.value != "") {
                 if (whereCypher != "")
                     whereCypher += " AND "
                 whereCypher += searchNodes.buildWhereClauseFromUI(queryObject, symbol);
@@ -453,8 +473,8 @@ var buildPaths = (function () {
 
 
     }
-    self.expandCollapse = function () {
-        if ($("#buildGraphDiv").html() == "") {
+    self.expandCollapse = function (expand) {
+        if ($("#buildGraphDiv").html() == "" || expand) {
             $("#buildGraphDiv").html(globalHtml);
         } else {
             $("#buildGraphDiv").html("");
@@ -483,7 +503,7 @@ var buildPaths = (function () {
             return connections;
         }
 
-        self.expandCollapse();
+        //  self.expandCollapse();
         var tableDataset = [];
         var columns = self.currentDataset.columns;
         self.currentDataset.data.forEach(function (line) {
@@ -532,6 +552,7 @@ var buildPaths = (function () {
         })
 
     }
+
     self.defineAsSet = function () {
         var setName = prompt("set name ?")
         if (!setName || setName == "")
@@ -593,6 +614,7 @@ var buildPaths = (function () {
 
         visjsGraph.draw("graphDiv", visjsData, {});
         visjsGraph.drawLegend(visjsData.labels);
+        filters.currentLabels = visjsData.labels;
         $("#toTextMenuButton").css("visibility", "visible");
         searchNodes.onExecuteGraphQuery()
 

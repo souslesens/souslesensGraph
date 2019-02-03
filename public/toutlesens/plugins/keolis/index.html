@@ -63,6 +63,7 @@
                     return items;
                 }
 
+
                 $.ajax({
                     type: "GET",
                     url: "/toutlesens/plugins/keolis/" + file,
@@ -273,11 +274,12 @@
                 else if (type == "tags")
                     label = "tag"
 
-
+debugger
                 context.queryObject={};
                 var clauseText = self.selectionName;
                 context.queryObject.label = label;
                 context.queryObject.text = clauseText;
+                context.queryObject.type = "plugin-"+label;
                 context.queryObject.where = toutlesensData.getWhereClauseFromArray("iD", self.selection, "n");
                 var cypher = "MATCH (n:" + label + ") where " + context.queryObject.where + " RETURN collect(ID(n)) as ids ";
 
@@ -285,10 +287,9 @@
                     if (err) {
                         return console.log(err);
                     }
-                    context.currentSet.nodeIds = result[0].ids;
 
-                    searchNodes.activatePanel("searchActionDiv")
-                    findTabs.tabs("option", "active", 0);
+                    context.queryObject.nodeSetIds=result[0].ids
+                    buildPaths.show( "only")
                 })
 
 
