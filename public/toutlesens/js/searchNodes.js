@@ -47,6 +47,8 @@ var searchNodes = (function () {
                     $(this).css("visibility", "visible");
 
             })
+            self.configBooleanOperatorsUI();
+
         }
 
         self.resetQueryClauses = function () {
@@ -55,29 +57,44 @@ var searchNodes = (function () {
             $("#searchNavActionDiv").css('visibility', 'hidden');
             $(".searchDialog_NavButton").css('visibility', 'hidden');
             $(".selectLabelDiv").removeClass("selectLabelDivSelected")
-
+            $("#searchDialog_booleanOperatorsDiv").css('visibility', 'hidden');
 
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
-            context.initGraphContext();
-            self.previousAction = "";
 
             $(".selectLabelDiv ").css("visibility", "visible");
-            context.queryObject = {};
             $(".searchDialog_CriteriaDiv").remove();
 
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
+            context.queryObject = {};
+            context.initGraphContext();
+            self.previousAction = "";
+            self.configBooleanOperatorsUI();
+        }
+
+
+        self.setUpdateContextQueryObject = function () {
+            var label = context.queryObject.label;
+            if (!label)
+                return;
+            $("#searchDialog_criteriaDiv").css('visibility', 'visible');
+            $("#searchNavDiv").css('visibility', 'visible');
+            $("#searchNavActionDiv").css('visibility', 'hidden');
+            $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
+
+            $(".selectLabelDiv").removeClass("selectLabelDivSelected");
+            $("#selectLabelDiv_" + label).addClass("selectLabelDivSelected");
+
+            $(".selectLabelDiv").css('visibility', 'hidden');
+            $("#selectLabelDiv_" + label).css('visibility', 'visible');
+
+            self.configBooleanOperatorsUI();
+
+
+
         }
 
         self.onChangeSourceLabel = function (value, clearContext) {
-            $("#searchDialog_criteriaDiv").css('visibility', 'visible');
-            $("#searchNavDiv").css('visibility', 'visible');
-            $("#searchNavActionDiv").css('visibility', 'visible');
-            $("#searchDialog_nextPanelButton").css('visibility', 'visible');
-            $(".selectLabelDiv").removeClass("selectLabelDivSelected");
-            $("#searchDialog_complexQueryUIButton").css('visibility', 'visible');
-
-            $("#selectLabelDiv_" + value).addClass("selectLabelDivSelected");
 
 
             if (self.previousAction != 'path') {// reset recoding of saved queries except if choose target label
@@ -89,13 +106,39 @@ var searchNodes = (function () {
                 context.queryObject.label = value;
             }
 
+
+self.configBooleanOperatorsUI();
+
+
+            $("#searchDialog_criteriaDiv").css('visibility', 'visible');
+            $("#searchNavDiv").css('visibility', 'visible');
+            $("#searchNavActionDiv").css('visibility', 'visible');
+            // $("#searchDialog_nextPanelButton").css('visibility', 'visible');
+            $(".selectLabelDiv").removeClass("selectLabelDivSelected");
+            $("#searchDialog_complexQueryUIButton").css('visibility', 'visible');
+            $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
+
+
+            $("#selectLabelDiv_" + value).addClass("selectLabelDivSelected");
             $("#searchDialog_valueInput").val();
             $('#searchDialog_valueInput').focus();
             //if(searchNodes.self.previousAction!="path" || pathSourceSearchCriteria)
-            $("#searchDialog_nextPanelButton").css('visibility', 'visible');
-            if (searchDialog_propertySelect) ;
-            filters.initProperty(null, value, searchDialog_propertySelect);
+            if (searchDialog_propertySelect)
+                filters.initProperty(null, value, searchDialog_propertySelect);
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
+        }
+
+        self.configBooleanOperatorsUI=function(){
+            if (context.queryObject.nodeIds) {
+                $("#searchDialog_booleanOperatorsAnd").css("visibility", "visible")
+                $("#searchDialog_booleanOperatorsOr").css("visibility", "visible")
+                $("#searchDialog_booleanOperatorsOnly").text("ONLY")
+            }
+            else {
+                $("#searchDialog_booleanOperatorsAnd").css("visibility", "hidden")
+                $("#searchDialog_booleanOperatorsOr").css("visibility", "hidden")
+                $("#searchDialog_booleanOperatorsOnly").text("ADD")
+            }
         }
 
 
@@ -157,17 +200,11 @@ var searchNodes = (function () {
         self.activatePanel = function (id) {
             if (id == "searchCriteriaDiv") {
                 self.resetQueryClauses();
+                self.clearCurrentLabel();
                 buildPaths.clear();
             }
-            if (id == "searchCriteriaDivFrombuildPaths") {
-                if (!context.queryObject.label) {
-                    return;
-                }
-                self.onChangeSourceLabel(context.queryObject.label, false)
-                id = "searchCriteriaDiv"
-            }
-            var visibility = "visible";
-            self.clearCurrentLabel();
+
+
             self.searchPanels.currentIndex = self.searchPanels.indexOf(id);
             $(".searchPanel").hide();
             $("#" + id).show();
@@ -237,7 +274,7 @@ var searchNodes = (function () {
             else {
                 if (self.searchPanels.currentIndex == 0) {
 
-                    searchNodes.setContextNodeQueryObjectFromUI("only",function(){
+                    searchNodes.setContextNodeQueryObjectFromUI("only", function () {
 
 
                     });
@@ -394,7 +431,7 @@ var searchNodes = (function () {
                 if (!self.dataTable)
                     self.dataTable = new myDataTable();
 
-                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.queryObject.nodeIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentSet.nodeIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
                 dialogLarge.load("htmlSnippets/dataTable.html", function () {
                     dialogLarge.dialog("open");
                     self.dataTable.loadNodes(self.dataTable, "dataTableDiv", cypher, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {
@@ -406,7 +443,7 @@ var searchNodes = (function () {
             }
 
             if (action == 'graphNodes') {
-                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.queryObject.nodeIds, "n") + ' RETURN n ' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentSet.nodeIds, "n") + ' RETURN n ' + Schema.getNameProperty();
                 //   Cypher.
 
 
@@ -414,7 +451,7 @@ var searchNodes = (function () {
 
             if (action == 'graphSomeNeighboursListLabels') {
 
-                var options = {useStartNodeSet: context.queryObject.nodeIds};
+                var options = {useStartNodeSet: context.currentSet.nodeIds};
 
                 if ($("#graphNeighboursAllOptionsCbx").prop("checked")) {// all neighbours
                     ;
@@ -499,7 +536,7 @@ var searchNodes = (function () {
 
 
                 var options = {
-                    useStartNodeSet: context.queryObject.nodeIds,
+                    useStartNodeSet: context.currentSet.nodeIds,
                     useStartLabels: [context.queryObject.label],
                     useEndLabels: neighboursLabels,
                 }
@@ -578,6 +615,7 @@ var searchNodes = (function () {
             $("#searchDialog_SaveQueryButton").css("visibility", "visible")
             $("#searchDialog_Criteriatext").css("visibility", "visible");
             $("#searchDialog_newQueryButton").css('visibility', 'visible');
+            $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
 
 
             var property = "";
@@ -591,9 +629,9 @@ var searchNodes = (function () {
             var text = (context.queryObject.label ? context.queryObject.label : "") + " " + property + " " + operator + " " + value;
 
 
-             if ((booleanOperator != "and" && booleanOperator != "or")  ) {
-                 context.queryObject ={label: context.queryObject.label}
-             }
+            if ((booleanOperator != "and" && booleanOperator != "or")) {
+                context.queryObject = {label: context.queryObject.label}
+            }
             if (!context.queryObject.nodeIds) {
                 context.queryObject = {
                     label: context.queryObject.label,
@@ -617,6 +655,8 @@ var searchNodes = (function () {
 
                 });
                 var booleanOperatorStr = booleanOperator || "";
+                if (booleanOperatorStr != "")
+                    booleanOperatorStr += "<br>"
                 context.queryObject.globalText += " <b>" + booleanOperatorStr + "</b> " + text
 
             }
@@ -643,7 +683,7 @@ var searchNodes = (function () {
                             return a.filter(Set.prototype.has, new Set(b));
                         }
 
-                        context.queryObject.nodeIds = intersectArray(context.queryObject.nodeIds, newIds)
+                        context.queryObject.nodeIds = intersectArray(context.currentSet.nodeIds, newIds)
                     } else {
                         if (!context.queryObject.nodeIds)
                             context.queryObject.nodeIds = [];
@@ -654,8 +694,8 @@ var searchNodes = (function () {
                     var foundIds = result.length;
 
 
-                    text += ": <b> " + foundIds + "nodes </b>"
-                    $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' >" + text + "</div>")
+                    /*   text += ": <b> " + foundIds + "nodes </b>"
+                       $("#searchDialog_Criteriatext").append(" <div   class='searchDialog_CriteriaDiv' >" + text + "</div>")*/
 
                     if (callback)
                         return callback();
@@ -702,7 +742,7 @@ var searchNodes = (function () {
             if (whereStr && whereStr != "")
                 whereStr = " WHERE " + whereStr
             else
-                whereStr="";
+                whereStr = "";
 
 
             if (context.queryObject.subQueries) {

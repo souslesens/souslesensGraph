@@ -1329,9 +1329,10 @@ var toutlesensController = (function () {
             //    $("#analyzePanel").width(rightPanelWidth - 50).height(totalHeight).css("position", "absolute").css("left", totalWidth - rightPanelWidth + 20).css("top", 20);
 
 
-            $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0)
+            $("#graphDiv").width(totalWidth - rightPanelWidth).height(totalHeight - 0);
+          //  $("#buildGraphWrappperDiv").width(totalWidth - rightPanelWidth);
 
-            $("#graphLegendDiv").width(120).height(200).css("position", "absolute").css("top", 60).css("left", 5).css("background", "none");
+            $("#graphLegendDiv").width(120).height(200).css("position", "absolute").css("top", totalHeight-200).css("left", 5).css("background", "none");
             $("#graphInfosDiv").width(400).height(40).css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 450).css("top", 50).css("background-color", "#eee");
             $("#BIlegendDiv").css("position", "absolute").css("top", 0).css("left", (totalWidth - rightPanelWidth) - 80).css("top", 80).css("background-color", "#eee");
             $("#graphInfosDiv").css("visibility", "hidden")
@@ -1366,7 +1367,8 @@ var toutlesensController = (function () {
 
 
             //   $("#mainButtons").width(rightPanelWidth).height(50).css("position", "absolute").css("left", $("#graphDiv").width() - 200).css("top", 50).css("visibility", "hidden");
-            $("#mainButtons").css(".max-width", 300).height(50).css("position", "absolute").css("left", 20).css("top", 10);//.css("visibility", "hidden");
+          //  $("#mainButtons").css(".max-width", 300).height(50).css("position", "absolute").css("left", 20).css("top", 10);//.css("visibility", "hidden");
+            $("#mainButtons").width(totalWidth - rightPanelWidth).height(50).css("position", "absolute").css("left", 20).css("top", 10);//.css("visibility", "hidden");
             $("#graphCommentDiv").css("max-width", "500").css("position", "absolute").css("left", 20).css("top", totalHeight - 70);
 
 

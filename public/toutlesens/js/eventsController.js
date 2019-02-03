@@ -123,6 +123,10 @@ var eventsController = (function () {
                         active: 0,
                         collapsible: true,
                         activate: function (event, ui) {
+                            var panelId=ui.newPanel[0].id;
+                            if(panelId=="findDiv"){
+                                buildPaths.expandCollapse()
+                            }
 
                         }
                     });

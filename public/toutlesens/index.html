@@ -186,6 +186,8 @@
     <script src="./js/schema.js"></script>
     <script src="./js/context.js"></script>
     <script src="./js/expandGraph.js"></script>
+    <script src="./js/nodeSets.js"></script>
+
 
 
 
@@ -434,12 +436,13 @@
 </div>
 
 
-<div id="mainButtons">
+<div id="mainButtons" style="background-color: #f4f0ec">
+    <div onclick="buildPaths.expandCollapse()">
     <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
 
 
     <input type="image" title="Build path" height="20px"
-           onclick="buildPaths.show()" id="BuilPathButton" src="images/path.png"
+           onclick="buildPaths.expandCollapse()" id="BuilPathButton" src="images/path.png"
            class=""/>
 
 
@@ -471,13 +474,15 @@
     <input type="image" title="display settings" height="20px"
            onclick="toutlesensController.dispatchAction('displaySettings')"
            id="displaySettingButton" src="images/display.png"/></td>
-    &nbsp;<input type="image" title="Display all nodes" height="20px"
+   <!-- &nbsp;<input type="image" title="Display all nodes" height="20px"
                  onclick="toutlesensController.dispatchAction('showAll')"
-                 id="searchAllButton" src="images/all.png"/></td>
+                 id="searchAllButton" src="images/all.png"/></td>-->
     <input type="image" title="Graph menu" height="20px"
            onclick="toutlesensController.dispatchAction('showGlobalMenu');" id="parametersMenuButton"
            src="images/parameters.png"/>
     <br><span id="graphInfosSpan" style="font-size:8px"></span>
+    </div>
+    <div id="buildGraphDiv"  style="    background-color: #f4d3b3;;"></div>
 
 </div>
 <div id="graphLegendDiv"></div>
@@ -700,6 +705,7 @@
 
 <div id="dialog" title="dialog"></div>
 <div id="dialogLarge"></div>
+
 
 
 <div id="controlPanelShowHide">

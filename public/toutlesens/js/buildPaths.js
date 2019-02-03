@@ -2,21 +2,36 @@ var buildPaths = (function () {
     var self = {};
     self.currentDataset;
     var currentDivIndex = -1;
-
+    var alphabet = "abcdefghijklmno";
+    var currentSetType;
     self.queryObjs = [];
     self.isEditing = false;
+    self.currentCypher = "";
+
     var globalHtml = "";
 
     var init = function () {
         var globalHtmlButtons = "</div>" +
-            "<button onclick='buildPaths.executeQuery()'>execute query </button>" +
-            "<button onclick='buildPaths.clear()'>clear all </button>" +
-            "<br><div id='buildPaths_cypherDiv'></div>" +
-            "<br><div id='buildPaths_resultDiv'></div>" +
-            "<br><div id='buildPaths_resultActionDiv'></div>"
+            "<div style='width: 100%;'><textarea id='buildPaths_cypherTA' onchange='buildPaths.cypher=$(this).val();' rows='2' style='width: 100%;background: #ede4d4;visibility: hidden' ></textarea><br></div>" +
+            "<div style=' justify-content: center;display: flex;flex-direction: row'></div>" +
+            "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('count')>Count </button>" +
+            "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('dataTable')>Table</button>" +
+            "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('graph')>Graph </button>" +
+            "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('set')>Create set </button>" +
+            "<button class='buildPathsButtons' onclick=buildPaths.editCypher()>Edit Cypher</button>" +
+            "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('others')>Others... </button>" +
 
-        globalHtml = "<div id='buildPaths_mainDiv'><div class='buildPaths' id='buildPaths_matchNodesWrapper' style='visibility:visible'>" +
-            globalHtmlButtons + "</div></div>"
+            "</div>"
+            + "<br><div id='buildPaths_resultDiv'></div>" //+
+
+
+        globalHtml = "<div class='buildPaths' id='buildPaths_matchNodesWrapper'  onclick='buildPaths.onUnSelectNodeDiv()' style='visibility:visible'>" +
+            globalHtmlButtons +
+            "<div style='width: 100%;visibility:hidden' id='buildPath_moreParamsDiv'> choose label <select class='buildPathsButtons' id='buildPaths_labelSelect'></select><button class='buildPathsButtons' onclick=buildPaths.executeQuery('set') >ok</button>" +
+            "<span style='visibility:hidden' id='buildPath_moreParamsSetDiv'>set name<inputclass='buildPathsButtons' id='buildPaths_setName'> comment<textarea class='buildPathsButtons' id='buildPaths_setCommentTA'></textarea></textarea></span> </div>" +
+
+
+            "</div>"
         ;
 
 
@@ -35,9 +50,11 @@ var buildPaths = (function () {
                     self.updateNodeQuery(currentDivIndex, context.queryObject);
                 else
                     self.addNodeQuery(context.queryObject);
+
             });
         }
         else {
+
             searchNodes.activatePanel("searchCriteriaDivFrombuildPaths")
 
         }
@@ -49,19 +66,24 @@ var buildPaths = (function () {
         $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
 
 
-        $("#dialogLarge").html(globalHtml);
-        $("#dialogLarge").dialog("option", "modal", false);
-        $("#dialogLarge").dialog("option", "position", {of: $('#graphDiv')});
+        $("#buildGraphDiv").html(globalHtml);
+        $("#buildGraphDiv").css("visibility", "visible")
 
-        $("#dialogLarge").dialog("open");
+        /*  $("#dialogLarge").html(globalHtml);
+          $("#dialogLarge").dialog("option", "modal", false);
+          $("#dialogLarge").dialog("option", "position", {of: $('#graphDiv')});
+
+          $("#dialogLarge").dialog("open");*/
 
     }
+
 
     self.addNodeQuery = function (queryObject) {
         var index = self.queryObjs.length;
         queryObject.inResult = true;
         self.queryObjs.push(queryObject)
         self.drawNodeQueryDivs();
+        //   self.onSelectNodeDiv(index);
 
 
     }
@@ -71,6 +93,9 @@ var buildPaths = (function () {
         self.queryObjs[index] = queryObject;
 
         $("#complexQuery_nodeConditionDiv_" + index).html(queryObject.globalText)
+        globalHtml = $("#buildGraphDiv").html()
+        self.cypher = self.buildQuery();
+        $("#buildPaths_cypherTA").text(self.cypher)
 
 
     }
@@ -83,14 +108,16 @@ var buildPaths = (function () {
 
 
         $("#buildPaths_matchNodesWrapper").html(html);
-        globalHtml = $("#buildPaths_mainDiv").html()
+        globalHtml = $("#buildGraphDiv").html();
+        self.cypher = self.buildQuery();
+        $("#buildPaths_cypherTA").text(self.cypher)
 
     }
 
     self.getNodeDivHtml = function (queryObject, index) {
-        var queryText = "";
-        if (queryObject.value && queryObject.value != "")
-            queryText = queryObject.property + " " + queryObject.operator + " " + queryObject.value;
+        var queryText = queryObject.text;
+        var queryCountNodes = "<b>" + queryObject.nodeIds.length + " nodes" + "</b>";
+
         var color = nodeColors[queryObject.label];
         var classInResult = "";
         if (queryObject.inResult)
@@ -98,11 +125,20 @@ var buildPaths = (function () {
 
 
         var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' buildPaths-nodeDiv " + classInResult + "'  onclick='buildPaths.onSelectNodeDiv(" + index + ")'>" +
-            " <div class='buildPaths-partDiv' style='background-color: " + color + "'><b>Label : " + queryObject.label + "</b></div>" +
-            "<div id='complexQuery_nodeConditionDiv_" + index + "' class='buildPaths-partDiv'> Condition : " + queryText + "</div>" +
-            " <div class='buildPaths-partDiv'><button  id='buildPaths_inResultButton'  onclick='buildPaths.nodeInResult(" + index + ")'>not in result</button> </div>" +
-            // "<button onclick='buildPaths.removeQueryObj(" + index + ")'>X</button>" +
-            "<input type='image' height='10px'  title='remove node' onclick='buildPaths.removeQueryObj(" + index + ")' src='images/trash.png'/>" +
+            " <div class='buildPaths-partDiv' style='background-color: " + color + "'><b>" + queryObject.label + "</b></div>" +
+            "<div id='complexQuery_nodeConditionDiv_" + index + "' class='complexQuery-nodeConditionDiv buildPaths-partDiv'> " + queryText + "</div>" +
+            "<div id='complexQuery_resultCountDiv_" + index + "' class='complexQuery-resultCountDiv buildPaths-partDiv'> " + queryCountNodes + "</div>" +
+            // " <div class='buildPaths-partDiv'><button  id='buildPaths_inResultButton'  onclick='buildPaths.nodeInResult(" + index + ")'>not in result</button> </div>" +
+            "<span><input type='checkbox' id='buildPaths-inResultCbx_" + index + "' checked='checked' >in result </span><br>"
+        // " <span><input type='checkbox' id='buildPaths-inResultCbx' checked='checked' onclick='buildPaths.nodeInResult(" + index + ")'>in result </span><br>";
+
+        if (false && index > 0)
+            html += "<span><input type='checkbox' id='buildPaths-clusterCbx'  onclick='buildPaths.clusterNodesInGraph(" + index + ")'>cluster</span> <br> ";
+
+        // "<button onclick='buildPaths.removeQueryObj(" + index + ")'>X</button>" +
+        html += "<div style='display: flex'><input type='image' height='15px'  title='move left' onclick='buildPaths.moveDivLeft(" + index + ")' src='images/left.png'/>" +
+            "<input type='image' height='15px'  title='remove node' onclick='buildPaths.removeQueryObj(" + index + ")' src='images/trash.png'/>" +
+            "<input type='image' height='15px'  title='move right' onclick='buildPaths.moveDivRight(" + index + ")' src='images/right.png'/></div>" +
             "</div>"
 
 
@@ -111,7 +147,33 @@ var buildPaths = (function () {
 
     }
 
+    self.moveDivLeft = function (index) {
+    }
+    self.moveDivRight = function (index) {
 
+    }
+    self.editCypher = function () {
+        var visibility = $('#buildPaths_cypherTA').css('visibility');
+        if (visibility == "hidden")
+            visibility = "visible"
+        else
+            visibility = "hidden"
+        $('#buildPaths_cypherTA').css('visibility', visibility);
+    }
+    self.onUnSelectNodeDiv = function () {
+        currentDivIndex = -1;
+        var index = self.queryObjs.length - 1;
+        var label = null;
+        if (index > -1)
+            label = self.queryObjs[label];
+
+        searchNodes.resetQueryClauses();
+        searchNodes.setUIPermittedLabels(label);
+
+
+        $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
+        event.stopPropagation()
+    }
     self.onSelectNodeDiv = function (index) {
         currentDivIndex = index;
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
@@ -119,9 +181,12 @@ var buildPaths = (function () {
         $(".selectLabelDiv").css("visibility", "visible");
 
         context.queryObject = self.queryObjs[index];
-        searchNodes.previousAction = "complexQueryNodeSelected";
 
-        searchNodes.activatePanel("searchCriteriaDivFrombuildPaths");
+
+        searchNodes.setUpdateContextQueryObject();
+        $("#mainAccordion").accordion("option", "active", 0);
+        $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
+        event.stopPropagation()
 
 
     }
@@ -139,7 +204,7 @@ var buildPaths = (function () {
 
     }
 
-    self.nodeInResult = function (index) {
+    /*self.nodeInResult = function (index) {
         if (!self.queryObjs[index].inResult) {
             $("#complexQuery_nodeDiv_" + index).addClass("buildPaths-nodeInResultDiv");
             self.queryObjs[index].inResult = true;
@@ -149,30 +214,68 @@ var buildPaths = (function () {
             self.queryObjs[index].inResult = false;
             $(("#buildPaths_inResultButton")).html('In Result')
         }
+    }*/
+
+    self.clusterNodesInGraph = function (index) {
+        if (!self.queryObjs[index].clusterInResult) {
+            self.queryObjs[index].clusterInResult = true;
+        } else {
+            delete self.queryObjs[index].clusterInResult;
+        }
     }
+
     self.clear = function () {
         self.queryObjs = [];
         globalHtml = "";
-        self.drawNodeQueryDivs();
-        currentDivIndex = -1
+        currentDivIndex = -1;
+        $("#buildPaths_cypherTA").text("")
+        self.cypher = "";
+        $("#buildGraphDiv").html("")
+        //  $("#buildPaths_matchNodesWrapper").html("")
+        globalHtml = ""
+
+
     }
-    self.reset = function () {
-        self.queryObjs = [];
-        $("#buildPaths_matchNodesWrapper").html("");
-        currentDivIndex = -1
+    self.showMoreParams = function (type) {
+        currentSetType = type
+        var labels = [];
+        self.queryObjs.forEach(function (queryObject, index) {
+            labels.push({label: (queryObject.label + "-" + index), index: index})
+        })
+        common.fillSelectOptions(buildPaths_labelSelect, labels, "label", "index", true)
+
+        if (type == "others" || type == "set") {
+            $("#buildPath_moreParamsDiv").css("visibility", "visible")
+            if (type == "set")
+                $("#buildPath_moreParamsSetDiv").css("visibility", "visible")
+
+
+        }
     }
-    self.executeQuery = function () {
+    /*  self.reset = function () {
+          self.queryObjs = [];
+          $("#buildPaths_matchNodesWrapper").html("");
+          currentDivIndex = -1
+      }*/
+
+    self.executeQuery = function (type) {
+
+
         $("#searchDialog_previousPanelButton").css('visibility', 'visible');
         var countResults = self.countResults();
-        if (countResults == 0) {
-            return alert("you must least include on label in return clause of the query")
+        /* if (countResults == 0) {
+             return alert("you must least include on label in return clause of the query")
+         }*/
+        if (!currentSetType) {
+            $("#buildPath_moreParamsDiv").css('visibility', 'hidden')
         }
+        self.cypher = self.buildQuery(type);
+        $('#buildPaths_cypherTA').val(self.cypher);
 
+        Cypher.executeCypher(self.cypher, function (err, result) {
 
-        var cypher = self.buildQuery();
-        $("#buildPaths_cypherDiv").html(cypher)
-        Cypher.executeCypher(cypher, function (err, result) {
             if (err) {
+                console.log("ERROR " + self.cypher)
                 return $("#buildPaths_resultDiv").html(err)
             }
             if (result.length == 0)
@@ -180,19 +283,53 @@ var buildPaths = (function () {
             if (false && result.length > Gparams.graphMaxDataLengthToDisplayGraphDirectly)
                 return $("#buildPaths_resultDiv").html("too many results" + result.length);
 
-            self.currentDataset = self.prepareDataset(result);
-            $("#buildPaths_resultDiv").html(+result.length + " pathes found")
 
-            var html = "<button onclick='buildPaths.displayTable()'>table or stat</button>"
-            if (countResults == 1)
-                html += "<button onclick='buildPaths.defineAsSet()'>define as set</button>"
-            // else {
-            html += "<button onclick='buildPaths.displayGraph()'>Graph</button>";
+            if (type == "count") {
+                $("#buildPaths_resultDiv").html(+result[0].cnt + " pathes found");
+                return;
+            }
+            else if (type == "dataTable") {
+                $("#buildPaths_resultDiv").html(+result.length + " pathes found");
+                self.currentDataset = self.prepareDataset(result);
+                return buildPaths.displayTable();
+            }
+            else if (type == "graph") {
+                $("#buildPaths_resultDiv").html(+result.length + " pathes found");
+                self.currentDataset = self.prepareDataset(result);
+                return buildPaths.displayGraph();
+            }
+            else if (currentSetType) {
+                var index = $("#buildPaths_labelSelect").val();
+                if (index == "" || index < 0)
+                    return;
+                index = parseInt(index);
+                var queryObj = self.queryObjs[index];
+                if (currentSetType == "set") {
+                    currentSetType = null;
+                    var name = $("#buildPaths_setName").val();
+                    var comment = $("#buildPaths_setCommentTA").val();
+                    nodeSets.create(name, queryObj.label, comment, self.cypher, result[0].setIds, function (err, resultSet) {
+                        var message = "";
+                        if (err)
+                            message = "ERROR " + err;
+                        else
+                            message = "Set " + name + "created :" + result[0].set.length + " nodes"
+                        $("#buildPaths_resultDiv").html(message)
+
+                    })
+
+                }
+                else if(currentSetType=="others"){
+                    if(!context.currentSet)
+                        context.currentSet={}
+                        context.currentSet.nodeIds= result[0].setIds;
 
 
-            //  }
-            //   globalHtml+=html
-            $("#buildPaths_resultActionDiv").html(html)
+                    searchNodes.activatePanel("searchActionDiv");
+                }
+
+            }
+
 
         })
 
@@ -209,7 +346,7 @@ var buildPaths = (function () {
         return count;
     }
 
-    self.buildQuery = function () {
+    self.buildQuery = function (type) {
         if (self.queryObjs.length == 0)
             return console.log("self.queryObjs is empty")
 
@@ -217,25 +354,31 @@ var buildPaths = (function () {
         var whereCypher = "";
         var returnCypher = "";
         var distinctWhere = "";
-        var alphabet = "abcdefghijklmno"
+
         self.queryObjs.forEach(function (queryObject, index) {
-            var symbol = alphabet.charAt(index)
+            var symbol = alphabet.charAt(index);
+            queryObject.inResult = $("#buildPaths-inResultCbx_" + index).is(':checked');
+
             if (index > 0)
                 matchCypher += "-[r" + index + "]-"
             matchCypher += "(" + symbol + ":" + queryObject.label + ")";
 
             if (queryObject.value && queryObject.value != "") {
-
-                whereCypher = searchNodes.buildWhereClauseFromUI(queryObject, symbol);
-
-                if (context.queryObject.subQueries) {
-                    context.queryObject.subQueries.forEach(function (suqQuery) {
+                if (whereCypher != "")
+                    whereCypher += " AND "
+                whereCypher += searchNodes.buildWhereClauseFromUI(queryObject, symbol);
+            }
+            if (context.queryObject.subQueries) {
+                context.queryObject.subQueries.forEach(function (suqQuery) {
+                    if (suqQuery.value && suqQuery.value != "") {
                         whereCypher += " " + suqQuery.booleanOperator + " " + searchNodes.buildWhereClauseFromUI(suqQuery, symbol);
-                    })
-                }
+                    }
+                })
             }
 
-            if (queryObject.inResult) {
+
+            else if (queryObject.inResult) {
+
 
                 if (returnCypher.length > 0) {
                     returnCypher += ",";
@@ -244,14 +387,30 @@ var buildPaths = (function () {
                 returnCypher += symbol;
                 distinctWhere += "ID(" + symbol + ")";
             }
+
         })
         if (whereCypher.length > 0)
-            whereCypher = " where " + whereCypher;
+            whereCypher = " WHERE " + whereCypher;
 
-        distinctWhere = "distinct(" + distinctWhere + ") as distinctIds";// pour supprimer les doublons
-        var cypher = " match " + matchCypher + " " + whereCypher + " return " + distinctWhere + "," + returnCypher + " limit " + Gparams.maxResultSupported;
+        if (type == "count") {
+            returnCypher = "count(a) as cnt";
+            distinctWhere = "";
+        }
+        else if (type == "set") {
+            var index = $("#buildPaths_labelSelect").val();
+            var symbol = alphabet.charAt(index);
+            returnCypher = "collect(ID(" + symbol + ")) as setIds";
+            distinctWhere = "";
+        }
+        else {
+            distinctWhere = "DISTINCT(" + distinctWhere + ") as distinctIds,";// pour supprimer les doublons
+        }
+
+
+        var cypher = " MATCH p=(" + matchCypher + ") " + whereCypher + " RETURN " + distinctWhere + returnCypher + " LIMIT " + Gparams.maxResultSupported;
         return cypher;
     }
+
 
     //var union=   "match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where  a.name=~'(?i).*art.*' and  cntR> 5 match(a)-[r]-(b2) return a , collect(id(b2)) as bx limit 100 union match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where cntR<5 match(a)-[r]-(b2) return a,b2 as bx limit 100"
 
@@ -294,9 +453,14 @@ var buildPaths = (function () {
 
 
     }
-    self.hide = function () {
-        self.isEditing = false;
-        $("#dialogLarge").dialog("close");
+    self.expandCollapse = function () {
+        if ($("#buildGraphDiv").html() == "") {
+            $("#buildGraphDiv").html(globalHtml);
+        } else {
+            $("#buildGraphDiv").html("");
+        }
+
+
     }
 
 
@@ -319,7 +483,7 @@ var buildPaths = (function () {
             return connections;
         }
 
-        self.hide();
+        self.expandCollapse();
         var tableDataset = [];
         var columns = self.currentDataset.columns;
         self.currentDataset.data.forEach(function (line) {
@@ -369,12 +533,15 @@ var buildPaths = (function () {
 
     }
     self.defineAsSet = function () {
+        var setName = prompt("set name ?")
+        if (!setName || setName == "")
+            return;
 
     }
 
 
     self.displayGraph = function () {
-        self.hide()
+        self.expandCollapse()
 
         toutlesensController.setGraphMessage("Working...")
         var visjsData = {nodes: [], edges: [], labels: []};

@@ -3,7 +3,8 @@ var context = (function () {
     var self = {};
     self.graphContext = {};
     self.queryObject = {};
-    self.currentNode = {}
+    self.currentNode = {};
+    self.currentSet={}
 
 
 

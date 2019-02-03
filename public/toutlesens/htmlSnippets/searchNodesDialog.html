@@ -1,24 +1,39 @@
-
 <!--https://css-tricks.com/snippets/css/a-guide-to-flexbox-->
 <style>
 
     .rightPanel {
-        display:flex;
+        display: flex;
         flex-wrap: wrap;
         justify-content: center;
         width: 350px;
     }
 
     .buildPaths {
-        display:flex;
+        display: flex;
         flex-wrap: wrap;
         justify-content: left;
         background-color: #7f9f7f;
-        margin-top: 200px;
+        margin-top: 0px;
 
     }
+
+    .buildPathsButtons {
+        font-size: 10px;
+    }
+
+    #buildGraphDiv {
+
+        background-color: #f4d3b3;
+      //  border-style: solid;
+    }
+
+    .complexQuery-nodeConditionDiv, .complexQuery-nodeConditionDiv, .complexQuery-resultCountDiv {
+        display: inline;
+        font-size: 10px;
+    }
+
     .buildPaths-nodeDiv {
-        display:flex;
+        display: flex;
         flex-wrap: wrap;
         flex-direction: column;
         justify-content: center;
@@ -31,17 +46,19 @@
         margin: 5px;
 
     }
-    .buildPaths-nodeDivSelected{
+
+    .buildPaths-nodeDivSelected {
         border-width: 5px;
         border-color: #0000cc;
     }
 
     .buildPaths-nodeInResultDiv {
 
-        background-color: #f8893f;
+        background-color: #d9bb73;
     }
+
     .buildPaths-partDiv {
-        width: 150px;
+        width: 100px;
         background-color: #a9b7d1;
         border-style: solid;
         border-width: 1px;
@@ -49,12 +66,10 @@
 
         padding: 5px;
         margin: 5px;
-        display:flex;
+
         justify-content: center;
 
-
     }
-
 
     .searchPanel {
 
@@ -149,9 +164,17 @@
         width: 300px;
         text-align: center;
     }
+
+    .buttonsWrapperDiv {
+        background-color: #eee;
+        border-style: solid;
+        border-width: thin;
+        border-radius: 3px;
+        padding: 3px
+    }
 </style>
 
-<div  style="display:flex;justify-content: center">
+<div style="display:flex;justify-content: center">
     <div id="searchCriteriaDiv" style="overflow: hidden;display:table;align-content: center"
          class="searchPanel rightPanel">
 
@@ -175,27 +198,32 @@
                         </select>
 
                         <input id="searchDialog_valueInput" size="10"
-                               onkeyup="$('#searchCriteriaAddButton').css('visibility','visible'); $('#searchDialog_nextPanelButton').css('visibility', 'visible');">
+                               onkeyup="$('#searchCriteriaAddButton').css('visibility','visible');">
 
 
-                       <!-- <div  style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">-->
-                            <div  style="padding :3px" class="rightPanel">
-                                <input type="image" title="Build path" height="20px"
-                                       onclick="buildPaths.show(true)" id="toTextMenuButton" src="images/path.png"
-                                       class=""/>
+                        <!-- <div  style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">-->
+                        <div style="padding :3px" class="rightPanel">
 
-                            <button   style="font-size: 10px;background-color:#7f9f7f" onclick="buildPaths.show('and');">
-                                AND
-                            </button>
-                            <button  style="font-size: 10px;background-color:#7f9f7f" onclick="buildPaths.show('or');">
-                                OR
-                            </button>
+                            <div id="searchDialog_booleanOperatorsDiv" class="buttonsWrapperDiv">
+                                <button id="searchDialog_booleanOperatorsOnly" style="font-size: 10px;background-color:#7f9f7f"
+                                        onclick="buildPaths.show('only');">
+                                    ONLY
+                                </button>
+                                <button  id="searchDialog_booleanOperatorsAnd" style="font-size: 10px;background-color:#7f9f7f"
+                                        onclick="buildPaths.show('and');">
+                                    AND
+                                </button>
+                                <button  id="searchDialog_booleanOperatorsOr" style="font-size: 10px;background-color:#7f9f7f"
+                                        onclick="buildPaths.show('or');">
+                                    OR
+                                </button>
+                            </div>
 
 
                         </div>
 
-                    <!--    <input type="image" height="20px" src="images/erase.png"
-                               onclick="$('#searchDialog_valueInput').val('')">-->
+                        <!--    <input type="image" height="20px" src="images/erase.png"
+                                   onclick="$('#searchDialog_valueInput').val('')">-->
                     </td>
                 </tr>
 
@@ -203,7 +231,7 @@
             </table>
 
             <input type="hidden" id="searchDialog_ObjectTypeInput" value="node">
-         <!--   <input type="hidden" id="searchDialog_NodeLabelInput" value="">-->
+            <!--   <input type="hidden" id="searchDialog_NodeLabelInput" value="">-->
             <input type="hidden" id="searchDialog_NodeLabelInut" value="">
 
         </div>
@@ -220,15 +248,14 @@
             </div>
 
 
-
             <div style="display:inline-list-item" class="actionSelectDiv "
                  onclick="searchNodes.onSearchAction('treeNodes')"><img align="center"
-                                                                       src="images/graphSmall.png">
+                                                                        src="images/graphSmall.png">
                 Tree
             </div>
             <div style="display:inline-list-item" class="actionSelectDiv "
                  onclick="searchNodes.onSearchAction('tableNodes')"><img align="center"
-                                                                        src="images/tableSmall.png">
+                                                                         src="images/tableSmall.png">
                 Table
             </div>
             <div style="display:inline-list-item" class="actionSelectDiv actionSelectDivHidden"
@@ -243,14 +270,14 @@
             </div>
             <div style="display:inline-list-item" class="actionSelectDiv "
                  onclick="searchNodes.onSearchAction('algorithms')"><img align="center"
-                                                                        src="images/treemapSmall.png">
+                                                                         src="images/treemapSmall.png">
                 Algorithms
             </div>
-            <div style="display:inline-list-item  " class="actionSelectDiv actionSelectDivHidden" onclick="searchNodes.onSearchAction('path')">
+            <div style="display:inline-list-item  " class="actionSelectDiv actionSelectDivHidden"
+                 onclick="searchNodes.onSearchAction('path')">
                 <img align="center"
                      src="images/graphSmall.png"> Pathes beetwen nodes
             </div>
-
 
 
             <div style="display:inline-list-item" class="actionSelectDiv actionSelectDivHidden"
@@ -388,16 +415,11 @@
 </div>
 
 
-
-
-
-
-
 <div id="searchNavDiv" class="rightPanel">
-    <div id="searchNavActionDiv"
-         style="background-color: #eee; border-style: solid; border-width: thin;padding :3px">
+    <div id="searchNavActionDiv" class="buttonsWrapperDiv">
 
-        <button class="searchDialog_NavButton_visible" style="visibility:visible; float:left" id="searchDialog_newQueryButton"
+        <button class="searchDialog_NavButton_visible" style="visibility:visible; float:left"
+                id="searchDialog_newQueryButton"
                 onclick="searchNodes.activatePanel('searchCriteriaDiv');">
             new
         </button>
@@ -407,9 +429,9 @@
                 onclick="searchNodes.previousPanel();">previous
         </button>
 
-      <!--  <button class="searchDialog_NavButton" onclick="searchNodes.nextPanel();"
-                id="searchDialog_nextPanelButton">next
-        </button>-->
+        <!--  <button class="searchDialog_NavButton" onclick="searchNodes.nextPanel();"
+                  id="searchDialog_nextPanelButton">next
+          </button>-->
         <button class="searchDialog_NavButton" onclick="buildPaths.show('only');"
                 id="searchDialog_nextPanelButton">next
         </button>
