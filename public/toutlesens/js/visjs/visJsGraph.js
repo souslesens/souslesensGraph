@@ -33,12 +33,13 @@ var visjsGraph = (function () {
         self.physics = {
 
             "barnesHut": {
-                "gravitationalConstant": -39950,
+               // "gravitationalConstant": -39950,
+                "gravitationalConstant": -10000,
                 "centralGravity": 0.35
             },
             "minVelocity": 0.75,
-            stabilization: false,
-            timestep: physicsTimeStep,
+            stabilization:{enabled: false},
+           // timestep: physicsTimeStep,
 
         }
         var showNodesLabelMinScale = .3;
@@ -521,13 +522,18 @@ var visjsGraph = (function () {
             self.legendLabels = labels;
             expandGraph.initSourceLabel(labels)
             var html = "<table>";
-            var onClick = ""
+            var onClick = "";
+            var usedLabels=[];
             for (var i = 0; i < labels.length; i++) {
-                var label = labels[i];
-                if (!nodeColors[label])
-                    continue;
-                html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" + label + "</span></td></tr>"
 
+                var label = labels[i];
+                if(usedLabels.indexOf(label)<0) {
+                    usedLabels.push(label)
+                    if (label && label != "" && nodeColors[label]){
+                            continue;
+                        html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" + label + "</span></td></tr>"
+                    }
+                }
             }
             html += "</table>"
             $("#graphLegendDiv").html(html);
@@ -798,8 +804,8 @@ var visjsGraph = (function () {
 
                 options.physics = {
                     enabled: true,
-                    stabilization: false,
-                    timestep: 0.46
+                    stabilization:{enabled: false},
+
                 };
 
             }
@@ -810,8 +816,8 @@ var visjsGraph = (function () {
                         direction: "UD"
                     }
                     ,
-                    stabilization: false,
-                    timestep: 0.46
+                    stabilization: {enabled: false},
+
                 };
             }
             network.setOptions(options);

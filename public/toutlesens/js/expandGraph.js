@@ -13,7 +13,7 @@ var expandGraph = (function () {
 
     }
 
-    self.execute = function () {
+    self.expandFromUI = function () {
         var filter = self.getExpandWhereFilter();
         var sourceLabel = $('#expand_labelsSelectSource').val();
         var targetLabel = $('#expand_labelsSelectTarget').val()
@@ -21,24 +21,38 @@ var expandGraph = (function () {
 
         var showAllNewNodesrelations = $("#expand_showAllrelationsCbx").prop("checked");
         self.expandedNodes = []
-
-
         self.initialDataset = {
             nodes: mapToArray(visjsGraph.nodes._data),
             edges: mapToArray(visjsGraph.edges._data),
         }
-
-
         if (sourceLabel == "" || targetLabel == "")
             return;
-
-
         var ids = visjsGraph.getNodesNeoIdsByLabelNeo(sourceLabel);
         var where = searchNodes.getWhereClauseFromArray("_id", ids, "n");
         var cypher = "match(n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ")" +
             " where " + where + " " +//" and NOT p:"+sourceLabel+
             " return n, collect(m) as mArray" +
-            " limit " + Gparams.maxResultSupported
+            " limit " + Gparams.maxResultSupported;
+
+        self.execute(cypher, clusterLimit, showAllNewNodesrelations, targetLabel);
+    }
+
+
+    self.expandFromNode = function (currentNode,label) {
+
+        var targetLabelStr="";
+        if(label)
+            targetLabelStr=":"+label;
+        var cypher = "match(n:" + currentNode.label + ")-[r]-(m" + targetLabelStr + ")" +
+            " where id(n)=" + currentNode.id + " " +//" and NOT p:"+sourceLabel+
+            " return n, collect(m) as mArray" +
+            " limit " + Gparams.maxResultSupported;
+        self.execute(cypher, 1000, true, label);
+
+
+    }
+
+    self.execute = function (cypher, clusterLimit, showAllNewNodesrelations, targetLabel) {
 
         console.log(cypher);
         var newNodes = [];
@@ -51,6 +65,8 @@ var expandGraph = (function () {
                 return console.log(err);
             var nodes = visjsGraph.nodes._data;
             var edges = visjsGraph.edges._data;
+
+            var allLabels=[];
 
 
             function getSizeBounds() {
@@ -94,6 +110,9 @@ var expandGraph = (function () {
                         labels: [targetLabel],
 
                     }
+                    if(visjsGraph.legendLabels.indexOf(targetLabel)<0)
+                        visjsGraph.legendLabels.push(targetLabel);
+
                     var visjsNode = connectors.getVisjsNodeFromNeoNode(nodeNeo, true);
 
                     var nodeSize = scaleSizefn(size);
@@ -122,6 +141,9 @@ var expandGraph = (function () {
                                 newNodes.push(visjsNode);
                             }
                         }
+                        var label=neoNode.labels[0]
+                        if(visjsGraph.legendLabels.indexOf(label)<0)
+                            visjsGraph.legendLabels.push(label);
 
 
                         var from = line.n._id;
@@ -144,6 +166,7 @@ var expandGraph = (function () {
 
             self.newNodes = newNodes;
             self.drawGraph(newNodes, newEdges, targetLabel)
+            visjsGraph.drawLegend(visjsGraph.legendLabels);
 
             if (showAllNewNodesrelations) {
                 // create edges with nodes other than source node
@@ -180,6 +203,7 @@ var expandGraph = (function () {
 
                     })
                     visjsGraph.edges.update(newEdges2);
+
                 })
             }
         })

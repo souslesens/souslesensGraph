@@ -94,7 +94,7 @@ var buildPaths = (function () {
 
         self.queryObjs[index] = queryObject;
 
-        $("#complexQuery_nodeConditionDiv_" + index).html(queryObject.globalText)
+        $("#buildPath_nodeConditionDiv_" + index).html(queryObject.globalText)
         globalHtml = $("#buildGraphDiv").html()
 
         self.cypher = self.buildQuery();
@@ -103,7 +103,7 @@ var buildPaths = (function () {
         if(queryObject.nodeIds.length>=Gparams.listDisplayLimitMax)
             maxStr=">"
         var queryCountNodes = "<b>" +maxStr+ queryObject.nodeIds.length + " nodes" + "</b>";
-        $("#complexQuery_resultCountDiv_"+index).html(queryCountNodes)
+        $("#buildPath_resultCountDiv_"+index).html(queryCountNodes)
 
     }
 
@@ -139,10 +139,10 @@ var buildPaths = (function () {
             classInResult = " buildPaths-nodeInResultDiv";
 
 
-        var html = "<div id='complexQuery_nodeDiv_" + index + "' class=' buildPaths-nodeDiv " + classInResult + "'  onclick='buildPaths.onSelectNodeDiv(" + index + ")'>" +
+        var html = "<div id='buildPath_nodeDiv_" + index + "' class=' buildPaths-nodeDiv " + classInResult + "'  onclick='buildPaths.onSelectNodeDiv(" + index + ")'>" +
             " <div class='buildPaths-partDiv' style='background-color: " + color + "'><b>" + queryObject.label + "</b></div>" +
-            "<div id='complexQuery_nodeConditionDiv_" + index + "' class='complexQuery-nodeConditionDiv buildPaths-partDiv'> " + queryText + "</div>" +
-            "<div id='complexQuery_resultCountDiv_" + index + "' class='complexQuery-resultCountDiv buildPaths-partDiv'> " + queryCountNodes + "</div>" +
+            "<div id='buildPath_nodeConditionDiv_" + index + "' class='buildPath-nodeConditionDiv buildPaths-partDiv'> " + queryText + "</div>" +
+            "<div id='buildPath_resultCountDiv_" + index + "' class='buildPath-resultCountDiv buildPaths-partDiv'> " + queryCountNodes + "</div>" +
             // " <div class='buildPaths-partDiv'><button  id='buildPaths_inResultButton'  onclick='buildPaths.nodeInResult(" + index + ")'>not in result</button> </div>" +
             "<span><input type='checkbox' id='buildPaths-inResultCbx_" + index + "' checked='checked' >in result </span><br>"
         // " <span><input type='checkbox' id='buildPaths-inResultCbx' checked='checked' onclick='buildPaths.nodeInResult(" + index + ")'>in result </span><br>";
@@ -181,19 +181,21 @@ var buildPaths = (function () {
         var index = self.queryObjs.length - 1;
         var label = null;
         if (index > -1)
-            label = self.queryObjs[label];
+            label = self.queryObjs[index].label;
 
         searchNodes.resetQueryClauses();
         searchNodes.setUIPermittedLabels(label);
 
 
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
+        $("#mainAccordion").accordion("option", "active", 0);
+        $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
         event.stopPropagation()
     }
     self.onSelectNodeDiv = function (index) {
         currentDivIndex = index;
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
-        $("#complexQuery_nodeDiv_" + index).addClass("buildPaths-nodeDivSelected")
+        $("#buildPath_nodeDiv_" + index).addClass("buildPaths-nodeDivSelected")
         $(".selectLabelDiv").css("visibility", "visible");
 
         context.queryObject = self.queryObjs[index];
@@ -222,11 +224,11 @@ var buildPaths = (function () {
 
     /*self.nodeInResult = function (index) {
         if (!self.queryObjs[index].inResult) {
-            $("#complexQuery_nodeDiv_" + index).addClass("buildPaths-nodeInResultDiv");
+            $("#buildPath_nodeDiv_" + index).addClass("buildPaths-nodeInResultDiv");
             self.queryObjs[index].inResult = true;
             $(("#buildPaths_inResultButton")).html('Not in Result')
         } else {
-            $("#complexQuery_nodeDiv_" + index).removeClass("buildPaths-nodeInResultDiv");
+            $("#buildPath_nodeDiv_" + index).removeClass("buildPaths-nodeInResultDiv");
             self.queryObjs[index].inResult = false;
             $(("#buildPaths_inResultButton")).html('In Result')
         }
@@ -472,11 +474,12 @@ var buildPaths = (function () {
                 props.labelNeo = line[key].labels[0];
                 if (labels.indexOf(props.labelNeo) < 0)
                     labels.push(props.labelNeo);
-                var obj = {
+                var obj=connectors.getVisjsNodeFromNeoNode( line[key],false)
+             /*   var obj = {
                     id: line[key]._id,
                     neoAttrs: props,
                     label: props.labelNeo
-                }
+                }*/
                 lineObj[key] = obj;
 
             }
@@ -546,6 +549,7 @@ var buildPaths = (function () {
             }
 
 
+
         })
         tableDataset.sort(function (a, b) {
             if (a.label > b.label) {
@@ -580,7 +584,7 @@ var buildPaths = (function () {
 
     self.displayGraph = function () {
         self.expandCollapse()
-
+var relsCount={};
         toutlesensController.setGraphMessage("Working...")
         var visjsData = {nodes: [], edges: [], labels: []};
         visjsData.labels = self.currentDataset.labels;
@@ -591,7 +595,8 @@ var buildPaths = (function () {
                 if (uniqueNodes.indexOf(nodeNeo.id) < 0) {
                     uniqueNodes.push(nodeNeo.id);
                     var visjsNodeLabel = nodeNeo.neoAttrs[Schema.getNameProperty(nodeNeo.label)];
-                    var visjsNode = {
+                 //   var visjsNode =connectors.getVisjsNodeFromNeoNode(nodeNeo,false);
+                /*   var visjsNode = {
                         labelNeo: nodeNeo.label,// because visjs where label is the node name
                         color: nodeColors[nodeNeo.label],
                         myId: nodeNeo.id,
@@ -603,7 +608,8 @@ var buildPaths = (function () {
                         //   label: visjsNodeLabel,
                         hiddenLabel: visjsNodeLabel,
                         // title: visjsNodeLabel
-                    }
+                    }*/
+                    var visjsNode=nodeNeo;
                     visjsData.nodes.push(visjsNode);
                 }
             }
@@ -622,13 +628,17 @@ var buildPaths = (function () {
                         width: 1,
 
                     }
-                    visjsData.edges.push(relObj)
+                    visjsData.edges.push(relObj);
+                    if(!relsCount[indexSymbol])
+                        relsCount[indexSymbol]=0
+                    relsCount[indexSymbol]+=1
                 }
                 previousSymbol = symbol;
 
             })
         })
 
+        self.updateResultCountDiv(relsCount);
         visjsGraph.draw("graphDiv", visjsData, {});
         visjsGraph.drawLegend(visjsData.labels);
         filters.currentLabels = visjsData.labels;
@@ -639,6 +649,17 @@ var buildPaths = (function () {
         searchNodes.onExecuteGraphQuery()
 
 
+    }
+    
+    self.updateResultCountDiv=function(relsCount){
+      /*  for(var key in relsCount){
+
+            var html=$("#buildPath_resultCountDiv_1"+key).html();
+            html="<span class=buildPath-relCount>"+relsCount[key]+"</span>/"+html
+            $("#buildPath_resultCountDiv_1"+key).html(html)
+
+        }*/
+        
     }
 
     return self;

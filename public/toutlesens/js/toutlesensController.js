@@ -604,10 +604,7 @@ var toutlesensController = (function () {
 
             }
             else if (action == 'expandNode') {
-                toutlesensController.generateGraph(context.currentNode.id, {
-                    applyFilters: false,
-                    addToPreviousQuery: true
-                });
+                expandGraph.expandFromNode(context.currentNode,null);
             }
             else if (action == 'expandNodeWithLabel') {
                 var labels = Schema.getPermittedLabels(context.currentNode.labelNeo, true, true);
@@ -616,21 +613,18 @@ var toutlesensController = (function () {
                 for (var i = 0; i < labels.length; i++) {
                     str += "<option>" + labels[i] + "</option>>";
                 }
+                str+="</select>"
                 $("#graphPopup").append(str);
                 $("#graphPopup").css("visibility", "visible");
 
             }
             else if (action == 'expandNodeWithLabelExecute') {
+                var currentLabel;
                 if (objectId != "" && objectId != "ALL")
                     currentLabel = objectId;
                 else
                     currentLabel = null;
-                toutlesensController.generateGraph(context.currentNode.id, {
-                    applyFilters: false,
-                    addToPreviousQuery: true
-                }, function (err, result) {
-                    currentLabel = null;
-                });
+                expandGraph.expandFromNode(context.currentNode,currentLabel);
             }
             else if (action == 'expandGraphWithLabelExecute') {
 

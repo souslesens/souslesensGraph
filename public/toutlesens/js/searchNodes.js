@@ -114,7 +114,7 @@ var searchNodes = (function () {
             $("#searchNavActionDiv").css('visibility', 'visible');
             // $("#searchDialog_nextPanelButton").css('visibility', 'visible');
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
-            $("#searchDialog_complexQueryUIButton").css('visibility', 'visible');
+            $("#searchDialog_buildPathUIButton").css('visibility', 'visible');
             $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
 
 
@@ -217,7 +217,7 @@ var searchNodes = (function () {
             self.searchPanels.currentIndex -= 1;
 
 
-            if (self.previousAction == 'complexQueryUI') {
+            if (self.previousAction == 'buildPathUI') {
                 buildPaths.draw();
                 return;
 

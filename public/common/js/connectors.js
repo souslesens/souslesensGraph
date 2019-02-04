@@ -156,9 +156,9 @@ var connectors = (function () {
                 nodeObj.label = labelVisjs;
                // nodeObj.title = labelVisjs;
             }
-            else{
+
                 nodeObj.hiddenLabel = labelVisjs;
-            }
+
 
 
             nodeObj.initialColor = nodeObj.color;
