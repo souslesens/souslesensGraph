@@ -411,7 +411,7 @@ var searchNodes = (function () {
 
             eventsController.stopEvent = true;
             toutlesensController.openFindAccordionPanel(false);
-            paintAccordion.accordion("option", "active", 1)
+            paintAccordion.accordion("option", "active", 0)
             tabsAnalyzePanel.tabs("option", "active", 2);//highlight
         }
 
@@ -430,7 +430,7 @@ var searchNodes = (function () {
                 if (!self.dataTable)
                     self.dataTable = new myDataTable();
 
-                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentObject.nodeSetIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id",context.queryObject.nodeSetIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
                 dialogLarge.load("htmlSnippets/dataTable.html", function () {
                     dialogLarge.dialog("open");
                     self.dataTable.loadNodes(self.dataTable, "dataTableDiv", cypher, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {
@@ -442,7 +442,7 @@ var searchNodes = (function () {
             }
 
             if (action == 'graphNodes') {
-                var cypher = "MATCH (n) where " + toutlesensData.getWhereClauseFromArray("_id", context.currentObject.nodeSetIds, "n") + ' RETURN n ' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id",context.queryObject.nodeSetIds, "n") + ' RETURN n ' + Schema.getNameProperty();
                 //   Cypher.
 
 
@@ -450,7 +450,7 @@ var searchNodes = (function () {
 
             if (action == 'graphSomeNeighboursListLabels') {
 
-                var options = {useStartNodeSet: context.currentObject.nodeSetIds};
+                var options = {useStartNodeSet:context.queryObject.nodeSetIds};
 
                 if ($("#graphNeighboursAllOptionsCbx").prop("checked")) {// all neighbours
                     ;
@@ -535,7 +535,7 @@ var searchNodes = (function () {
 
 
                 var options = {
-                    useStartNodeSet: context.currentObject.nodeSetIds,
+                    useStartNodeSet:context.queryObject.nodeSetIds,
                     useStartLabels: [context.queryObject.label],
                     useEndLabels: neighboursLabels,
                 }
@@ -682,7 +682,7 @@ var searchNodes = (function () {
                             return a.filter(Set.prototype.has, new Set(b));
                         }
 
-                        context.queryObject.nodeIds = intersectArray(context.currentObject.nodeSetIds, newIds)
+                        context.queryObject.nodeIds = intersectArray(context.queryObject.nodeIds, newIds)
                     } else {
                         if (!context.queryObject.nodeIds)
                             context.queryObject.nodeIds = [];
@@ -791,6 +791,30 @@ var searchNodes = (function () {
             }
             return propStr;
 
+        }
+
+        self.getWhereClauseFromArray = function (property, _array, nodeSymbol) {
+            var array;
+            if (!nodeSymbol)
+                nodeSymbol = "n";
+            if (typeof _array == "string")
+                array = _array.split(",");
+            else
+                array = _array;
+
+            var query = nodeSymbol + "." + property + " in ["
+            if (property == "_id")
+                query = "ID(n) in ["
+            var quote = "";
+            for (var i = 0; i < array.length; i++) {
+                if (i > 0 && i < array.length)
+                    query += ","
+                else if ((typeof array[i] === 'string'))
+                    var quote = "\"";
+                query += quote + array[i] + quote;
+            }
+            query += "] ";
+            return query;
         }
 
 

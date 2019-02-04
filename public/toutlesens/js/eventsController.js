@@ -146,39 +146,21 @@ var eventsController = (function () {
 
                         if (index == 0) {
                             toutlesensController.currentActionObj.mode = "infos";
-
                         }
                         if (index == 1) {
                             toutlesensController.currentActionObj.mode = "filter";
-                            /*    var filterMovableDiv = $("#filterMovableDiv").detach();
-                                $("#searchCriteriaTextDiv").css("visibility", "hidden");
-                                $("#searchCriteriaAddButton").css("visibility", "hidden");
-
-                                $("#filterDiv").append(filterMovableDiv);
-                                $("#filterActionDiv").html(
-                                    "<button onclick=\"filters.filterOnProperty(null,'only')\">Only</button>" +
-                                    "<button onclick=\"filters.filterOnProperty(null,'not')\">Not</button>" +
-                                    "<button onclick=\"filters.filterOnProperty(null,'removeAll')\">Clear Filter</button>"
-                                );
-                                filters.setLabelsOrTypes("node");*/
                         }
                         if (index == 2) {
-                            toutlesensController.currentActionObj.mode = "highlight";
-
-                            /*   $("#searchCriteriaTextDiv").css("visibility","hidden").css("height","10px");
-                               $("#searchCriteriaAddButton").css("visibility", "hidden");
-                               $("#propertiesSelectionDialog_propertySelect").val("");
-                               var filterMovableDiv = $("#filterMovableDiv").detach();
-                               $("#highlightDiv").append(filterMovableDiv);*/
-                            /*   $("#highlightDiv").load("htmlSnippets/paintDialog.html", function () {
-                                   paint.initColorsPalette(10, "paintDialogPalette");
-                                   filters.setLabelsOrTypes("node");
-                               });*/
+                            toutlesensController.currentActionObj.mode = "expand";
 
                         }
-
                         if (index == 3) {
-                            searchNodes.searchSimilars(context.currentNode);
+                            toutlesensController.currentActionObj.mode = "highlight";
+                            $("#paintAccordion").accordion("option", "active",1)
+                            $("#paintAccordion").accordion("option", "active", 0)
+
+                        } if (index == 4) {
+                            //searchNodes.searchSimilars(context.currentNode);
                         }
 
 
@@ -205,9 +187,10 @@ var eventsController = (function () {
                             $("#nodeDiv").append(nodeDivDetach);
 
                         }
-                        if (index == 0)
+                        if (index == 0) {
+
                             ;//toutlesensController.currentActionObj = {type: "findNode"}
-                        if (index == 1)
+                        } if (index == 1)
                             toutlesensController.currentActionObj = {type: "findNode"}
 
                         if (index == 2)

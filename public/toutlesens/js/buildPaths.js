@@ -10,7 +10,7 @@ var buildPaths = (function () {
 
     var globalHtml = "";
 
-    var init = function () {
+    self.init = function () {
         var globalHtmlButtons = "</div>" +
             "<div style='width: 100%;'><textarea id='buildPaths_cypherTA' onchange='buildPaths.cypher=$(this).val();' rows='2' style='width: 100%;background: #ede4d4;visibility: hidden' ></textarea><br></div>" +
             "<div style=' justify-content: center;display: flex;flex-direction: row'></div>" +
@@ -20,6 +20,7 @@ var buildPaths = (function () {
             "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('set')>Create set </button>" +
             "<button class='buildPathsButtons' onclick=buildPaths.editCypher()>Edit Cypher</button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('others')>Others... </button>" +
+            "<button  class='buildPathsButtons' onclick= searchNodes.activatePanel('searchCriteriaDiv')>New query </button>" +
 
             "</div>"
             + "<br><div id='buildPaths_resultDiv'></div>" //+
@@ -37,21 +38,14 @@ var buildPaths = (function () {
 
     }
 
+
     self.show = function (booleanOperator) {
         self.isEditing = true;
 
-        if (!$("#buildPaths_matchNodesWrapper").length)
-            init()
 
 
 
-        $("#graphPopup").css("visibility", "hidden")
-        $("#searchDialog_newQueryButton").css('visibility', 'visible');
-        $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
 
-
-        $("#buildGraphDiv").html(globalHtml);
-        $("#buildGraphDiv").css("visibility", "visible")
 
         if (context.queryObject.nodeSetIds ) {// cas we use a nodeSet
             context.queryObject.nodeIds=context.queryObject.nodeSetIds;
@@ -73,6 +67,13 @@ var buildPaths = (function () {
         searchNodes.setUIPermittedLabels(context.queryObject.label);
 
 
+        $("#graphPopup").css("visibility", "hidden")
+        $("#searchDialog_newQueryButton").css('visibility', 'visible');
+        $("#searchDialog_nextPanelButton").css('visibility', 'hidden');
+
+
+        $("#buildGraphDiv").html(globalHtml);
+        $("#buildGraphDiv").css("visibility", "visible")
 
 
 
@@ -95,9 +96,14 @@ var buildPaths = (function () {
 
         $("#complexQuery_nodeConditionDiv_" + index).html(queryObject.globalText)
         globalHtml = $("#buildGraphDiv").html()
+
         self.cypher = self.buildQuery();
         $("#buildPaths_cypherTA").text(self.cypher)
-
+        var maxStr="";
+        if(queryObject.nodeIds.length>=Gparams.listDisplayLimitMax)
+            maxStr=">"
+        var queryCountNodes = "<b>" +maxStr+ queryObject.nodeIds.length + " nodes" + "</b>";
+        $("#complexQuery_resultCountDiv_"+index).html(queryCountNodes)
 
     }
 
@@ -108,6 +114,11 @@ var buildPaths = (function () {
         })
 
 
+
+        if(globalHtml=="") {
+            self.init()
+            $("#buildGraphDiv").html(globalHtml);
+        }
         $("#buildPaths_matchNodesWrapper").html(html);
         globalHtml = $("#buildGraphDiv").html();
         self.cypher = self.buildQuery();
@@ -117,7 +128,10 @@ var buildPaths = (function () {
 
     self.getNodeDivHtml = function (queryObject, index) {
         var queryText = queryObject.text;
-        var queryCountNodes = "<b>" + queryObject.nodeIds.length + " nodes" + "</b>";
+        var maxStr=""
+        if(queryObject.nodeIds.length>=Gparams.listDisplayLimitMax)
+            maxStr=">"
+        var queryCountNodes = "<b>" +maxStr+ queryObject.nodeIds.length + " nodes" + "</b>";
 
         var color = nodeColors[queryObject.label];
         var classInResult = "";
@@ -335,9 +349,9 @@ var buildPaths = (function () {
 
                 }
                 else if (currentSetType == "others") {
-
-                    context.currentObject.nodeSetIds = result[0].setIds;
                     context.queryObject = queryObj;
+                    context.queryObject.nodeSetIds = result[0].setIds;
+
                     self.expandCollapse()
 
 
@@ -397,7 +411,7 @@ var buildPaths = (function () {
             }
 
 
-            else if (queryObject.inResult) {
+            if (queryObject.inResult) {
 
 
                 if (returnCypher.length > 0) {
@@ -476,9 +490,12 @@ var buildPaths = (function () {
     self.expandCollapse = function (expand) {
         if ($("#buildGraphDiv").html() == "" || expand) {
             $("#buildGraphDiv").html(globalHtml);
+            $("#BIlegendDiv").css("visibility","hidden")
         } else {
             $("#buildGraphDiv").html("");
         }
+        if(event && event.stopPropagation)
+        event.stopPropagation()
 
 
     }
@@ -615,6 +632,9 @@ var buildPaths = (function () {
         visjsGraph.draw("graphDiv", visjsData, {});
         visjsGraph.drawLegend(visjsData.labels);
         filters.currentLabels = visjsData.labels;
+
+        paint.initHighlight();
+        common.fillSelectOptionsWithStringArray(filterDialog_NodeLabelInput, filters.currentLabels);
         $("#toTextMenuButton").css("visibility", "visible");
         searchNodes.onExecuteGraphQuery()
 

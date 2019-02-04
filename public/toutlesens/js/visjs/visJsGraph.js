@@ -41,6 +41,7 @@ var visjsGraph = (function () {
             timestep: physicsTimeStep,
 
         }
+        var showNodesLabelMinScale = .3;
 
 
         var stopPhysicsTimeout = 5000;
@@ -544,7 +545,7 @@ var visjsGraph = (function () {
                 $("#graphInfosSpan").html(" scale " + Math.round(scale * 100) + "%");
                 //  if (_options.showNodesLabel == false && scale > self.scaleToShowLabels) {
 
-                var showNodesLabelMinScale = .4;
+
 
                 var nodes = [];
                 for (var key in self.nodes._data) {

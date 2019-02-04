@@ -112,7 +112,7 @@ var specialQueries=(function(){
 
     self.similarsGraphSimilars = function () {
         self.similarOptions.id = null;
-        toutlesensData.getWhereClauseFromArray("_id", self.self.similarOptions.similarNodes, function (err, result) {
+        searchNodes.getWhereClauseFromArray("_id", self.self.similarOptions.similarNodes, function (err, result) {
 
             toutlesensController.generateGraph(null, null, function (err, result) {
                 var selectedNodes = []
@@ -312,7 +312,7 @@ var specialQueries=(function(){
                 }
 
 
-                toutlesensData.getWhereClauseFromArray("_id", ids, function (err, result) {
+                searchNodes.getWhereClauseFromArray("_id", ids, function (err, result) {
                     /*  if(context.cypherMatchOptions.sourceNodeWhereFilter!="")
                           context.cypherMatchOptions.sourceNodeWhereFilter+= " and " + self.filterLabelWhere;
                       else*/

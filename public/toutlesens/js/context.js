@@ -4,6 +4,7 @@ var context = (function () {
     self.graphContext = {};
     self.queryObject = {};
     self.currentNode = {};
+    self.cypherMatchOptions={}
 
 
 

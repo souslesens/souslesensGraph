@@ -415,6 +415,7 @@
                 Gparams.displayVersion = queryParams.displayVersion
             }
             versionController.applyVersion(version);
+            buildPaths.init()
 
 
         })
@@ -437,12 +438,12 @@
 
 
 <div id="mainButtons" style="background-color: #f4f0ec">
-    <div onclick="buildPaths.expandCollapse(true)">
+    <div onclick="buildPaths.expandCollapse()">
     <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
 
 
     <input type="image" title="Build path" height="20px"
-           onclick="buildPaths.expandCollapse()" id="BuilPathButton" src="images/path.png"
+           onclick="buildPaths.expandCollapse(true)" id="BuilPathButton" src="images/path.png"
            class=""/>
 
 
@@ -694,8 +695,8 @@
 
 
     </div>
-    <h3><b>Graphoramas</b></h3>
-    <div id="graphoramasDiv" class="mainAccordionPanel"></div>
+   <!-- <h3><b>Graphoramas</b></h3>
+    <div id="graphoramasDiv" class="mainAccordionPanel"></div>-->
 
 </div>
 

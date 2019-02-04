@@ -248,7 +248,7 @@ var algorithms = (function () {
         function useSelection(ids) {
             context.queryObject = {
                 label: sourceLabel,
-                where: toutlesensData.getWhereClauseFromArray("_id", ids, "n"),
+                where: searchNodes.getWhereClauseFromArray("_id", ids, "n"),
                 nodeIds: ids,
                 clauseText: "[" + label + "] " + key
             }
@@ -328,6 +328,9 @@ var algorithms = (function () {
 
         if (algorithm == "relationsRanking") {
             var limit = $("#searchDialog_AlgorithmsResultSize").val();
+            var where=" WHERE "+searchNodes.getWhereClauseFromArray("_id", context.queryObject.nodeSetIds,"n");
+
+            var cypher = "Match (n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ") "+where+" return n, count (r) as cnt order by cnt desc limit " + limit;
 
             Cypher.executeCypher(cypher, function (err, result) {
                     if (err)
@@ -365,7 +368,7 @@ var algorithms = (function () {
         var minCountTargetNode = $("#searchDialog_AlgorithmsMinCountTargetNodes").val();
         var resultSize = $("#searchDialog_AlgorithmsResultSize").val();
         var similarityCutoff = $("#searchDialog_AlgorithmsSimilarityCutoff").val();
-        var where = toutlesensData.getWhereClauseFromArray("_id", queryObject.nodeIds, "n")
+        var where = searchNodes.getWhereClauseFromArray("_id", queryObject.nodeIds, "n")
         if (where && where.length > 0)
             where = " WHERE " + where
 

@@ -5,21 +5,21 @@
 
     <h3>color scale</h3>
 
-    <div id="paintDialog_colorScaleSimple" style="min-height: 100px">
+    <div id="paintDialog_colorScaleSimple" style="min-height:100px">
 
         Highlight property values range<br>
         <select id="paintDialog_highlightPropertySelect"
                                                onchange="paint.paintClasses($(this).val())"></select>
         <br>
 
-        <input type="hidden" id="paintDialog_NclassesInput" style="width:30px" value="10">
+           <input type="hidden" id="paintDialog_NclassesInput" style="width:30px" value="10">
 
 
     </div>
 
     <h3>Cluster</h3>
 
-    <div id="paintDialog_clusterDiv" style="min-height: 100px">
+    <div id="paintDialog_clusterDiv" style="min-height:100px">
         <button onclick="paint.clusterByClass()" id="paint_clusterButton" style="visibility: hidden"> cluster</button>
         <button onclick="paint.unClusterByClass()" id="paint_unClusterButton" style="visibility: hidden"> unCluster
         </button>
@@ -73,6 +73,14 @@
 
     <script>
 
+        paintAccordion=$("#paintAccordion").accordion(
+            {
+                active: 0,
+                collapsible: true,
+                activate: function (event, ui) {
+
+                }
+            });
 
     </script>
 

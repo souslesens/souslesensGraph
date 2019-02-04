@@ -121,7 +121,7 @@ var toutlesensController = (function () {
 
                 }
                 else if (Array.isArray(id)) {
-                    toutlesensData.getWhereClauseFromArray("_id", id);
+                    searchNodes.getWhereClauseFromArray("_id", id);
                 }
                 else
                     context.cypherMatchOptions.sourceNodeWhereFilter = "";
@@ -648,7 +648,7 @@ var toutlesensController = (function () {
                     addToPreviousQuery: true
                 }
                 options.whereFilters = []
-                options.whereFilters.push(toutlesensData.getWhereClauseFromArray("_id", ids, "n"));
+                options.whereFilters.push(searchNodes.getWhereClauseFromArray("_id", ids, "n"));
                 if (filter && filter != "")
                     options.whereFilters.push(filter);
                 options.useStartLabels = [sourceLabel]
@@ -1204,6 +1204,7 @@ var toutlesensController = (function () {
             $("#queryDiv").load("htmlSnippets/searchNodesDialog.html", function () {
 
                 searchNodes.init(Schema);
+                nodeSets.initNodeSetSelect()
             });
             $("#filterDiv").load("htmlSnippets/filterDialog.html", function () {
 
@@ -1230,6 +1231,9 @@ var toutlesensController = (function () {
                 paint.initHighlight();
                 filters.setLabelsOrTypes("node");
             });
+
+
+
 
 
         }

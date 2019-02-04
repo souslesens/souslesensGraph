@@ -793,14 +793,7 @@ value=atob(value)
             if (paintDialog_highlightPropertySelect)
                 common.fillSelectOptionsWithStringArray(paintDialog_highlightPropertySelect, properties,true);
             common.fillSelectOptionsWithStringArray(paint_showNodeNamesForLabelSelect, filters.currentLabels,true);
-            paintAccordion=$("#paintAccordion").accordion(
-                {
-                    active: 0,
-                    collapsible: false,
-                    activate: function (event, ui) {
 
-                    }
-                });
 
         }
 
@@ -823,7 +816,7 @@ value=atob(value)
             }
             else if (action == "graphClusterNodes") {
                 var nodeIds = visjsGraph.network.getNodesInCluster(context.currentNode.id)
-                toutlesensData.getWhereClauseFromArray("_id", nodeIds, function (err, result) {
+                searchNodes.getWhereClauseFromArray("_id", nodeIds, function (err, result) {
 
                     toutlesensController.generateGraph(null, {
                         applyFilters: true,

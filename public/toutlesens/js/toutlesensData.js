@@ -46,29 +46,7 @@ var toutlesensData = (function () {
             " EXTRACT(node IN nodes(path) | labels(node)) as labels "
             + ", EXTRACT(rel IN relationships(path) | labels(startNode(rel))) as startLabels";
 
-        self.getWhereClauseFromArray = function (property, _array, nodeSymbol) {
-            var array;
-            if (!nodeSymbol)
-                nodeSymbol = "n";
-            if (typeof _array == "string")
-                array = _array.split(",");
-            else
-                array = _array;
 
-            var query = nodeSymbol + "." + property + " in ["
-            if (property == "_id")
-                query = "ID(n) in ["
-            var quote = "";
-            for (var i = 0; i < array.length; i++) {
-                if (i > 0 && i < array.length)
-                    query += ","
-                else if ((typeof array[i] === 'string'))
-                    var quote = "\"";
-                query += quote + array[i] + quote;
-            }
-            query += "] ";
-            return query;
-        }
 
 
 
@@ -97,13 +75,13 @@ var toutlesensData = (function () {
 
             if (options.id && !options.useStartNodeSet) {
 
-                if (id > 0) {
-                    whereStatements.push("  (ID(n)=" + id + ")");
+                if (options.id > 0) {
+                    whereStatements.push("  (ID(n)=" + options.id + ")");
                     hasMclause = false;
                 }
                 else {
                     hasMclause = true;
-                    whereStatements.push("  (ID(m)=" + (-id) + ")");
+                    whereStatements.push("  (ID(m)=" + (-options.id) + ")");
 
                 }
             }
@@ -218,6 +196,7 @@ var toutlesensData = (function () {
             } else {
                 self.currentStatement = statement;
             }
+
 
 
 

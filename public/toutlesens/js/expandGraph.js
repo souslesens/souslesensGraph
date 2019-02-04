@@ -34,7 +34,7 @@ var expandGraph = (function () {
 
 
         var ids = visjsGraph.getNodesNeoIdsByLabelNeo(sourceLabel);
-        var where = toutlesensData.getWhereClauseFromArray("_id", ids, "n");
+        var where = searchNodes.getWhereClauseFromArray("_id", ids, "n");
         var cypher = "match(n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ")" +
             " where " + where + " " +//" and NOT p:"+sourceLabel+
             " return n, collect(m) as mArray" +
@@ -149,7 +149,7 @@ var expandGraph = (function () {
                 // create edges with nodes other than source node
 
 
-                var cypher = "Match (n)-[r]-(m) where " + toutlesensData.getWhereClauseFromArray("_id", self.expandedNodes, "n") + "return id(n) as nId,labels(n)[0] as clusterLabel, collect(id(m)) as mIds";
+                var cypher = "Match (n)-[r]-(m) where " + searchNodes.getWhereClauseFromArray("_id", self.expandedNodes, "n") + "return id(n) as nId,labels(n)[0] as clusterLabel, collect(id(m)) as mIds";
                 Cypher.executeCypher(cypher, function (err, result) {
                     var newEdges2 = [];
 
@@ -196,7 +196,7 @@ var expandGraph = (function () {
         self.openedClusterId = clusterId
 
 
-        var cypher = "Match (n)-[r]-(m) where " + toutlesensData.getWhereClauseFromArray("_id", clusterNodeIds) + "return n,collect(id(m)) as mIds";
+        var cypher = "Match (n)-[r]-(m) where " + searchNodes.getWhereClauseFromArray("_id", clusterNodeIds) + "return n,collect(id(m)) as mIds";
         Cypher.executeCypher(cypher, function (err, result) {
             var newNodes = [];
             var newEdges = [];

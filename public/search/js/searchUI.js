@@ -167,9 +167,9 @@ var searchUI = (function () {
         };
 
         if (searchNodes.queryObject.query) {
-            payload.options.queryObject = searchNodes.queryObject.query;
-            payload.options.indexName = searchNodes.queryObject.indexName;
-            payload.options.getAssociatedWords.indexName = searchNodes.queryObject.indexName;
+            payload.options.queryObject =context.queryObject.query;
+            payload.options.indexName =context.queryObject.indexName;
+            payload.options.getAssociatedWords.indexName =context.queryObject.indexName;
 
 
         }

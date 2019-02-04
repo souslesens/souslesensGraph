@@ -1,9 +1,9 @@
 var nodeSets = (function () {
     var self = {};
 
-    self.create = function (name, label, comment,cypher, ids, callback) {
-        var data={nodeIds:ids,cypher:cypher}
-       data = btoa(JSON.stringify(data));
+    self.create = function (name, label, comment, cypher, ids, callback) {
+        var data = {nodeIds: ids, cypher: cypher}
+        data = btoa(JSON.stringify(data));
 
         var cypher = "MERGE (n:nodeSet{name:'" + name + "',label:'" + label + "',comment:'" + comment + "',subGraph:'" + subGraph + "',data:'" + data + "'}) return  n.name as name"
         //  console.log(cypher);
@@ -17,25 +17,25 @@ var nodeSets = (function () {
         })
 
     }
-    self.get = function (name) {
+    self.get = function (name,callback) {
         var cypher = "MATCH(n:nodeSet{name:'" + name + "',subGraph:'" + subGraph + "'})return n";
         Cypher.executeCypher(cypher, function (err, result) {
             if (err || result.length == 0) {
-                return null;
+                return callback(null);
             }
             else {
-                var set = result[0].n;
+                var set = result[0].n.properties;
                 set.data = JSON.parse(atob(set.data))
-                return set;
+                return callback(null,set);
 
             }
         })
     }
-    self.getAllNames = function (name) {
+    self.getAllNames = function (callback) {
         var cypher = "MATCH(n:nodeSet{subGraph:'" + subGraph + "'})return n.name as name order by name";
         Cypher.executeCypher(cypher, function (err, result) {
             if (err || result.length == 0) {
-                return null;
+                return callback(null);
             }
             else {
                 var names = [];
@@ -43,7 +43,7 @@ var nodeSets = (function () {
                     names.push(line.name);
                 })
 
-                return names;
+                return callback(null, names);
 
             }
         })
@@ -61,8 +61,37 @@ var nodeSets = (function () {
 
     }
 
+    self.initNodeSetSelect = function () {
+
+        nodeSets.getAllNames(function (err, nodeSetNames) {
+              common.fillSelectOptionsWithStringArray(searchDialog_nodeSetsSelect,nodeSetNames,true)
+        });
+    }
+
+    self.searchWithNodeSet=function(name){
+        self.get(name,function(err, set){
+            if(err)
+                return;
+
+            context.queryObject={};
+            context.queryObject.label = set.label;
+            context.queryObject.text = "Set "+set.name;
+            context.queryObject.cypher = set.data.cypher;
+            context.queryObject.type = "nodeSet-"+set.label;
+            context.queryObject.nodeSetIds=set.data.nodeIds;
+            buildPaths.show('only')
+
+
+
+        }
+    );
+
+
+    }
+
 
     return self;
 
 
-})()
+})
+()

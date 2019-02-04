@@ -92,7 +92,7 @@ var customizeUI = (function () {
             currentDisplayType = "SIMPLE_FORCE_GRAPH";
 
             toutlesensController.setResponsiveDimensions(0);
-            toutlesensData.getWhereClauseFromArray("id", idsList, function (err, result) {
+            searchNodes.getWhereClauseFromArray("id", idsList, function (err, result) {
                 toutlesensController.generateGraph(null, {applyFilters: true}, function () {
 
                     $("#filtersDiv").html("");
