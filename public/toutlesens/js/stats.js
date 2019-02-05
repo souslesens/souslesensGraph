@@ -26,11 +26,13 @@ var stats = (function () {
         dataset.forEach(function (line) {
 
             if (sourceLabel =="" || sourceLabel == line.label) {
-                for (var key in line.connectionsCountMap) {
+
+            }
+              /*  for (var key in line.connectionsCountMap) {
                     if (targetLabel =="" || key==targetLabel) {
                         scores.push({name:line.name,id:line.id,countRels:line.connectionsCountMap[key]});
                     }
-                }
+              /*  }
             }
 
 

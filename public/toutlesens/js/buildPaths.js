@@ -56,10 +56,15 @@ var buildPaths = (function () {
             self.addQueryObjectDiv();
         }else if (booleanOperator) {
             searchNodes.setContextNodeQueryObjectFromUI(booleanOperator, function () {
-                if (currentDivIndex > -1 && context.queryObject.label == self.queryObjs[currentDivIndex].label) // updateNodeQuery
-                    self.updateQueryDiv(currentDivIndex, context.queryObject);
-                else
+                if (currentDivIndex > -1 && context.queryObject.label == self.queryObjs[currentDivIndex].label) {
+                 // updateNodeQuery
+                self.updateQueryDiv(currentDivIndex, context.queryObject);
+                    searchNodes.setUpdateContextQueryObject();
+            }
+                else {
                     self.addQueryObjectDiv();
+                    self.onSelectNodeDiv (self.queryObjs.length-1);
+                }
 
             });
         }
@@ -69,6 +74,9 @@ var buildPaths = (function () {
 
         }
         searchNodes.setUIPermittedLabels(context.queryObject.label);
+       // searchNodes.configBooleanOperatorsUI(true);
+
+
 
 
         $("#graphPopup").css("visibility", "hidden")
@@ -111,6 +119,7 @@ var buildPaths = (function () {
         $("#buildPath_resultCountDiv_"+index).html(queryCountNodes)
 
     }
+
 
     self.drawNodeQueryDivs = function (withButtons) {
         var html = ""
@@ -421,8 +430,8 @@ var buildPaths = (function () {
                     whereCypher += " AND "
                 whereCypher += searchNodes.buildWhereClauseFromUI(queryObject, symbol);
             }
-            if (context.queryObject.subQueries) {
-                context.queryObject.subQueries.forEach(function (suqQuery) {
+            if (queryObject.subQueries) {
+                queryObject.subQueries.forEach(function (suqQuery) {
                     if (suqQuery.value && suqQuery.value != "") {
                         whereCypher += " " + suqQuery.booleanOperator + " " + searchNodes.buildWhereClauseFromUI(suqQuery, symbol);
                     }
@@ -537,7 +546,7 @@ var buildPaths = (function () {
                     if (key2 != key) {
                         if (connections[key] != "")
                             connections[key] += ","
-                        connections[key] += line[key2].neoAttrs[Schema.getNameProperty(line[key2].label)] + "[" + line[key2].label + "]"
+                        connections[key] += line[key2].neoAttrs[Schema.getNameProperty(line[key2].label)] + "[" + line[key2].labelNeo + "]"
                     }
 
                 })
@@ -573,7 +582,25 @@ var buildPaths = (function () {
 
 
         })
-        tableDataset.sort(function (a, b) {
+
+
+        //group all connections
+        var datasetGroupedMap={}
+        tableDataset.forEach(function(line){
+            if(!datasetGroupedMap[line.id]){
+                datasetGroupedMap[line.id]=line
+            }else if(line.connectedTo)
+                datasetGroupedMap[line.id].connectedTo+=","+line.connectedTo
+
+        })
+        var datasetGroupedArray=[];
+        for(var key in datasetGroupedMap){
+            datasetGroupedArray.push(datasetGroupedMap[key]);
+        }
+
+
+
+        datasetGroupedArray.sort(function (a, b) {
             if (a.label > b.label) {
                 return 1;
             }
@@ -584,12 +611,12 @@ var buildPaths = (function () {
 
         })
 
-        var xx = tableDataset;
+
         $("#dialog").load("htmlSnippets/exportDialog.html", function () {
             dialog.dialog("open");
 
             dialog.dialog({title: "Select table columns"});
-            exportDialog.init(tableDataset)
+            exportDialog.init(datasetGroupedArray)
 
 
         })
@@ -616,21 +643,7 @@ var relsCount={};
                 var nodeNeo = line[nodeKey];
                 if (uniqueNodes.indexOf(nodeNeo.id) < 0) {
                     uniqueNodes.push(nodeNeo.id);
-                    var visjsNodeLabel = nodeNeo.neoAttrs[Schema.getNameProperty(nodeNeo.label)];
-                 //   var visjsNode =connectors.getVisjsNodeFromNeoNode(nodeNeo,false);
-                /*   var visjsNode = {
-                        labelNeo: nodeNeo.label,// because visjs where label is the node name
-                        color: nodeColors[nodeNeo.label],
-                        myId: nodeNeo.id,
-                        id: nodeNeo.id,
-                        children: [],
-                        neoAttrs: nodeNeo.neoAttrs,
-                        value: 8,
-                        endRel: "",
-                        //   label: visjsNodeLabel,
-                        hiddenLabel: visjsNodeLabel,
-                        // title: visjsNodeLabel
-                    }*/
+
                     var visjsNode=nodeNeo;
                     visjsData.nodes.push(visjsNode);
                 }

@@ -89,7 +89,8 @@ var searchNodes = (function () {
             $("#selectLabelDiv_" + label).css('visibility', 'visible');
 
             self.configBooleanOperatorsUI();
-
+            if (searchDialog_propertySelect) ;
+            filters.initProperty(null, label, searchDialog_propertySelect)
 
         }
 
@@ -127,8 +128,9 @@ var searchNodes = (function () {
             $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
         }
 
-        self.configBooleanOperatorsUI = function () {
-            if (context.queryObject.nodeIds) {
+        self.configBooleanOperatorsUI = function (forceShowAndOr) {
+         //   if (context.queryObject.nodeIds  || forceShowAndOr) {
+            if ((context.queryObject.value && context.queryObject.value!="" )  || forceShowAndOr) {
                 $("#searchDialog_booleanOperatorsAnd").css("visibility", "visible")
                 $("#searchDialog_booleanOperatorsOr").css("visibility", "visible")
                 $("#searchDialog_booleanOperatorsOnly").text("ONLY")
@@ -430,7 +432,7 @@ var searchNodes = (function () {
                 if (!self.dataTable)
                     self.dataTable = new myDataTable();
 
-                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id",context.queryObject.nodeSetIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id", context.queryObject.nodeSetIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
                 dialogLarge.load("htmlSnippets/dataTable.html", function () {
                     dialogLarge.dialog("open");
                     self.dataTable.loadNodes(self.dataTable, "dataTableDiv", cypher, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {
@@ -442,7 +444,7 @@ var searchNodes = (function () {
             }
 
             if (action == 'graphNodes') {
-                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id",context.queryObject.nodeSetIds, "n") + ' RETURN n ' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id", context.queryObject.nodeSetIds, "n") + ' RETURN n ' + Schema.getNameProperty();
                 //   Cypher.
 
 
@@ -450,7 +452,7 @@ var searchNodes = (function () {
 
             if (action == 'graphSomeNeighboursListLabels') {
 
-                var options = {useStartNodeSet:context.queryObject.nodeSetIds};
+                var options = {useStartNodeSet: context.queryObject.nodeSetIds};
 
                 if ($("#graphNeighboursAllOptionsCbx").prop("checked")) {// all neighbours
                     ;
@@ -535,7 +537,7 @@ var searchNodes = (function () {
 
 
                 var options = {
-                    useStartNodeSet:context.queryObject.nodeSetIds,
+                    useStartNodeSet: context.queryObject.nodeSetIds,
                     useStartLabels: [context.queryObject.label],
                     useEndLabels: neighboursLabels,
                 }
@@ -746,7 +748,11 @@ var searchNodes = (function () {
 
             if (context.queryObject.subQueries) {
                 context.queryObject.subQueries.forEach(function (suqQuery) {
-                    whereStr += " " + suqQuery.booleanOperator + " " + self.buildWhereClauseFromUI(suqQuery, "n");
+                    var boolOp = ""
+
+                    if (whereStr.length > 0)
+                        boolOp = suqQuery.booleanOperator
+                    whereStr += " " + boolOp + " " + self.buildWhereClauseFromUI(suqQuery, "n");
                 })
 
 

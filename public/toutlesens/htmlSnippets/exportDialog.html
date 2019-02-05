@@ -3,7 +3,9 @@
     var exportDialog = (function () {
         var self = {};
         self.dataset;
-        self.init = function (data) {
+        self.connections;
+        self.init = function (data,connections) {
+            self.connections=connections;
             exportDialog_tabDiv = $("#exportDialog_tabDiv").tabs();
 
 
