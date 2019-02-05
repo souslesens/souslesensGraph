@@ -7,7 +7,9 @@ var buildPaths = (function () {
     self.queryObjs = [];
     self.isEditing = false;
     self.currentCypher = "";
+
     var cardCliked=false;
+    var stopExpand=false;
 
     var globalHtml = "";
 
@@ -506,13 +508,20 @@ var buildPaths = (function () {
 
     }
     self.expandCollapse = function (expand) {
-        if ($("#buildGraphDiv").html() == "" || expand) {
+       if(expand) {
+           stopExpand = false;
+           return;
+       }
+       else
+           stopExpand=true;
+
+            if ($("#buildGraphDiv").html() == "" || expand) {
             $("#buildGraphDiv").html(globalHtml);
             $("#BIlegendDiv").css("visibility","hidden")
         } else {
             $("#buildGraphDiv").html("");
         }
-  
+
 
     }
 

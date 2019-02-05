@@ -530,7 +530,7 @@ var visjsGraph = (function () {
                 if(usedLabels.indexOf(label)<0) {
                     usedLabels.push(label)
                     if (label && label != "" && nodeColors[label]){
-                            continue;
+
                         html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" + label + "</span></td></tr>"
                     }
                 }
