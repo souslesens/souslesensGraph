@@ -7,6 +7,7 @@ var buildPaths = (function () {
     self.queryObjs = [];
     self.isEditing = false;
     self.currentCypher = "";
+    var cardCliked=false;
 
     var globalHtml = "";
 
@@ -18,22 +19,23 @@ var buildPaths = (function () {
             "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('dataTable')>Table</button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('graph')>Graph </button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('set')>Create set </button>" +
-            "<button class='buildPathsButtons' onclick=buildPaths.editCypher()>Edit Cypher</button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('others')>Others... </button>" +
+            "<button class='buildPathsButtons' onclick=buildPaths.editCypher()>Edit Cypher</button>" +
             "<button  class='buildPathsButtons' onclick= searchNodes.activatePanel('searchCriteriaDiv')>New query </button>" +
 
             "</div>"
             + "<br><div id='buildPaths_resultDiv'></div>" //+
 
 
-        globalHtml = "<div class='buildPaths' id='buildPaths_matchNodesWrapper'  onclick='buildPaths.onUnSelectNodeDiv()' style='visibility:visible'>" +
+        globalHtml = "<div class='buildPaths stopPropag' id='buildPaths_matchNodesWrapper'  onclick='buildPaths.onUnSelectNodeDiv($(this))' style='visibility:visible'>" +
             globalHtmlButtons +
             "<div style='width: 100%;visibility:hidden' id='buildPath_moreParamsDiv'> choose label <select class='buildPathsButtons' id='buildPaths_labelSelect'></select><button class='buildPathsButtons' onclick=buildPaths.executeQuery('set') >ok</button>" +
             "<span style='visibility:hidden' id='buildPath_moreParamsSetDiv'>set name<input class='buildPathsButtons' id='buildPaths_setName'> comment<textarea rows='1'cols='50' class='buildPathsButtons' id='buildPaths_setCommentTA'></textarea></textarea></span> </div>" +
 
 
             "</div>"
-        ;
+
+
 
 
     }
@@ -73,7 +75,8 @@ var buildPaths = (function () {
 
 
         $("#buildGraphDiv").html(globalHtml);
-        $("#buildGraphDiv").css("visibility", "visible")
+        $("#buildGraphDiv").css("visibility", "visible");
+
 
 
 
@@ -139,7 +142,7 @@ var buildPaths = (function () {
             classInResult = " buildPaths-nodeInResultDiv";
 
 
-        var html = "<div id='buildPath_nodeDiv_" + index + "' class=' buildPaths-nodeDiv " + classInResult + "'  onclick='buildPaths.onSelectNodeDiv(" + index + ")'>" +
+        var html = "<div id='buildPath_nodeDiv_" + index + "' class=' buildPaths-nodeDiv  stopPropag" + classInResult + "'  onclick='buildPaths.onSelectNodeDiv(" + index + ")'>" +
             " <div class='buildPaths-partDiv' style='background-color: " + color + "'><b>" + queryObject.label + "</b></div>" +
             "<div id='buildPath_nodeConditionDiv_" + index + "' class='buildPath-nodeConditionDiv buildPaths-partDiv'> " + queryText + "</div>" +
             "<div id='buildPath_resultCountDiv_" + index + "' class='buildPath-resultCountDiv buildPaths-partDiv'> " + queryCountNodes + "</div>" +
@@ -177,6 +180,10 @@ var buildPaths = (function () {
         $('#buildPaths_cypherTA').val(self.cypher)
     }
     self.onUnSelectNodeDiv = function () {
+        if(cardCliked){
+            cardCliked=false;
+            return;
+        }
         currentDivIndex = -1;
         var index = self.queryObjs.length - 1;
         var label = null;
@@ -190,7 +197,9 @@ var buildPaths = (function () {
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
         $("#mainAccordion").accordion("option", "active", 0);
         $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
-        event.stopPropagation()
+
+
+
     }
     self.onSelectNodeDiv = function (index) {
         currentDivIndex = index;
@@ -204,7 +213,13 @@ var buildPaths = (function () {
         searchNodes.setUpdateContextQueryObject();
         $("#mainAccordion").accordion("option", "active", 0);
         $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
-        event.stopPropagation()
+        cardCliked=true;
+     /* if  (event && typeof event !== 'undefined')
+        event.stopPropagation()*/
+     //   (typeof event !== 'undefined')
+      //  event.stopPropagation()
+   /*     if(window.event)
+            window.event.stopPropagation();*/
 
 
     }
@@ -497,9 +512,7 @@ var buildPaths = (function () {
         } else {
             $("#buildGraphDiv").html("");
         }
-        if(event && event.stopPropagation)
-        event.stopPropagation()
-
+  
 
     }
 
