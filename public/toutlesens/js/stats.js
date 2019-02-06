@@ -28,12 +28,7 @@ var stats = (function () {
             if (sourceLabel =="" || sourceLabel == line.label) {
 
             }
-              /*  for (var key in line.connectionsCountMap) {
-                    if (targetLabel =="" || key==targetLabel) {
-                        scores.push({name:line.name,id:line.id,countRels:line.connectionsCountMap[key]});
-                    }
-              /*  }
-            }
+
 
 
 

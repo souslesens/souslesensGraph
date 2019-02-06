@@ -102,8 +102,8 @@ var buildPaths = (function () {
         $("#buildPath_nodeConditionDiv_" + index).html(queryObject.globalText)
         globalHtml = $("#buildGraphDiv").html()
 
-        self.cypher = self.buildQuery();
-        $("#buildPaths_cypherTA").text(self.cypher)
+        self.currentCypher = self.buildQuery();
+        $("#buildPaths_cypherTA").text(self.currentCypher)
         var maxStr = "";
         if (queryObject.nodeIds.length >= Gparams.listDisplayLimitMax)
             maxStr = ">"
@@ -128,8 +128,8 @@ var buildPaths = (function () {
         }
         $("#buildPaths_matchNodesWrapper").html(html);
         globalHtml = $("#buildGraphDiv").html();
-        self.cypher = self.buildQuery();
-        $("#buildPaths_cypherTA").text(self.cypher)
+        self.currentCypher = self.buildQuery();
+        $("#buildPaths_cypherTA").text(self.currentCypher)
 
     }
 
@@ -181,7 +181,7 @@ var buildPaths = (function () {
         else
             visibility = "hidden"
         $('#buildPaths_cypherTA').css('visibility', visibility);
-        $('#buildPaths_cypherTA').val(self.cypher)
+        $('#buildPaths_cypherTA').val(self.currentCypher)
     }
     self.onUnSelectNodeDiv = function () {
         if (cardCliked) {
@@ -206,10 +206,12 @@ var buildPaths = (function () {
     }
     self.onSelectNodeDiv = function (index) {
         currentDivIndex = index;
+        if (self.queryObjs[index].type.indexOf("nodeSet") == 0)
+            return;
+
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
         $("#buildPath_nodeDiv_" + index).addClass("buildPaths-nodeDivSelected")
         $(".selectLabelDiv").css("visibility", "visible");
-
         context.queryObject = self.queryObjs[index];
 
 
@@ -266,7 +268,7 @@ var buildPaths = (function () {
         globalHtml = "";
         currentDivIndex = -1;
         $("#buildPaths_cypherTA").text("")
-        self.cypher = "";
+        self.currentCypher = "";
         $("#buildGraphDiv").html("")
         //  $("#buildPaths_matchNodesWrapper").html("")
         globalHtml = ""
@@ -304,7 +306,7 @@ var buildPaths = (function () {
           currentDivIndex = -1
       }*/
 
-    self.executeQuery = function (type) {
+    self.executeQuery = function (type, callback) {
 
 
         $("#searchDialog_previousPanelButton").css('visibility', 'visible');
@@ -315,13 +317,13 @@ var buildPaths = (function () {
         if (!currentSetType) {
             $("#buildPath_moreParamsDiv").css('visibility', 'hidden')
         }
-        self.cypher = self.buildQuery(type);
-        $('#buildPaths_cypherTA').val(self.cypher);
+        self.currentCypher = self.buildQuery(type);
+        $('#buildPaths_cypherTA').val(self.currentCypher);
 
-        Cypher.executeCypher(self.cypher, function (err, result) {
+        Cypher.executeCypher(self.currentCypher, function (err, result) {
 
             if (err) {
-                console.log("ERROR " + self.cypher)
+                console.log("ERROR " + self.currentCypher)
                 return $("#buildPaths_resultDiv").html(err)
             }
             if (result.length == 0)
@@ -337,12 +339,12 @@ var buildPaths = (function () {
             else if (type == "dataTable") {
                 $("#buildPaths_resultDiv").html(+result.length + " pathes found");
                 self.currentDataset = self.prepareDataset(result);
-                return buildPaths.displayTable();
+                return buildPaths.displayTable(callback);
             }
             else if (type == "graph") {
                 $("#buildPaths_resultDiv").html(+result.length + " pathes found");
                 self.currentDataset = self.prepareDataset(result);
-                return buildPaths.displayGraph();
+                return buildPaths.displayGraph(callback);
             }
             else if (currentSetType) {
                 var index = $("#buildPaths_labelSelect").val();
@@ -358,7 +360,7 @@ var buildPaths = (function () {
                     var comment = $("#buildPaths_setCommentTA").val();
                     if (!comment)
                         comment = ""
-                    nodeSets.create(name, queryObj.label, comment, self.cypher, result[0].setIds, function (err, resultSet) {
+                    nodeSets.create(name, queryObj.label, comment, self.currentCypher, result[0].setIds, function (err, resultSet) {
                         var message = "";
                         if (err)
                             message = "ERROR " + err;
@@ -464,7 +466,7 @@ var buildPaths = (function () {
 
         var cypher = " MATCH p=(" + matchCypher + ") " + whereCypher + " RETURN " + distinctWhere + returnCypher + " LIMIT " + Gparams.maxResultSupported;
         if (returnQueryObj)
-            return {match:matchCypher,where:whereCypher,return:returnCypher,distinctWhere:distinctWhere,};
+            return {match: matchCypher, where: whereCypher, return: returnCypher, distinctWhere: distinctWhere,};
         return cypher;
     }
 
@@ -530,7 +532,7 @@ var buildPaths = (function () {
     }
 
 
-    self.displayTable = function () {
+    self.displayTable = function (callback) {
 
         function getConnections(line) {
             var connections = {}
@@ -608,8 +610,9 @@ var buildPaths = (function () {
         $("#dialog").load("htmlSnippets/exportDialog.html", function () {
             dialog.dialog("open");
 
+
             dialog.dialog({title: "Select table columns"});
-            exportDialog.init(datasetGroupedArray)
+            exportDialog.init(datasetGroupedArray, true)
 
 
         })
@@ -623,15 +626,11 @@ var buildPaths = (function () {
 
     }
 
-
-    self.displayGraph = function () {
-        self.expandCollapse()
-        var relsCount = {};
-        toutlesensController.setGraphMessage("Working...")
+    self.drawGraph = function (dataset, callback) {
         var visjsData = {nodes: [], edges: [], labels: []};
         visjsData.labels = self.currentDataset.labels;
         var uniqueNodes = []
-        self.currentDataset.data.forEach(function (line, indexLine) {
+        dataset.data.forEach(function (line, indexLine) {
             for (var nodeKey in line) {
                 var nodeNeo = line[nodeKey];
                 if (uniqueNodes.indexOf(nodeNeo.id) < 0) {
@@ -642,7 +641,7 @@ var buildPaths = (function () {
                 }
             }
             var previousSymbol;
-            self.currentDataset.labelSymbols.forEach(function (symbol, indexSymbol) {
+            dataset.labelSymbols.forEach(function (symbol, indexSymbol) {
                 if (indexSymbol > 0) {
                     var fromNode = line[previousSymbol];
                     var toNode = line[symbol];
@@ -665,19 +664,37 @@ var buildPaths = (function () {
 
             })
         })
-
-        self.updateResultCountDiv(relsCount);
-        visjsGraph.draw("graphDiv", visjsData, {});
         visjsGraph.drawLegend(visjsData.labels);
         filters.currentLabels = visjsData.labels;
+
+        visjsGraph.draw("graphDiv", visjsData, {}, function () {
+            if (callback)
+                callback();
+        });
+
+    }
+    self.displayGraph = function (callback) {
+        self.expandCollapse()
+        var relsCount = {};
+        toutlesensController.setGraphMessage("Working...")
+        self.drawGraph(self.currentDataset, function(){
+            self.updateResultCountDiv(relsCount);
+
+            if (callback)
+                callback();
+
+        });
+
 
         paint.initHighlight();
         common.fillSelectOptionsWithStringArray(filterDialog_NodeLabelInput, filters.currentLabels);
         $("#toTextMenuButton").css("visibility", "visible");
         searchNodes.onExecuteGraphQuery()
 
-
     }
+
+
+
 
     self.displayStats = function () {
         var limit = $("#searchDialog_AlgorithmsResultSize").val();
@@ -690,14 +707,19 @@ var buildPaths = (function () {
         var targetSymbol = alphabet.charAt(targetIndex);
         var sourceLabel = self.queryObjs[sourceIndex].label;
         var targetLabel = self.queryObjs[targetIndex].label;
-        var cypher = "Match "+queryObj.match+" " + queryObj.where + " return "+sourceSymbol+"."+Schema.getNameProperty()+" as name, count ("+targetSymbol+") as cnt order by cnt desc limit " + limit;
+        var cypher = "Match " + queryObj.match + " " + queryObj.where + " return " + sourceSymbol + "." + Schema.getNameProperty() + " as name, count (" + targetSymbol + ") as cnt order by cnt desc limit " + limit;
 
         Cypher.executeCypher(cypher, function (err, result) {
-                if (err)
-                    console.log(err);
+                if (err) {
+                    $("#buildPaths_resultDiv").val(err);
+                    return console.log(err);
+                }
+                self.currentCypher = cypher;
+                $("#buildPaths_cypherTA").val(cypher);
+
                 if (result.length == 0) {
                     $("#waitImg").css("visibility", "hidden");
-                    toutlesensController.setGraphMessage("No result")
+                    $("#buildPaths_resultDiv").val("No result");
                     return;
                 }
                 var statsData = [];

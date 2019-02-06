@@ -4,9 +4,11 @@
         var self = {};
         self.dataset;
         self.connections;
-        self.init = function (data,connections) {
-            self.connections=connections;
+        self.init = function (data,disableStatsTab) {
+
             exportDialog_tabDiv = $("#exportDialog_tabDiv").tabs();
+if(disableStatsTab)
+            $( "#exportDialog_tabDiv" ).tabs( "disable", 1 );
 
 
             self.dataset = data;

@@ -520,8 +520,13 @@ var visjsGraph = (function () {
 
 
         self.drawLegend = function (labels, relTypes) {
-            self.legendLabels = labels;
-            expandGraph.initSourceLabel(labels)
+            self.legendLabels=[];
+            labels.forEach(function(label){
+                if(label!="" &&  self.legendLabels.indexOf(label)<0 )
+                    self.legendLabels .push(label);
+            })
+
+            expandGraph.initSourceLabel(self.legendLabels)
             var html = "<table>";
             var onClick = "";
             var usedLabels=[];

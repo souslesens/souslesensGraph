@@ -4,6 +4,8 @@ var expandGraph = (function () {
     self.initialDataset;
     self.expandedNodes = []
 
+    hasClusters = false;
+
 
     var mapToArray = function (map) {
         var array = [];
@@ -19,6 +21,14 @@ var expandGraph = (function () {
         var targetLabel = $('#expand_labelsSelectTarget').val()
         var clusterLimit = parseInt($("#expand_clusterMinLimit").val());
 
+
+        if(!sourceLabel || sourceLabel=="")
+            return alert("select from label")
+        if(!targetLabel || targetLabel=="")
+            return alert("select to label")
+        if( isNaN(clusterLimit) )
+            return alert("enter a number")
+
         var showAllNewNodesrelations = $("#expand_showAllrelationsCbx").prop("checked");
         self.expandedNodes = []
         self.initialDataset = {
@@ -29,20 +39,28 @@ var expandGraph = (function () {
             return;
         var ids = visjsGraph.getNodesNeoIdsByLabelNeo(sourceLabel);
         var where = searchNodes.getWhereClauseFromArray("_id", ids, "n");
+
         var cypher = "match(n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ")" +
             " where " + where + " " +//" and NOT p:"+sourceLabel+
             " return n, collect(m) as mArray" +
             " limit " + Gparams.maxResultSupported;
+        if (hasClusters)// on redessinne d'abord le graphe
+            buildPaths.drawGraph(buildPaths.currentDataset,  function () {
+                self.execute(cypher, clusterLimit, showAllNewNodesrelations, targetLabel);
+            });
+        else {
+            self.execute(cypher, clusterLimit, showAllNewNodesrelations, targetLabel);
+        }
 
-        self.execute(cypher, clusterLimit, showAllNewNodesrelations, targetLabel);
+
     }
 
 
-    self.expandFromNode = function (currentNode,label) {
+    self.expandFromNode = function (currentNode, label) {
 
-        var targetLabelStr="";
-        if(label)
-            targetLabelStr=":"+label;
+        var targetLabelStr = "";
+        if (label)
+            targetLabelStr = ":" + label;
         var cypher = "match(n:" + currentNode.label + ")-[r]-(m" + targetLabelStr + ")" +
             " where id(n)=" + currentNode.id + " " +//" and NOT p:"+sourceLabel+
             " return n, collect(m) as mArray" +
@@ -66,7 +84,7 @@ var expandGraph = (function () {
             var nodes = visjsGraph.nodes._data;
             var edges = visjsGraph.edges._data;
 
-            var allLabels=[];
+            var allLabels = [];
 
 
             function getSizeBounds() {
@@ -81,14 +99,14 @@ var expandGraph = (function () {
 
             var sizeBounds = getSizeBounds()
             var scaleSizefn = d3.scaleLinear().domain([sizeBounds.min, sizeBounds.max]).range([20, 100]);
-
+            hasClusters = false;
 
             result.forEach(function (line) {
                 var size = line.mArray.length;
 
                 // **********************CLUSTER  make one node containing all clustered nodes and link it*******************
                 if (size > clusterLimit) {
-
+                    hasClusters = true;
                     var clusterIds = [];
                     var clusterNames = [];
                     line.mArray.forEach(function (neoNode) {
@@ -110,7 +128,7 @@ var expandGraph = (function () {
                         labels: [targetLabel],
 
                     }
-                    if(visjsGraph.legendLabels.indexOf(targetLabel)<0)
+                    if (visjsGraph.legendLabels.indexOf(targetLabel) < 0)
                         visjsGraph.legendLabels.push(targetLabel);
 
                     var visjsNode = connectors.getVisjsNodeFromNeoNode(nodeNeo, true);
@@ -141,8 +159,8 @@ var expandGraph = (function () {
                                 newNodes.push(visjsNode);
                             }
                         }
-                        var label=neoNode.labels[0]
-                        if(visjsGraph.legendLabels.indexOf(label)<0)
+                        var label = neoNode.labels[0]
+                        if (visjsGraph.legendLabels.indexOf(label) < 0)
                             visjsGraph.legendLabels.push(label);
 
 
@@ -349,7 +367,7 @@ var expandGraph = (function () {
 
     self.initSourceLabel = function (labels) {
         //   common.fillSelectOptionsWithStringArray(expand_labelsSelectSource, Schema.getAllLabelNames(),true);
-        var emptyOption = true;
+        var emptyOption = false;
         if (labels.length == 1) {
             emptyOption = false;
             self.setSourceLabel(labels[0])
@@ -367,7 +385,7 @@ var expandGraph = (function () {
         $("#expandWhere_propertySelect").val("");
 
         var targetLabels = Schema.getPermittedLabels(label, true, true);
-        common.fillSelectOptionsWithStringArray(expand_labelsSelectTarget, targetLabels, true);
+        common.fillSelectOptionsWithStringArray(expand_labelsSelectTarget, targetLabels);
 
     }
 

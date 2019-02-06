@@ -36,7 +36,9 @@ var searchNodes = (function () {
 
         self.setUIPermittedLabels = function (label) {
             if (!label) {
+                $(".selectLabelDiv ").css("opacity", 1);
                 return $(".selectLabelDiv ").css("visibility", "visible");
+
 
             }
             var opacityAllowed = 0.7;
@@ -73,6 +75,7 @@ var searchNodes = (function () {
             $("#searchNavActionDiv").css('visibility', 'hidden');
             $(".searchDialog_NavButton").css('visibility', 'hidden');
             $(".selectLabelDiv").removeClass("selectLabelDivSelected")
+            $(".selectLabelDiv ").css("opacity", 1);
             $("#searchDialog_booleanOperatorsDiv").css('visibility', 'hidden');
 
             $("#searchDialog_valueInput").val();
