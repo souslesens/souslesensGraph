@@ -243,6 +243,7 @@ var visjsGraph = (function () {
 
                 if (!_options.scale) {
                     network.fit();
+                    if(!_options.fixed)
                     self.setLabelsVisibility()
                 }
                 if (_options.onFinishDraw) {

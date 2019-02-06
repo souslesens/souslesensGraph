@@ -140,6 +140,7 @@ var filters = (function () {
         else if (objectType == "relation")
             self.initRelationProperty(type, selectId);
 
+
     }
 
     self.onChangeSourceLabel = function (value) {
@@ -215,6 +216,8 @@ var filters = (function () {
             selectId = document.getElementById("filterDialog_propertySelect")
         common.fillSelectOptionsWithStringArray(selectId, propertiesArray)
         $("#filterDialog_propertySelect").val(Schema.getNameProperty())
+
+        $(selectId).val(Schema.schema.defaultNodeNameProperty)
 
     }
 

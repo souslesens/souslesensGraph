@@ -8,8 +8,8 @@ var buildPaths = (function () {
     self.isEditing = false;
     self.currentCypher = "";
 
-    var cardCliked=false;
-    var stopExpand=false;
+    var cardCliked = false;
+    var stopExpand = false;
 
     var globalHtml = "";
 
@@ -20,8 +20,10 @@ var buildPaths = (function () {
             "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('count')>Count </button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('dataTable')>Table</button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.executeQuery('graph')>Graph </button>" +
+            "<button  class='buildPathsButtons' onclick=buildPaths.showStatsDialog('stats')>Stats</button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('set')>Create set </button>" +
             "<button  class='buildPathsButtons' onclick=buildPaths.showMoreParams('others')>Others... </button>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
             "<button class='buildPathsButtons' onclick=buildPaths.editCypher()>Edit Cypher</button>" +
             "<button  class='buildPathsButtons' onclick= searchNodes.activatePanel('searchCriteriaDiv')>New query </button>" +
 
@@ -38,8 +40,6 @@ var buildPaths = (function () {
             "</div>"
 
 
-
-
     }
 
 
@@ -47,23 +47,19 @@ var buildPaths = (function () {
         self.isEditing = true;
 
 
-
-
-
-
-        if (context.queryObject.nodeSetIds ) {// cas we use a nodeSet
-            context.queryObject.nodeIds=context.queryObject.nodeSetIds;
+        if (context.queryObject.nodeSetIds) {// cas we use a nodeSet
+            context.queryObject.nodeIds = context.queryObject.nodeSetIds;
             self.addQueryObjectDiv();
-        }else if (booleanOperator) {
+        } else if (booleanOperator) {
             searchNodes.setContextNodeQueryObjectFromUI(booleanOperator, function () {
                 if (currentDivIndex > -1 && context.queryObject.label == self.queryObjs[currentDivIndex].label) {
-                 // updateNodeQuery
-                self.updateQueryDiv(currentDivIndex, context.queryObject);
-                    searchNodes.setUpdateContextQueryObject();
-            }
+                    // updateNodeQuery
+                    self.updateQueryDiv(currentDivIndex, context.queryObject);
+                    //   searchNodes.setUpdateContextQueryObject();
+                }
                 else {
                     self.addQueryObjectDiv();
-                    self.onSelectNodeDiv (self.queryObjs.length-1);
+                    self.onSelectNodeDiv(self.queryObjs.length - 1);
                 }
 
             });
@@ -73,10 +69,8 @@ var buildPaths = (function () {
             searchNodes.activatePanel("searchCriteriaDivFrombuildPaths")
 
         }
-        searchNodes.setUIPermittedLabels(context.queryObject.label);
-       // searchNodes.configBooleanOperatorsUI(true);
 
-
+        // searchNodes.configBooleanOperatorsUI(true);
 
 
         $("#graphPopup").css("visibility", "hidden")
@@ -86,8 +80,6 @@ var buildPaths = (function () {
 
         $("#buildGraphDiv").html(globalHtml);
         $("#buildGraphDiv").css("visibility", "visible");
-
-
 
 
     }
@@ -112,11 +104,13 @@ var buildPaths = (function () {
 
         self.cypher = self.buildQuery();
         $("#buildPaths_cypherTA").text(self.cypher)
-        var maxStr="";
-        if(queryObject.nodeIds.length>=Gparams.listDisplayLimitMax)
-            maxStr=">"
-        var queryCountNodes = "<b>" +maxStr+ queryObject.nodeIds.length + " nodes" + "</b>";
-        $("#buildPath_resultCountDiv_"+index).html(queryCountNodes)
+        var maxStr = "";
+        if (queryObject.nodeIds.length >= Gparams.listDisplayLimitMax)
+            maxStr = ">"
+        var queryCountNodes = "<b>" + maxStr + queryObject.nodeIds.length + " nodes" + "</b>";
+        $("#buildPath_resultCountDiv_" + index).html(queryCountNodes);
+        searchNodes.setUIPermittedLabels(queryObject.label);
+
 
     }
 
@@ -128,8 +122,7 @@ var buildPaths = (function () {
         })
 
 
-
-        if(globalHtml=="") {
+        if (globalHtml == "") {
             self.init()
             $("#buildGraphDiv").html(globalHtml);
         }
@@ -142,10 +135,10 @@ var buildPaths = (function () {
 
     self.getNodeDivHtml = function (queryObject, index) {
         var queryText = queryObject.text;
-        var maxStr=""
-        if(queryObject.nodeIds.length>=Gparams.listDisplayLimitMax)
-            maxStr=">"
-        var queryCountNodes = "<b>" +maxStr+ queryObject.nodeIds.length + " nodes" + "</b>";
+        var maxStr = ""
+        if (queryObject.nodeIds.length >= Gparams.listDisplayLimitMax)
+            maxStr = ">"
+        var queryCountNodes = "<b>" + maxStr + queryObject.nodeIds.length + " nodes" + "</b>";
 
         var color = nodeColors[queryObject.label];
         var classInResult = "";
@@ -191,8 +184,8 @@ var buildPaths = (function () {
         $('#buildPaths_cypherTA').val(self.cypher)
     }
     self.onUnSelectNodeDiv = function () {
-        if(cardCliked){
-            cardCliked=false;
+        if (cardCliked) {
+            cardCliked = false;
             return;
         }
         currentDivIndex = -1;
@@ -202,13 +195,12 @@ var buildPaths = (function () {
             label = self.queryObjs[index].label;
 
         searchNodes.resetQueryClauses();
-        searchNodes.setUIPermittedLabels(label);
+        searchNodes.setUIPermittedLabels(null);
 
 
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
         $("#mainAccordion").accordion("option", "active", 0);
         $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
-
 
 
     }
@@ -224,13 +216,14 @@ var buildPaths = (function () {
         searchNodes.setUpdateContextQueryObject();
         $("#mainAccordion").accordion("option", "active", 0);
         $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
-        cardCliked=true;
-     /* if  (event && typeof event !== 'undefined')
-        event.stopPropagation()*/
-     //   (typeof event !== 'undefined')
-      //  event.stopPropagation()
-   /*     if(window.event)
-            window.event.stopPropagation();*/
+        searchNodes.setUIPermittedLabels(context.queryObject.label);
+        cardCliked = true;
+        /* if  (event && typeof event !== 'undefined')
+           event.stopPropagation()*/
+        //   (typeof event !== 'undefined')
+        //  event.stopPropagation()
+        /*     if(window.event)
+                 window.event.stopPropagation();*/
 
 
     }
@@ -404,7 +397,7 @@ var buildPaths = (function () {
         return count;
     }
 
-    self.buildQuery = function (type) {
+    self.buildQuery = function (type, returnQueryObj) {
         if (self.queryObjs.length == 0)
             return console.log("self.queryObjs is empty")
 
@@ -420,10 +413,10 @@ var buildPaths = (function () {
             if (index > 0)
                 matchCypher += "-[r" + index + "]-"
             matchCypher += "(" + symbol + ":" + queryObject.label + ")";
-            if(queryObject.nodeSetIds){//nodeSet
+            if (queryObject.nodeSetIds) {//nodeSet
                 if (whereCypher != "")
                     whereCypher += " AND "
-                whereCypher += "id("+symbol+") in ["+queryObject.nodeSetIds.toString()+"]";
+                whereCypher += "id(" + symbol + ") in [" + queryObject.nodeSetIds.toString() + "]";
             }
             else if (queryObject.value && queryObject.value != "") {
                 if (whereCypher != "")
@@ -470,6 +463,8 @@ var buildPaths = (function () {
 
 
         var cypher = " MATCH p=(" + matchCypher + ") " + whereCypher + " RETURN " + distinctWhere + returnCypher + " LIMIT " + Gparams.maxResultSupported;
+        if (returnQueryObj)
+            return {match:matchCypher,where:whereCypher,return:returnCypher,distinctWhere:distinctWhere,};
         return cypher;
     }
 
@@ -500,12 +495,12 @@ var buildPaths = (function () {
                 props.labelNeo = line[key].labels[0];
                 if (labels.indexOf(props.labelNeo) < 0)
                     labels.push(props.labelNeo);
-                var obj=connectors.getVisjsNodeFromNeoNode( line[key],false)
-             /*   var obj = {
-                    id: line[key]._id,
-                    neoAttrs: props,
-                    label: props.labelNeo
-                }*/
+                var obj = connectors.getVisjsNodeFromNeoNode(line[key], false)
+                /*   var obj = {
+                       id: line[key]._id,
+                       neoAttrs: props,
+                       label: props.labelNeo
+                   }*/
                 lineObj[key] = obj;
 
             }
@@ -517,16 +512,16 @@ var buildPaths = (function () {
 
     }
     self.expandCollapse = function (expand) {
-       if(expand) {
-           stopExpand = false;
-           return;
-       }
-       else
-           stopExpand=true;
+        if (expand) {
+            stopExpand = false;
+            return;
+        }
+        else
+            stopExpand = true;
 
-            if ($("#buildGraphDiv").html() == "" || expand) {
+        if ($("#buildGraphDiv").html() == "" || expand) {
             $("#buildGraphDiv").html(globalHtml);
-            $("#BIlegendDiv").css("visibility","hidden")
+            $("#BIlegendDiv").css("visibility", "hidden")
         } else {
             $("#buildGraphDiv").html("");
         }
@@ -580,24 +575,22 @@ var buildPaths = (function () {
             }
 
 
-
         })
 
 
         //group all connections
-        var datasetGroupedMap={}
-        tableDataset.forEach(function(line){
-            if(!datasetGroupedMap[line.id]){
-                datasetGroupedMap[line.id]=line
-            }else if(line.connectedTo)
-                datasetGroupedMap[line.id].connectedTo+=","+line.connectedTo
+        var datasetGroupedMap = {}
+        tableDataset.forEach(function (line) {
+            if (!datasetGroupedMap[line.id]) {
+                datasetGroupedMap[line.id] = line
+            } else if (line.connectedTo)
+                datasetGroupedMap[line.id].connectedTo += "," + line.connectedTo
 
         })
-        var datasetGroupedArray=[];
-        for(var key in datasetGroupedMap){
+        var datasetGroupedArray = [];
+        for (var key in datasetGroupedMap) {
             datasetGroupedArray.push(datasetGroupedMap[key]);
         }
-
 
 
         datasetGroupedArray.sort(function (a, b) {
@@ -633,7 +626,7 @@ var buildPaths = (function () {
 
     self.displayGraph = function () {
         self.expandCollapse()
-var relsCount={};
+        var relsCount = {};
         toutlesensController.setGraphMessage("Working...")
         var visjsData = {nodes: [], edges: [], labels: []};
         visjsData.labels = self.currentDataset.labels;
@@ -644,7 +637,7 @@ var relsCount={};
                 if (uniqueNodes.indexOf(nodeNeo.id) < 0) {
                     uniqueNodes.push(nodeNeo.id);
 
-                    var visjsNode=nodeNeo;
+                    var visjsNode = nodeNeo;
                     visjsData.nodes.push(visjsNode);
                 }
             }
@@ -664,9 +657,9 @@ var relsCount={};
 
                     }
                     visjsData.edges.push(relObj);
-                    if(!relsCount[indexSymbol])
-                        relsCount[indexSymbol]=0
-                    relsCount[indexSymbol]+=1
+                    if (!relsCount[indexSymbol])
+                        relsCount[indexSymbol] = 0
+                    relsCount[indexSymbol] += 1
                 }
                 previousSymbol = symbol;
 
@@ -685,16 +678,73 @@ var relsCount={};
 
 
     }
-    
-    self.updateResultCountDiv=function(relsCount){
-      /*  for(var key in relsCount){
 
-            var html=$("#buildPath_resultCountDiv_1"+key).html();
-            html="<span class=buildPath-relCount>"+relsCount[key]+"</span>/"+html
-            $("#buildPath_resultCountDiv_1"+key).html(html)
+    self.displayStats = function () {
+        var limit = $("#searchDialog_AlgorithmsResultSize").val();
+        var sourceIndex = $("#buildPath_StatSourceLabelSelect").val();
+        var targetIndex = $("#buildPath_StatTargetLabelSelect").val();
+        var queryObj = self.buildQuery("count", true);
 
-        }*/
-        
+        $("#dialog").dialog("close");
+        var sourceSymbol = alphabet.charAt(sourceIndex);
+        var targetSymbol = alphabet.charAt(targetIndex);
+        var sourceLabel = self.queryObjs[sourceIndex].label;
+        var targetLabel = self.queryObjs[targetIndex].label;
+        var cypher = "Match "+queryObj.match+" " + queryObj.where + " return "+sourceSymbol+"."+Schema.getNameProperty()+" as name, count ("+targetSymbol+") as cnt order by cnt desc limit " + limit;
+
+        Cypher.executeCypher(cypher, function (err, result) {
+                if (err)
+                    console.log(err);
+                if (result.length == 0) {
+                    $("#waitImg").css("visibility", "hidden");
+                    toutlesensController.setGraphMessage("No result")
+                    return;
+                }
+                var statsData = [];
+                result.forEach(function (line) {
+                    statsData.push({name: line.name, count: line.cnt})
+                });
+                if (!toutlesensController.graphDataTable) {
+                    toutlesensController.graphDataTable = new myDataTable();
+                    toutlesensController.graphDataTable.pageLength = 30;
+                }
+
+                dialogLarge.load("htmlSnippets/dataTable.html", function () {
+                    dialogLarge.dialog("open");
+                    toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv", statsData, function (err, result) {
+                    }, 2000)
+
+
+                })
+
+            }
+        )
+    }
+
+    self.showStatsDialog = function () {
+        $("#dialog").load("htmlSnippets/stats.html", function () {
+            var labels = [];
+            self.queryObjs.forEach(function (line, index) {
+                labels.push({name: line.label, index: index})
+            })
+            common.fillSelectOptions(buildPath_StatSourceLabelSelect, labels, "name", "index", true)
+            common.fillSelectOptions(buildPath_StatTargetLabelSelect, labels, "name", "index", true)
+
+            $("#dialog").dialog("option", "title", "statistics");
+            $("#dialog").dialog({modal: false});
+            $("#dialog").dialog("open");
+        });
+    }
+
+    self.updateResultCountDiv = function (relsCount) {
+        /*  for(var key in relsCount){
+
+              var html=$("#buildPath_resultCountDiv_1"+key).html();
+              html="<span class=buildPath-relCount>"+relsCount[key]+"</span>/"+html
+              $("#buildPath_resultCountDiv_1"+key).html(html)
+
+          }*/
+
     }
 
     return self;

@@ -39,12 +39,28 @@ var searchNodes = (function () {
                 return $(".selectLabelDiv ").css("visibility", "visible");
 
             }
+            var opacityAllowed = 0.7;
+            var opacityAll = 0.1;
+            $(".selectLabelDiv ").css("visibility", "visible");
             var allowedLabels = Schema.getPermittedLabels(label, true, true);
             $(".selectLabelDiv ").each(function () {
-                if (allowedLabels.indexOf($(this).html()) < 0)
-                    $(this).css("visibility", "hidden");
-                else
-                    $(this).css("visibility", "visible");
+                var thisLabel=$(this).html()
+                console.log(thisLabel)
+                if (false) {
+                    if (allowedLabels.indexOf(thisLabel) < 0)
+                        $(this).css("visibility", "hidden");
+                    else
+                        $(this).css("visibility", "visible");
+                }
+                if (true) {
+                    if(label==thisLabel)
+                        $(this).css("opacity", 1);
+                    else if (allowedLabels.indexOf(thisLabel) < 0)
+                        $(this).css("opacity", opacityAll);
+
+                     else
+                        $(this).css("opacity", opacityAllowed);
+                }
 
             })
             self.configBooleanOperatorsUI();
@@ -125,12 +141,12 @@ var searchNodes = (function () {
             //if(searchNodes.self.previousAction!="path" || pathSourceSearchCriteria)
             if (searchDialog_propertySelect)
                 filters.initProperty(null, value, searchDialog_propertySelect);
-            $("#searchDialog_propertySelect").val(Schema.schema.defaultNodeNameProperty)
+
         }
 
         self.configBooleanOperatorsUI = function (forceShowAndOr) {
-         //   if (context.queryObject.nodeIds  || forceShowAndOr) {
-            if ((context.queryObject.value && context.queryObject.value!="" )  || forceShowAndOr) {
+            //   if (context.queryObject.nodeIds  || forceShowAndOr) {
+            if ((context.queryObject.value && context.queryObject.value != "") || forceShowAndOr) {
                 $("#searchDialog_booleanOperatorsAnd").css("visibility", "visible")
                 $("#searchDialog_booleanOperatorsOr").css("visibility", "visible")
                 $("#searchDialog_booleanOperatorsOnly").text("ONLY")
