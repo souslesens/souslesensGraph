@@ -1,11 +1,17 @@
 var async = require("async");
 var elasticProxy = require("./elasticProxy.js")
-var mySQLproxy = require("./mySQLproxy..js")
+var mySQLproxy = require("./mySQLproxy..js");
+var fs=require('fs');
+var path=require("path");
 
 
 var ATD_theques = {
 
-    indexDescriptions: {
+
+    configLocation:__dirname+"/../config/search/atdSearchConfig.json",
+
+
+  /*  indexDescriptions: {
         "phototheque": {
             type: "mySQL",
             schema: "phototheque",
@@ -61,10 +67,19 @@ var ATD_theques = {
         }
 
 
-    },
+    },*/
 
+    loadConfig:function(){
+        var filePath=path.resolve(ATD_theques.configLocation)
+        var data=""+fs.readFileSync(filePath)
+        ATD_theques.indexDescriptions=JSON.parse(data).indexDescriptions
+
+
+
+    }
+    ,
     indexTheques: function (indexes) {
-
+        ATD_theques.loadConfig()
         async.eachSeries(indexes, function (index, callbackEachIndex) {
                 console.log("processing " + index)
                 var schema = elasticProxy.getIndexMappings(index);
@@ -119,7 +134,7 @@ var ATD_theques = {
 module.exports = ATD_theques
 
 
-//ATD_theques.indexTheques(["bordereaux"]);
+ATD_theques.indexTheques(["bordereaux"]);
 
 
 const args = process.argv;

@@ -1,0 +1,70 @@
+{
+  "indexDescriptions": {
+    "phototheque": {
+      "type": "mySQL",
+      "schema": "phototheque",
+      "settings": "ATD",
+      "connOptions": {
+        "host": "localhost",
+        "user": "root",
+        "password": "vi0lon",
+        "database": "phototheque"
+      },
+      "sqlQuery": "select * from phototheque"
+    },
+    "artotheque": {
+      "type": "mySQL",
+      "schema": "phototheque",
+      "settings": "ATD",
+      "connOptions": {
+        "host": "localhost",
+        "user": "root",
+        "password": "vi0lon",
+        "database": "artotheque"
+      },
+      "sqlQuery": "select * from artotheque"
+    },
+    "audiotheque": {
+      "type": "mySQL",
+      "schema": "default",
+      "settings": "ATD",
+      "connOptions": {
+        "host": "localhost",
+        "user": "root",
+        "password": "vi0lon",
+        "database": "audiotheque"
+      },
+      "sqlQuery": "select * from audiotheque"
+    },
+    "videotheque": {
+      "type": "mySQL",
+      "schema": "default",
+      "settings": "ATD",
+      "connOptions": {
+        "host": "localhost",
+        "user": "root",
+        "password": "vi0lon",
+        "database": "videotheque"
+      },
+      "sqlQuery": "select * from videotheque"
+    },
+    "bordereaux": {
+      "type": "fs",
+      "settings": "ATD",
+      "dir": "D:\\ATD_Baillet\\versements2018",
+      "schema": "officeDocument"
+    },
+    "ocr": {
+      "type": "fs",
+      "settings": "ATD",
+      "dir": "H:\\ATD\\ATD_QUART_MONDE_Cde2017_2128_Cde01_BP10_PDF",
+      "schema": "officeDocument"
+    },
+    "testatd": {
+      "type": "fs",
+      "settings": "ATD",
+      "dir": "C:\\Users\\claud\\Downloads\\test",
+      "schema": "officeDocument"
+    }
+  }
+}

@@ -274,12 +274,12 @@
                 else if (type == "tags")
                     label = "tag"
 
-debugger
+
                 context.queryObject={};
                 var clauseText = self.selectionName;
                 context.queryObject.label = label;
                 context.queryObject.text = clauseText;
-                context.queryObject.type = "plugin-"+label;
+                context.queryObject.type = "nodeSet-plugin-"+label;
                 context.queryObject.where = searchNodes.getWhereClauseFromArray("iD", self.selection, "n");
                 var cypher = "MATCH (n:" + label + ") where " + context.queryObject.where + " RETURN collect(ID(n)) as ids ";
 
@@ -289,6 +289,7 @@ debugger
                     }
 
                     context.queryObject.nodeSetIds=result[0].ids
+                    $("#findTabs").tabs("option", "active", 0);
                     buildPaths.show( "only")
                 })
 

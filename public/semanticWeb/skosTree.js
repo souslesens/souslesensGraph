@@ -2,7 +2,27 @@ var skosTree = (function () {
     var self = {}
 var rdfUrl="../rdf"
 
-    self.loadTree = function (treeDivId, skosInput) {
+    self.loadJsTree = function (treeDivId, skosInput) {// format direct jstree
+        var file = $("#" + skosInput).val();
+        $.ajax({
+            type: "GET",
+            url: "data/"+file,
+          //  dataType: "json",
+            success: function (data, textStatus, jqXHR) {
+             //  data= JSON.parse(data)
+
+                jsTreeController.load(data, treeDivId, function (err, result) {
+                    $("#" + treeDivId).jstree("select_node", "ul > li:first");
+                    var selectedNode = $("#" + treeDivId).jstree("get_selected");
+                    $("#" + treeDivId).jstree("open_node", selectedNode, false, true);
+
+                })
+            }
+        })
+    }
+
+
+    self.loadSkosTree = function (treeDivId, skosInput) {
         var ontology = $("#" + skosInput).val();
         var payload = {
             loadSkosToTree: 1,

@@ -4,9 +4,11 @@ var buildPaths = (function () {
     var currentDivIndex = -1;
     var alphabet = "abcdefghijklmno";
     var currentSetType;
+
     self.queryObjs = [];
     self.isEditing = false;
     self.currentCypher = "";
+
 
     var cardCliked = false;
     var stopExpand = false;
@@ -118,6 +120,7 @@ var buildPaths = (function () {
     self.drawNodeQueryDivs = function (withButtons) {
         var html = ""
         self.queryObjs.forEach(function (queryObject, index) {
+            html += self.getRelDivHtml(index);
             html += self.getNodeDivHtml(queryObject, index);
         })
 
@@ -169,6 +172,61 @@ var buildPaths = (function () {
 
     }
 
+    self.getRelDivHtml = function (index) {
+        if (index == 0)
+            return "";
+        var startLabel = self.queryObjs[index - 1].label;
+        var endLabel = self.queryObjs[index].label;
+        var permittedRels = Schema.getPermittedRelations(startLabel, "both");
+        var rels = [];
+        permittedRels.forEach(function (rel) {
+            if (rel.endLabel == endLabel || rel.startLabel == endLabel)
+                rels.push(rel)
+        })
+        self.queryObjs[index].incomingRelation = {
+            candidates: rels,
+            selected: null
+        }
+
+
+        var html = "<div id='buildPath_relDiv_" + index + "' class=' buildPaths-relDiv  stopPropag '  onclick='buildPaths.onRelDivClick(" + index + ")' >" +
+            // " <div class='buildPaths-relPartDiv' style='display: flex;margin: 2px'><i>" + rels[0].name + "</i>" +//
+            // "<input type=\"image\" height=\"15px\" src=\"images/filter.png\" onclick='buildPaths.onRelFilterClick(" + index + ")'></div>" +//
+            "<div id='buildPath_relConditionsDiv_" + index + "' class=' buildPaths-relConditionDiv  stopPropag' ><-></div>" +
+            "</div>"
+
+
+        if (rels.length > 1) {// choose witch relation**************!!!
+            self.onRelDivClick(index);
+
+
+        }
+
+        return html;
+
+
+    }
+
+    self.onRelDivClick = function (index) {
+        $("#dialog").load("htmlSnippets/searchRelationsDialog.html", function () {
+            dialog.dialog("open");
+
+            dialog.dialog({title: "Relation conditions"});
+            self.queryObjs.selectedIndex = index;
+            searchRelations.initDialog(self.queryObjs[index].incomingRelation.candidates)
+
+
+        })
+    }
+
+    self.updateRelation = function (relation) {
+        self.queryObjs[self.queryObjs.selectedIndex].incomingRelation.selected = relation;
+        dialog.dialog("close");
+        var html = relation.name + "<br>" + relation.queryObject.text;
+        $("#buildPath_relConditionsDiv_" + self.queryObjs.selectedIndex).html(html);
+
+    }
+
     self.moveDivLeft = function (index) {
     }
     self.moveDivRight = function (index) {
@@ -206,7 +264,7 @@ var buildPaths = (function () {
     }
     self.onSelectNodeDiv = function (index) {
         currentDivIndex = index;
-        if (self.queryObjs[index].type.indexOf("nodeSet") == 0)
+        if (self.queryObjs[index].type && self.queryObjs[index].type.indexOf("nodeSet") == 0)
             return;
 
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
@@ -306,8 +364,29 @@ var buildPaths = (function () {
           currentDivIndex = -1
       }*/
 
+
+    self.checkQueryExceedsLimits = function () {
+        var ok = true;
+        var cartesianProduct = 1
+        self.queryObjs.forEach(function (line) {
+            if (line.nodeIds)
+                cartesianProduct *= line.nodeIds.length
+            else if (line.nodeSetIds)
+                cartesianProduct *= line.nodeIds.length
+
+        })
+        var amount
+        if (self.queryObjs.length > 1)
+            var amount = Math.pow(cartesianProduct, 1 / (self.queryObjs.length - 1))
+        if (amount > 10000)
+            return true;
+        return false;
+
+    }
     self.executeQuery = function (type, callback) {
 
+        if (self.checkQueryExceedsLimits())
+            return alert("query too large. put  conditions on nodes or relations")
 
         $("#searchDialog_previousPanelButton").css('visibility', 'visible');
         var countResults = self.countResults();
@@ -403,32 +482,203 @@ var buildPaths = (function () {
         if (self.queryObjs.length == 0)
             return console.log("self.queryObjs is empty")
 
-        var matchCypher = "";
-        var whereCypher = "";
-        var returnCypher = "";
-        var distinctWhere = "";
+        var cypherObj = {
+            match: [],
+            whereNode: [],
+            whereRelation: [],
+            with: [],
+            return: [],
+            distinct: []
+
+
+        }
+
+
 
         self.queryObjs.forEach(function (queryObject, index) {
+            var matchCypher = "";
+            var whereCypher = "";
+            var whereRelationCypher = "";
+
             var symbol = alphabet.charAt(index);
             queryObject.inResult = $("#buildPaths-inResultCbx_" + index).is(':checked');
 
-            if (index > 0)
+            if (index == 0) {
+                matchCypher = "(" + symbol + ":" + queryObject.label + ")";
+            } else {
                 matchCypher += "-[r" + index + "]-"
-            matchCypher += "(" + symbol + ":" + queryObject.label + ")";
+                matchCypher += "(" + symbol + ":" + queryObject.label + ")";
+            }
+
+
             if (queryObject.nodeSetIds) {//nodeSet
-                if (whereCypher != "")
-                    whereCypher += " AND "
                 whereCypher += "id(" + symbol + ") in [" + queryObject.nodeSetIds.toString() + "]";
             }
             else if (queryObject.value && queryObject.value != "") {
-                if (whereCypher != "")
-                    whereCypher += " AND "
-                whereCypher += searchNodes.buildWhereClauseFromUI(queryObject, symbol);
+
+                whereCypher += searchNodes.getWhereClauseFromQueryObject(queryObject, symbol);
             }
             if (queryObject.subQueries) {
                 queryObject.subQueries.forEach(function (suqQuery) {
                     if (suqQuery.value && suqQuery.value != "") {
-                        whereCypher += " " + suqQuery.booleanOperator + " " + searchNodes.buildWhereClauseFromUI(suqQuery, symbol);
+                        whereCypher += " " + suqQuery.booleanOperator + " " + searchNodes.getWhereClauseFromQueryObject(suqQuery, symbol);
+                    }
+                })
+            }
+
+
+            if (queryObject.inResult) {
+                cypherObj.return.push(symbol)
+                cypherObj.distinct.push(symbol)
+            }
+
+
+
+            // set relation where
+            if (queryObject.incomingRelation) {
+                var relation = queryObject.incomingRelation.selected
+                if (index > 0 && relation) {
+
+                    var queryRelObject = relation.queryObject;
+                    if (queryRelObject.property == "numberOfRelations") {
+                        cypherObj.with.push(queryRelObject);
+//with n,count(r) as cnt  MATCH (n:personne)-[r]-(m:communaute) where cnt>3  return n,m
+                    }
+                    else if(queryRelObject.value!="") {
+                        var withStr=searchNodes.getWhereClauseFromQueryObject(queryRelObject, symbol)
+                        cypherObj.whereRelation.push(withStr)
+
+
+                    }
+                }
+            }
+
+            cypherObj.match.push(matchCypher)
+            cypherObj.whereNode.push(whereCypher)
+            cypherObj.whereRelation.push(whereRelationCypher)
+
+
+
+
+        })
+
+
+        function concatClauses(clausesArray, sep) {
+            var str = "";
+            clausesArray.forEach(function (clause, index) {
+                if (index > 0 && sep!="") {
+                    str += " " + sep + " "
+                }
+                str += clause
+            })
+            return str;
+        }
+
+        cypherObj.match.cypher=concatClauses( cypherObj.match,"")
+
+
+        cypherObj.whereNode.cypher=concatClauses( cypherObj.whereNode,"AND");
+        if(cypherObj.whereNode.cypher.length!="")
+            cypherObj.whereNode.cypher=" WHERE "+cypherObj.whereNode.cypher;
+
+         cypherObj.whereRelation.cypher=concatClauses( cypherObj.whereRelation,"AND")
+        if(cypherObj.whereRelation.cypher!=""){
+        if( cypherObj.whereNode.cypher=="")
+            cypherObj.whereRelation.cypher=" WHERE "+cypherObj.whereRelation.cypher;
+        else
+            cypherObj.whereRelation.cypher=" AND "+cypherObj.whereRelation.cypher;
+
+        }
+
+
+        cypherObj.return.cypher=concatClauses( cypherObj.return,",")
+        cypherObj.distinct.cypher=concatClauses( cypherObj.whereRelation,"-")
+
+
+
+
+
+
+
+
+
+
+
+
+// return clause
+        if (type == "count") {
+            cypherObj.return.cypher = "count(a) as cnt";
+            cypherObj.distinct.cypher = "";
+        }
+        else if (type == "set") {
+            var index = $("#buildPaths_labelSelect").val();
+            var symbol = alphabet.charAt(index);
+            cypherObj.return.cypher = "collect(ID(" + symbol + ")) as setIds";
+            cypherObj.distinct.cypher = "";
+        }
+        else {
+            cypherObj.distinct.cypher = "DISTINCT(" + cypherObj.distinct.cypher + ") as distinctIds,";// pour supprimer les doublons
+            cypherObj.return.cypher=","+cypherObj.return.cypher
+        }
+
+
+        var cypher="";
+if(cypherObj.with.length==0) {// without with clause
+
+             cypher = " MATCH p=(" + cypherObj.match.cypher + ") " + cypherObj.whereNode.cypher +cypherObj.whereRelation.cypher+ " RETURN " + cypherObj.distinct.cypher + cypherObj.return.cypher + " LIMIT " + Gparams.maxResultSupported;
+        }
+        else {//use of WITH : count relations for example...
+            for (var key in withClauses) {
+
+            }
+        }
+        if (returnQueryObj)
+            return {
+                match: globalMatchCypher,
+                where: globalWhereCypher,
+                return: returnCypher,
+                distinctWhere: distinctWhere,
+            };
+        return cypher;
+    }
+    self.buildQueryOld = function (type, returnQueryObj) {
+        if (self.queryObjs.length == 0)
+            return console.log("self.queryObjs is empty")
+
+        var globalMatchCypher = "";
+        var globalWhereCypher = "";
+        var globalWhereRelationCypher = "";
+        var returnCypher = "";
+        var distinctWhere = "";
+        var withClauses = {};
+
+        self.queryObjs.forEach(function (queryObject, index) {
+            var matchCypher = "";
+            var whereCypher = "";
+            var whereRelationCypher = "";
+
+            var symbol = alphabet.charAt(index);
+            queryObject.inResult = $("#buildPaths-inResultCbx_" + index).is(':checked');
+
+            if (index == 0) {
+                matchCypher = "(" + symbol + ":" + queryObject.label + ")";
+            } else {
+                matchCypher += "-[r" + index + "]-"
+                matchCypher += "(" + symbol + ":" + queryObject.label + ")";
+            }
+
+
+            if (queryObject.nodeSetIds) {//nodeSet
+                whereCypher += "id(" + symbol + ") in [" + queryObject.nodeSetIds.toString() + "]";
+            }
+            else if (queryObject.value && queryObject.value != "") {
+
+                whereCypher += searchNodes.getWhereClauseFromQueryObject(queryObject, symbol);
+            }
+            if (queryObject.subQueries) {
+                queryObject.subQueries.forEach(function (suqQuery) {
+                    if (suqQuery.value && suqQuery.value != "") {
+                        whereCypher += " " + suqQuery.booleanOperator + " " + searchNodes.getWhereClauseFromQueryObject(suqQuery, symbol);
                     }
                 })
             }
@@ -445,9 +695,43 @@ var buildPaths = (function () {
                 distinctWhere += "ID(" + symbol + ")";
             }
 
+            // set relation where
+            if (queryObject.incomingRelation) {
+                var relation = queryObject.incomingRelation.selected
+                if (index > 0 && relation) {
+                    var queryRelObject = relation.queryObject;
+                    if (queryRelObject.property == "numberOfRelations") {
+                        withClauses[symbol] = "(MATCH WITH " + symbol + ",count(r) as cnt r" + index + ")";
+//with n,count(r) as cnt  MATCH (n:personne)-[r]-(m:communaute) where cnt>3  return n,m
+                    }
+                    else {
+
+                        //    var relWhere = searchNodes.getWhereClauseFromQueryObject(queryRelObject, "r" + index)
+                        if (whereRelationCypher != "")
+                            whereRelationCypher += " and "
+                        whereRelationCypher += relWhere;
+
+                    }
+                }
+            }
+
+            globalMatchCypher += matchCypher;
+            if (whereCypher.length > 0) {
+                if (globalWhereCypher == "")
+                    globalWhereCypher = " WHERE " + whereCypher;
+                else
+                    globalWhereCypher = " AND " + whereCypher;
+            }
+            if (whereRelationCypher.length > 0) {
+                if (globalWhereCypher == "")
+                    globalWhereCypher = " WHERE " + whereRelationCypher;
+                else
+                    globalWhereCypher = " AND " + whereRelationCypher;
+            }
+
+
         })
-        if (whereCypher.length > 0)
-            whereCypher = " WHERE " + whereCypher;
+
 
         if (type == "count") {
             returnCypher = "count(a) as cnt";
@@ -464,9 +748,21 @@ var buildPaths = (function () {
         }
 
 
-        var cypher = " MATCH p=(" + matchCypher + ") " + whereCypher + " RETURN " + distinctWhere + returnCypher + " LIMIT " + Gparams.maxResultSupported;
+        if (Object.keys(withClauses).length == 0) {
+            var cypher = " MATCH p=(" + globalMatchCypher + ") " + globalWhereCypher + " RETURN " + distinctWhere + returnCypher + " LIMIT " + Gparams.maxResultSupported;
+        }
+        else {//use of WITH : count relations for example...
+            for (var key in withClauses) {
+
+            }
+        }
         if (returnQueryObj)
-            return {match: matchCypher, where: whereCypher, return: returnCypher, distinctWhere: distinctWhere,};
+            return {
+                match: globalMatchCypher,
+                where: globalWhereCypher,
+                return: returnCypher,
+                distinctWhere: distinctWhere,
+            };
         return cypher;
     }
 
@@ -656,9 +952,9 @@ var buildPaths = (function () {
 
                     }
                     visjsData.edges.push(relObj);
-                    if (!relsCount[indexSymbol])
-                        relsCount[indexSymbol] = 0
-                    relsCount[indexSymbol] += 1
+                    /*  if (!relsCount[indexSymbol])
+                          relsCount[indexSymbol] = 0
+                      relsCount[indexSymbol] += 1*/
                 }
                 previousSymbol = symbol;
 
@@ -677,7 +973,7 @@ var buildPaths = (function () {
         self.expandCollapse()
         var relsCount = {};
         toutlesensController.setGraphMessage("Working...")
-        self.drawGraph(self.currentDataset, function(){
+        self.drawGraph(self.currentDataset, function () {
             self.updateResultCountDiv(relsCount);
 
             if (callback)
@@ -692,8 +988,6 @@ var buildPaths = (function () {
         searchNodes.onExecuteGraphQuery()
 
     }
-
-
 
 
     self.displayStats = function () {

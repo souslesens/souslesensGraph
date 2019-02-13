@@ -1,0 +1,39 @@
+
+<table>
+    <tr>
+        <td>
+
+            <select id="searchRelDialog_relTypeSelect" onchange=" searchRelations.initRelProps($(this).prop('selectedIndex'));"></select>
+        </td>
+    </tr>
+    <tr>
+<td colspan="3">
+    <select id="searchRelDialog_propertySelect" style="height: 25px;width:100px" onchange=" searchRelations.onRelPropsSelect($(this).prop('selectedIndex'));">
+    </select>
+</td>
+    </tr>
+    <tr>
+        <td>
+    <select id="searchRelDialog_operatorSelect">
+        <option>=</option>
+        <option>!=</option>
+        <option>&lt;</option>
+        <option>&gt;</option>
+        <option selected="selected">contains</option>
+        <option>notContains</option>
+    </select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+
+    <input id="searchRelDialog_valueInput" size="10"
+           onkeyup="$('#searchCriteriaAddButton').css('visibility','visible');">
+</td>
+    </tr>
+    <tr>
+        <td>
+           <button onclick="searchRelations.setRelationCriteria()">OK</button>
+        </td>
+    </tr>
+</table>

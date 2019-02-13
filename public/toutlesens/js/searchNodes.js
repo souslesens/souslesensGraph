@@ -491,7 +491,7 @@ var searchNodes = (function () {
                             value: $("#neighboursWhere_valueInput").val()
                         }
 
-                        options.whereFilters = [searchNodes.buildWhereClauseFromUI(queryobject, "m")];
+                        options.whereFilters = [searchNodes.getWhereClauseFromQueryObject(queryobject, "m")];
                     }
 
 
@@ -758,7 +758,7 @@ var searchNodes = (function () {
                 labelStr = ":" + queryObject.label;
 
 
-            var whereStr = self.buildWhereClauseFromUI(queryObject, "n");
+            var whereStr = self.getWhereClauseFromQueryObject(queryObject, "n");
             if (whereStr && whereStr != "")
                 whereStr = " WHERE " + whereStr
             else
@@ -771,7 +771,7 @@ var searchNodes = (function () {
 
                     if (whereStr.length > 0)
                         boolOp = suqQuery.booleanOperator
-                    whereStr += " " + boolOp + " " + self.buildWhereClauseFromUI(suqQuery, "n");
+                    whereStr += " " + boolOp + " " + self.getWhereClauseFromQueryObject(suqQuery, "n");
                 })
 
 
@@ -783,7 +783,7 @@ var searchNodes = (function () {
         }
 
 
-        self.buildWhereClauseFromUI = function (queryObject, nodeAlias) {
+        self.getWhereClauseFromQueryObject = function (queryObject, nodeAlias) {
 
 
             var property = queryObject.property;
@@ -792,10 +792,16 @@ var searchNodes = (function () {
 
             if (!value || value == "")
                 return null;
+
+
+
+
+
             var not = (operator == "notContains") ? "NOT " : "";
             if (operator == "!=") {
                 operator = "<>"
             }
+
 
             else if (operator == "~" || operator == "contains" || operator == "notContains") {
                 operator = "=~"
@@ -808,6 +814,8 @@ var searchNodes = (function () {
                     value = "\"" + value + "\"";
             }
             var propStr = "";
+
+
             if (property == "any")
                 propStr = "(any(prop in keys(n) where n[prop]" + operator + value + "))";
 

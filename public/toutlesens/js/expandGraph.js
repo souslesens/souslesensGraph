@@ -399,7 +399,7 @@ var expandGraph = (function () {
             operator: $("#expandWhere_operatorSelect").val(),
             value: $("#expandWhere_valueInput").val()
         }
-        var filter = searchNodes.buildWhereClauseFromUI(queryobject, "m");
+        var filter = searchNodes.getWhereClauseFromQueryObject(queryobject, "m");
         return filter;
 
     }

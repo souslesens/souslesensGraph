@@ -433,6 +433,8 @@ var Schema = (function () {
 
         }
 
+
+
         self.getAllLabelNames = function () {
             var labels = [];//[""];
             for (var label in Schema.schema.labels) {
