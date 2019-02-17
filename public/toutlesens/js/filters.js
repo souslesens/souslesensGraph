@@ -235,11 +235,11 @@ var filters = (function () {
      */
     self.filterGraphOnProperty = function (option, booleanOption, objectType, objectName, property, operator, value) {
         if (booleanOption == "removeAll") {
-            visjsGraph.filterGraph(objectType,"all");
+            visjsGraph.filterGraph("all");
 
         }
         else {
-            visjsGraph.filterGraph(objectType,booleanOption, property, operator, value, objectName);
+            visjsGraph.filterGraph(booleanOption, property, operator, value, objectName);
         }
 
     }

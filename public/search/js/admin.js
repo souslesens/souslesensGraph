@@ -9,6 +9,11 @@ var admin = (function () {
     var self = {}
 
     self.elasticExec = function (operation,newIndex) {
+
+
+
+
+
         $("#message").html("");
         var indexName = $("#indexName").val();
         if (!indexName || indexName == "") {
@@ -34,6 +39,19 @@ var admin = (function () {
         var payload;
         if(!operation || operation=="")
             return  alert("enter index type");
+
+
+        if(operation=="transformDirDocsToPlainText"){
+            var rootDir=$("#rootDir").val();
+            if(!rootDir || rootDir=="")
+                return alert("enter dir path")
+            payload = {
+                transformDirDocsToPlainText: 1,
+                rootDir: rootDir,
+            };
+
+
+        }
         if (operation == "indexDocDirInNewIndex") {
             payload = {
                 indexDocDirInNewIndex: 1,

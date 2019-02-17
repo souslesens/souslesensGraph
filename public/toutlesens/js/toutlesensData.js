@@ -219,15 +219,10 @@ var toutlesensData = (function () {
 
                         if (options.id == null) {
                             return callback(null, []);
+
                         }
-                        if (options.id > -1) {// we retry with inverse relation
-                            options.id = -options.id
-                            self.getNodeAllRelations(-id, options, callback);
-                        }
-                        else {
-                            options.id = -options.id
-                            return callback(null, []);
-                        }
+                        return callback(null, []);
+
 
                     }
                     if (data.length >= Gparams.maxResultSupported) {// query too get the real number of relations

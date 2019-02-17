@@ -167,6 +167,7 @@ var elasticProxy = {
 
     },
 
+
     removeSchemaMappingsCustomProperties: function (indexSchema) {
         var customProperties = ["isTitle", "isId", "inCSV", "isSearched"];
         var types = [];
@@ -233,16 +234,29 @@ var elasticProxy = {
 
     search: function (index, type, query, callback) {
 
-        getClient().searchUI.search({
-            index: index,
-            type: type,
-            body: {
-                query: {
-                    match: {
-                        body: query
-                    }
+        var body = {
+            query: {
+                match: {
+                    body: query
                 }
             }
+        }
+        if (query == "*") {
+            body = {
+                query: {
+                    match_all: {}
+                }
+            }
+
+        }
+
+
+        console.log(JSON.stringify(body, null, 2))
+        getClient().search({
+            index: index,
+            type: type,
+            body: body,
+
         }).then(function (resp) {
             var hits = resp.hits.hits;
             callback(null, hits);
@@ -274,6 +288,52 @@ var elasticProxy = {
             } else {
                 callback(null, resp);
             }
+        });
+    },
+
+
+    findByIds: function (index, ids, returnFields, callback) {
+
+        var payload =
+            {
+                "from": "0",
+
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "ids": {
+                                    "values": ids
+                                }
+                            }
+                        ]
+                    }
+                }
+
+
+            };
+
+
+        if (returnFields)
+            payload._source = returnFields;
+
+
+        var options = {
+            method: 'POST',
+            json: payload,
+            url: baseUrl + index + "/_search"
+        };
+
+        console.log(JSON.stringify(payload, null, 2));
+        request(options, function (error, response, body) {
+            var options = {
+                error: error,
+                index: index,
+                body: body,
+                callback: callback
+            }
+            elasticProxy.processSearchResult(options);
+
         });
     },
 
@@ -2326,7 +2386,7 @@ var elasticProxy = {
                     })
                 }
                 catch (e) {
-                   return callbackSeries(e);
+                    return callbackSeries(e);
                 }
             }], function (err) {
             if (err)
@@ -2525,6 +2585,90 @@ var elasticProxy = {
         })
     }
     ,
+
+
+    transformDirDocsToPlainText: function (dir,callbackMain) {
+        var index = "";
+        var type = "officeDocument";
+        var nDocs=0
+        async.series([
+            //transform skos toJson
+            function (callback) {
+
+                elasticProxy.deleteIndex(index, true, function (err, result) {
+                    if (err)
+                        return callback(err)
+                    return callback(null)
+                })
+
+            },
+            function (callback) {
+
+                elasticProxy.indexDocumentDir(dir, index, type, true, function (err, result) {
+                    if (err)
+                        return callback(err)
+                    return callback(null)
+                })
+            },
+
+            function (callback) {
+                elasticProxy.refreshIndex(index + "temp", function (err, result) {
+                    if (err)
+                        return callback(err)
+                    return callback(null)
+                })
+            },
+                function (callback) {
+
+                elasticProxy.search(index + "temp", type, "*", function (err, result) {
+
+
+                    if (err)
+                        return callback(err)
+                    var xx = result;
+
+                    result.forEach(function (hit) {
+
+                        var content = hit._source.attachment;
+                        //content=atob(content);
+                        if (content && content.content) {
+                            content.content = content.content.replace(/\n/g, ".")
+                            content.content = content.content.replace(/\.+/g, ".")
+                            content.content = content.content.replace(/\t/g, " ")
+
+
+                            var title = hit._source.title;
+                            var docStr = JSON.stringify(content, null, 2);
+
+                            nDocs+=1;
+                            var filePath = path.resolve(dir + "/" + title + ".txt")
+                            fs.writeFileSync(filePath, docStr)
+                        }
+                    })
+                    callback(null)
+
+                })
+            },
+            function (callback) {
+             //   return callback(null);
+
+
+             elasticProxy.deleteIndex(index + "temp", true, function (err, result) {
+                    if (err)
+                        return callback(err)
+                    return callback(null)
+                })
+
+            },
+        ], function (err) {
+            if( err)
+                return callbackMain(err);
+            console.log("done")
+            return callbackMain (null,{result:"done :"+nDocs+" files"});
+
+        })
+
+    }
 }
 
 
@@ -2746,6 +2890,8 @@ if (false) {
 
 
 }
+
+
 if (false) {
     var str = "" + fs.readFileSync("D:\\Total\\docs\\GM MEC Word\\documents\\elasticAllDocuments.json")
     var json = JSON.parse(str);
@@ -2760,11 +2906,26 @@ if (false) {
 
 }
 
+
+if (false) {
+    var str = "" + fs.readFileSync(path.resolve(__dirname + "/../config/others/thesaurusIngenieur.elastic.json"))
+    var json = JSON.parse(str);
+
+    elasticProxy.indexJsonArray("thesaurusingenieur", "thesuarusingenieur", json, {}, function (err, result) {
+        var x = result;
+    })
+
+
+}
+
 if (false) {
 
     elasticProxy.indexSqlTable({name: "phototheque"}, "select * from phototheque ", "phototheque2", "phototheque", function (err, result) {
         var x = result;
     })
+}
+if (false) {
+    elasticProxy.transformDirDocsToPlainText("D:\\Total\\docs\\test\\test");
 }
 
 

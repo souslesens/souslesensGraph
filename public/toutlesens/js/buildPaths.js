@@ -378,7 +378,7 @@ var buildPaths = (function () {
         var amount
         if (self.queryObjs.length > 1)
             var amount = Math.pow(cartesianProduct, 1 / (self.queryObjs.length - 1))
-        if (amount > 10000)
+        if (amount > 1000000)
             return true;
         return false;
 
@@ -529,7 +529,7 @@ var buildPaths = (function () {
 
             if (queryObject.inResult) {
                 cypherObj.return.push(symbol)
-                cypherObj.distinct.push(symbol)
+                cypherObj.distinct.push(  "ID(" + symbol + ")")
             }
 
 
@@ -566,10 +566,12 @@ var buildPaths = (function () {
         function concatClauses(clausesArray, sep) {
             var str = "";
             clausesArray.forEach(function (clause, index) {
-                if (index > 0 && sep!="") {
-                    str += " " + sep + " "
+                if(clause!="") {
+                    if (index > 0 && sep != "") {
+                        str += " " + sep + " "
+                    }
+                    str += clause
                 }
-                str += clause
             })
             return str;
         }
@@ -592,7 +594,7 @@ var buildPaths = (function () {
 
 
         cypherObj.return.cypher=concatClauses( cypherObj.return,",")
-        cypherObj.distinct.cypher=concatClauses( cypherObj.whereRelation,"-")
+        cypherObj.distinct.cypher=concatClauses( cypherObj.distinct,"+\"-\"+")
 
 
 
@@ -618,7 +620,7 @@ var buildPaths = (function () {
         }
         else {
             cypherObj.distinct.cypher = "DISTINCT(" + cypherObj.distinct.cypher + ") as distinctIds,";// pour supprimer les doublons
-            cypherObj.return.cypher=","+cypherObj.return.cypher
+
         }
 
 
@@ -634,10 +636,10 @@ if(cypherObj.with.length==0) {// without with clause
         }
         if (returnQueryObj)
             return {
-                match: globalMatchCypher,
-                where: globalWhereCypher,
-                return: returnCypher,
-                distinctWhere: distinctWhere,
+                match: cypherObj.match.cypher,
+                where: cypherObj.whereNode.cypher,
+                return: cypherObj.return.cypher,
+                distinctWhere: cypherObj.distinct.cypher
             };
         return cypher;
     }

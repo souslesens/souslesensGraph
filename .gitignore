@@ -74,3 +74,5 @@ logs/elastic.log
 logs/classifierManager.log
 *.log
 *.log
+config/others/thesaurusIngenieurRoot.elastic.json
+config/others/thesaurusIngenieur.elastic.json

@@ -448,10 +448,11 @@ var searchNodes = (function () {
 
 
             if (action == 'tableNodes') {
+                var ids= context.queryObject.nodeSetIds ||  context.queryObject.nodeIds
                 if (!self.dataTable)
                     self.dataTable = new myDataTable();
 
-                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id", context.queryObject.nodeSetIds, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id",ids, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
                 dialogLarge.load("htmlSnippets/dataTable.html", function () {
                     dialogLarge.dialog("open");
                     self.dataTable.loadNodes(self.dataTable, "dataTableDiv", cypher, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {

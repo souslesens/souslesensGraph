@@ -1197,7 +1197,7 @@ var visjsGraph = (function () {
         }
 
 
-        self.filterGraph = function (objectType, booleanOption, property, operator, value, type) {
+        self.filterGraph = function ( booleanOption, property, operator, value, type) {
             //  self.saveGraph();
 
 

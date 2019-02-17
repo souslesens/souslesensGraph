@@ -132,6 +132,16 @@ router.post(serverParams.routesRootUrl + '/elastic', function (req, response) {
         elasticProxy.findDocumentsById(req.body.indexName, req.body.ids, req.body.words, function (error, result) {
             processResponse(response, error, result)
         });
+
+    else if (req.body && req.body.findByIds)
+        elasticProxy.findByIds(req.body.options.indexName, req.body.ids, req.body.returnFields, function (error, result) {
+            processResponse(response, error, result)
+        });
+
+
+
+
+
     else if (req.body && req.body.getAssociatedWords)
         elasticProxy.getAssociatedWords(req.body.indexName, req.body.word, req.body.size, req.body.options, function (error, result) {
             processResponse(response, error, result)
@@ -211,6 +221,12 @@ router.post(serverParams.routesRootUrl + '/elastic', function (req, response) {
         elasticProxy.getUserIndexes(req.body.user, function (error, result) {
             processResponse(response, error, result)
         });
+
+    else if (req.body && req.body.transformDirDocsToPlainText)
+        elasticProxy.transformDirDocsToPlainText(req.body.rootDir, function (error, result) {
+            processResponse(response, error, result)
+        });
+
 
 
 });
