@@ -46,6 +46,7 @@ if(disableStatsTab)
             })
             var filteredDataset=[];
             var filter = $("#exportDialog_filterDiv").val();
+            debugger
             self.dataset.forEach(function (line, index) {
                 if (filter && filter != "") {
                     if (line.label && line.label != filter)

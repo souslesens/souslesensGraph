@@ -6,6 +6,8 @@ var searchRelations = (function () {
         if (!Array.isArray(rels))
             rels = [rels];
         self.currentRelations = rels;
+        $("#searchRelDialog_relTypeSelect option").remove();
+
         if (rels.length == 1) {
             common.fillSelectOptions(searchRelDialog_relTypeSelect, rels,"name","name");
             $("#searchRelDialog_relTypeSelect").val(rels[0].name);
@@ -29,7 +31,8 @@ var searchRelations = (function () {
     }
 
     self.setRelationCriteria=function(){
-        var relation=   self.currentRelations[self.currentRelations.index];
+        var index=$("#searchRelDialog_relTypeSelect").prop('selectedIndex');
+        var relation=   self.currentRelations[index];
 
         relation.queryObject={
             property: $("#searchRelDialog_propertySelect").val(),

@@ -107,7 +107,7 @@ var searchNodes = (function () {
             $(".selectLabelDiv").css('visibility', 'hidden');
             $("#selectLabelDiv_" + label).css('visibility', 'visible');
 
-            self.configBooleanOperatorsUI();
+            self.configBooleanOperatorsUI(true);
             if (searchDialog_propertySelect) ;
             filters.initProperty(null, label, searchDialog_propertySelect)
 

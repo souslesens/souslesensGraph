@@ -416,15 +416,22 @@ var Schema = (function () {
                 direction = "normal";
             var relationsPermitted = [];
             var relations = self.schema.relations;
+            var relationNames = [];
+
             for (var key in relations) {
                 var relation = relations[key];
-
+                var ok = false
                 relation.type = key;
                 if (relation.startLabel == label && (direction == "normal" || direction == "both"))
-                    relationsPermitted.push(relation);
+                    ok = true
                 if (relation.endLabel == label && (direction == "inverse" || direction == "both")) {
                     relation.inverse = 1;
+                    ok = true;
+                }
+                if (relationNames.indexOf(relation.type) < 0) {
+                    relationNames.push(relation.type);
                     relationsPermitted.push(relation);
+
                 }
 
 
@@ -432,7 +439,6 @@ var Schema = (function () {
             return relationsPermitted;
 
         }
-
 
 
         self.getAllLabelNames = function () {

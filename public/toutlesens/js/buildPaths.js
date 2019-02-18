@@ -242,9 +242,11 @@ var buildPaths = (function () {
         $('#buildPaths_cypherTA').val(self.currentCypher)
     }
     self.onUnSelectNodeDiv = function () {
+        self.currentDivIndex=-1
         if (cardCliked) {
             cardCliked = false;
             return;
+
         }
         currentDivIndex = -1;
         var index = self.queryObjs.length - 1;
@@ -258,7 +260,7 @@ var buildPaths = (function () {
 
         $(".buildPaths-nodeDiv ").removeClass("buildPaths-nodeDivSelected")
         $("#mainAccordion").accordion("option", "active", 0);
-        $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
+        $("#searchDialog_booleanOperatorsDiv").css('visibility', 'hidden');
 
 
     }
@@ -273,10 +275,11 @@ var buildPaths = (function () {
         context.queryObject = self.queryObjs[index];
 
 
-        searchNodes.setUpdateContextQueryObject();
+
         $("#mainAccordion").accordion("option", "active", 0);
         $("#searchDialog_booleanOperatorsDiv").css('visibility', 'visible');
         searchNodes.setUIPermittedLabels(context.queryObject.label);
+        searchNodes.setUpdateContextQueryObject();
         cardCliked = true;
         /* if  (event && typeof event !== 'undefined')
            event.stopPropagation()*/
@@ -385,7 +388,7 @@ var buildPaths = (function () {
     }
     self.executeQuery = function (type, callback) {
 
-        if (self.checkQueryExceedsLimits())
+        if (false && self.checkQueryExceedsLimits())
             return alert("query too large. put  conditions on nodes or relations")
 
         $("#searchDialog_previousPanelButton").css('visibility', 'visible');
@@ -500,13 +503,35 @@ var buildPaths = (function () {
             var whereCypher = "";
             var whereRelationCypher = "";
 
+
             var symbol = alphabet.charAt(index);
             queryObject.inResult = $("#buildPaths-inResultCbx_" + index).is(':checked');
+
+
+            // set relation where
+            var relType="";
+            if (queryObject.incomingRelation) {
+                var relation = queryObject.incomingRelation.selected
+                if (index > 0 && relation) {
+                    relType=":"+relation.type;
+                    var queryRelObject = relation.queryObject;
+                    if (queryRelObject.property == "numberOfRelations") {
+                        cypherObj.with.push(queryRelObject);
+//with n,count(r) as cnt  MATCH (n:personne)-[r]-(m:communaute) where cnt>3  return n,m
+                    }
+                    else if(queryRelObject.value!="") {
+                        var withStr=searchNodes.getWhereClauseFromQueryObject(queryRelObject, symbol)
+                        cypherObj.whereRelation.push(withStr)
+
+
+                    }
+                }
+            }
 
             if (index == 0) {
                 matchCypher = "(" + symbol + ":" + queryObject.label + ")";
             } else {
-                matchCypher += "-[r" + index + "]-"
+                matchCypher += "-[r" + index + relType+"]-"
                 matchCypher += "(" + symbol + ":" + queryObject.label + ")";
             }
 
@@ -534,24 +559,7 @@ var buildPaths = (function () {
 
 
 
-            // set relation where
-            if (queryObject.incomingRelation) {
-                var relation = queryObject.incomingRelation.selected
-                if (index > 0 && relation) {
 
-                    var queryRelObject = relation.queryObject;
-                    if (queryRelObject.property == "numberOfRelations") {
-                        cypherObj.with.push(queryRelObject);
-//with n,count(r) as cnt  MATCH (n:personne)-[r]-(m:communaute) where cnt>3  return n,m
-                    }
-                    else if(queryRelObject.value!="") {
-                        var withStr=searchNodes.getWhereClauseFromQueryObject(queryRelObject, symbol)
-                        cypherObj.whereRelation.push(withStr)
-
-
-                    }
-                }
-            }
 
             cypherObj.match.push(matchCypher)
             cypherObj.whereNode.push(whereCypher)

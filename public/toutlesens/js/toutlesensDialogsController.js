@@ -187,7 +187,8 @@ self.getNodeInfoButtons=function(){
 
        if( true){// show properties
            toutlesensData.getNodeInfos(context.currentNode.id, function (obj) {
-
+if(obj.length==0)
+    return  $("#nodeInfoMenuDiv").html("No result");
                str += textOutputs.formatNodeInfo(obj[0].n.properties);
                str += "<br>" + customizeUI.customInfo(obj);
                $("#nodeInfoMenuDiv").html(str);

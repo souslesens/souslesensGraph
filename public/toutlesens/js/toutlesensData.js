@@ -458,6 +458,8 @@ var toutlesensData = (function () {
 
 
         self.getNodeInfos = function (id, callback) {
+            if (isNaN(id))
+                id="\""+id+"\""
             query = "MATCH (n) WHERE ID(n) =" + id + " RETURN n ";
             Cypher.executeCypher(query, function(err, result){
                 if(err)

@@ -64,6 +64,7 @@ var nodeSets = (function () {
     self.initNodeSetSelect = function () {
 
         nodeSets.getAllNames(function (err, nodeSetNames) {
+            if(nodeSetNames)
               common.fillSelectOptionsWithStringArray(searchDialog_nodeSetsSelect,nodeSetNames,true)
         });
     }
