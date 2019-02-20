@@ -37,16 +37,17 @@ if(disableStatsTab)
 
 
         self.execute = function () {
-
+            debugger
             var checkedProperties = [];
             $(".exportDialog_propcbx").each(function (index, cbx) {
                 if ($(this).prop("checked")) {
                     checkedProperties.push(cbx.value)
                 }
+                checkedProperties.push("neoId")
             })
             var filteredDataset=[];
             var filter = $("#exportDialog_filterDiv").val();
-            debugger
+
             self.dataset.forEach(function (line, index) {
                 if (filter && filter != "") {
                     if (line.label && line.label != filter)
@@ -63,6 +64,8 @@ if(disableStatsTab)
                             self.dataset[index][key] = line[key].substring(0, 200) + "...";
                     }
 
+
+
                     if (checkedProperties.indexOf(key) >-1)
                         filteredLine[key]=line[key];
 
@@ -74,21 +77,19 @@ if(disableStatsTab)
                 toutlesensController.graphDataTable.pageLength = 30;
             }
 
-            //if($('#dialog').dialog)
+
             $('.ui-button-icon').click();
-            //  $('#dialog').dialog("close");
-            // $('#dialogLarge').html("<div id='dataTableDiv' style='width: 600px'></div>").promise().done(function () {
-            //   $('#dialogLarge').load("htmlSnippets/dataTable.html", function () {
-            //   $('#dialogLarge').dialog("open");
 
 
+            buildPaths.expandCollapse()
             dialogLarge.load("htmlSnippets/dataTable.html", function () {
                 dialogLarge.dialog("open");
 
                 toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv",filteredDataset, function (err, result) {
 
 
-                }, 2000)
+
+                })
 
             })
         }

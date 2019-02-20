@@ -143,7 +143,7 @@ var buildPaths = (function () {
             maxStr = ">"
         var queryCountNodes = "<b>" + maxStr + queryObject.nodeIds.length + " nodes" + "</b>";
 
-        var color = nodeColors[queryObject.label];
+        var color = context.nodeColors[queryObject.label];
         var classInResult = "";
         if (queryObject.inResult)
             classInResult = " buildPaths-nodeInResultDiv";
@@ -179,10 +179,15 @@ var buildPaths = (function () {
         var endLabel = self.queryObjs[index].label;
         var permittedRels = Schema.getPermittedRelations(startLabel, "both");
         var rels = [];
+        var relTypes = [];
         permittedRels.forEach(function (rel) {
-            if (rel.endLabel == endLabel || rel.startLabel == endLabel)
-                rels.push(rel)
+            if (rel.endLabel == endLabel || rel.startLabel == endLabel) ;
+
+            rels.push(rel)
+            relTypes.push(rel.type)
         })
+        if (relTypes.length > 1)
+            searchRelations.setEdgeColors(relTypes)
         self.queryObjs[index].incomingRelation = {
             candidates: rels,
             selected: null
@@ -196,11 +201,11 @@ var buildPaths = (function () {
             "</div>"
 
 
-        if (rels.length > 1) {// choose witch relation**************!!!
-            self.onRelDivClick(index);
+        /*  if (rels.length > 1) {// choose witch relation**************!!!
+              self.onRelDivClick(index);
 
 
-        }
+          }*/
 
         return html;
 
@@ -242,7 +247,7 @@ var buildPaths = (function () {
         $('#buildPaths_cypherTA').val(self.currentCypher)
     }
     self.onUnSelectNodeDiv = function () {
-        self.currentDivIndex=-1
+        self.currentDivIndex = -1
         if (cardCliked) {
             cardCliked = false;
             return;
@@ -273,7 +278,6 @@ var buildPaths = (function () {
         $("#buildPath_nodeDiv_" + index).addClass("buildPaths-nodeDivSelected")
         $(".selectLabelDiv").css("visibility", "visible");
         context.queryObject = self.queryObjs[index];
-
 
 
         $("#mainAccordion").accordion("option", "active", 0);
@@ -497,7 +501,6 @@ var buildPaths = (function () {
         }
 
 
-
         self.queryObjs.forEach(function (queryObject, index) {
             var matchCypher = "";
             var whereCypher = "";
@@ -509,18 +512,19 @@ var buildPaths = (function () {
 
 
             // set relation where
-            var relType="";
+            var relType = "";
             if (queryObject.incomingRelation) {
                 var relation = queryObject.incomingRelation.selected
                 if (index > 0 && relation) {
-                    relType=":"+relation.type;
+                    relType = ":" + relation.type;
+
                     var queryRelObject = relation.queryObject;
                     if (queryRelObject.property == "numberOfRelations") {
                         cypherObj.with.push(queryRelObject);
 //with n,count(r) as cnt  MATCH (n:personne)-[r]-(m:communaute) where cnt>3  return n,m
                     }
-                    else if(queryRelObject.value!="") {
-                        var withStr=searchNodes.getWhereClauseFromQueryObject(queryRelObject, symbol)
+                    else if (queryRelObject.value != "") {
+                        var withStr = searchNodes.getWhereClauseFromQueryObject(queryRelObject, symbol)
                         cypherObj.whereRelation.push(withStr)
 
 
@@ -531,8 +535,10 @@ var buildPaths = (function () {
             if (index == 0) {
                 matchCypher = "(" + symbol + ":" + queryObject.label + ")";
             } else {
-                matchCypher += "-[r" + index + relType+"]-"
+
+                matchCypher += "-[r" + index + relType + "]-"
                 matchCypher += "(" + symbol + ":" + queryObject.label + ")";
+                cypherObj.return.push("r" + index);
             }
 
 
@@ -554,18 +560,18 @@ var buildPaths = (function () {
 
             if (queryObject.inResult) {
                 cypherObj.return.push(symbol)
-                cypherObj.distinct.push(  "ID(" + symbol + ")")
+                cypherObj.distinct.push("ID(" + symbol + ")")
             }
 
-
-
+            if (subGraph)
+                cypherObj.whereNode.push(symbol + ".subGraph='" + subGraph + "'")
 
 
             cypherObj.match.push(matchCypher)
             cypherObj.whereNode.push(whereCypher)
+
+
             cypherObj.whereRelation.push(whereRelationCypher)
-
-
 
 
         })
@@ -574,7 +580,7 @@ var buildPaths = (function () {
         function concatClauses(clausesArray, sep) {
             var str = "";
             clausesArray.forEach(function (clause, index) {
-                if(clause!="") {
+                if (clause != "") {
                     if (index > 0 && sep != "") {
                         str += " " + sep + " "
                     }
@@ -584,35 +590,25 @@ var buildPaths = (function () {
             return str;
         }
 
-        cypherObj.match.cypher=concatClauses( cypherObj.match,"")
+        cypherObj.match.cypher = concatClauses(cypherObj.match, "")
 
 
-        cypherObj.whereNode.cypher=concatClauses( cypherObj.whereNode,"AND");
-        if(cypherObj.whereNode.cypher.length!="")
-            cypherObj.whereNode.cypher=" WHERE "+cypherObj.whereNode.cypher;
+        cypherObj.whereNode.cypher = concatClauses(cypherObj.whereNode, "AND");
+        if (cypherObj.whereNode.cypher.length != "")
+            cypherObj.whereNode.cypher = " WHERE " + cypherObj.whereNode.cypher;
 
-         cypherObj.whereRelation.cypher=concatClauses( cypherObj.whereRelation,"AND")
-        if(cypherObj.whereRelation.cypher!=""){
-        if( cypherObj.whereNode.cypher=="")
-            cypherObj.whereRelation.cypher=" WHERE "+cypherObj.whereRelation.cypher;
-        else
-            cypherObj.whereRelation.cypher=" AND "+cypherObj.whereRelation.cypher;
+        cypherObj.whereRelation.cypher = concatClauses(cypherObj.whereRelation, "AND")
+        if (cypherObj.whereRelation.cypher != "") {
+            if (cypherObj.whereNode.cypher == "")
+                cypherObj.whereRelation.cypher = " WHERE " + cypherObj.whereRelation.cypher;
+            else
+                cypherObj.whereRelation.cypher = " AND " + cypherObj.whereRelation.cypher;
 
         }
 
 
-        cypherObj.return.cypher=concatClauses( cypherObj.return,",")
-        cypherObj.distinct.cypher=concatClauses( cypherObj.distinct,"+\"-\"+")
-
-
-
-
-
-
-
-
-
-
+        cypherObj.return.cypher = concatClauses(cypherObj.return, ",")
+        cypherObj.distinct.cypher = concatClauses(cypherObj.distinct, "+\"-\"+")
 
 
 // return clause
@@ -632,10 +628,10 @@ var buildPaths = (function () {
         }
 
 
-        var cypher="";
-if(cypherObj.with.length==0) {// without with clause
+        var cypher = "";
+        if (cypherObj.with.length == 0) {// without with clause
 
-             cypher = " MATCH p=(" + cypherObj.match.cypher + ") " + cypherObj.whereNode.cypher +cypherObj.whereRelation.cypher+ " RETURN " + cypherObj.distinct.cypher + cypherObj.return.cypher + " LIMIT " + Gparams.maxResultSupported;
+            cypher = " MATCH p=(" + cypherObj.match.cypher + ") " + cypherObj.whereRelation.cypher + cypherObj.whereNode.cypher + " RETURN " + cypherObj.distinct.cypher + cypherObj.return.cypher + " LIMIT " + Gparams.maxResultSupported;
         }
         else {//use of WITH : count relations for example...
             for (var key in withClauses) {
@@ -651,171 +647,56 @@ if(cypherObj.with.length==0) {// without with clause
             };
         return cypher;
     }
-    self.buildQueryOld = function (type, returnQueryObj) {
-        if (self.queryObjs.length == 0)
-            return console.log("self.queryObjs is empty")
-
-        var globalMatchCypher = "";
-        var globalWhereCypher = "";
-        var globalWhereRelationCypher = "";
-        var returnCypher = "";
-        var distinctWhere = "";
-        var withClauses = {};
-
-        self.queryObjs.forEach(function (queryObject, index) {
-            var matchCypher = "";
-            var whereCypher = "";
-            var whereRelationCypher = "";
-
-            var symbol = alphabet.charAt(index);
-            queryObject.inResult = $("#buildPaths-inResultCbx_" + index).is(':checked');
-
-            if (index == 0) {
-                matchCypher = "(" + symbol + ":" + queryObject.label + ")";
-            } else {
-                matchCypher += "-[r" + index + "]-"
-                matchCypher += "(" + symbol + ":" + queryObject.label + ")";
-            }
-
-
-            if (queryObject.nodeSetIds) {//nodeSet
-                whereCypher += "id(" + symbol + ") in [" + queryObject.nodeSetIds.toString() + "]";
-            }
-            else if (queryObject.value && queryObject.value != "") {
-
-                whereCypher += searchNodes.getWhereClauseFromQueryObject(queryObject, symbol);
-            }
-            if (queryObject.subQueries) {
-                queryObject.subQueries.forEach(function (suqQuery) {
-                    if (suqQuery.value && suqQuery.value != "") {
-                        whereCypher += " " + suqQuery.booleanOperator + " " + searchNodes.getWhereClauseFromQueryObject(suqQuery, symbol);
-                    }
-                })
-            }
-
-
-            if (queryObject.inResult) {
-
-
-                if (returnCypher.length > 0) {
-                    returnCypher += ",";
-                    distinctWhere += "+'-'+"
-                }
-                returnCypher += symbol;
-                distinctWhere += "ID(" + symbol + ")";
-            }
-
-            // set relation where
-            if (queryObject.incomingRelation) {
-                var relation = queryObject.incomingRelation.selected
-                if (index > 0 && relation) {
-                    var queryRelObject = relation.queryObject;
-                    if (queryRelObject.property == "numberOfRelations") {
-                        withClauses[symbol] = "(MATCH WITH " + symbol + ",count(r) as cnt r" + index + ")";
-//with n,count(r) as cnt  MATCH (n:personne)-[r]-(m:communaute) where cnt>3  return n,m
-                    }
-                    else {
-
-                        //    var relWhere = searchNodes.getWhereClauseFromQueryObject(queryRelObject, "r" + index)
-                        if (whereRelationCypher != "")
-                            whereRelationCypher += " and "
-                        whereRelationCypher += relWhere;
-
-                    }
-                }
-            }
-
-            globalMatchCypher += matchCypher;
-            if (whereCypher.length > 0) {
-                if (globalWhereCypher == "")
-                    globalWhereCypher = " WHERE " + whereCypher;
-                else
-                    globalWhereCypher = " AND " + whereCypher;
-            }
-            if (whereRelationCypher.length > 0) {
-                if (globalWhereCypher == "")
-                    globalWhereCypher = " WHERE " + whereRelationCypher;
-                else
-                    globalWhereCypher = " AND " + whereRelationCypher;
-            }
-
-
-        })
-
-
-        if (type == "count") {
-            returnCypher = "count(a) as cnt";
-            distinctWhere = "";
-        }
-        else if (type == "set") {
-            var index = $("#buildPaths_labelSelect").val();
-            var symbol = alphabet.charAt(index);
-            returnCypher = "collect(ID(" + symbol + ")) as setIds";
-            distinctWhere = "";
-        }
-        else {
-            distinctWhere = "DISTINCT(" + distinctWhere + ") as distinctIds,";// pour supprimer les doublons
-        }
-
-
-        if (Object.keys(withClauses).length == 0) {
-            var cypher = " MATCH p=(" + globalMatchCypher + ") " + globalWhereCypher + " RETURN " + distinctWhere + returnCypher + " LIMIT " + Gparams.maxResultSupported;
-        }
-        else {//use of WITH : count relations for example...
-            for (var key in withClauses) {
-
-            }
-        }
-        if (returnQueryObj)
-            return {
-                match: globalMatchCypher,
-                where: globalWhereCypher,
-                return: returnCypher,
-                distinctWhere: distinctWhere,
-            };
-        return cypher;
-    }
 
 
     //var union=   "match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where  a.name=~'(?i).*art.*' and  cntR> 5 match(a)-[r]-(b2) return a , collect(id(b2)) as bx limit 100 union match (a:personne)-[r1]-(b:tag)  with  a,count(b) as cntR  where cntR<5 match(a)-[r]-(b2) return a,b2 as bx limit 100"
 
     self.prepareDataset = function (neoResult) {
-        var dataset = []
+        var dataset = {nodes: [], relations: []}
         var columns = [];
         var labelSymbols = [];
         var labels = [];
-        neoResult.forEach(function (line) {// define columns and structure objects by line
+        var relTypes = [];
+        var currentRel;
+        neoResult.forEach(function (line, index) {// define columns and structure objects by line
             var lineObj = {};
 
             for (var key in line) {// each node type
+                var subLine = line[key];
                 if (key == "distinctIds")
                     continue;
-                if (labelSymbols.indexOf(key) < 0)
-                    labelSymbols.push(key);
+                if (key.indexOf("r") == 0) {// relation
+                    if (relTypes.indexOf(subLine.type) < 0)
+                        relTypes.push(subLine.type);
+                    currentRel = {id: subLine._id, neoAttrs: subLine.properties, type: subLine.type};
 
-                var props = line[key].properties;
-                for (var keyProp in props) {
-                    if (columns.indexOf(keyProp) < 0) {
-                        columns.push(keyProp);
-                    }
                 }
-                props.neoId = line[key]._id;
-                props.labelNeo = line[key].labels[0];
-                if (labels.indexOf(props.labelNeo) < 0)
-                    labels.push(props.labelNeo);
-                var obj = connectors.getVisjsNodeFromNeoNode(line[key], false)
-                /*   var obj = {
-                       id: line[key]._id,
-                       neoAttrs: props,
-                       label: props.labelNeo
-                   }*/
-                lineObj[key] = obj;
+                else {
 
+                    if (labelSymbols.indexOf(key) < 0)
+                        labelSymbols.push(key);
+
+                    var props = subLine.properties;
+                    for (var keyProp in props) {
+                        if (columns.indexOf(keyProp) < 0) {
+                            columns.push(keyProp);
+                        }
+                    }
+                    props.neoId = subLine._id;
+                    props.labelNeo = subLine.labels[0];
+                    if (labels.indexOf(props.labelNeo) < 0)
+                        labels.push(props.labelNeo);
+                    var obj = connectors.getVisjsNodeFromNeoNode(subLine, false)
+                    obj.incomingRelation = currentRel;
+                    lineObj[key] = obj;
+
+
+                }
+                dataset.nodes.push(lineObj)
             }
-            dataset.push(lineObj)
 
         })
-        return {columns: columns, data: dataset, labelSymbols: labelSymbols, labels: labels};
+        return {columns: columns, data: dataset, labelSymbols: labelSymbols, labels: labels, relTypes: relTypes};
 
 
     }
@@ -859,14 +740,16 @@ if(cypherObj.with.length==0) {// without with clause
 
         //  self.expandCollapse();
         var tableDataset = [];
-        var columns = self.currentDataset.columns;
-        self.currentDataset.data.forEach(function (line) {
+        var columns = self.currentDataset.nodes.columns;
+        columns.push("neoId")
+        self.currentDataset.nodes.data.forEach(function (line) {
 
             var connections = getConnections(line);
             for (var nodeKey in line) {
 
                 var datasetLine = {};
                 datasetLine["label"] = line[nodeKey].neoAttrs["labelNeo"];
+                datasetLine["label"].neoId = line[nodeKey].id;
                 columns.forEach(function (col) {
                     if (col != "labelNeo") {
                         var value = line[nodeKey].neoAttrs[col];
@@ -933,10 +816,12 @@ if(cypherObj.with.length==0) {// without with clause
     }
 
     self.drawGraph = function (dataset, callback) {
+
+
         var visjsData = {nodes: [], edges: [], labels: []};
-        visjsData.labels = self.currentDataset.labels;
+        visjsData.labels = dataset.labels;
         var uniqueNodes = []
-        dataset.data.forEach(function (line, indexLine) {
+        dataset.data.nodes.forEach(function (line, indexLine) {
             for (var nodeKey in line) {
                 var nodeNeo = line[nodeKey];
                 if (uniqueNodes.indexOf(nodeNeo.id) < 0) {
@@ -951,16 +836,12 @@ if(cypherObj.with.length==0) {// without with clause
                 if (indexSymbol > 0) {
                     var fromNode = line[previousSymbol];
                     var toNode = line[symbol];
-                    var relObj = {
-                        from: fromNode.id,
-                        to: toNode.id,
-                        type: "NA",
-                        neoId: "" + fromNode.id + "_" + toNode.id,
-                        neoAttrs: {},
-                        color: "#555",
-                        width: 1,
+                    var relNeo = line[symbol].incomingRelation;
 
-                    }
+
+                    var relObj = connectors.getVisjsRelFromNeoRel (fromNode.id, toNode.id, relNeo.id, relNeo.id.type, relNeo.neoAttrs, false, false);
+
+
                     visjsData.edges.push(relObj);
                     /*  if (!relsCount[indexSymbol])
                           relsCount[indexSymbol] = 0
@@ -970,7 +851,10 @@ if(cypherObj.with.length==0) {// without with clause
 
             })
         })
-        visjsGraph.drawLegend(visjsData.labels);
+        if (dataset.relTypes.length > 1)
+            visjsGraph.drawLegend(visjsData.labels, dataset.relTypes);
+        else
+            visjsGraph.drawLegend(visjsData.labels, null);
         filters.currentLabels = visjsData.labels;
 
         visjsGraph.draw("graphDiv", visjsData, {}, function () {

@@ -74,7 +74,7 @@ var algorithms = (function () {
                             var props = node.properties;
                             var nodeObj = {
                                 labelNeo: props.label,// because visjs where label is the node name
-                                background: nodeColors[props.label],
+                                background: context.nodeColors[props.label],
                                 id: node._id,
                                 label: props.name,
                                 hiddenLabel: props.name,
@@ -166,7 +166,7 @@ var algorithms = (function () {
                             var label = line.sourceNode.properties[nodeNameVal];
                             var nodeObj = {
                                 labelNeo: label,// because visjs where label is the node name
-                                background: nodeColors[label],
+                                background: context.nodeColors[label],
                                 id: line.sourceNode._id,
                                 label: label,
                                 hiddenLabel: label,
@@ -183,7 +183,7 @@ var algorithms = (function () {
                             var label = line.targetNode.properties[nodeNameVal];
                             var nodeObj = {
                                 labelNeo: label,// because visjs where label is the node name
-                                background: nodeColors[label],
+                                background: context.nodeColors[label],
                                 id: line.targetNode._id,
                                 label: label,
                                 hiddenLabel: label,

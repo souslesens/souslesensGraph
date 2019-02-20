@@ -162,11 +162,12 @@ var myDataTable = function () {
                     var idx = table.cell('.selected', 0).index();
                     // var data = table.row( idx.row ).data();
                     var line = dataSet[idx.row];
-                    context.currentNode = {id: line.id};
+                    context.currentNode = {id: line.neoId};
                     $("#datatablePopupDiv").html(toutlesensDialogsController.setPopupMenuNodeInfoContent);
                     $("#datatablePopupDiv").css("top",py).css("left",px);
 
                     $("#datatablePopupDiv").css("visibility","visible")
+
 
 
 

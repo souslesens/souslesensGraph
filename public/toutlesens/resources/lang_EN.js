@@ -1,4 +1,4 @@
-langResources['EN'] = {
+lang.langResources['EN'] = {
 		
 		// index. html
 

@@ -67,7 +67,7 @@ var textOutputs = (function () {
         var color = "black";
         if (true) {//node.nodeType && node.nodeType == "node" && node.parentNodeType && node.parentNodeType != "label") {
             label = "" + node.label + ".";
-            color = nodeColors[node.label];
+            color = context.nodeColors[node.label];
             if (!color)
                 color = "brown";
             label = "<span style='color:" + color + "'>" + label + "</span>";
@@ -94,7 +94,7 @@ var textOutputs = (function () {
                 name = name.substring(0, p);
         }
         if (node.nodeType && node.nodeType == "label") {
-            color = nodeColors[name];
+            color = context.nodeColors[name];
             name = "<span style='font-size:18px;color:" + color + ";font-weight:bold'>" + name + "</span>";
         }
 

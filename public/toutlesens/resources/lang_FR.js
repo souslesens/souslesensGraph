@@ -1,4 +1,4 @@
-langResources['FR'] = {
+lang.langResources['FR'] = {
 
 	// index. html
 	"lang_1" : "Chercher",

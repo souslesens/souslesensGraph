@@ -2012,7 +2012,7 @@ var elasticProxy = {
                 return callback(error);
             if (body.error) {
                 console.log(JSON.stringify(body.error));
-                callback(body.error);
+                 return callback(body.error);
 
             }
             var options = {
@@ -2588,7 +2588,7 @@ var elasticProxy = {
 
 
     transformDirDocsToPlainText: function (dir,callbackMain) {
-        var index = "";
+        var index = "transform";
         var type = "officeDocument";
         var nDocs=0
         async.series([

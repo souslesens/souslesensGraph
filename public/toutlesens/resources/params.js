@@ -114,6 +114,8 @@ var Gparams = {
 //Graph display defaults***************************
     circleR: 15,
     defaultNodeColor: "grey",
+    defaultNodeSize:10,
+    defaultTextSize:14,
     nodeMaxTextLength: 40,
     user: "anonymous",
     curveOffset: 40,
@@ -186,6 +188,18 @@ var Gparams = {
         '#B39BAB',
         '#FFDEF4',]
 
+
+
+, "relationPalette":[
+        "#d9d7dc",
+        "#c8bac1",
+        "#d5d7cc",
+        "#ceccd7",
+        "#c7dfdf",
+        "#fff0f0",
+        "#ffebe2",
+        "#ddb9c3",
+    ]
 }
 
 

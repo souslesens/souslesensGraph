@@ -58,7 +58,7 @@ var rdfController=(function(){
                 /*    toutlesensData.prepareRawData(data, false, currentDisplayType, function (err, data, labels, relations) {
                         if (callback)
                             return callback(null, data);
-                        nodeColors["BNF"] = "green";
+                        context.nodeColors["BNF"] = "green";
                         linkColors["narrower"] = "blue";
                         linkColors["broader"] = "orange";
                         linkColors["related"] = "red";*/

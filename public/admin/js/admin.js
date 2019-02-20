@@ -31,7 +31,7 @@ var currentRequests;
 var importType = "LINK";
 var currentCsvObject;
 var subGraph;
-var nodeColors = {};
+var context.nodeColors = {};
 var toutlesensData = null;
 var currentObject = null;
 var toutlesensController = null;

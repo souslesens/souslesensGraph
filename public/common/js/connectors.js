@@ -116,7 +116,7 @@ var connectors = (function () {
 
             }
             for (var i = 0; i < dataLabels.length; i++) {
-                colors.push(nodeColors[dataLabels[i]])
+                colors.push(context.nodeColors[dataLabels[i]])
             }
             /*  if (options.clusterIntermediateNodes) {
                   visjsGraph.clusters = clusters;
@@ -135,7 +135,7 @@ var connectors = (function () {
             if (labelVisjs && labelVisjs.length > Gparams.nodeMaxTextLength)
                 labelVisjs = labelVisjs.substring(0, Gparams.nodeMaxTextLength) + "...";
 
-            var color = nodeColors[nodeNeo.labels[0]];
+            var color = context.nodeColors[nodeNeo.labels[0]];
             var nodeObj = {
 
                 labelNeo: labels[0],// because visjs where label is the node name
@@ -144,7 +144,9 @@ var connectors = (function () {
                 id: neoId,
                 children: [],
                 neoAttrs: nodeNeoProps,
-                value: 8,
+              // value: 2,
+                size: Gparams.defaultNodeSize,
+                font:{size: Gparams.defaultTextSize},
 
 
             }
@@ -228,6 +230,8 @@ var connectors = (function () {
 
 
             var color = "#99d";//linkColors[rel];
+            if(context.edgeColors[type])
+                color=context.edgeColors[type];
             var relObj = {
                 from: from,
                 to: to,
@@ -331,7 +335,7 @@ var connectors = (function () {
                     neoAttrs: schema.labels[label],
                     labelNeo: "label",// because visjs where label is the node name
                     // color: "lightBlue",
-                    color: nodeColors[label],
+                    color: context.nodeColors[label],
                     myId: id,
                     shape: "box",
                     id: id++,

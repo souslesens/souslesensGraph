@@ -177,7 +177,7 @@ self.getNodeInfoButtons=function(){
 
   str+="</td></tr><tr><td>"
 
-    str+=   "<B><span style='color:" + nodeColors[label] + "'> [" + label + "]<span>" +"</B>"+name+"<br>";
+    str+=   "<B><span style='color:" + context.nodeColors[label] + "'> [" + label + "]<span>" +"</B>"+name+"<br>";
     var customInfo=customizeUI.customInfo(context.currentNode);
 
        str+="</td></tr><tr><td>"

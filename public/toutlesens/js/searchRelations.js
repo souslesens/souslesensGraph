@@ -1,7 +1,14 @@
 var searchRelations = (function () {
 
     var self = {};
-    self.currentRelations = []
+    self.currentRelations = [];
+
+
+
+
+
+
+
     self.initDialog = function (rels) {
         if (!Array.isArray(rels))
             rels = [rels];
@@ -46,6 +53,14 @@ var searchRelations = (function () {
 
 
 
+}
+
+self.setEdgeColors=function(relTypes){
+        context.edgeColors={}
+        relTypes.forEach(function(type,index){
+            context.edgeColors[type]= Gparams.relationPalette[(index% (Gparams.relationPalette.length-1))]
+
+        })
 }
 
 

@@ -38,10 +38,11 @@ var visjsGraph = (function () {
                 "centralGravity": 0.35
             },
             "minVelocity": 0.75,
-            stabilization:{enabled: false},
+          stabilization:{enabled: false},
            // timestep: physicsTimeStep,
 
         }
+   // self.physics = {};
         var showNodesLabelMinScale = .3;
 
 
@@ -59,11 +60,6 @@ var visjsGraph = (function () {
                 _options = {};
 
 
-            if (!_options.solver) {
-                _options.solver = "barnesHut";
-                //  _options.solver="forceAtlas2Based";
-
-            }
 
             var t0 = new Date();
             if (false && visjsData.nodes.length == 0) {
@@ -101,6 +97,7 @@ var visjsGraph = (function () {
                 stopPhysicsTimeout = _options.stopPhysicsTimeout;
             else
                 stopPhysicsTimeout = Math.pow(10, x);
+            stopPhysicsTimeout = 3000;
             //   console.log("x" + x + " stopPhysicsTimeout: " + self.edges.length + " time " + stopPhysicsTimeout)
             var data = {
                 nodes: self.nodes,
@@ -133,16 +130,14 @@ var visjsGraph = (function () {
                           min: 5,
                           max: 150
                       },*/
-                    /*    scaling: {
-                          min: 8,
-                          max: 20,
-                           label: {
-                                 min: 10,
-                                 max: 16,
-                                 drawThreshold: 10,
-                                 maxVisible: 16
-                             }
-
+                    /*   scaling: {
+                           scaling: {
+                               customScalingFunction: function (min,max,total,value) {
+                                   return value/total;
+                               },
+                               min:10,
+                               max:20
+                           }
                     }*/
                 },
                 edges:
@@ -230,6 +225,7 @@ var visjsGraph = (function () {
 
 
             window.setTimeout(function () {
+                console.log(JSON.stringify(_options,null,2))
                 self.physics.enabled = false;
                 if (_options.fixed) {
                     _options.physics={}
@@ -244,7 +240,7 @@ var visjsGraph = (function () {
                 if (!_options.scale) {
                     network.fit();
                     if(!_options.fixed)
-                    self.setLabelsVisibility()
+                    self.onScaleChange()
                 }
                 if (_options.onFinishDraw) {
 
@@ -256,7 +252,7 @@ var visjsGraph = (function () {
 
 
             network.on("zoom", function (params) {
-                self.setLabelsVisibility()
+                self.onScaleChange()
 
             });
             network.on("configChange", function (params) {
@@ -293,7 +289,7 @@ var visjsGraph = (function () {
                     }
                     else {
                         network.fit();
-                        self.setLabelsVisibility()
+                        self.onScaleChange()
                     }
 
 
@@ -529,18 +525,34 @@ var visjsGraph = (function () {
             expandGraph.initSourceLabel(self.legendLabels)
             var html = "<table>";
             var onClick = "";
+
             var usedLabels=[];
             for (var i = 0; i < labels.length; i++) {
 
                 var label = labels[i];
                 if(usedLabels.indexOf(label)<0) {
                     usedLabels.push(label)
-                    if (label && label != "" && nodeColors[label]){
-
-                        html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" + label + "</span></td></tr>"
+                    if (label && label != "" && context.nodeColors[label]){
+                        onClick = "onclick=filter.filterNodeLegend('"+label+"')";
+                        html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + context.nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" + label + "</span></td></tr>"
                     }
                 }
             }
+
+            if(relTypes){
+                relTypes.forEach(function(type){
+                    onClick = "onclick=filter.filterNodeLegend('"+label+"')";
+                    html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + type + "' style='background-color: " + context.edgeColors[type] + ";width:40px;height:3px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>[" + type + "]</span></td></tr>"
+
+                })
+
+
+
+            }
+
+
+
+
             html += "</table>"
             $("#graphLegendDiv").html(html);
             $("#textMenuButton").css("visibility", "visible")
@@ -548,7 +560,7 @@ var visjsGraph = (function () {
 
         }
 
-        self.setLabelsVisibility = function () {
+        self.onScaleChange = function () {
             var scale = network.getScale();
             if (scale == 1)
                 return;
@@ -560,11 +572,16 @@ var visjsGraph = (function () {
 
 
                 var nodes = [];
+                var scaleCoef=scale>=1?(scale*.9):(scale*2)
+                var size=Gparams.defaultNodeSize/scaleCoef;
+                var fontSize=Gparams.defaultTextSize/(scale*.9);
                 for (var key in self.nodes._data) {
+
                     if (scale > showNodesLabelMinScale) {
-                        nodes.push({id: key, label: self.nodes._data[key].hiddenLabel});
+
+                        nodes.push({id: key, label: self.nodes._data[key].hiddenLabel,size:size,font:{size:size}});
                     } else {
-                        nodes.push({id: key, label: null});
+                        nodes.push({id: key, label: null,size:size,font:{size:size}});
                     }
                 }
                 self.nodes.update(nodes);
@@ -573,59 +590,7 @@ var visjsGraph = (function () {
             self.currentScale = scale;
         }
 
-        self.drawLegendVisj = function (labels, relTypes) {
-            self.legendLabels = labels;
-            var nodes = [];
-            var x = 10;
-            var y = -50;
-            var y = 10;
-            for (var i = 0; i < labels.length; i++) {
-                var label = labels[i];
-                if (!nodeColors[label])
-                    continue;
-                labelObj = {
-                    id: label,
-                    shape: "box",
-                    // size: 5,
-                    color: nodeColors[label],
-                    label: label,
-                    //   font: {stroke: "black", "font-size": "14px"},
-                    x: x,
-                    y: y,
-                    fixed: true
-                    // margin: { top: 5, right:5, bottom:5, left: 5 }
-                }
-                // x += 50;
-                y += 30;
-                nodes.push(labelObj);
-            }
 
-            ;
-
-
-            var data = {
-                nodes: nodes,
-                edges: []
-            };
-            var options = {
-                /* nodes: {
-                     shape: 'square'
-                 }*/
-            };
-            var container = document.getElementById("graphLegendDiv");
-            var network = new vis.Network(container, data, options);
-            network.on("click", function (params) {
-
-                var label = params.nodes[0];
-                /* currentLabel = label;
-                 context.currentNode.id == null;
-                 return toutlesensController.generateGraph(null, {applyFilters: true}, function (err, result) {
-                     currentLabel = null;
-                 });*/
-
-
-            });
-        }
         self.setNodesColor = function (nodeIds, color) {
             var newNodes = [];
             var nodeColor;
@@ -978,7 +943,7 @@ var visjsGraph = (function () {
 
                 var str = "";
                 var properties = node.neoAttrs;
-                var color = nodeColors[node.labelNeo];
+                var color = context.nodeColors[node.labelNeo];
                 var connections = node.connections
                 str += "<br>" + "[" + node.labelNeo + "]" + JSON.stringify(properties)
                 str += "<ul>"
@@ -1276,7 +1241,7 @@ var visjsGraph = (function () {
                             x: (node.x || -100),
                             y: (node.y || -100),
                             label: (node.label || ""),
-                            color: nodeColors[node.labelNeo]
+                            color: context.nodeColors[node.labelNeo]
                         }
                     )
                     self.nodes.add(visjsNodes);

@@ -104,8 +104,8 @@ var searchNodes = (function () {
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $("#selectLabelDiv_" + label).addClass("selectLabelDivSelected");
 
-            $(".selectLabelDiv").css('visibility', 'hidden');
-            $("#selectLabelDiv_" + label).css('visibility', 'visible');
+           // $(".selectLabelDiv").css('visibility', 'hidden');
+          //  $("#selectLabelDiv_" + label).css('visibility', 'visible');
 
             self.configBooleanOperatorsUI(true);
             if (searchDialog_propertySelect) ;
@@ -191,7 +191,7 @@ var searchNodes = (function () {
             var parentWidth = $("#searchNodesNodeLabelsDiv").width() - 10;
             var parentTop = $("#searchNodesNodeLabelsDiv").css("top");
             labels.forEach(function (label) {
-                var color = nodeColors[label];
+                var color = context.nodeColors[label];
                 str += ' <div class="selectLabelDiv"   id="selectLabelDiv_' + label + '" style=" background-color: ' + color + '" onclick="searchNodes.onChangeSourceLabel(\'' + label + '\',true)">' + label + '</div>'
             })
             $("#searchNodesNodeLabelsDiv").html(str).promise().done(function () {
@@ -773,6 +773,12 @@ var searchNodes = (function () {
                     if (whereStr.length > 0)
                         boolOp = suqQuery.booleanOperator
                     whereStr += " " + boolOp + " " + self.getWhereClauseFromQueryObject(suqQuery, "n");
+
+                    if(subGraph) {
+                        if (whereStr != "")
+                            whereStr += " AND "
+                        whereStr += "n.subGraph='" + subGraph + "'"
+                    }
                 })
 
 

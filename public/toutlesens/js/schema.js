@@ -390,12 +390,12 @@ var Schema = (function () {
                 var i = 0;
                 for (var key in Schema.schema.labels) {
                     if (false && Schema.schema.labels[key].color)
-                        nodeColors[key] = Schema.schema.labels[key].color;
+                        context.nodeColors[key] = Schema.schema.labels[key].color;
                     else {
                         var index = (i++) % Gparams.palette.length;
 
-                        nodeColors[key] = Gparams.palette[index];
-                        console.log(index + " " + nodeColors[key] + " " + key)
+                        context.nodeColors[key] = Gparams.palette[index];
+                        console.log(index + " " + context.nodeColors[key] + " " + key)
                     }
                     if (Schema.schema.labels[key].icon == "default.png")
                         delete Schema.schema.labels[key].icon;
@@ -405,7 +405,7 @@ var Schema = (function () {
                 for (var i = 0; i < dataModel.allLabels.length; i++) {
                     var label = dataModel.allLabels[i];
                     var index = i % Gparams.palette.length;
-                    nodeColors[label] = Gparams.palette[index];
+                    context.nodeColors[label] = Gparams.palette[index];
                 }
             }
         }

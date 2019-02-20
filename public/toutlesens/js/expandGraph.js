@@ -2,7 +2,8 @@ var expandGraph = (function () {
     var self = {};
     self.openedClusterId;
     self.initialDataset;
-    self.expandedNodes = []
+    self.expandedNodes = [];
+
 
     hasClusters = false;
 
@@ -22,11 +23,11 @@ var expandGraph = (function () {
         var clusterLimit = parseInt($("#expand_clusterMinLimit").val());
 
 
-        if(!sourceLabel || sourceLabel=="")
+        if (!sourceLabel || sourceLabel == "")
             return alert("select from label")
-        if(!targetLabel || targetLabel=="")
+        if (!targetLabel || targetLabel == "")
             return alert("select to label")
-        if( isNaN(clusterLimit) )
+        if (isNaN(clusterLimit))
             return alert("enter a number")
 
         var showAllNewNodesrelations = $("#expand_showAllrelationsCbx").prop("checked");
@@ -42,10 +43,10 @@ var expandGraph = (function () {
 
         var cypher = "match(n:" + sourceLabel + ")-[r]-(m:" + targetLabel + ")" +
             " where " + where + " " +//" and NOT p:"+sourceLabel+
-            " return n, collect(m) as mArray" +
+            " return n, collect(m) as mArray  , type(r) as relType, r as rel" +
             " limit " + Gparams.maxResultSupported;
         if (hasClusters)// on redessinne d'abord le graphe
-            buildPaths.drawGraph(buildPaths.currentDataset,  function () {
+            buildPaths.drawGraph(buildPaths.currentDataset.nodes, function () {
                 self.execute(cypher, clusterLimit, showAllNewNodesrelations, targetLabel);
             });
         else {
@@ -63,12 +64,17 @@ var expandGraph = (function () {
             targetLabelStr = ":" + label;
         var cypher = "match(n:" + currentNode.label + ")-[r]-(m" + targetLabelStr + ")" +
             " where id(n)=" + currentNode.id + " " +//" and NOT p:"+sourceLabel+
-            " return n, collect(m) as mArray" +
+            " return n, collect(m) as mArray, type(r) as relType, r as rel" +
             " limit " + Gparams.maxResultSupported;
         self.execute(cypher, 1000, true, label);
 
 
     }
+
+
+
+
+
 
     self.execute = function (cypher, clusterLimit, showAllNewNodesrelations, targetLabel) {
 
@@ -77,7 +83,7 @@ var expandGraph = (function () {
         var newEdges = [];
         var newNodeIds = [];
         var mArrayIds = [];
-
+        self.relType = [];
         Cypher.executeCypher(cypher, function (err, result) {
             if (err)
                 return console.log(err);
@@ -97,9 +103,36 @@ var expandGraph = (function () {
                 return {min: clusterLimit, max: max};
             }
 
+            function  setEdgeColors(lines){
+                var newRelTypes = [];
+                var allRelTypes=[];
+                for(var key in context.edgeColors){
+                    allRelTypes.push(key);
+                }
+                allRelTypes=allRelTypes.concat(newRelTypes);
+                lines.forEach(function (line) {
+                    var relType = line.relType;
+                    if (newRelTypes.indexOf(relType) < 0)
+                        newRelTypes.push(relType);
+                })
+                searchRelations.setEdgeColors(allRelTypes);
+                return allRelTypes;
+            }
+
+
+
+
+
+
+
+
+
             var sizeBounds = getSizeBounds()
             var scaleSizefn = d3.scaleLinear().domain([sizeBounds.min, sizeBounds.max]).range([20, 100]);
             hasClusters = false;
+           var allRelTypes= setEdgeColors(result);
+
+
 
             result.forEach(function (line) {
                 var size = line.mArray.length;
@@ -116,7 +149,14 @@ var expandGraph = (function () {
                     })
                     var clusterId = "cluster" + targetLabel + "_" + line.n._id;
                     var relId = "" + Math.random();
-                    var relType = "expand";
+
+                    var relProps = line.rel.properties;
+                    if (context.currentRelations.types.indexOf(relType) < 0)
+                        context.currentRelations.types.push(relType);
+                    if (context.currentRelations.props.indexOf(relProps) < 0)
+                        context.currentRelations.props.push(relProps);
+
+
                     var nodeNeo = {
                         _id: clusterId,
                         properties: {
@@ -141,7 +181,7 @@ var expandGraph = (function () {
                     visjsNode.borderWidth = 3
                     newNodes.push(visjsNode);
 
-                    var visjsEdge = connectors.getVisjsRelFromNeoRel(line.n._id, clusterId, relId, relType, {});
+                    var visjsEdge = connectors.getVisjsRelFromNeoRel(line.n._id, clusterId, relId, relType, relProps);
                     newEdges.push(visjsEdge);
 
 
@@ -167,9 +207,10 @@ var expandGraph = (function () {
                         var from = line.n._id;
                         var to = neoNode._id;
                         var relId = "" + Math.random();
-                        var relType = "expand"
+                        var relType = line.relType;
+                        var relProps = line.rel.properties;
 
-                        var visjsEdge = connectors.getVisjsRelFromNeoRel(from, to, relId, relType, {});
+                        var visjsEdge = connectors.getVisjsRelFromNeoRel(from, to, relId, relType, relProps);
                         newEdges.push(visjsEdge);
 
                     })
@@ -183,14 +224,16 @@ var expandGraph = (function () {
             // **********************make  links with other nodes than expanded node*******************
 
             self.newNodes = newNodes;
-            self.drawGraph(newNodes, newEdges, targetLabel)
-            visjsGraph.drawLegend(visjsGraph.legendLabels);
+            self.drawGraph(newNodes, newEdges, targetLabel);
+
+
+            visjsGraph.drawLegend(visjsGraph.legendLabels,allRelTypes);
 
             if (showAllNewNodesrelations) {
                 // create edges with nodes other than source node
 
 
-                var cypher = "Match (n)-[r]-(m) where " + searchNodes.getWhereClauseFromArray("_id", self.expandedNodes, "n") + "return id(n) as nId,labels(n)[0] as clusterLabel, collect(id(m)) as mIds";
+                var cypher = "Match (n)-[r]-(m) where " + searchNodes.getWhereClauseFromArray("_id", self.expandedNodes, "n") + "return id(n) as nId,labels(n)[0] as clusterLabel, collect(id(m)) as mIds, type(r) as relType";
                 Cypher.executeCypher(cypher, function (err, result) {
                     var newEdges2 = [];
 
@@ -260,9 +303,10 @@ var expandGraph = (function () {
                 var from = sourceNodeId;
                 var to = neoNode._id;
                 var relId = "" + Math.random();
-                var relType = "expand"
+                var relType = line.relType;
+                var relProps = line.rel.properties;
 
-                var visjsEdge = connectors.getVisjsRelFromNeoRel(from, to, relId, relType, {});
+                var visjsEdge = connectors.getVisjsRelFromNeoRel(from, to, relId, relType, relProps);
                 newEdges.push(visjsEdge);
 
                 // link opened nodes to others nodes on graph
@@ -273,7 +317,7 @@ var expandGraph = (function () {
                         var to = neoNode._id;
                         var relId = "" + Math.random();
                         var relType = "expand"
-                        var visjsEdge2 = connectors.getVisjsRelFromNeoRel(from, to, relId, relType, {});
+                        var visjsEdge2 = connectors.getVisjsRelFromNeoRel(from, to, relId, relType, relProps);
                         newEdges.push(visjsEdge2);
                     }
 
@@ -370,7 +414,7 @@ var expandGraph = (function () {
         var emptyOption = false;
         if (labels.length == 1) {
             emptyOption = false;
-            self.setSourceLabel(labels[0])
+            self.setTargetLabel(labels[0])
         }
 
         common.fillSelectOptionsWithStringArray(expand_labelsSelectSource, labels, emptyOption);
@@ -379,13 +423,16 @@ var expandGraph = (function () {
         }
 
     }
-    self.setSourceLabel = function (label) {
+    self.setTargetLabel = function (label) {
         $("#expandWhereDiv").hide()
         $('#expand_labelsSelectSource').val(label);
         $("#expandWhere_propertySelect").val("");
 
         var targetLabels = Schema.getPermittedLabels(label, true, true);
         common.fillSelectOptionsWithStringArray(expand_labelsSelectTarget, targetLabels);
+        if(targetLabels.length==1)
+            $("#expand_labelsSelectTarget").prop("selectedIndex",0)
+
 
     }
 

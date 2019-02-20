@@ -390,7 +390,7 @@ var treeMap = (function () {
 
                 g.selectAll("rect").style("fill", function (d) {
                     if (d.neoAttrs && d.neoAttrs.label) {
-                        var color = nodeColors[d.neoAttrs.label];
+                        var color = context.nodeColors[d.neoAttrs.label];
                         if (color)
                             return color;
                     }

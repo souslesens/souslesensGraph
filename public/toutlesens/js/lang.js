@@ -26,8 +26,8 @@
  ******************************************************************************/
 var lang = (function(){
  var self = {};
-
-//moved  var langResources = {}
+self.langResources={}
+//moved  var lang.langResources = {}
 
 
 
@@ -37,8 +37,8 @@ var lang = (function(){
 
        if (queryParams.lang)
            Gparams.lang = queryParams.lang;
-	for ( var key in langResources[lang]) {
-		var str = langResources[lang][key]
+	for ( var key in lang.langResources[lang]) {
+		var str = lang.langResources[lang][key]
 		$("#" + key).html(str);
 
 	}

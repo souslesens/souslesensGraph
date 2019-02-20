@@ -519,7 +519,7 @@ var toutlesensController = (function () {
 
             if (action == "onNodeClick") {
                 toutlesensController.dispatchAction("nodeInfos", id);
-                expandGraph.setSourceLabel(context.currentNode.labelNeo)
+                expandGraph.setTargetLabel(context.currentNode.labelNeo)
 
             }
 
@@ -681,7 +681,7 @@ var toutlesensController = (function () {
                             // y: 200,
                             id: node.p._id,
                             label: node.p.properties.name,
-                            color: nodeColors[node.p.labels[0]],
+                            color: context.nodeColors[node.p.labels[0]],
                             data: node.p.properties
 
                         });
@@ -729,7 +729,7 @@ var toutlesensController = (function () {
                 $("#linkActionDiv").css("visibility", "visible");
                 var sourceNode = JSON.parse(JSON.stringify(context.currentNode));
                 $("#linkSourceNode").val(sourceNode.name);
-                $("#linkSourceNode").css("color", nodeColors[sourceNode.label]);
+                $("#linkSourceNode").css("color", context.nodeColors[sourceNode.label]);
                 $("#linkSourceLabel").html(sourceNode.label);
                 self.currentRelationData = {
                     sourceNode: sourceNode,
@@ -740,7 +740,7 @@ var toutlesensController = (function () {
                 $("#linkActionDiv").css("visibility", "visible");
                 var targetNode = JSON.parse(JSON.stringify(context.currentNode));
                 $("#linkTargetNode").val(targetNode.name);
-                $("#linkTargetNode").css("color", nodeColors[targetNode.label]);
+                $("#linkTargetNode").css("color", context.nodeColors[targetNode.label]);
                 $("#linkTargetLabel").html(targetNode.label);
 
                 self.currentRelationData.targetNode = targetNode;

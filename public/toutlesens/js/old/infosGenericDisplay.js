@@ -67,11 +67,11 @@ var infosGenericDisplay = (function () {
 
                     var paletteColor = Gparams.palette[k % Gparams.palette.length];
                     Schema.schema.labels[label].color = paletteColor;
-                    nodeColors[label] = paletteColor;
+                    context.nodeColors[label] = paletteColor;
                     k++;
                 }
                 else {
-                    nodeColors[label] = Schema.schema.labels[label].color;
+                    context.nodeColors[label] = Schema.schema.labels[label].color;
                 }
 
                 //  toutlesensController.setLinkColors();
