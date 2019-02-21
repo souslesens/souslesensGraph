@@ -1039,7 +1039,7 @@ var toutlesensController = (function () {
 
             else if (action == "displaySettings") {
                 $("#dialog").load("htmlSnippets/visjsGraphDisplayMenu.html", function () {
-                    var layout = Gparams.graphDefaultLayout;
+                    var layout = Gparams.visjs.defaultLayout;
                     if (layout.indexOf("hierarchical") > -1) {
                         ($("#graphLayoutDirectionDir").css("visibility", "visible"));
                     } else {

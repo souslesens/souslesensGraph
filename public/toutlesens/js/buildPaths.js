@@ -186,7 +186,8 @@ var buildPaths = (function () {
             rels.push(rel)
             relTypes.push(rel.type)
         })
-        if (relTypes.length > 1)
+
+
             searchRelations.setEdgeColors(relTypes)
         self.queryObjs[index].incomingRelation = {
             candidates: rels,
@@ -839,7 +840,7 @@ var buildPaths = (function () {
                     var relNeo = line[symbol].incomingRelation;
 
 
-                    var relObj = connectors.getVisjsRelFromNeoRel (fromNode.id, toNode.id, relNeo.id, relNeo.id.type, relNeo.neoAttrs, false, false);
+                    var relObj = connectors.getVisjsRelFromNeoRel (fromNode.id, toNode.id, relNeo.id, relNeo.type, relNeo.neoAttrs, false, false);
 
 
                     visjsData.edges.push(relObj);
@@ -851,8 +852,10 @@ var buildPaths = (function () {
 
             })
         })
-        if (dataset.relTypes.length > 1)
+        if (true || dataset.relTypes.length > 1) {
+            searchRelations.setEdgeColors(dataset.relTypes)
             visjsGraph.drawLegend(visjsData.labels, dataset.relTypes);
+        }
         else
             visjsGraph.drawLegend(visjsData.labels, null);
         filters.currentLabels = visjsData.labels;

@@ -3,67 +3,111 @@
  */
 var visjsGraph = (function () {
         var self = {};
+        var network;
 
-
-
-
-        self.physicsOn = true;
-        self.configure = true;
 
         self.nodes = [];
         self.edges = [];
+        self.physicsOn = true;
         self.network = null;
+        self.layout = "physics";
         self.currentScale;
 
 
-
-
-        self.currentLayoutType = Gparams.visjs.defaultLayout;
+        self.currentLayoutType = "random";
         self.currentLayoutDirection = "";
         self.currentShape = Gparams.visjs.defaultNodeShape;
 
-
+        self.clusters = []
         self.scaleToShowLabels = 0.6;
         self.context = null;
         self.dragRect = {x: 0, y: 0, w: 0, h: 0};
         self.graphHistory = [];
         self.graphHistory.currentIndex = 0;
         self.legendLabels = [];
-        self.physics = {};
 
 
+        var physicsTimeStep = 0.5;
+        /* if (data.length < 2000)
+             physicsTimeStep = 0.2*/
+        self.physics = {
+
+            "barnesHut": {
+               // "gravitationalConstant": -39950,
+                "gravitationalConstant": -10000,
+                "centralGravity": 0.35
+            },
+            "minVelocity": 0.75,
+          stabilization:{enabled: false},
+           // timestep: physicsTimeStep,
+
+        }
+   // self.physics = {};
         var showNodesLabelMinScale = .3;
+
+
         var stopPhysicsTimeout = 5000;
         var lastClick = new Date();
         var dblClickDuration = 500;
-      
 
 
         var dragPosition = {};
         var options = {};
-        var physicsTimeStep = 0.5;
 
 
-        self.getDefaultPhysics = function () {
-            return {
-                "barnesHut": {
-                    // "gravitationalConstant": -39950,
-                    "gravitationalConstant": -10000,
-                    "centralGravity": 0.35
-                },
-                "minVelocity": 0.75,
-                "stabilization": {enabled: false},
-
-            }
-
-        }
-
-
-        self.getVisJsOptions = function (_options) {
+        self.draw = function (divId, visjsData, _options, callback) {
             if (!_options)
                 _options = {};
 
-            var options = {
+
+
+            var t0 = new Date();
+            if (false && visjsData.nodes.length == 0) {
+                $("#graphDiv").html("No  data to display")
+                return;
+
+            }
+
+            smoothRelLine = true;
+            if (_options && !_options.smooth)
+                smoothRelLine = false;
+
+            var container = document.getElementById(divId);
+            self.nodes = new vis.DataSet(visjsData.nodes);
+            self.edges = new vis.DataSet(visjsData.edges);
+
+            if (typeof context !== 'undefined' && !_options.noHistory && self.nodes.length > 0) {// a graph is allready drawn we put  it into history if not allready imported graph
+                self.graphHistory.push({
+                    context: context || context.getGraphContext(),
+                    graph: self.exportGraph(),
+                    date: new Date()
+                });
+                self.graphHistory.currentIndex = self.graphHistory.length - 1
+                if (self.graphHistory.currentIndex > 0)
+                    $("#previousGraphMenuButton").css("visibility", "visible");
+
+            }
+
+
+            //   var x = Math.log10(self.edges.length * 2) + 1;
+            //   var x = (Math.log(self.edges.length * 2) * Math.LOG10E) + 1;
+            var x = (Math.log(self.nodes.length * 2) * Math.LOG10E) + 1;
+
+            if (_options.stopPhysicsTimeout)
+                stopPhysicsTimeout = _options.stopPhysicsTimeout;
+            else
+                stopPhysicsTimeout = Math.pow(10, x);
+            stopPhysicsTimeout = 3000;
+            //   console.log("x" + x + " stopPhysicsTimeout: " + self.edges.length + " time " + stopPhysicsTimeout)
+            var data = {
+                nodes: self.nodes,
+                edges: self.edges
+            };
+
+
+            options = {
+
+
                 manipulation: {
                     enabled: false
                 },
@@ -73,124 +117,130 @@ var visjsGraph = (function () {
                     hover: true
                 },
 
+
                 nodes: {
                     borderWidthSelected: 6,
-                    shape: Gparams.visjs.defaultNodeShape,
-                    size: Gparams.visjs.defaultNodeSize,
-                    font: {size: Gparams.visjs.defaultTextSize},
-
+                    shape: 'dot',
+                    size: 10,
+                    font: {size: 14},
+                    /*  scaling: {
+                          customScalingFunction: function (min, max, total, value) {
+                              return value / total;
+                          },
+                          min: 5,
+                          max: 150
+                      },*/
+                    /*   scaling: {
+                           scaling: {
+                               customScalingFunction: function (min,max,total,value) {
+                                   return value/total;
+                               },
+                               min:10,
+                               max:20
+                           }
+                    }*/
                 },
                 edges:
                     {
                         selectionWidth: 5,
-                       smooth:{enabled:false},
+                        smooth: smoothRelLine,
                         font:
                             {
                                 size: 8
                             }
+                        //font: { "font-style":'italic'}
                     }
                 ,
                 interaction: {
+
                     keyboard: false
-                },
-                manipulation: false
+                }
 
 
             };
-            if (_options.scale)
-                options.scale = _options.scale;
+            /* if (_options.scale)
+                 options.scale = _options.scale;*/
+            options.manipulation = false;
 
-            if (Object.keys(self.edges).length > 1000)
+
+            if (data.edges.length > 1000)
                 options.layout = {improvedLayout: false}
 
             if (_options.fixed) {
-                options.physics = {}
+                options.physics={}
                 options.physics = false;
             }
             else {
+
                 self.physicsOn = true;
+                self.physics.enabled = true;
                 options.physics = self.physics
 
             }
+            var firstNode = data.nodes._data[Object.keys(data.nodes._data)[0]];
+            // var firstNode=data.nodes._data.values().next().value
+            if (firstNode && firstNode.x)
+                self.physicsOn = false;
 
-            if (_options.stopPhysicsTimeout)
-                stopPhysicsTimeout = _options.stopPhysicsTimeout;
 
-            if (self.configure) {
-                var wrapper = $(".vis-configuration-wrapper")
-                if (!wrapper.length) {
-                    options.configure = {
+            var wrapper = $(".vis-configuration-wrapper")
+            if (!wrapper.length) {
+                options.configure = {
 
-                        filter: function (option, path) {
-                            if (path.indexOf('physics') !== -1) {
-                                return true;
-                            }
-                            if (path.indexOf('smooth') !== -1 || option === 'smooth') {
-                                return true;
-                            }
-                            return false;
-                        },
-                        container: document.getElementById('configVisjs')
-                    }
+                    filter: function (option, path) {
+                        if (path.indexOf('physics') !== -1) {
+                            return true;
+                        }
+                        if (path.indexOf('smooth') !== -1 || option === 'smooth') {
+                            return true;
+                        }
+                        return false;
+                    },
+                    container: document.getElementById('configVisjs')
                 }
             }
-            console.log(JSON.stringify(options, null, 2));
-
-            return options;
-        }
-
-        self.setStabilisationTimeOut = function (nodesLength) {
-            var x = (Math.log(self.nodes.length * 2) * Math.LOG10E) + 1;
-
-            stopPhysicsTimeout = Math.pow(10, x);
-
-            console.log("stopPhysicsTimeout " + stopPhysicsTimeout)
-
-        }
 
 
-        self.draw = function (divId, visjsData, _options, callback) {
+            network = new vis.Network(container, data, options);
+            //  network.dragView=false;
+            self.network = network;
 
-            {// initialisation
-                var t0 = new Date();
-                var container = document.getElementById(divId);
-                self.nodes = new vis.DataSet(visjsData.nodes);
-                self.edges = new vis.DataSet(visjsData.edges);
+
+            for (var i = 0; i < self.clusters.length; i++) {
+
+                var clusterOptions = {
+                    joinCondition: function (childOptions) {
+                        return childOptions.cluster == self.clusters[i]; // the color is fully defined in the node.
+                    },
+                    clusterNodeProperties: {
+                        id: 'cluster:' + color,
+                        borderWidth: 3,
+                        shape: 'database',
+                        color: color,
+                        label: 'color:' + color
+                    }
+                };
+                network.cluster(clusterOptions);
             }
-
-
-            var data = {
-                nodes: self.nodes,
-                edges: self.edges
-            };
-
-
-            self.setStabilisationTimeOut(self.nodes.length);
-            var options = self.getVisJsOptions(_options)
-            self.physics = self.getDefaultPhysics();
-
-
-            self.network = new vis.Network(container, data, options);
-
 
 
             window.setTimeout(function () {
-
+                console.log(JSON.stringify(_options,null,2))
                 self.physics.enabled = false;
                 if (_options.fixed) {
+                    _options.physics={}
                     _options.physics = false;
                 }
                 else {
-                    self.network.setOptions(
-                        {physics: self.physics}
+                    network.setOptions(
+                        self.physics
                     );
-                    self.physicsOn = false;
                 }
 
                 if (!_options.scale) {
-                    self.network.fit();
-                    if (!_options.fixed)
-                        self.onScaleChange()
+                    network.fit();
+                    if(!_options.fixed)
+                    self.onScaleChange()
                 }
                 if (_options.onFinishDraw) {
 
@@ -201,49 +251,79 @@ var visjsGraph = (function () {
             }, stopPhysicsTimeout);
 
 
-            self.network.on("click", function (params) {
+            network.on("zoom", function (params) {
+                self.onScaleChange()
+
+            });
+            network.on("configChange", function (params) {
+                self.physic = params;
+                network.setOptions(self.physic)
+
+            });
+
+            network.on("doubleClick", function (params) {
+                /*        var nodeId = params.nodes[0];
+                        context.currentNode = self.nodesMap[nodeId];
+                        toutlesensController.generateGraph(nodeId, {applyFilters: false});//NO !!! minus sign to search on m (see toutlesensData 148)*/
+            })
+            //stop animation
+            network.on("click", function (params) {
                 if (_options.onClick) {
                     var fn = _options["onClick"];
                     return fn(params);
                 }
+
                 $("#graphPopup").css("visibility", "hidden");
-
-
-                //stop or animation when click on canvas
                 if (params.edges.length == 0 && params.nodes.length == 0) {
+
                     if (options.fixed)
                         return;
-
                     self.physicsOn = !self.physicsOn;
-                    self.physics.enabled=self.physicsOn;
-                    self.network.setOptions(
-
-                        {physics: self.physics, edges:{smooth:{enabled:false}}}
-                    );
+                    network.setOptions({
+                        physics: {enabled: self.physicsOn}
+                    });
 
                     if (_options.onFinishDraw) {
                         var fn = _options["onFinishDraw"];
                         fn();
                     }
                     else {
-                        self.network.fit();
+                        network.fit();
                         self.onScaleChange()
                     }
 
 
                 }
-
-                // select node
                 else if (params.nodes.length == 1) {
                     var nodeId = params.nodes[0];
-                    context.currentNode = self.nodes._data[nodeId];
-                    context.currentNode._graphPosition = params.pointer.DOM;
-                    if (params.event.srcEvent.ctrlKey) {
-                        // toutlesensController.dispatchAction("expandNode", nodeId)
+
+                    var clusterId = false;
+                    if (("" + nodeId).indexOf("cluster") > -1) {
+
+                        clusterId = nodeId;
+
+                        context.currentNode = self.nodes._data[nodeId];
+                        context.currentNode.type = "cluster";
+
                     }
 
+                    else {
 
+                        context.currentNode = self.nodes._data[nodeId];
+                        /*   var now=new Date().getTime();
+                         //  console.log(params.event.timeStamp+" "+now.getTime())
+                           var delay=Math.abs(now-lastClick)
+                           lastClick=now;
+                           console.log(delay);
+                           if(delay<dblClickDuration) {//dbleclick*/
+                        context.currentNode._graphPosition = params.pointer.DOM;
+                        if (params.event.srcEvent.ctrlKey) {
+                            // toutlesensController.dispatchAction("expandNode", nodeId)
+
+                        }
+                    }
                     var point = params.pointer.DOM;
+
                     if (toutlesensController) {
                         toutlesensController.dispatchAction("onNodeClick", nodeId);
                         toutlesensController.showPopupMenu(point.x, point.y, "nodeInfo");
@@ -254,8 +334,6 @@ var visjsGraph = (function () {
 
 
                 }
-
-                // select edge
                 else if (params.edges.length == 1) {
                     var edgeId = params.edges[0];
                     context.currentNode = self.edges._data[edgeId];
@@ -266,44 +344,28 @@ var visjsGraph = (function () {
                     toutlesensController.showPopupMenu(point.x, point.y, "relationInfos");
                 }
             });
-
-            self.network.on("zoom", function (params) {
-                self.onScaleChange()
-
-            });
-            self.network.on("configChange", function (params) {
-
-                self.physics.enabled=true;
-                Object.assign(self.physics, params.physics);
-                self.network.setOptions({physics: self.physics})
-
-            });
-
-            self.network.on("doubleClick", function (params) {
-            })
-
-     /*       self.network.on("beforeDrawing", function (ctx) {
+            network.on("beforeDrawing", function (ctx) {
                 self.context = ctx;
             });
-            self.network.on("afterDrawing", function (ctx) {
+            network.on("afterDrawing", function (ctx) {
                 self.context = ctx;
                 if (callback)
                     callback();
             });
 
-            self.network.on("dragStart", function (params) {
+            network.on("dragStart", function (params) {
                 dragPosition = params.pointer.DOM;
 
                 //   self.dragRect("dragStart",dragPosition.x,dragPosition.y);
             });
 
-            self.network.on("drag", function (params) {
+            network.on("drag", function (params) {
                 dragPosition = params.pointer.DOM;
                 //  self.dragRect("drag",dragPosition.x,dragPosition.y);
             });
 
-            self.network.on("dragEnd", function (params) {
-                return;
+            network.on("dragEnd", function (params) {
+
                 var dragEndPos = params.pointer.DOM;
                 self.dragRect("dragEnd", dragPosition.x, dragPosition.y);
                 if ((true || _options.dragConnectedNodes) && params.event.srcEvent.ctrlKey) {
@@ -325,30 +387,71 @@ var visjsGraph = (function () {
 
             });
 
-            self.network.on("hoverNode", function (params) {
+            network.on("hoverNode", function (params) {
 
             });
-            self.network.on("selectNode", function (params) {
+            network.on("selectNode", function (params) {
 
 
             });
 
 
-            self.network.on("selectEdge", function (params) {
+            network.on("selectEdge", function (params) {
                 //  console.log('selectEdge Event:', params);
             });
-            self.network.on("deselectNode", function (params) {
+            network.on("deselectNode", function (params) {
                 // console.log('deselectNode Event:', params);
             });
-            self.network.on("deselectEdge", function (params) {
+            network.on("deselectEdge", function (params) {
                 //  console.log('deselectEdge Event:', params);
             });
-            self.network.on(" afterDrawing", function (params) {
+            network.on(" afterDrawing", function (params) {
                 onVisjsGraphReady();
                 //  console.log('graph loaded Event');
-            });*/
+            });
+
+            if (false) {// rightclick drag to select by rect drag
+                container = $("#graphDiv");
+                container.on("mousemove", function (e) {
+                    if (drag) {
+                        restoreDrawingSurface();
+                        rect.w = (e.pageX - this.offsetLeft) - rect.startX;
+                        rect.h = (e.pageY - this.offsetTop) - rect.startY;
+
+                        ctx.setLineDash([5]);
+                        ctx.strokeStyle = "rgb(0, 102, 0)";
+                        ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
+                        ctx.setLineDash([]);
+                        //ctx.fillStyle = "rgba(0, 255, 0, 0.02)";
+                        ctx.fillStyle = "rgba(0, 0, 0, 0.02)";
+                        ctx.fillRect(rect.startX, rect.startY, rect.w, rect.h);
+                    }
+                });
+
+                container.on("mousedown", function (e) {
+                    if (e.button == 2) {
+                        selectedNodes = e.ctrlKey ? network.getSelectedNodes() : null;
+                        saveDrawingSurface();
+                        var that = this;
+                        rect.startX = e.pageX - this.offsetLeft;
+                        rect.startY = e.pageY - this.offsetTop;
+                        drag = true;
+                        container[0].style.cursor = "crosshair";
+                    }
+                });
+
+                container.on("mouseup", function (e) {
+                    if (e.button == 2) {
+                        restoreDrawingSurface();
+                        drag = false;
+
+                        container[0].style.cursor = "default";
+                        selectNodesFromHighlight();
+                    }
+                });
 
 
+            }
 
 
         }
@@ -356,7 +459,7 @@ var visjsGraph = (function () {
             self.edges.setOption({width: 1})
 
 
-            var connectedEdges =  self.network.getConnectedEdges(nodeId);
+            var connectedEdges = network.getConnectedEdges(nodeId);
             var nodeEdges = [];
             for (var i = 0; i < connectedEdges.length; i++) {
                 var connectedEdgeId = connectedEdges[i];
@@ -393,7 +496,7 @@ var visjsGraph = (function () {
                 options.layout = {hierarchical: false, randomSeed: 2}
             }
             if (apply) {
-                self.network.setOptions(options)
+                network.setOptions(options)
             }
             return (options)
         }
@@ -405,46 +508,49 @@ var visjsGraph = (function () {
             }
 
             if (apply) {
-
-                self.network.setOptions(options)
+                // var xx=network.layoutEngine.options;
+                network.setOptions(options)
             }
             return (options)
         }
 
 
         self.drawLegend = function (labels, relTypes) {
-            self.legendLabels = [];
-            labels.forEach(function (label) {
-                if (label != "" && self.legendLabels.indexOf(label) < 0)
-                    self.legendLabels.push(label);
+            self.legendLabels=[];
+            labels.forEach(function(label){
+                if(label!="" &&  self.legendLabels.indexOf(label)<0 )
+                    self.legendLabels .push(label);
             })
 
             expandGraph.initSourceLabel(self.legendLabels)
             var html = "<table>";
             var onClick = "";
 
-            var usedLabels = [];
+            var usedLabels=[];
             for (var i = 0; i < labels.length; i++) {
 
                 var label = labels[i];
-                if (usedLabels.indexOf(label) < 0) {
+                if(usedLabels.indexOf(label)<0) {
                     usedLabels.push(label)
-                    if (label && label != "" && context.nodeColors[label]) {
-                        onClick = "onclick=filter.filterNodeLegend('" + label + "')";
+                    if (label && label != "" && context.nodeColors[label]){
+                        onClick = "onclick=filter.filterNodeLegend('"+label+"')";
                         html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + label + "' style='background-color: " + context.nodeColors[label] + ";width:20px;height: 20px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>" + label + "</span></td></tr>"
                     }
                 }
             }
 
-            if (relTypes) {
-                relTypes.forEach(function (type) {
-                    onClick = "onclick=filter.filterNodeLegend('" + label + "')";
+            if(relTypes){
+                relTypes.forEach(function(type){
+                    onClick = "onclick=filter.filterNodeLegend('"+label+"')";
                     html += "<tr" + onClick + "><td><span  class='legendSpan' id='legendSpan_" + type + "' style='background-color: " + context.edgeColors[type] + ";width:40px;height:3px'>&nbsp;&nbsp;&nbsp;</span></td><td><span style='font-size: 10px'>[" + type + "]</span></td></tr>"
 
                 })
 
 
+
             }
+
+
 
 
             html += "</table>"
@@ -455,7 +561,7 @@ var visjsGraph = (function () {
         }
 
         self.onScaleChange = function () {
-            var scale =  self.network.getScale();
+            var scale = network.getScale();
             if (scale == 1)
                 return;
             if (!self.currentScale || Math.abs(scale - self.currentScale) > .01) {
@@ -464,17 +570,18 @@ var visjsGraph = (function () {
                 //  if (_options.showNodesLabel == false && scale > self.scaleToShowLabels) {
 
 
+
                 var nodes = [];
-                var scaleCoef = scale >= 1 ? (scale * .9) : (scale * 2)
-                var size = Gparams.visjs.defaultNodeSize / scaleCoef;
-                var fontSize = Gparams.visjs.defaultTextSize / (scale * .9);
+                var scaleCoef=scale>=1?(scale*.9):(scale*2)
+                var size=Gparams.visjs.defaultNodeSize/scaleCoef;
+                var fontSize=Gparams.visjs.defaultTextSize/(scale*.9);
                 for (var key in self.nodes._data) {
 
                     if (scale > showNodesLabelMinScale) {
 
-                        nodes.push({id: key, label: self.nodes._data[key].hiddenLabel, size: size, font: {size: size}});
+                        nodes.push({id: key, label: self.nodes._data[key].hiddenLabel,size:size,font:{size:size}});
                     } else {
-                        nodes.push({id: key, label: null, size: size, font: {size: size}});
+                        nodes.push({id: key, label: null,size:size,font:{size:size}});
                     }
                 }
                 self.nodes.update(nodes);
@@ -566,7 +673,7 @@ var visjsGraph = (function () {
 
         }
         self.selectNode = function (ids) {
-            self.network.selectNodes(ids, true);
+            network.selectNodes(ids, true);
 
         }
 
@@ -618,12 +725,15 @@ var visjsGraph = (function () {
                 }
 
             }
-            self.network.setData({nodes: self.nodes, edges: self.edges});
+            network.setData({nodes: self.nodes, edges: self.edges});
 
             //  physics: {enabled: true}
-            self.network.setOptions({
+            network.setOptions({
                 physics: {enabled: true}
             });
+            // network.fit()
+
+            //  self.edges.update(edges);
 
 
         }
@@ -647,31 +757,31 @@ var visjsGraph = (function () {
                     delete self.edges._data[key].label;
 
             }
-            self.network.setData({nodes: self.nodes, edges: self.edges});
+            network.setData({nodes: self.nodes, edges: self.edges});
 
             //  physics: {enabled: true}
-            self.network.setOptions({
+            network.setOptions({
                 physics: {enabled: true}
             });
-
+            //   network.fit()
         }
 
 
         self.changeLayout = function (select) {
-            self.currentLayoutType = $(select).val();
+            self.layout = $(select).val();
             var options = {}
 
-            if (self.currentLayoutType == "physics") {
+            if (self.layout == "physics") {
 
                 options.physics = {
                     enabled: true,
-                    stabilization: {enabled: false},
+                    stabilization:{enabled: false},
 
                 };
 
             }
 
-            if (self.currentLayoutType == "hierarchical") {
+            if (self.layout == "hierarchical") {
                 options.layout = {
                     hierarchical: {
                         direction: "UD"
@@ -681,12 +791,12 @@ var visjsGraph = (function () {
 
                 };
             }
-            self.network.setOptions(options);
-            self.network.fit()
+            network.setOptions(options);
+            network.fit()
         }
 
         self.fitToPage = function () {
-            self.network.fit({
+            network.fit({
                 animation: {
                     scale: 1.0,
                     animation: {
@@ -705,7 +815,7 @@ var visjsGraph = (function () {
                     str = node.neoAttrs[Schema.getNameProperty()]
                 if (str.match(regex)) {
                     self.nodes.update({id: node.id, shape: "star"});
-                    self.network.focus(node.id,
+                    network.focus(node.id,
                         {
                             scale: 1.0,
                             animation: {
@@ -735,7 +845,7 @@ var visjsGraph = (function () {
 
 
             self.nodes.update(nodes);
-            self.network.fit()
+            network.fit()
 
         }
         self.outlinePathNodes = function () {
@@ -773,14 +883,14 @@ var visjsGraph = (function () {
             function addConnections(elem, index) {
                 // need to replace this with a tree of the network, then get child direct children of the element
 
-                elem.connections =  self.network.getConnectedNodes(elem.id);
+                elem.connections = network.getConnectedNodes(elem.id);
             }
 
             function destroyNetwork() {
-                self.network.destroy();
+                network.destroy();
             }
 
-            var positions =  self.network.getPositions();
+            var positions = network.getPositions();
 
             var nodes = objectToArray(self.nodes._data, positions);
 
@@ -904,21 +1014,21 @@ var visjsGraph = (function () {
                 edges: getEdgeData(allEdges)
             }
 
-           /* if (!options)
-                options = {smooth: true};*/
+            if (!options)
+                options = {smooth: true};
             if (!options.history)
                 options.noHistory = true;
             options.fixed = true;
 
             self.draw("graphDiv", data, options);
-
+            //  network = new vis.Network(container, data, {});
 
         }
 
 
         self.getConnectedNodes = function (nodeId) {
 
-            return  self.network.getConnectedNodes(nodeId);
+            return network.getConnectedNodes(nodeId);
 
         }
 
@@ -932,11 +1042,11 @@ var visjsGraph = (function () {
 
         self.dragConnectedNodes = function (nodeId, offset) {
 
-            var connectedNodes =  self.network.getConnectedNodes(nodeId);
-            var connectedEdges =  self.network.getConnectedEdges(nodeId);
+            var connectedNodes = network.getConnectedNodes(nodeId);
+            var connectedEdges = network.getConnectedEdges(nodeId);
 
 
-            var positions =  self.network.getPositions()
+            var positions = network.getPositions()
             var nodes = [];
             var edges = []
             for (var i = 0; i < connectedNodes.length; i++) {
@@ -1052,7 +1162,7 @@ var visjsGraph = (function () {
         }
 
 
-        self.filterGraph = function (booleanOption, property, operator, value, type) {
+        self.filterGraph = function ( booleanOption, property, operator, value, type) {
             //  self.saveGraph();
 
 
@@ -1068,7 +1178,7 @@ var visjsGraph = (function () {
                     if (context.currentNode && context.currentNode.id && context.currentNode.id == node.id)
                         ;
                     else {
-                        var connectedEdgesIds =  self.network.getConnectedEdges(key);
+                        var connectedEdgesIds = network.getConnectedEdges(key);
 
                         /* var nodeEdges = [];
                           for (var i = 0; i < connectedEdges.length; i++) {
@@ -1104,7 +1214,7 @@ var visjsGraph = (function () {
 
 
         self.removeNode = function (id) {
-            var connectedEdges =  self.network.getConnectedEdges(id);
+            var connectedEdges = network.getConnectedEdges(id);
             for (var i = 0; i < connectedEdges.length; i++) {
                 var connectedEdgeId = connectedEdges[i];
                 self.edges.remove({id: connectedEdgeId})
@@ -1199,7 +1309,7 @@ var visjsGraph = (function () {
         }
 
         self.exportPng = function () {
-            var canvasElement = self.network.canvas
+            var canvasElement = this.network.canvas
             var canvasElement = document.getElementsByTagName("canvas")[0]
             //   var canvasElement = document.getElementById(id);
 
@@ -1216,7 +1326,88 @@ var visjsGraph = (function () {
             dlLink.click();
             document.body.removeChild(dlLink);
         }
+        /*    self.getClusterByClusterId=function(clusterId){
+                var xx=self.nodes._data;
+                for( var key in self.network.clustering.clusteredNodes){
 
+                    if(self.network.clustering.clusteredNodes[key].clusterId==clusterId) {
+                        var node = self.network.nodes.get("" + key);
+                        return self.network.clustering.clusteredNodes[key]
+                    }
+                }
+                return null;
+
+
+            }*/
+
+
+        self.clusterTyTargetNodesCount = function (loweLimit) {
+
+            function setCardinalities(loweLimit) {
+                var clusterdNodes = []
+                for (var key in  data.nodes._data) {
+                    var node = data.nodes._data[key];
+                    var connectedNodes = network.getConnectedNodes(node.id);
+                    var labels = {};
+                    connectedNodes.forEach(function (connectedNodeId) {
+                        var connectedNode = data.nodes._data[connectedNodeId]
+                        if (!labels[connectedNode.labelNeo])
+                            labels[connectedNode.labelNeo] = [];
+
+                        labels[connectedNode.labelNeo].push(connectedNodeId);
+                    })
+
+                    for (var labelKey in labels) {
+                        if (labels[labelKey].length > loweLimit) {
+                            labels[labelKey].forEach(function (connectedNode) {
+                                clusterdNodes.push({id: connectedNode, clusterId: node.id + "_" + labelKey})
+                            })
+                        }
+
+                    }
+
+                }
+                self.nodes.update(clusterdNodes);
+
+            }
+
+
+            //     setCardinalities(4);
+
+            var clusterSize = 0;
+
+            var clusterByConnection = {
+                joinCondition: function (options, childOptions) {
+                    if (options.clusterId)
+                        var xx = options
+
+                    return false;// the color is fully defined in the node.
+
+                },
+                processProperties: function (clusterOptions, childNodes, childEdges) {
+                    var totalMass = 0;
+                    for (var i = 0; i < childNodes.length; i++) {
+                        totalMass += childNodes[i].mass;
+                    }
+                    clusterOptions.mass = totalMass;
+
+                    return clusterOptions;
+                },
+
+
+                clusterNodeProperties: {
+                    id: 'cluster:',
+                    // borderWidth: 3,
+                    shape: 'dot',
+                    color: 'blue',
+                    label: 'aaa',
+                    size: 30
+                }
+            };
+            visjsGraph.network.cluster(clusterByConnection);
+
+
+        }
 
         return self;
 

@@ -145,8 +145,8 @@ var connectors = (function () {
                 children: [],
                 neoAttrs: nodeNeoProps,
               // value: 2,
-                size: Gparams.defaultNodeSize,
-                font:{size: Gparams.defaultTextSize},
+                size: Gparams.visjs.defaultNodeSize,
+                font:{size: Gparams.visjs.defaultTextSize},
 
 
             }

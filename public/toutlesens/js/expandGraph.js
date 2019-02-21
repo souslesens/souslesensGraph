@@ -109,12 +109,13 @@ var expandGraph = (function () {
                 for(var key in context.edgeColors){
                     allRelTypes.push(key);
                 }
-                allRelTypes=allRelTypes.concat(newRelTypes);
+
                 lines.forEach(function (line) {
                     var relType = line.relType;
                     if (newRelTypes.indexOf(relType) < 0)
                         newRelTypes.push(relType);
                 })
+                allRelTypes=allRelTypes.concat(newRelTypes);
                 searchRelations.setEdgeColors(allRelTypes);
                 return allRelTypes;
             }

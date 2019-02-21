@@ -194,7 +194,7 @@ var paint = (function () {
                     targetNodes.push({
                         id: "" + allGraphNodes[i].id,
                         color: allGraphNodes[i].initialColor,
-                        shape: Gparams.graphDefaultShape,
+                        shape: Gparams.visjs.defaultNodeShape,
                         hidden: false
                     });
 

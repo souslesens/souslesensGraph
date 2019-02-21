@@ -29,6 +29,25 @@ var serverRootUrl = "";
 var Gparams = {
     plugins: ['keolis'],
     displayVersion: "1_googleLike",
+    user: "anonymous",
+
+
+    //Graph display defaults***************************
+    visjs:{
+        defaultNodeSize:10,
+        defaultTextSize:14,
+        defaultNodeShape: "dot",
+        defaultLayout: "random",
+
+
+    },
+//?? à supprimer ?
+    shortestPathMaxDistanceTest: 8,
+    circleR: 15,
+    nodeMaxTextLength: 40,
+
+
+
 
     searchNodeAutocompletion: true,
     queryInElasticSearch: false,
@@ -68,9 +87,7 @@ var Gparams = {
     showLabelsMaxNumOfNodes: 4000,//in fact relations
 
 
-    shortestPathMaxDistanceTest: 8,
-    graphDefaultLayout: "random",
-    graphDefaultShape: "dot",
+
 
     //urls************************
     httpProxyUrl: serverRootUrl + "/http",
@@ -111,15 +128,7 @@ var Gparams = {
     navigationStyle: "",// , "jpt" // Jean Paul
 
 
-//Graph display defaults***************************
-    circleR: 15,
-    defaultNodeColor: "grey",
-    defaultNodeSize:10,
-    defaultTextSize:14,
-    nodeMaxTextLength: 40,
-    user: "anonymous",
-    curveOffset: 40,
-    relStrokeWidth: 4,
+
 
 
     outlineColor: "grey",

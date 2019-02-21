@@ -134,19 +134,7 @@ var traversalController = (function () {
         }
 
 
-        /*  self.executeMoreOrLessShortestPathTraversalSearch = function (less) {
-              if (less)
-                  self.context.currentDistance--;
-              else {
-                  $("#executeLessShortestPathButton").css("visibility", "visible")
-                  var maxDistanceLimit = Gparams.shortestPathMaxDistanceTest;
-                  self.context.currentDistance++;
-                  if (self.context.currentDistance > maxDistanceLimit)
-                      return $("#shortestPathDistance").text("max distance reached " + maxDistanceLimit);
-              }
-              self.drawPathes();
 
-          };*/
 
         /**
          *

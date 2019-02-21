@@ -420,15 +420,14 @@ var Schema = (function () {
 
             for (var key in relations) {
                 var relation = relations[key];
-                var ok = false
-                relation.type = key;
+                var ok = false;
                 if (relation.startLabel == label && (direction == "normal" || direction == "both"))
                     ok = true
                 if (relation.endLabel == label && (direction == "inverse" || direction == "both")) {
                     relation.inverse = 1;
                     ok = true;
                 }
-                if (relationNames.indexOf(relation.type) < 0) {
+                if (ok===true) {
                     relationNames.push(relation.type);
                     relationsPermitted.push(relation);
 
