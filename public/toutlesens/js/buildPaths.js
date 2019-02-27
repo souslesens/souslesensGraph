@@ -741,9 +741,9 @@ var buildPaths = (function () {
 
         //  self.expandCollapse();
         var tableDataset = [];
-        var columns = self.currentDataset.nodes.columns;
+        var columns = self.currentDataset.columns;
         columns.push("neoId")
-        self.currentDataset.nodes.data.forEach(function (line) {
+        self.currentDataset.data.nodes.forEach(function (line) {
 
             var connections = getConnections(line);
             for (var nodeKey in line) {

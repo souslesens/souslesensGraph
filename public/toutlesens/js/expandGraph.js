@@ -46,7 +46,7 @@ var expandGraph = (function () {
             " return n, collect(m) as mArray  , type(r) as relType, r as rel" +
             " limit " + Gparams.maxResultSupported;
         if (hasClusters)// on redessinne d'abord le graphe
-            buildPaths.drawGraph(buildPaths.currentDataset.nodes, function () {
+            buildPaths.drawGraph(buildPaths.currentDataset.data.nodes, function () {
                 self.execute(cypher, clusterLimit, showAllNewNodesrelations, targetLabel);
             });
         else {

@@ -35,7 +35,7 @@ var Gparams = {
     //Graph display defaults***************************
     visjs:{
         defaultNodeSize:10,
-        defaultTextSize:14,
+        defaultTextSize:18,
         defaultNodeShape: "dot",
         defaultLayout: "random",
 

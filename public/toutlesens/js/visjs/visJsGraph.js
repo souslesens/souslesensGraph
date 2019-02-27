@@ -169,7 +169,7 @@ var visjsGraph = (function () {
             var options = self.getVisJsOptions(_options)
             self.physics = self.getDefaultPhysics();
 
-
+            options.physics.enabled=true;
             self.network = new vis.Network(container, data, options);
 
 
