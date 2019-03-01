@@ -46,7 +46,7 @@ var searchNodes = (function () {
             $(".selectLabelDiv ").css("visibility", "visible");
             var allowedLabels = Schema.getPermittedLabels(label, true, true);
             $(".selectLabelDiv ").each(function () {
-                var thisLabel=$(this).html()
+                var thisLabel = $(this).html()
                 console.log(thisLabel)
                 if (false) {
                     if (allowedLabels.indexOf(thisLabel) < 0)
@@ -55,12 +55,12 @@ var searchNodes = (function () {
                         $(this).css("visibility", "visible");
                 }
                 if (true) {
-                    if(label==thisLabel)
+                    if (label == thisLabel)
                         $(this).css("opacity", 1);
                     else if (allowedLabels.indexOf(thisLabel) < 0)
                         $(this).css("opacity", opacityAll);
 
-                     else
+                    else
                         $(this).css("opacity", opacityAllowed);
                 }
 
@@ -104,8 +104,8 @@ var searchNodes = (function () {
             $(".selectLabelDiv").removeClass("selectLabelDivSelected");
             $("#selectLabelDiv_" + label).addClass("selectLabelDivSelected");
 
-           // $(".selectLabelDiv").css('visibility', 'hidden');
-          //  $("#selectLabelDiv_" + label).css('visibility', 'visible');
+            // $(".selectLabelDiv").css('visibility', 'hidden');
+            //  $("#selectLabelDiv_" + label).css('visibility', 'visible');
 
             self.configBooleanOperatorsUI(true);
             if (searchDialog_propertySelect) ;
@@ -448,11 +448,11 @@ var searchNodes = (function () {
 
 
             if (action == 'tableNodes') {
-                var ids= context.queryObject.nodeSetIds ||  context.queryObject.nodeIds
+                var ids = context.queryObject.nodeSetIds || context.queryObject.nodeIds
                 if (!self.dataTable)
                     self.dataTable = new myDataTable();
 
-                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id",ids, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
+                var cypher = "MATCH (n) where " + searchNodes.getWhereClauseFromArray("_id", ids, "n") + ' RETURN n order by n.' + Schema.getNameProperty();
                 dialogLarge.load("htmlSnippets/dataTable.html", function () {
                     dialogLarge.dialog("open");
                     self.dataTable.loadNodes(self.dataTable, "dataTableDiv", cypher, {onClick: toutlesensController.graphNodeNeighbours}, function (err, result) {
@@ -641,7 +641,7 @@ var searchNodes = (function () {
 
             var property = "";
             var operator = "";
-            if (value != "") {
+            if (true || value != "") {
                 property = $("#searchDialog_propertySelect").val();
                 operator = $("#searchDialog_operatorSelect").val()
             }
@@ -737,7 +737,7 @@ var searchNodes = (function () {
 
 
             //if  no value consider that there is no property set
-            if (queryObject.value == "")
+            if (queryObject.value == "" && queryObject.operator.indexOf("xists")<0)
                 queryObject.property = "";
 
             queryObject.subGraph = subGraph;
@@ -774,7 +774,7 @@ var searchNodes = (function () {
                         boolOp = suqQuery.booleanOperator
                     whereStr += " " + boolOp + " " + self.getWhereClauseFromQueryObject(suqQuery, "n");
 
-                    if(subGraph) {
+                    if (subGraph) {
                         if (whereStr != "")
                             whereStr += " AND "
                         whereStr += "n.subGraph='" + subGraph + "'"
@@ -797,12 +797,13 @@ var searchNodes = (function () {
             var operator = queryObject.operator;
             var value = queryObject.value;
 
-            if (!value || value == "")
+
+
+            if (operator == "exists" || operator == "notExists") {
+                ;
+            }
+            else if (!value || value == "")
                 return null;
-
-
-
-
 
             var not = (operator == "notContains") ? "NOT " : "";
             if (operator == "!=") {
@@ -822,8 +823,14 @@ var searchNodes = (function () {
             }
             var propStr = "";
 
-
-            if (property == "any")
+            if (operator == "exists" || operator == "notExists") {
+                if(operator == "notExists")
+                    not=" NOT "
+                else
+                    not=" "
+                propStr = not +" EXISTS("+ nodeAlias + "." + property+ ")";
+            }
+            else if (property == "any")
                 propStr = "(any(prop in keys(n) where n[prop]" + operator + value + "))";
 
             else {

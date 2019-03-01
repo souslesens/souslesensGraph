@@ -13,6 +13,9 @@ var authentication = (function () {
 
             $("#loginDiv").css("visibility", "visible");
             $("#panels").css("visibility", "hidden");
+           var width = $(window).width()
+          var height = $(window).height()
+            $("#loginDiv").width( width).height(height).css("background-color", "#e5ebea").css("top","0px").css("left","0");;
            // $("#panels").css("display", "none")
 
         }

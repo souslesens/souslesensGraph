@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Title</title>
 
-    <!--  <script src="../../../common/js/jquery/jquery.min.js"></script>
-      <script src="../../../common/js/jquery/jquery-ui.min.js"></script>-->
+    <!--<script src="../../../common/js/jquery/jquery.min.js"></script>
+    <script src="../../../common/js/jquery/jquery-ui.min.js"></script>-->
     <script src="../../../common/js/jquery/jquery.splitter.js"></script>
 
     <script src="../../../common/js/jsTree/jstree.min.js"></script>
@@ -16,10 +16,11 @@
 
         $(function () {
             $("#graphSelectionButton").css("display", "none")
-            $("#treeDivKeolis").width(rightPanelWidth - 40).height(totalHeight - 150).css("visibility", "visible")
+            $("#treeDivquantum").width(rightPanelWidth - 40).height(totalHeight - 150).css("visibility", "visible")
         })
         var quantum = (function () {
-
+            var neoUrl = "../../../neo";
+            var neoUrl = "../../neo";
 
             var self = {};
             var data = {};
@@ -28,24 +29,44 @@
             self.selectionName = "";
             self.currentNode;
             self.initiated = false;
+            self.loadedNodes = [];
+            self.currentRootNeoId;
+            self.currentType;
 
 
             self.getNodes = function (type, rootNeoId, callback) {
+                var relType
+                if (type == 'physicalClass') {
+                    relType = "childOf"
+                    //  context.queryObject.label = "tag";
+                }
+                else if (type == 'functionalClass') {
+                    relType = 'childOf';
+
+                }
                 var payload = {
                     generateTreeFromChildToParentRelType: 1,
-                    label: "physicalClass",
-                    relType: "childOf",
+                    label: type,
+                    relType:relType,
                     rootNeoId: rootNeoId
                 }
 
 
                 $.ajax({
                     type: "POST",
-                    url: "../../neo",
+                    url: neoUrl,
                     dataType: "json",
                     data: payload,
                     success: function (data, textStatus, jqXHR) {
-                        return callback(null, data)
+                        var jsTreeData = []
+                        data.forEach(function (line, index) {
+                            if (self.loadedNodes.indexOf(line.id) < 0) {
+                                self.loadedNodes.push(line.id)
+                                jsTreeData.push(line)
+                            }
+
+                        })
+                        return callback(null, jsTreeData)
                     },
                     error: function (error) {
                         return callback(error)
@@ -54,17 +75,41 @@
             }
 
 
-            self.loadJon = function (_type) {
+            self.getJsTreeRootNeoId = function (type) {
+                self.loadedNodes = [];
+                self.currentType=type;
+                var match = "Match (n:" + type + ") where n.name='Root' return id(n) as id";
+                var payload = {
+                    match: match,
+                }
+
+
+                $.ajax({
+                    type: "POST",
+                    url: neoUrl,
+                    dataType: "json",
+                    data: payload,
+                    success: function (data, textStatus, jqXHR) {
+                      self.currentRootNeoId=data[0].id;
+                        quantum.getNodes  (type, self.currentRootNeoId , function(err,jsTreeData){
+                            if(err)
+                                return console.log(err);
+                           return  self.loadJon  (type, jsTreeData) ;
+                        })
+
+                    },
+                    error: function (error) {
+                        return callback(error)
+                    }
+                })
+            }
+
+
+            self.loadJon = function (type, jsTreeData) {
+
                 $("#graphSelectionButton").css("display", "none")
-                type = _type
-                if (type == 'physicalClass') {
-                    file = "tagsFR.csv.json"
-                    context.queryObject.label = "tag";
-                }
-                else if (type == 'functionalClass') {
-                    file = 'categoriesFR.csv.json';
-                    context.queryObject.label = "categorieCommunaute";
-                }
+
+
 
                 function customMenu(node) {
                     var items = {
@@ -87,104 +132,96 @@
                 }
 
 
-                self.getNodes(type, 24789, function (err, data) {
-                    var jsTreeData = []
-                    data.forEach(function (line, index) {
-                        jsTreeData.push(line)
-                    })
-                    jsTreeData.sort(function (a, b) {
-                        if (a.text > b.text)
-                            return 1;
-                        if (a.text < b.text)
-                            return -1;
-                        return 0;
+                jsTreeData.sort(function (a, b) {
+                    if (a.text > b.text)
+                        return 1;
+                    if (a.text < b.text)
+                        return -1;
+                    return 0;
 
-                    })
-
-
-                    if (self.initiated) {
-                        $('#treeDivKeolis').jstree(true).settings.core.data = jsTreeData;
-                        $('#treeDivKeolis').jstree(true).refresh();
-                        return;
-                    }
-
-                    self.initiated = true;
-                    //console.log(JSON.stringify(jsTreeData,null,2))
-                    var plugins = [];
-                    plugins.push("search");
-                    plugins.push("sort");
-                    plugins.push("types");
-                    plugins.push("contextmenu");
-
-
-                    $('#treeDivKeolis').jstree({
-                        'core': {
-                            'check_callback': true,
-                            'data': jsTreeData,
-
-
-                        }
-                        , 'contextmenu': {
-                            'items': keolis.treeMenu
-                        },
-                        'plugins': plugins,
-                    }).on("select_node.jstree",
-                        function (evt, obj) {
-                            self.onNodeSelect(obj.node);
-                        })
-
-
-                });
-
-            }
-
-            self.getChildren = function (id) {
-                var children = [];
-                data.forEach(function (line) {
-                    if (line.parentID == id)
-                        children.push({
-                            id: line.iD,
-                            //  parent: id,
-                            text: line.nom
-                        })
                 })
-                return children;
+
+
+                if (self.initiated) {
+                    $('#treeDivquantum').jstree(true).settings.core.data = jsTreeData;
+                    $('#treeDivquantum').jstree(true).refresh();
+                    return;
+                }
+
+                self.initiated = true;
+                //console.log(JSON.stringify(jsTreeData,null,2))
+                var plugins = [];
+                plugins.push("search");
+                plugins.push("sort");
+                plugins.push("types");
+                plugins.push("contextmenu");
+
+
+                $('#treeDivquantum').jstree({
+                    'core': {
+                        'check_callback': true,
+                        'data': jsTreeData,
+
+
+                    }
+                    , 'contextmenu': {
+                        'items': quantum.treeMenu
+                    },
+                    'plugins': plugins,
+                }).on("select_node.jstree",
+                    function (evt, obj) {
+                        self.onNodeSelect(obj.node);
+                    })
+                  .on('loaded.jstree', function(e, data) {
+                        // invoked after jstree has loaded
+                      $(this).jstree("open_node", ""+quantum.currentRootNeoId);
+                    })
+
+
 
             }
 
-            self.addChildrenNodes = function (obj) {
-                debugger
-                var position = 'last';
-                var parent = $('#treeDivKeolis').jstree('get_selected');
-                var parentId = obj.id;
-                self.getNodes(type, obj.id, function (err, data) {
+
+
+
+        self.getChildren = function (id) {
+            var children = [];
+            data.forEach(function (line) {
+                if (line.parentID == id)
+                    children.push({
+                        id: line.iD,
+                        //  parent: id,
+                        text: line.nom
+                    })
+            })
+            return children;
+
+        }
+
+        self.addChildrenNodes = function (obj) {
+
+            var position = 'last';
+            var parent = $('#treeDivquantum').jstree('get_selected');
+            var parentId = obj.id;
+            self.getNodes(self.currentType, obj.id, function (err, data) {
                     data.forEach(function (childNode, index) {
                         childNode.id = "" + childNode.id
                         if (childNode.id != parentId) {
 
                             childNode.parent = "" + parent[0];
 
-                         console.log(JSON.stringify(childNode))
-                            try {
-                                $('#treeDivKeolis').jstree('create_node', childNode.parent, childNode, 'last', function (www) {
-                                    //
-                                });
-                            }
+                            $('#treeDivquantum').jstree('create_node', childNode.parent, childNode, 'last', function (www) {
+                                //
+                            });
 
-                            catch (e) {
-                                var xx = 3
-                            }
+
                         }
-                        //  $('#treeDivKeolis').jstree('open_node', parent);
 
-                else
-                    {
-                        var xx = 1;
-                    }
+                    })
+                    $('#treeDivquantum').jstree('open_node', parent);
 
-                })
-            }
-        );
+                }
+            );
         }
 
 
@@ -193,6 +230,7 @@
             if (obj.children.length == 0)
                 self.addChildrenNodes(obj);
         }
+
 
         self.treeMenu = function (node) {
             var items = {}
@@ -209,9 +247,9 @@
                 data: menuItemData,
                 action: (function (menuItem) {
 
-                    keolis.selection.push(node.id)
+                    quantum.selection.push(node.id)
                     $("#" + node.id + "_anchor").css("color", "blue");
-                    self.selectionName = "[" + type + "] " + menuItemData.text
+                    self.selectionName = "[" + self.currentType + "] " + menuItemData.text
                 })
 
             }
@@ -220,14 +258,14 @@
                 data: menuItemData,
                 action: (function (menuItem) {
                     $(".jstree-anchor").css("color", "black");
-                    keolis.selection = [];
+                    quantum.selection = [];
                     $("#graphSelectionButton").css("display", "block")
                     self.currentNode += " and children"
-                    keolis.selection.push(node.id)
+                    quantum.selection.push(node.id)
                     $("#" + node.id + "_anchor").css("color", "blue");
-                    self.selectionName = "[" + type + "]  and children " + menuItemData.text
+                    self.selectionName = "[" + self.currentType + "]  and children " + menuItemData.text
                     node.children.forEach(function (child) {
-                        keolis.selection.push(child)
+                        quantum.selection.push(child)
                         $("#" + child + "_anchor").css("color", "blue");
                     })
                 })
@@ -238,14 +276,14 @@
                 data: menuItemData,
                 action: (function (menuItem) {
                     self.currentNode += " and children"
-                    keolis.selection.push(node.id)
+                    quantum.selection.push(node.id)
                     $("#graphSelectionButton").css("display", "block")
                     $("#" + node.id + "_anchor").css("color", "blue");
                     if (self.selectionName.length > 0)
                         self.selectionName += " , "
-                    self.selectionName += "[" + type + "]  and children " + menuItemData.text
+                    self.selectionName += "[" + self.currentType + "]  and children " + menuItemData.text
                     node.children.forEach(function (child) {
-                        keolis.selection.push(child)
+                        quantum.selection.push(child)
                         $("#" + child + "_anchor").css("color", "blue");
                     })
                 })
@@ -256,7 +294,7 @@
                 data: menuItemData,
                 action: (function (menuItem) {
                     $(".jstree-anchor").css("color", "black");
-                    keolis.selection = [];
+                    quantum.selection = [];
                     self.selectionName = ""
                     $("#graphSelectionButton").css("display", "none")
                 })
@@ -279,37 +317,31 @@
         self.graphSelection = function () {
 
             var sel = self.selection;
-            var label = "";
-            if (type == "categories")
-                label = "categorieCommunaute"
-            else if (type == "tags")
-                label = "tag"
+
 
 
             context.queryObject = {};
             var clauseText = self.selectionName;
-            context.queryObject.label = label;
+            context.queryObject.label = self.currentType;
             context.queryObject.text = clauseText;
-            context.queryObject.type = "nodeSet-plugin-" + label;
-            context.queryObject.where = searchNodes.getWhereClauseFromArray("iD", self.selection, "n");
-            var cypher = "MATCH (n:" + label + ") where " + context.queryObject.where + " RETURN collect(ID(n)) as ids ";
+            context.queryObject.type = "nodeSet-plugin-" + self.currentType;
+            context.queryObject.where = searchNodes.getWhereClauseFromArray("_id", self.selection, "n");
 
-            Cypher.executeCypher(cypher, function (err, result) {
-                if (err) {
-                    return console.log(err);
-                }
 
-                context.queryObject.nodeSetIds = result[0].ids
+                context.queryObject.nodeSetIds = [];
+                self.selection.forEach(function(idStr){
+                    context.queryObject.nodeSetIds.push(parseInt(idStr))
+                })
                 $("#findTabs").tabs("option", "active", 0);
                 buildPaths.show("only")
-            })
+
 
 
         }
 
         self.clearSelection = function () {
             $(".jstree-anchor").css("color", "black");
-            keolis.selection = [];
+            quantum.selection = [];
             $("#graphSelectionButton").css("display", "block")
         }
 
@@ -321,13 +353,13 @@
 
 </head>
 <body>
-<button onclick="  quantum.loadJon('tags')">tags</button>
-<button onclick="  quantum.loadJon('categories')">categories</button>
-<!--<button onclick="  keolis.clearSelection()">clear selection</button>-->
+<button onclick="  quantum.getJsTreeRootNeoId('physicalClass')">physicalClass</button>
+<button onclick="  quantum.getJsTreeRootNeoId('functionalClass')">functionalClass</button>
+<!--<button onclick="  quantum.clearSelection()">clear selection</button>-->
 <button onclick="quantum.graphSelection()" id="graphSelectionButton" display="none">Use selection</button>
 
 <br>
-<div id="treeDivKeolis" style="width:400px;height: 800px;overflow: auto"></div>
+<div id="treeDivquantum" style="width:400px;height: 800px;overflow: auto"></div>
 
 <script>
 

@@ -1,5 +1,6 @@
 {
 
-  "Fauconnet":{"login":"Fauconnet","password":"ClaFauc17","groups":["ATD","ADMIN"]}
+  "Fauconnet":{"login":"Fauconnet","password":"ClaFauc17","groups":["ATD","ADMIN"]},
+  "Neo-Quantum-User":{"login":"Neo-Quantum-User","password":"zi6ZK45z_NEO","groups":["ATD","ADMIN"]}
 
 }

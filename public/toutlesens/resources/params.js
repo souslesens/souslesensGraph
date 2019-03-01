@@ -27,7 +27,7 @@
  ******************************************************************************/
 var serverRootUrl = "";
 var Gparams = {
-    plugins: [],//['keolis','Total'],
+    plugins: ['Total'],
     displayVersion: "1_googleLike",
     user: "anonymous",
 

@@ -4,11 +4,11 @@
         var self = {};
         self.dataset;
         self.connections;
-        self.init = function (data,disableStatsTab) {
+        self.init = function (data, disableStatsTab) {
 
             exportDialog_tabDiv = $("#exportDialog_tabDiv").tabs();
-if(disableStatsTab)
-            $( "#exportDialog_tabDiv" ).tabs( "disable", 1 );
+            if (disableStatsTab)
+                $("#exportDialog_tabDiv").tabs("disable", 1);
 
 
             self.dataset = data;
@@ -19,7 +19,7 @@ if(disableStatsTab)
                         properties.push(key);
                 }
             })
-            var html = "";
+            var html = "<input type=checkbox onchange=exportDialog.swithCbxSelectAll($(this))>select all<br>";
             properties.forEach(function (prop) {
                 var checked = "";
                 if (prop == "connectedTo" || prop == Schema.schema.defaultNodeNameProperty)
@@ -34,10 +34,18 @@ if(disableStatsTab)
             self.initStatsDialog()
 
         }
+        self.swithCbxSelectAll = function (cbx) {
+
+            var checked = $(cbx).prop("checked")
+            $(".exportDialog_propcbx").each(function (index, cbx) {
+                $(this).prop("checked", checked)
+
+            })
+        }
 
 
         self.execute = function () {
-            debugger
+
             var checkedProperties = [];
             $(".exportDialog_propcbx").each(function (index, cbx) {
                 if ($(this).prop("checked")) {
@@ -45,18 +53,18 @@ if(disableStatsTab)
                 }
                 checkedProperties.push("neoId")
             })
-            var filteredDataset=[];
+            var filteredDataset = [];
             var filter = $("#exportDialog_filterDiv").val();
 
             self.dataset.forEach(function (line, index) {
                 if (filter && filter != "") {
                     if (line.label && line.label != filter)
-                      return;
+                        return;
                     else if (line.labelNeo && line.labelNeo != filter)
-                    return;
+                        return;
 
                 }
-                var filteredLine={}
+                var filteredLine = {}
                 for (var key in line) {
 
                     if (key == "connectedTo") {
@@ -65,9 +73,8 @@ if(disableStatsTab)
                     }
 
 
-
-                    if (checkedProperties.indexOf(key) >-1)
-                        filteredLine[key]=line[key];
+                    if (checkedProperties.indexOf(key) > -1)
+                        filteredLine[key] = line[key];
 
                 }
                 filteredDataset.push(filteredLine)
@@ -85,8 +92,7 @@ if(disableStatsTab)
             dialogLarge.load("htmlSnippets/dataTable.html", function () {
                 dialogLarge.dialog("open");
 
-                toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv",filteredDataset, function (err, result) {
-
+                toutlesensController.graphDataTable.loadJsonInTable(null, "dataTableDiv", filteredDataset, function (err, result) {
 
 
                 })
