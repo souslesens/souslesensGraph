@@ -87,7 +87,7 @@ var uploadCsvForNeo = {
       },*/
 
 
-    loadLocal: function (file,subGraph, callback) {
+    loadLocal: function (file, subGraph, callback) {
         var headers = [];
         normalizeHeader = function (headerArray, s) {
             //   var   r = s.toLowerCase();
@@ -115,8 +115,8 @@ var uploadCsvForNeo = {
 
         processValues = function (header, value) {
 
-            if (value.indexOf("\n") > -1) {
-              //  value = value.replace(/\n/g, "")
+            if (false && value.indexOf("\n") > -1) {
+                //  value = value.replace(/\n/g, "")
                 var array = value.split("\n");
                 //value= JSON.stringify(array)
                 value = array;
@@ -125,47 +125,82 @@ var uploadCsvForNeo = {
 
 
         }
+        getSeparator = function (callback) {
+            var readStream = fs.createReadStream(file, {start: 0, end: 1000, encoding: 'utf8'});
+            var separator = ",";
+            readStream.on('data', function (chunk) {
+                var separators = [",", "\t", ";"]
+                var ok = 0
+                separators.forEach(function (sep) {
+                    if (separators.indexOf(sep) > 0)
+                        if ((ok++) == 0)
+                            callback(sep);
+                })
+                readStream.destroy();
+            }).on('end', function () {
+                var xx = 3
+                return;
+            })
+                .on('close', function () {
+                    return;
+                })
+            ;
+
+        }
 
 
         const csv = require('csv-parser')
         const fs = require('fs')
         const results = [];
+        getSeparator(function (_separator) {
+            var count = 0;
+            var separator = _separator
+            var countLines = 0
+            fs.createReadStream(file)
+                .pipe(csv(
+                    {
+                        separator: separator,
+                        mapHeaders: ({header, index}) =>
+                            normalizeHeader(headers, header)
+                        ,
+                        /*   mapValues: ({header, index, value}) =>
+                               processValues(header, value),*/
 
 
-        fs.createReadStream(file)
-            .pipe(csv(
-                {
-                    separator: ';',
-                    mapHeaders: ({header, index}) =>
-                        normalizeHeader(headers, header)
-                    ,
-                    mapValues: ({header, index, value}) =>
-                        processValues(header, value),
+                    })
 
-                })
+                    .on('data', function (data) {
+                        console.log((count++) + "  " + data.iD)
+                        if (data.iD == "TOTAL-P0000001086")
+                            var xx = 1
+                        results.push(data)
 
-                .on('data', function (data) {
+                    })
+                    .on('end', function () {
+                        console.log(countLines)
+                        var xx = results;
+                        var yy = headers;
 
-                    results.push(data)
+                        var fileName = file.substring(file.lastIndexOf(path.sep) + 1)
+                        var filePath = path.resolve("uploads/" + fileName + ".json");
+                        // headers = headers.sort();
+                        fs.writeFileSync(filePath, JSON.stringify({headers: headers, data: results}, null, 2));
+                        var result = {
+                            message: "listCsvFields",
+                            remoteJsonPath: filePath,
+                            name: fileName,
+                            header: headers,
+                            subGraph: subGraph
+                        };
+                        socket.message("file " + fileName + "loaded");
+                        callback(null, result);
+                    }))
+            /*  .on('headers', (headers) => {
+                  console.log(`First header: ${headers[0]}`)
+              })*/
 
-                })
-                .on('end', function () {
-                    var xx = results;
-                    var yy = headers;
 
-                    var fileName = file.substring(file.lastIndexOf(path.sep) + 1)
-                    var filePath = path.resolve("uploads/" + fileName + ".json");
-                   // headers = headers.sort();
-                    fs.writeFileSync(filePath, JSON.stringify({headers:headers, data :results},null,2));
-                    var result = {message: "listCsvFields", remoteJsonPath: filePath, name: fileName, header: headers,subGraph:subGraph};
-               socket.message("file "+fileName+"loaded");
-                    callback(null, result);
-                }))
-        /*  .on('headers', (headers) => {
-              console.log(`First header: ${headers[0]}`)
-          })*/
-
-
+        })
     }
 
 

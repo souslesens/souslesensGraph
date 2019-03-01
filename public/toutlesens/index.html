@@ -75,7 +75,6 @@
     <script src="../../common/js/d3/d3-colorLegend.js"></script>
 
 
-
     <script src="../common/js/common.js"></script>
 
     <script src="js/customizeUI.js"></script>
@@ -87,7 +86,6 @@
     <script src="js/traversalController.js"></script>
     <script src="js/algorithms.js"></script>
     <script src="js/buildPaths.js"></script>
-
 
 
     <script src="js/paramsController.js"></script>
@@ -152,7 +150,6 @@
     <script src="./js/neoToMongo.js"></script>
 
 
-
     <script src="../common/js/others/tableFlip.js"></script>
 
 
@@ -166,6 +163,8 @@
     <script src="js/savedQueries.js"></script>
     <script src="js/searchNodes.js"></script>
     <script src="js/searchRelations.js"></script>
+
+    <script src="../common/js/authentication.js"></script>
 
 
     <script src="../common/js/cypher.js"></script>
@@ -186,8 +185,6 @@
     <script src="./js/context.js"></script>
     <script src="./js/expandGraph.js"></script>
     <script src="./js/nodeSets.js"></script>
-
-
 
 
     <style>
@@ -212,6 +209,11 @@
 
         a:active {
             text-decoration: underline;
+        }
+
+        #panels {
+            margin-top: 2px;
+            display: inline-flex;
         }
 
         #treeContainer {
@@ -323,8 +325,9 @@
             min-height: 200px;
 
         }
+
         #configVisjs {
-            float:left;
+            float: left;
             width: 400px;
             height: 600px;
         }
@@ -380,7 +383,7 @@
                 toutlesensController.intiRelationTypes,
                 customizeUI.customize,
                 toutlesensController.afterGraphInit,
-             //   statistics.initLabelsCurrentQueries,
+                //   statistics.initLabelsCurrentQueries,
                 functionalities.initFunctionalities
 
                 //  searchNodes.patternInitLabels,
@@ -395,12 +398,9 @@
                     return setMessage("Error cannot load Schema");
                 // play init UI methods after schema is loaded
                 for (var i = 0; i < afterLoadModelTasks.length; i++) {
-                 //   try {
-                        afterLoadModelTasks[i](subGraph);
-                /*    }
-                    catch (err) {
-                        console.log("" + i + "  " + err);
-                    }*/
+                    //   try {
+                    afterLoadModelTasks[i](subGraph);
+
                 }
 
                 toutlesensController.appInitEnded = true;
@@ -414,7 +414,10 @@
                 Gparams.displayVersion = queryParams.displayVersion
             }
             versionController.applyVersion(version);
-            buildPaths.init()
+            buildPaths.init();
+            authentication.init(false,function(err,result){
+
+            })
 
 
         })
@@ -427,294 +430,304 @@
 
 <!--  ****************************************************main panel***************************-->
 
-
-<div id="mainPanel">
-
-
-    <div id="graphDiv"></div>
-
-</div>
+<div id="panels">
+    <div id="mainPanel">
 
 
-<div id="mainButtons" style="background-color: #f4f0ec">
-    <div onclick="buildPaths.expandCollapse()">
-    <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
+        <div id="graphDiv"></div>
 
-
-    <input type="image" title="Build path" height="20px"
-           onclick="buildPaths.expandCollapse(true)" id="BuilPathButton" src="images/path.png"
-           class=""/>
-
-
-
-    <input type="image" title="Export to text" height="20px"
-           onclick=toutlesensController.dispatchAction('showGraphTable') id="textMenuButton" src="images/text.png"
-           class="graphDisplayed"/>
-
-
-    <input type="image" title="<span id='lang_XX'>schema</span>" height="20px" id="schemaButton" src="images/cube.png"/>
-
-
-
-    <input type="image" title="Zoom on node" height="20px" onclick="toutlesensController.dispatchAction('zoomOnNode')"
-           id="zoomOnNodeMenuButton"
-           src="images/zoom.png" class="graphDisplayed"/>
-    <input type="image" title="Fit to page" height="20px" onclick="visjsGraph.fitToPage()" id="fitMenuButton"
-           src="images/fit.png" class="graphDisplayed"/>
-    <input type="image" title="Take a snapshot" height="20px"
-           onclick="toutlesensController.dispatchAction('graphorama')" id="snapShotMenuButton"
-           src="images/snapshot.png" class="aa"/>
-
-    <input type="image" title="Previous graph" height="20px" onclick="visjsGraph.showPreviousGraph()"
-           id="previousGraphMenuButton" src="images/previous.jpg"/>
-    <input type="image" title="Next graph" height="20px" onclick="visjsGraph.showNextGraph()" id="nextGraphMenuButton"
-           src="images/next.jpg"/>
-    <input type="image" title="Next display" height="20px" onclick="toutlesensController.dispatchAction('addNode')"
-           class="canModify" ; id="newNodeButton" src="images/newNode.png"/>
-    <input type="image" title="display settings" height="20px"
-           onclick="toutlesensController.dispatchAction('displaySettings')"
-           id="displaySettingButton" src="images/display.png"/></td>
-   <!-- &nbsp;<input type="image" title="Display all nodes" height="20px"
-                 onclick="toutlesensController.dispatchAction('showAll')"
-                 id="searchAllButton" src="images/all.png"/></td>-->
-    <input type="image" title="Graph menu" height="20px"
-           onclick="toutlesensController.dispatchAction('showGlobalMenu');" id="parametersMenuButton"
-           src="images/parameters.png"/>
-    <br><span id="graphInfosSpan" style="font-size:8px"></span>
     </div>
-    <div id="buildGraphDiv"  style="    background-color: #f4d3b3;;"></div>
-
-</div>
-<div id="graphLegendDiv"></div>
-<div id="graphInfosDiv" style="font-size: 8px"></div>
-<div id="graphCommentDiv" style="position: absolute;background-color: white;margin: 2px;padding: 2px"></div>
-<div id="BIlegendDiv"
-     style="visibility:hidden;z-index:20;border: 1px;border-style: solid;padding: 5px;background-color: #fafafa;max-height: 400px;max-width: 250px;overflow: auto"></div>
 
 
-<div id="mainAccordion">
-    <h3><b>Query</b></h3>
-    <div id="findDiv" class="mainAccordionPanel">
-
-        <div id="findTabs">
-            <ul id="findTabsUl">
-                <li><a href="#queryDiv"><span>Query </span></a></li>
-              <!--  <li><a href="#nodeDiv"><span>Node  </span></a></li>
-                <li><a href="#relationDiv"><span>Relation </span></a></li>
-
-                <li><a href="#pathDiv"><span>Pathes </span></a></li>
-                <li><a href="#advancedQueriesDiv" id="advancedQueriesTabLi"><span>Advanced </span></a></li>-->
-
-                <li><a href="#pluginDiv" id="pluginLi"><span>Plugin </span></a></li>
-                <!--     <li><a href="#tagCloudDiv" id="tagCloudLi"><span >tagCloud</span></a></li>-->
+    <div id="mainButtons" style="background-color: #f4f0ec">
+        <div onclick="buildPaths.expandCollapse()">
+            <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
 
 
-                <!--  <li><a href="#requestDiv"><span >Request </span></a></li>-->
+            <input type="image" title="Build path" height="20px"
+                   onclick="buildPaths.expandCollapse(true)" id="BuilPathButton" src="images/path.png"
+                   class=""/>
 
 
-            </ul>
-            <script>
-                // customizeUI.addPlugins(Gparams.plugins);  PB initalisation dialog and tabs
-            </script>
+            <input type="image" title="Export to text" height="20px"
+                   onclick=toutlesensController.dispatchAction('showGraphTable') id="textMenuButton"
+                   src="images/text.png"
+                   class="graphDisplayed"/>
 
 
-          <!--  <div id="nodeDiv" class="findTab">
-                <div id="nodeDivDetachable">
-                    <input type="hidden" value="500" id="limitResult">
-                    <table border="0">
-                        <tr>
-                            <td>
-                                <table>
-                                    <tr align="center">
-                                        <td><span id='lang_1'>Node</span></td>
-                                        <td><input id="word"
-
-                                                   size="10"></td>
-                                        <td><input type="image" id="eraseWordButton" height="20px"
-                                                   src="images/erase.png"></td>
+            <input type="image" title="<span id='lang_XX'>schema</span>" height="20px" id="schemaButton"
+                   src="images/cube.png"/>
 
 
+            <input type="image" title="Zoom on node" height="20px"
+                   onclick="toutlesensController.dispatchAction('zoomOnNode')"
+                   id="zoomOnNodeMenuButton"
+                   src="images/zoom.png" class="graphDisplayed"/>
+            <input type="image" title="Fit to page" height="20px" onclick="visjsGraph.fitToPage()" id="fitMenuButton"
+                   src="images/fit.png" class="graphDisplayed"/>
+            <input type="image" title="Take a snapshot" height="20px"
+                   onclick="toutlesensController.dispatchAction('graphorama')" id="snapShotMenuButton"
+                   src="images/snapshot.png" class="aa"/>
+
+            <input type="image" title="Previous graph" height="20px" onclick="visjsGraph.showPreviousGraph()"
+                   id="previousGraphMenuButton" src="images/previous.jpg"/>
+            <input type="image" title="Next graph" height="20px" onclick="visjsGraph.showNextGraph()"
+                   id="nextGraphMenuButton"
+                   src="images/next.jpg"/>
+            <input type="image" title="Next display" height="20px"
+                   onclick="toutlesensController.dispatchAction('addNode')"
+                   class="canModify" ; id="newNodeButton" src="images/newNode.png"/>
+            <input type="image" title="display settings" height="20px"
+                   onclick="toutlesensController.dispatchAction('displaySettings')"
+                   id="displaySettingButton" src="images/display.png"/></td>
+            <!-- &nbsp;<input type="image" title="Display all nodes" height="20px"
+                          onclick="toutlesensController.dispatchAction('showAll')"
+                          id="searchAllButton" src="images/all.png"/></td>-->
+            <input type="image" title="Graph menu" height="20px"
+                   onclick="toutlesensController.dispatchAction('showGlobalMenu');" id="parametersMenuButton"
+                   src="images/parameters.png"/>
+            <br><span id="graphInfosSpan" style="font-size:8px"></span>
+        </div>
+        <div id="buildGraphDiv" style="    background-color: #f4d3b3;;"></div>
+
+    </div>
+    <div id="graphLegendDiv"></div>
+    <div id="graphInfosDiv" style="font-size: 8px"></div>
+    <div id="graphCommentDiv" style="position: absolute;background-color: white;margin: 2px;padding: 2px"></div>
+    <div id="BIlegendDiv"
+         style="visibility:hidden;z-index:20;border: 1px;border-style: solid;padding: 5px;background-color: #fafafa;max-height: 400px;max-width: 250px;overflow: auto"></div>
 
 
-                                    </tr>
+    <div id="mainAccordion">
+        <h3><b>Query</b></h3>
+        <div id="findDiv" class="mainAccordionPanel">
 
-                                </table>
+            <div id="findTabs">
+                <ul id="findTabsUl">
+                    <li><a href="#queryDiv"><span>Query </span></a></li>
+                    <!--  <li><a href="#nodeDiv"><span>Node  </span></a></li>
+                      <li><a href="#relationDiv"><span>Relation </span></a></li>
 
+                      <li><a href="#pathDiv"><span>Pathes </span></a></li>
+                      <li><a href="#advancedQueriesDiv" id="advancedQueriesTabLi"><span>Advanced </span></a></li>-->
 
-                            </td>
-
-                        </tr>
-                        </tr>
-                        <td colspan="2">
-                            <div id="searchResultMessage"
-                                 style="color: #0000cc;font-size: 10px;font-style: italic"></div>
-                        </td>
-
-                        <tr>
-
-                        <tr>
-                            <td colspan="2">
+                    <li><a href="#pluginDiv" id="pluginLi"><span>Plugin </span></a></li>
+                    <!--     <li><a href="#tagCloudDiv" id="tagCloudLi"><span >tagCloud</span></a></li>-->
 
 
-                                <div id="treeContainer">
-                                    <div id="genericTree"></div>
-                                </div>
-
-                            </td>
+                    <!--  <li><a href="#requestDiv"><span >Request </span></a></li>-->
 
 
-                        </tr>
+                </ul>
+                <script>
+                    // customizeUI.addPlugins(Gparams.plugins);  PB initalisation dialog and tabs
+                </script>
 
 
-                    </table>
-                </div>
+                <!--  <div id="nodeDiv" class="findTab">
+                      <div id="nodeDivDetachable">
+                          <input type="hidden" value="500" id="limitResult">
+                          <table border="0">
+                              <tr>
+                                  <td>
+                                      <table>
+                                          <tr align="center">
+                                              <td><span id='lang_1'>Node</span></td>
+                                              <td><input id="word"
 
-            </div>
-
-
-            <div id="relationDiv" class="findTab">
-                type <select id="findRelationsTypeSelect"
-                             onchange="toutlesensController.setRelationProperties(this)"></select>
-                <br>
-                property <select id="findRelationsPropertyKeySelect"></select>
-                <select id="findRelationsPropertyOperatorSelect">
-                    <option>=</option>
-                    <option><></option>
-                    <option>&lt;</option>
-                    <option>&gt;</option>
-
-                </select>
-                <input id="findRelationsPropertyValueInput" size="10">
-                <button onclick="toutlesensController.generateGraphFromRelType()"> OK</button>
-
-                </input>
-                <div id="findRelationsCurrentType"></div>
-
-            </div>
-
-            <div id="pathDiv" class="findTab">
-
-                <table>
-                    <tr>
-                        <td colspan="3">
-
-
-                            <select id="pathType">
-                                <option value="shortestPath">
-                                    Shortest path
-                                </option>
-
-
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-
-                        <td>
-                            <button onclick="traversalController.showSearchMenu('source'); ">Between node</button>
-                            <br><span id="pathes_sourceNode"></span></td>
-                        <td></td>
-
-                    </tr>
-                    <tr>
-
-
-                        <td>
-                            <button onclick="traversalController.showSearchMenu('target'); ">And node</button>
-                            <br><span id="pathes_targetNode" class="targetNode"></span></td>
-                        <td></td>
-
-                    </tr>
-
-
-                    <tr>
-                        <td colspan="3">
-
-                            <div id="pathes_buttonsDiv"></div>
+                                                         size="10"></td>
+                                              <td><input type="image" id="eraseWordButton" height="20px"
+                                                         src="images/erase.png"></td>
 
 
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            &nbsp;<span id="shortestPathDistance"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <div id="traversalFindDiv" style="background-color: #b3b6c2">
-                            </div>
-                        </td>
-                    </tr>
+
+                                          </tr>
+
+                                      </table>
 
 
-                </table>
+                                  </td>
 
-            </div>
--->
-            <div id="advancedQueriesDiv" class="findTab">
-                <div id="advancedQueriesAccordion">
-                    <h3>Pivots nodes</h3>
-                    <div>
-                        <div id="pivotsDiv" style="height:450px"></div>
+                              </tr>
+                              </tr>
+                              <td colspan="2">
+                                  <div id="searchResultMessage"
+                                       style="color: #0000cc;font-size: 10px;font-style: italic"></div>
+                              </td>
+
+                              <tr>
+
+                              <tr>
+                                  <td colspan="2">
+
+
+                                      <div id="treeContainer">
+                                          <div id="genericTree"></div>
+                                      </div>
+
+                                  </td>
+
+
+                              </tr>
+
+
+                          </table>
+                      </div>
+
+                  </div>
+
+
+                  <div id="relationDiv" class="findTab">
+                      type <select id="findRelationsTypeSelect"
+                                   onchange="toutlesensController.setRelationProperties(this)"></select>
+                      <br>
+                      property <select id="findRelationsPropertyKeySelect"></select>
+                      <select id="findRelationsPropertyOperatorSelect">
+                          <option>=</option>
+                          <option><></option>
+                          <option>&lt;</option>
+                          <option>&gt;</option>
+
+                      </select>
+                      <input id="findRelationsPropertyValueInput" size="10">
+                      <button onclick="toutlesensController.generateGraphFromRelType()"> OK</button>
+
+                      </input>
+                      <div id="findRelationsCurrentType"></div>
+
+                  </div>
+
+                  <div id="pathDiv" class="findTab">
+
+                      <table>
+                          <tr>
+                              <td colspan="3">
+
+
+                                  <select id="pathType">
+                                      <option value="shortestPath">
+                                          Shortest path
+                                      </option>
+
+
+                                  </select>
+                              </td>
+                          </tr>
+                          <tr>
+
+                              <td>
+                                  <button onclick="traversalController.showSearchMenu('source'); ">Between node</button>
+                                  <br><span id="pathes_sourceNode"></span></td>
+                              <td></td>
+
+                          </tr>
+                          <tr>
+
+
+                              <td>
+                                  <button onclick="traversalController.showSearchMenu('target'); ">And node</button>
+                                  <br><span id="pathes_targetNode" class="targetNode"></span></td>
+                              <td></td>
+
+                          </tr>
+
+
+                          <tr>
+                              <td colspan="3">
+
+                                  <div id="pathes_buttonsDiv"></div>
+
+
+
+                              </td>
+                          </tr>
+                          <tr>
+                              <td colspan="3">
+                                  &nbsp;<span id="shortestPathDistance"></span>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td colspan="3">
+                                  <div id="traversalFindDiv" style="background-color: #b3b6c2">
+                                  </div>
+                              </td>
+                          </tr>
+
+
+                      </table>
+
+                  </div>
+      -->
+                <div id="advancedQueriesDiv" class="findTab">
+                    <div id="advancedQueriesAccordion">
+                        <h3>Pivots nodes</h3>
+                        <div>
+                            <div id="pivotsDiv" style="height:450px"></div>
+                        </div>
+                        <!--   <h3>Count by label</h3>
+                           <div>
+                               <div id="countByLabelDiv" style="height:450px"></div>
+                           </div>
+                           <h3>transitive relations</h3>
+                           <div id="transitiveRelationsDiv" style="height:450px"></div>-->
+                        <h3>Cypher query</h3>
+
+                        <div id="cypherQueryDiv" style="height:450px"></div>
+
+
                     </div>
-                    <!--   <h3>Count by label</h3>
-                       <div>
-                           <div id="countByLabelDiv" style="height:450px"></div>
-                       </div>
-                       <h3>transitive relations</h3>
-                       <div id="transitiveRelationsDiv" style="height:450px"></div>-->
-                    <h3>Cypher query</h3>
-
-                    <div id="cypherQueryDiv" style="height:450px"></div>
-
-
                 </div>
+                <!--  <div id="tagCloudDiv">
+                  <iframe id='tagCloudIframe' src='htmlSnippets/tagCloud.html' style='width: 100%;height: 500px'>
+                  </iframe>
+                  </div>-->
+
+                <div id="queryDiv" class="findTab">
+                </div>
+
+                <div id="pluginDiv" class="findTab"></div>
+
+                <!--    <div id="requestDiv">
+
+                    </div>-->
             </div>
-            <!--  <div id="tagCloudDiv">
-              <iframe id='tagCloudIframe' src='htmlSnippets/tagCloud.html' style='width: 100%;height: 500px'>
-              </iframe>
-              </div>-->
 
-            <div id="queryDiv" class="findTab">
-            </div>
-
-            <div id="pluginDiv" class="findTab"></div>
-
-            <!--    <div id="requestDiv">
-
-                </div>-->
         </div>
 
+        <h3><b>Graph</b></h3>
+        <div id="analyzePanel" class="mainAccordionPanel">
+
+
+        </div>
+        <!-- <h3><b>Graphoramas</b></h3>
+         <div id="graphoramasDiv" class="mainAccordionPanel"></div>-->
+
     </div>
 
-    <h3><b>Graph</b></h3>
-    <div id="analyzePanel" class="mainAccordionPanel">
+
+    <div id="graphPopup"
+         style="visibility: hidden;position: absolute;background-color: white;margin: 2px;padding: 2px"></div>
+
+    <div id="dialog" title="dialog"></div>
+    <div id="dialogLarge"></div>
 
 
+    <div id="controlPanelShowHide">
+
+        <input type="image" title="Graph menu" height="20px"
+               onclick="toutlesensController.switchanalyzePanelDisplay();" id="fullScreenButton"
+               src="images/fullScreen.png"/>
     </div>
-   <!-- <h3><b>Graphoramas</b></h3>
-    <div id="graphoramasDiv" class="mainAccordionPanel"></div>-->
+
 
 </div>
-
-
-<div id="graphPopup"
-     style="visibility: hidden;position: absolute;background-color: white;margin: 2px;padding: 2px"></div>
-
-<div id="dialog" title="dialog"></div>
-<div id="dialogLarge"></div>
-
-
-
-<div id="controlPanelShowHide">
-
-    <input type="image" title="Graph menu" height="20px"
-           onclick="toutlesensController.switchanalyzePanelDisplay();" id="fullScreenButton"
-           src="images/fullScreen.png"/>
+<div id="loginDiv" style="position: absolute;top:200px;left: 200px;visibility: hidden">
+    login<input id="loginInput">
+    password<input type="password" id="passwordInput" onkeydown="if (event.keyCode == 13)
+                        document.getElementById('loginButton').click()">
+    <button id="loginButton" onclick="authentication.doLogin()">OK</button>
+    <div id="loginMessage"></div>
 </div>
-
-
 </body>
 </html>

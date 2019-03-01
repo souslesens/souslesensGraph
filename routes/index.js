@@ -22,6 +22,7 @@ var serverParams = require("../bin/serverParams.js")
 var socket = require('./socket.js');
 var fileSystemProxy = require("../bin/fileSystemProxy..js")
 var authentication = require("../bin/authentication..js")
+var neoToJstree=require("../bin/transform/neoToJsTree..js")
 
 
 
@@ -63,7 +64,18 @@ router.post(serverParams.routesRootUrl + '/neo', function (req, response) {
     }
 
 
+
+    if (req.body && req.body.generateTreeFromChildToParentRelType)
+        neoToJstree.generateTreeFromChildToParentRelType(req.body.label, req.body.relType, req.body.rootNeoId,  function (error, result) {
+            processResponse(response, error, result)
+        });
+
+
+
 });
+
+
+
 
 router.post(serverParams.routesRootUrl + '/source', function (req, response) {
     if (req.body && req.body.find)

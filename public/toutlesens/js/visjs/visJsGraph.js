@@ -467,14 +467,18 @@ var visjsGraph = (function () {
                 var nodes = [];
                 var scaleCoef = scale >= 1 ? (scale * .9) : (scale * 2)
                 var size = Gparams.visjs.defaultNodeSize / scaleCoef;
-                var fontSize = Gparams.visjs.defaultTextSize / (scale * .9);
+                var fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef ));
+                if(scale<1)
+                    fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef*0.8 ));
+                else
+                   fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef*1.3 ));
                 for (var key in self.nodes._data) {
 
                     if (scale > showNodesLabelMinScale) {
 
-                        nodes.push({id: key, label: self.nodes._data[key].hiddenLabel, size: size, font: {size: size}});
+                        nodes.push({id: key, label: self.nodes._data[key].hiddenLabel, size: size, font: {size: fontSize}});
                     } else {
-                        nodes.push({id: key, label: null, size: size, font: {size: size}});
+                        nodes.push({id: key, label: null, size: size, font: {size: fontSize}});
                     }
                 }
                 self.nodes.update(nodes);
