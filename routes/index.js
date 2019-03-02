@@ -49,7 +49,8 @@ router.post(serverParams.routesRootUrl + '/test', function (req, response) {
 });
 router.post(serverParams.routesRootUrl + '/neo', function (req, response) {
     if (req.body && req.body.match)
-        neoProxy.match(req.body.match, function (error, result) {
+     neoProxy.match(req.body.match, function (error, result) {
+      //  neoProxy.matchRest(req.body.match, function (error, result) {
             processResponse(response, error, result)
         });
     if (req.body && req.body.cypher) {

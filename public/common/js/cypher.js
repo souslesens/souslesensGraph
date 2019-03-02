@@ -2,7 +2,7 @@ var Cypher=(function(){
     var self={};
     self.neo4jProxyUrl = "../../../neo";
     self.executeCypher = function (cypher, callback) {
-
+console.log(cypher);
         var payload = {match: cypher};
         $.ajax({
             type: "POST",

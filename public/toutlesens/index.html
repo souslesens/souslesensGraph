@@ -444,49 +444,44 @@
             <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
 
 
-            <input type="image" title="Build path" height="20px"
-                   onclick="buildPaths.expandCollapse(true)" id="BuilPathButton" src="images/path.png"
-                   class=""/>
+            <input type="image" title="Build path" height="20px"   id="mainPanel_BuilPathButton" src="images/path.png" class=""/>
+
+            <input type="image" title="Export to text" height="20px"  id="mainPanel_textMenuButton" src="images/text.png"  class="graphDisplayed"/>
 
 
-            <input type="image" title="Export to text" height="20px"
-                   onclick=toutlesensController.dispatchAction('showGraphTable') id="textMenuButton"
-                   src="images/text.png"
-                   class="graphDisplayed"/>
+            <input type="image" title="<span id='lang_XX'>schema</span>" height="20px" id="mainPanel_schemaButton" src="images/cube.png"/>
 
 
-            <input type="image" title="<span id='lang_XX'>schema</span>" height="20px" id="schemaButton"
-                   src="images/cube.png"/>
 
 
-            <input type="image" title="Zoom on node" height="20px"
-                   onclick="toutlesensController.dispatchAction('zoomOnNode')"
-                   id="zoomOnNodeMenuButton"
-                   src="images/zoom.png" class="graphDisplayed"/>
-            <input type="image" title="Fit to page" height="20px" onclick="visjsGraph.fitToPage()" id="fitMenuButton"
-                   src="images/fit.png" class="graphDisplayed"/>
-            <input type="image" title="Take a snapshot" height="20px"
+          <!--  <input type="image" title="Take a snapshot" height="20px"
                    onclick="toutlesensController.dispatchAction('graphorama')" id="snapShotMenuButton"
-                   src="images/snapshot.png" class="aa"/>
+                   src="images/snapshot.png" class="aa"/>-->
 
-            <input type="image" title="Previous graph" height="20px" onclick="visjsGraph.showPreviousGraph()"
-                   id="previousGraphMenuButton" src="images/previous.jpg"/>
-            <input type="image" title="Next graph" height="20px" onclick="visjsGraph.showNextGraph()"
-                   id="nextGraphMenuButton"
-                   src="images/next.jpg"/>
-            <input type="image" title="Next display" height="20px"
-                   onclick="toutlesensController.dispatchAction('addNode')"
-                   class="canModify" ; id="newNodeButton" src="images/newNode.png"/>
-            <input type="image" title="display settings" height="20px"
-                   onclick="toutlesensController.dispatchAction('displaySettings')"
-                   id="displaySettingButton" src="images/display.png"/></td>
+            <input type="image" title="Previous graph" height="20px"  id="mainPanel_previousGraphMenuButton" src="images/previous.jpg"/>
+
+            <input type="image" title="Next graph" height="20px"  id="mainPanel_nextGraphMenuButton" src="images/next.jpg"/>
+
+            <input type="image" title="Next display" height="20px"  class="canModify" ; id="mainPanel_newNodeButton" src="images/newNode.png"/>
+
+            <input type="image" title="display settings" height="20px"  id="mainPanel_displaySettingButton" src="images/display.png"/></td>
+
             <!-- &nbsp;<input type="image" title="Display all nodes" height="20px"
                           onclick="toutlesensController.dispatchAction('showAll')"
                           id="searchAllButton" src="images/all.png"/></td>-->
-            <input type="image" title="Graph menu" height="20px"
-                   onclick="toutlesensController.dispatchAction('showGlobalMenu');" id="parametersMenuButton"
-                   src="images/parameters.png"/>
+
+
+            <input type="image" title="Graph menu" height="20px" id="mainPanel_parametersMenuButton" src="images/parameters.png"/>
+
+            <input type="image" title="Zoom on node" height="20px"  id="mainPanel_zoomOnNodeMenuButton" src="images/zoom.png" class="graphDisplayed"/>
+            <input type="image" title="Fit to page" height="20px"  id="mainPanel_fitMenuButton" src="images/fit.png" class="graphDisplayed"/>
+            <input type='image' height='20px'  title='fit Graph'  id="mainPanel_showHideLabelsButton" src='images/label.png' class="graphDisplayed"/>
+
             <br><span id="graphInfosSpan" style="font-size:8px"></span>
+
+
+
+
         </div>
         <div id="buildGraphDiv" style="    background-color: #f4d3b3;;"></div>
 

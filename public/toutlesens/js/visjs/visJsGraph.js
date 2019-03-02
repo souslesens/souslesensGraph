@@ -7,6 +7,7 @@ var visjsGraph = (function () {
 
 
 
+
         self.physicsOn = true;
         self.configure = true;
 
@@ -30,6 +31,7 @@ var visjsGraph = (function () {
         self.graphHistory.currentIndex = 0;
         self.legendLabels = [];
         self.physics = {};
+        self.labelsVisible = false;
 
 
         var showNodesLabelMinScale = .3;
@@ -226,8 +228,8 @@ var visjsGraph = (function () {
                         fn();
                     }
                     else {
-                        self.network.fit();
-                        self.onScaleChange()
+                      //  self.network.fit();
+                      //  self.onScaleChange()
                     }
 
 
@@ -475,9 +477,10 @@ var visjsGraph = (function () {
                 for (var key in self.nodes._data) {
 
                     if (scale > showNodesLabelMinScale) {
-
+                        self.labelsVisible=true;
                         nodes.push({id: key, label: self.nodes._data[key].hiddenLabel, size: size, font: {size: fontSize}});
                     } else {
+                        self.labelsVisible=false;
                         nodes.push({id: key, label: null, size: size, font: {size: fontSize}});
                     }
                 }
@@ -1219,6 +1222,26 @@ var visjsGraph = (function () {
             document.body.appendChild(dlLink);
             dlLink.click();
             document.body.removeChild(dlLink);
+        }
+
+        self.showHideLabels=function(){
+
+            var visible= self.labelsVisible;
+
+                var nodes = [];
+            for (var key in self.nodes._data) {
+
+                if(  visible==false) {
+                    nodes.push({id: key, label: self.nodes._data[key].hiddenLabel });
+                } else {
+                    nodes.push({id: key, label: null});
+                }
+            }
+
+            self.nodes.update(nodes);
+            setTimeout(function(){ self.labelsVisible=visible?false:true;},100)
+
+
         }
 
 

@@ -89,6 +89,34 @@ neo4jProxy = {
         } catch (e) {
             console.log(e);
         }
+    },
+
+    matchRest:function(matchStr,callback){
+        var payload = {
+            "query": matchStr
+        }
+        var path = "/db/data/cypher";
+        var neo4jUrl = serverParams.neo4jUrl;
+        request({
+                url: neo4jUrl + path,
+                json: payload,
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',}
+            },
+            function (err, res) {
+                if (err)
+                    callback(err)
+                else if (res.body && res.body.errors && res.body.errors.length > 0) {
+                    console.log(JSON.stringify(res.body.errors))
+                    callback(res.body.errors)
+                }
+                else {
+                    callback(null, res.body)
+                }
+            })
+
+
+
     }
 
     , cypher: function (url, path, payload, callback) {

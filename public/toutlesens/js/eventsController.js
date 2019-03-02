@@ -27,14 +27,7 @@ var eventsController = (function () {
             })
 
 
-            $("#schemaButton").click(function (e) {
-                var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
-                if (e.ctrlKey && storedSchema) {
-                    localStorage.removeItem("schemaGraph_" + subGraph);
-                }
-                toutlesensController.dispatchAction("showSchema")
 
-            });
 
             $("#word").keyup(function (e) {
                 //********************************************************
@@ -82,6 +75,61 @@ var eventsController = (function () {
                     return self.stopEvent = false;
                 toutlesensController.openFindAccordionPanel(false);
             })
+
+
+
+            $("#mainPanel_BuilPathButton").on('click', function (event) {
+                event.stopPropagation();
+                buildPaths.expandCollapse(true);
+            })
+            $("#mainPanel_textMenuButton").on('click', function (event) {
+                event.stopPropagation();
+                toutlesensController.dispatchAction('showGraphTable')
+            })
+            $("#mainPanel_schemaButton").click(function (e) {
+                var storedSchema = localStorage.getItem("schemaGraph_" + subGraph)
+                if (e.ctrlKey && storedSchema) {
+                    localStorage.removeItem("schemaGraph_" + subGraph);
+                }
+                toutlesensController.dispatchAction("showSchema")
+
+            });
+            $("#mainPanel_zoomOnNodeMenuButton").on('click', function (event) {
+                event.stopPropagation();
+                toutlesensController.dispatchAction('zoomOnNode');
+            })
+            $("#mainPanel_fitMenuButton").on('click', function (event) {
+                event.stopPropagation();
+                visjsGraph.fitToPage()
+            })
+            $("#mainPanel_previousGraphMenuButton").on('click', function (event) {
+                event.stopPropagation();
+                visjsGraph.showPreviousGraph();
+            })
+            $("#mainPanel_nextGraphMenuButton").on('click', function (event) {
+                event.stopPropagation();
+                visjsGraph.showNextGraph()
+            })
+            $("#mainPanel_displaySettingButton").on('click', function (event) {
+                event.stopPropagation();
+                toutlesensController.dispatchAction('displaySettings');
+            })
+            $("#mainPanel_newNodeButton").on('click', function (event) {
+                event.stopPropagation();
+                toutlesensController.dispatchAction('addNode')
+            })
+            $("#mainPanel_parametersMenuButton").on('click', function (event) {
+                event.stopPropagation();
+                toutlesensController.dispatchAction('showGlobalMenu')
+            })
+            $("#mainPanel_showHideLabelsButton").on('click', function (event) {
+                event.stopPropagation();
+                visjsGraph.showHideLabels()
+            })
+
+
+
+
 
 
 //*******************************************components**************************************

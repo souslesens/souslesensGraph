@@ -867,6 +867,8 @@ var buildPaths = (function () {
 
     }
     self.displayGraph = function (callback) {
+
+        $(".graphDisplayed").css("visibility", "visible");
         self.expandCollapse()
         var relsCount = {};
         toutlesensController.setGraphMessage("Working...")

@@ -749,7 +749,7 @@ var searchNodes = (function () {
             var returnStr = " RETURN n";
             var cursorStr = "";
 
-            cursorStr += " ORDER BY n." + Gparams.defaultNodeNameProperty;
+          //  cursorStr += " ORDER BY n." + Gparams.defaultNodeNameProperty;
             if (queryObject.from)
                 cursorStr += " SKIP " + queryObject.from;
             if (queryObject.limit)
@@ -783,7 +783,8 @@ var searchNodes = (function () {
 
 
             }
-            var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN n" + cursorStr;
+         //   var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN n" + cursorStr;
+            var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN id(n) as n" + cursorStr;
             queryObject.cypher = cypher;
             return callback(null, queryObject);
 
