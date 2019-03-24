@@ -1501,76 +1501,112 @@ var elasticProxy = {
         if (elasticProxy.getIndexMappings(elasticIndex, elasticType).fields)
             elasticFieldsMap = elasticProxy.getIndexMappings(elasticIndex, elasticType).fields.fieldObjs;
         var jsonData = [];
-        csv({noheader: false, trim: true, delimiter: "auto"})
-            .fromString(data)
-            .on('json', function (json) {
-                jsonData.push(json);
 
-            })
-            .on('done', function () {
-                var startId = Math.round(Math.random() * 10000000);
-                var elasticPayload = [];
-                // contcat all fields values in content field
 
-                for (var i = 0; i < jsonData.length; i++) {
-                    for (var key in jsonData[i])
-                        if (elasticFields.indexOf(key) < 0)
-                            elasticFields.push(key);
-                }
+        util.getCsvFileSeparator(csvPath, function (separator) {
+            var headers = [];
+            var jsonData = [];
+            var startId = 100000
+            fs.createReadStream(csvPath)
+                .pipe(csv(
+                    {
+                        separator: separator,
+                        /*   mapHeaders: ({header, index}) =>
+                               util.normalizeHeader(headers, header)
+                           ,*/
+                        /*   mapValues: ({header, index, value}) =>
+                               processValues(header, value),*/
 
-                for (var i = 0; i < jsonData.length; i++) {
-                    var payload = {};
-                    var content = "";
-                    var contentValue = ""
 
-                    elasticPayload.push({index: {_index: elasticIndex, _type: elasticType, _id: "_" + (startId++)}})
-                    for (var j = 0; j < jsonData.length; j++) {
-                        var key = elasticFields[j];
-                        var value = jsonData[i][key];
-                        if (!value)
-                            continue;
-                        if (value == "0000-00-00")
-                            continue;
-                        if (true || elasticFieldsMap && elasticFieldsMap[key].isSearched)
-                            contentValue += ". " + value;
+                    })
+                    .on('header', (header) => {
+                        headers = header;
+                    })
 
-                        payload[key] = value;
-                        if (true)
-                            x = 1
+                    .on('data', function (data) {
 
-                    }
+                        jsonData.push(JSON.parse("" + data));
 
-                    if (contentValue.length > 0)
-                        payload["content"] = contentValue;
-                    elasticPayload.push(payload);
 
-                }
 
-                getClient().bulk({
-                    body: elasticPayload
-                }, function (err, resp) {
-                    if (err) {
-                        console.log("ERROR " + err)
-                        //  console.log(JSON.stringify(elasticPayload, null, 2))
-                        return callback(err);
-                    } else if (resp.errors) {
-                        resp.items.forEach(function (item, index) {
-                            if (item.index.result != "created") {
-                                console.log(JSON.stringify(jsonData[index]))
-                                console.log(JSON.stringify(item))
+
+
+
+
+
+
+
+
+
+                    })
+                    .on('end', function () {
+                        var subsetIndexed = false;
+                        var nIteration = 0;
+
+
+                        var elasticPayload = [];
+
+                        for (var i = 0; i < jsonData.length; i++) {
+                            var payload = {};
+                            var content = "";
+                            var contentValue = ""
+                            elasticPayload.push({
+                                index: {
+                                    _index: elasticIndex,
+                                    _type: elasticType,
+                                    _id: "_" + (startId++)
+                                }
+                            })
+                            for (var j = 0; j < headers.length; j++) {
+                                var key = headers[j];
+                                var value = jsonData[i][key];
+                                if (!value)
+                                    continue;
+                                if (value == "0000-00-00")
+                                    continue;
+                                if (true || elasticFieldsMap && elasticFieldsMap[key].isSearched)
+                                    contentValue += ". " + value;
+
+                                payload[key] = value;
+
+
                             }
-                        })
-                        return callback(resp.errors);
-                    } else {
-                        return callback(null, "done");
-                    }
-                });
 
+                            if (contentValue.length > 0)
+                                payload["content"] = contentValue;
+                            elasticPayload.push(payload);
 
-            });
+                        }
 
+                        getClient().bulk({
+                            body: elasticPayload
+                        }, function (err, resp) {
+                            if (err) {
+                                console.log("ERROR " + err)
+                                //  console.log(JSON.stringify(elasticPayload, null, 2))
+                                return callback(err);
+                            } else if (resp.errors) {
+                                resp.items.forEach(function (item, index) {
+                                    if (item.index.result != "created") {
+                                        console.log(JSON.stringify(jsonData[index]))
+                                        console.log(JSON.stringify(item))
+                                    }
+                                })
+                                return callback(resp.errors);
+                            } else {
+                                subsetIndexed = true;
+                                console.log("indexed " + jsonData.length);
+                                jsonData = [];
+                                return callback(null, "done");
+                            }
+                        });
 
+                    })
+                );
+
+        })
     }
+
 
     ,
     indexsourceCollection: function (mongodb, sourceCollection, sourceQuery, elasticIndex, elasticType, callback) {
@@ -1862,6 +1898,7 @@ var elasticProxy = {
             }
         })
     }
+
     ,
     initIndex: function (indexName, settingsType, callback) {
         elasticProxy.deleteIndex(indexName, true, function (err) {
@@ -2012,7 +2049,7 @@ var elasticProxy = {
                 return callback(error);
             if (body.error) {
                 console.log(JSON.stringify(body.error));
-                 return callback(body.error);
+                return callback(body.error);
 
             }
             var options = {
@@ -2036,7 +2073,8 @@ var elasticProxy = {
         });
 
 
-    },
+    }
+    ,
     indexDocumentFile: function (_file, index, type, base64, infos, callback) {
         var id;
         if (infos && infos.hash)
@@ -2329,7 +2367,7 @@ var elasticProxy = {
                 try {
 
 
-                    var csv = fs.readFileSync(file)
+                    //  var csv = fs.readFileSync(file)
                     elasticProxy.indexCsv(file, index, index, function (err, result) {
                         if (err)
                             return callbackSeries(err);
@@ -2346,7 +2384,8 @@ var elasticProxy = {
             return callback(null, "done")
 
         })
-    },
+    }
+    ,
 
     indexjsonFile: function (index, newIndex, file, callback) {
         async.series([
@@ -2394,7 +2433,8 @@ var elasticProxy = {
             return callback(null, "done")
 
         })
-    },
+    }
+    ,
 
     indexDirInExistingIndex: function (index, type, rootDir, doClassifier, settings, callback) {
         if (!fs.existsSync(rootDir)) {
@@ -2587,10 +2627,10 @@ var elasticProxy = {
     ,
 
 
-    transformDirDocsToPlainText: function (dir,callbackMain) {
+    transformDirDocsToPlainText: function (dir, callbackMain) {
         var index = "transform";
         var type = "officeDocument";
-        var nDocs=0
+        var nDocs = 0
         async.series([
             //transform skos toJson
             function (callback) {
@@ -2618,7 +2658,7 @@ var elasticProxy = {
                     return callback(null)
                 })
             },
-                function (callback) {
+            function (callback) {
 
                 elasticProxy.search(index + "temp", type, "*", function (err, result) {
 
@@ -2640,7 +2680,7 @@ var elasticProxy = {
                             var title = hit._source.title;
                             var docStr = JSON.stringify(content, null, 2);
 
-                            nDocs+=1;
+                            nDocs += 1;
                             var filePath = path.resolve(dir + "/" + title + ".txt")
                             fs.writeFileSync(filePath, docStr)
                         }
@@ -2650,10 +2690,10 @@ var elasticProxy = {
                 })
             },
             function (callback) {
-             //   return callback(null);
+                //   return callback(null);
 
 
-             elasticProxy.deleteIndex(index + "temp", true, function (err, result) {
+                elasticProxy.deleteIndex(index + "temp", true, function (err, result) {
                     if (err)
                         return callback(err)
                     return callback(null)
@@ -2661,10 +2701,10 @@ var elasticProxy = {
 
             },
         ], function (err) {
-            if( err)
+            if (err)
                 return callbackMain(err);
             console.log("done")
-            return callbackMain (null,{result:"done :"+nDocs+" files"});
+            return callbackMain(null, {result: "done :" + nDocs + " files"});
 
         })
 
@@ -2926,6 +2966,14 @@ if (false) {
 }
 if (false) {
     elasticProxy.transformDirDocsToPlainText("D:\\Total\\docs\\test\\test");
+}
+
+if (false) {
+
+    elasticProxy.indexCsvFile("granddebatdemocratie", "granddebatdemocratie", "D:\\DEMOCRATIE_ET_CITOYENNETE.csv", function (err, result) {
+        var xx = err;
+
+    })
 }
 
 

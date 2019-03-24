@@ -188,7 +188,7 @@ var buildPaths = (function () {
         })
 
 
-            searchRelations.setEdgeColors(relTypes)
+        searchRelations.setEdgeColors(relTypes)
         self.queryObjs[index].incomingRelation = {
             candidates: rels,
             selected: null
@@ -240,6 +240,7 @@ var buildPaths = (function () {
     }
     self.editCypher = function () {
         var visibility = $('#buildPaths_cypherTA').css('visibility');
+
         if (visibility == "hidden")
             visibility = "visible"
         else
@@ -404,8 +405,17 @@ var buildPaths = (function () {
         if (!currentSetType) {
             $("#buildPath_moreParamsDiv").css('visibility', 'hidden')
         }
-        self.currentCypher = self.buildQuery(type);
-        $('#buildPaths_cypherTA').val(self.currentCypher);
+
+
+        var uiCypher = $('#buildPaths_cypherTA').val();
+        if (true || uiCypher == "") {
+            self.currentCypher = self.buildQuery(type);
+            $('#buildPaths_cypherTA').val(self.currentCypher);
+        }
+        else {
+            self.currentCypher = $('#buildPaths_cypherTA').val();
+
+        }
 
         Cypher.executeCypher(self.currentCypher, function (err, result) {
 
@@ -540,6 +550,7 @@ var buildPaths = (function () {
                 matchCypher += "-[r" + index + relType + "]-"
                 matchCypher += "(" + symbol + ":" + queryObject.label + ")";
                 cypherObj.return.push("r" + index);
+
             }
 
 
@@ -687,6 +698,7 @@ var buildPaths = (function () {
                     props.labelNeo = subLine.labels[0];
                     if (labels.indexOf(props.labelNeo) < 0)
                         labels.push(props.labelNeo);
+
                     var obj = connectors.getVisjsNodeFromNeoNode(subLine, false)
                     obj.incomingRelation = currentRel;
                     lineObj[key] = obj;
@@ -748,6 +760,7 @@ var buildPaths = (function () {
             var connections = getConnections(line);
             for (var nodeKey in line) {
 
+
                 var datasetLine = {};
                 datasetLine["label"] = line[nodeKey].neoAttrs["labelNeo"];
                 datasetLine["label"].neoId = line[nodeKey].id;
@@ -773,10 +786,14 @@ var buildPaths = (function () {
         //group all connections
         var datasetGroupedMap = {}
         tableDataset.forEach(function (line) {
-            if (!datasetGroupedMap[line.id]) {
-                datasetGroupedMap[line.id] = line
-            } else if (line.connectedTo)
-                datasetGroupedMap[line.id].connectedTo += "," + line.connectedTo
+            if (!datasetGroupedMap[line.neoId]) {
+                datasetGroupedMap[line.neoId] = line
+                datasetGroupedMap[line.neoId].connectedToArray = [];
+            } else if (line.connectedTo) {
+                if (datasetGroupedMap[line.neoId].connectedToArray.indexOf(line.connectedTo) < 0)
+                    datasetGroupedMap[line.neoId].connectedToArray.push(line.connectedTo);
+                //  datasetGroupedMap[line.id].connectedTo += "," + line.connectedTo
+            }
 
         })
         var datasetGroupedArray = [];
@@ -794,6 +811,17 @@ var buildPaths = (function () {
             }
             return 0;
 
+        })
+
+        datasetGroupedArray.forEach(function (line) {
+            line.connectedToArray.forEach(function (connection, index) {
+                if (index == 0)
+                    line.connectedTo = "";
+                else
+                    line.connectedTo += ",";
+                line.connectedTo += connection;
+
+            })
         })
 
 
@@ -840,7 +868,7 @@ var buildPaths = (function () {
                     var relNeo = line[symbol].incomingRelation;
 
 
-                    var relObj = connectors.getVisjsRelFromNeoRel (fromNode.id, toNode.id, relNeo.id, relNeo.type, relNeo.neoAttrs, false, false);
+                    var relObj = connectors.getVisjsRelFromNeoRel(fromNode.id, toNode.id, relNeo.id, relNeo.type, relNeo.neoAttrs, false, false);
 
 
                     visjsData.edges.push(relObj);

@@ -140,6 +140,63 @@ Util = {
     },
     capitalizeFirstLetter: function (string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+
+
+    getCsvFileSeparator :function (file,callback) {
+        var readStream = fs.createReadStream(file, {start: 0, end: 5000, encoding: 'utf8'});
+        var separator = ",";
+        readStream.on('data', function (chunk) {
+            var separators = [",", "\t", ";"];
+            var p = chunk.indexOf("\n")
+            if (p < 0)
+                p = chunk.indexOf("\r")
+            if (p < 0) {
+                readStream.destroy();
+                console.log("no line break or return in file")
+                return null;
+            }
+            var firstLine = chunk.substring(0, p)
+            for (var k = 0; k < separators.length; k++) {
+                if (firstLine.indexOf(separators[k]) > 0)
+                    callback(separators[k]);
+            }
+
+
+            readStream.destroy();
+        }).on('end', function () {
+            var xx = 3
+            return;
+        })
+            .on('close', function () {
+                return;
+            })
+        ;
+
+    },
+
+    normalizeHeader :function (headerArray, s) {
+        //   var   r = s.toLowerCase();
+        var r = s;
+        r = r.replace(/[\(\)'.]/g, "")
+        r = r.replace(/[\s-_]+\w/g, function (txt) {
+            return txt.charAt(txt.length - 1).toUpperCase()
+        });
+        r = r.replace(new RegExp("\\s", 'g'), "");
+        r = r.replace(new RegExp("[àáâãäå]", 'g'), "a");
+        r = r.replace(new RegExp("æ", 'g'), "ae");
+        r = r.replace(new RegExp("ç", 'g'), "c");
+        r = r.replace(new RegExp("[èéêë]", 'g'), "e");
+        r = r.replace(new RegExp("[ìíîï]", 'g'), "i");
+        r = r.replace(new RegExp("ñ", 'g'), "n");
+        r = r.replace(new RegExp("[òóôõö]", 'g'), "o");
+        r = r.replace(new RegExp("œ", 'g'), "oe");
+        r = r.replace(new RegExp("[ùúûü]", 'g'), "u");
+        r = r.replace(new RegExp("[ýÿ]", 'g'), "y");
+        r = r.replace(new RegExp("\\W", 'g'), "");
+        r = "" + r.charAt(0).toLowerCase() + r.substring(1);
+        headerArray.push(r);
+        return r;
     }
 
     }

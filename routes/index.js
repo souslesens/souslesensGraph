@@ -70,6 +70,11 @@ router.post(serverParams.routesRootUrl + '/neo', function (req, response) {
         neoToJstree.generateTreeFromChildToParentRelType(req.body.label, req.body.relType, req.body.rootNeoId,  function (error, result) {
             processResponse(response, error, result)
         });
+    if (req.body && req.body.generateAllDescendantsTreeFromChildToParentRelType)
+        neoToJstree. generateAllDescendantsTreeFromChildToParentRelType(req.body.label, req.body.relType, req.body.rootNeoId,req.body.depth , function (error, result) {
+            processResponse(response, error, result)
+        });
+
 
 
 

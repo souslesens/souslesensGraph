@@ -47,7 +47,7 @@
                 var payload = {
                     generateTreeFromChildToParentRelType: 1,
                     label: type,
-                    relType:relType,
+                    relType: relType,
                     rootNeoId: rootNeoId
                 }
 
@@ -77,7 +77,7 @@
 
             self.getJsTreeRootNeoId = function (type) {
                 self.loadedNodes = [];
-                self.currentType=type;
+                self.currentType = type;
                 var match = "Match (n:" + type + ") where n.name='Root' return id(n) as id";
                 var payload = {
                     match: match,
@@ -90,11 +90,11 @@
                     dataType: "json",
                     data: payload,
                     success: function (data, textStatus, jqXHR) {
-                      self.currentRootNeoId=data[0].id;
-                        quantum.getNodes  (type, self.currentRootNeoId , function(err,jsTreeData){
-                            if(err)
+                        self.currentRootNeoId = data[0].id;
+                        quantum.getNodes(type, self.currentRootNeoId, function (err, jsTreeData) {
+                            if (err)
                                 return console.log(err);
-                           return  self.loadJon  (type, jsTreeData) ;
+                            return self.loadJon(type, jsTreeData);
                         })
 
                     },
@@ -108,7 +108,6 @@
             self.loadJon = function (type, jsTreeData) {
 
                 $("#graphSelectionButton").css("display", "none")
-
 
 
                 function customMenu(node) {
@@ -172,181 +171,242 @@
                     function (evt, obj) {
                         self.onNodeSelect(obj.node);
                     })
-                  .on('loaded.jstree', function(e, data) {
+                    .on('loaded.jstree', function (e, data) {
                         // invoked after jstree has loaded
-                      $(this).jstree("open_node", ""+quantum.currentRootNeoId);
+                        $(this).jstree("open_node", "" + quantum.currentRootNeoId);
                     })
-
 
 
             }
 
 
+            self.getChildren = function (id) {
+                var children = [];
+                data.forEach(function (line) {
+                    if (line.parentID == id)
+                        children.push({
+                            id: line.iD,
+                            //  parent: id,
+                            text: line.nom
+                        })
+                })
+                return children;
+
+            }
+
+            self.addChildrenNodes = function (obj) {
+
+                var position = 'last';
+                var parent = $('#treeDivquantum').jstree('get_selected');
+                var parentId = obj.id;
+                self.getNodes(self.currentType, obj.id, function (err, data) {
+                        data.forEach(function (childNode, index) {
+                            childNode.id = "" + childNode.id
+                            if (childNode.id != parentId) {
+
+                                childNode.parent = "" + parent[0];
+
+                                $('#treeDivquantum').jstree('create_node', childNode.parent, childNode, 'last', function (www) {
+                                    //
+                                });
 
 
-        self.getChildren = function (id) {
-            var children = [];
-            data.forEach(function (line) {
-                if (line.parentID == id)
-                    children.push({
-                        id: line.iD,
-                        //  parent: id,
-                        text: line.nom
+                            }
+
+                        })
+                        $('#treeDivquantum').jstree('open_node', parent);
+
+                    }
+                );
+            }
+
+
+            self.onNodeSelect = function (obj) {
+
+                if (obj.children.length == 0)
+                    self.addChildrenNodes(obj);
+            }
+
+
+            self.treeMenu = function (node) {
+                var items = {}
+
+
+                var menuItemData = {}
+                menuItemData.parentId = node.parent;
+                menuItemData.parents = node.parents;
+                menuItemData.text = node.text
+                self.currentNode = node;
+                $("#graphSelectionButton").css("display", "block")
+                items ["selectNode"] = {
+                    label: "selectNode",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+
+                        quantum.selection.push(node.id)
+                        $("#" + node.id + "_anchor").css("color", "blue");
+                        self.selectionName = "[" + self.currentType + "] " + menuItemData.text
                     })
-            })
-            return children;
-
-        }
-
-        self.addChildrenNodes = function (obj) {
-
-            var position = 'last';
-            var parent = $('#treeDivquantum').jstree('get_selected');
-            var parentId = obj.id;
-            self.getNodes(self.currentType, obj.id, function (err, data) {
-                    data.forEach(function (childNode, index) {
-                        childNode.id = "" + childNode.id
-                        if (childNode.id != parentId) {
-
-                            childNode.parent = "" + parent[0];
-
-                            $('#treeDivquantum').jstree('create_node', childNode.parent, childNode, 'last', function (www) {
-                                //
-                            });
-
-
-                        }
-
-                    })
-                    $('#treeDivquantum').jstree('open_node', parent);
 
                 }
-            );
-        }
+                items ["selectAlldescendants"] = {
+                    label: "select all descendants",
+                    data: menuItemData,
+                    action: (function (menuItem) {
 
+                      quantum.selectAlldescendants(node.id);
 
-        self.onNodeSelect = function (obj) {
-
-            if (obj.children.length == 0)
-                self.addChildrenNodes(obj);
-        }
-
-
-        self.treeMenu = function (node) {
-            var items = {}
-
-
-            var menuItemData = {}
-            menuItemData.parentId = node.parent;
-            menuItemData.parents = node.parents;
-            menuItemData.text = node.text
-            self.currentNode = node;
-            $("#graphSelectionButton").css("display", "block")
-            items ["selectNode"] = {
-                label: "selectNode",
-                data: menuItemData,
-                action: (function (menuItem) {
-
-                    quantum.selection.push(node.id)
-                    $("#" + node.id + "_anchor").css("color", "blue");
-                    self.selectionName = "[" + self.currentType + "] " + menuItemData.text
-                })
-
-            }
-            items ["selectNodeAndChildren"] = {
-                label: "selectNodeAndChildren",
-                data: menuItemData,
-                action: (function (menuItem) {
-                    $(".jstree-anchor").css("color", "black");
-                    quantum.selection = [];
-                    $("#graphSelectionButton").css("display", "block")
-                    self.currentNode += " and children"
-                    quantum.selection.push(node.id)
-                    $("#" + node.id + "_anchor").css("color", "blue");
-                    self.selectionName = "[" + self.currentType + "]  and children " + menuItemData.text
-                    node.children.forEach(function (child) {
-                        quantum.selection.push(child)
-                        $("#" + child + "_anchor").css("color", "blue");
                     })
-                })
 
-            }
-            items ["addNodeAndChildrenToSelection"] = {
-                label: "addNodeAndChildrenToSelection",
-                data: menuItemData,
-                action: (function (menuItem) {
-                    self.currentNode += " and children"
-                    quantum.selection.push(node.id)
-                    $("#graphSelectionButton").css("display", "block")
-                    $("#" + node.id + "_anchor").css("color", "blue");
-                    if (self.selectionName.length > 0)
-                        self.selectionName += " , "
-                    self.selectionName += "[" + self.currentType + "]  and children " + menuItemData.text
-                    node.children.forEach(function (child) {
-                        quantum.selection.push(child)
-                        $("#" + child + "_anchor").css("color", "blue");
+                }
+
+
+                items ["selectNodeAndChildren"] = {
+                    label: "selectNodeAndChildren",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+                        $(".jstree-anchor").css("color", "black");
+                        quantum.selection = [];
+                        $("#graphSelectionButton").css("display", "block")
+                        self.currentNode += " and children"
+                        quantum.selection.push(node.id)
+                        $("#" + node.id + "_anchor").css("color", "blue");
+                        self.selectionName = "[" + self.currentType + "]  and children " + menuItemData.text
+                        node.children.forEach(function (child) {
+                            quantum.selection.push(child)
+                            $("#" + child + "_anchor").css("color", "blue");
+                        })
                     })
-                })
 
+                }
+                items ["addNodeAndChildrenToSelection"] = {
+                    label: "addNodeAndChildrenToSelection",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+                        self.currentNode += " and children"
+                        quantum.selection.push(node.id)
+                        $("#graphSelectionButton").css("display", "block")
+                        $("#" + node.id + "_anchor").css("color", "blue");
+                        if (self.selectionName.length > 0)
+                            self.selectionName += " , "
+                        self.selectionName += "[" + self.currentType + "]  and children " + menuItemData.text
+                        node.children.forEach(function (child) {
+                            quantum.selection.push(child)
+                            $("#" + child + "_anchor").css("color", "blue");
+                        })
+                    })
+
+                }
+                items ["clearSelection"] = {
+                    label: "clear selection",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+                        $(".jstree-anchor").css("color", "black");
+                        quantum.selection = [];
+                        self.selectionName = ""
+                        $("#graphSelectionButton").css("display", "none")
+                    })
+
+                }
+
+                /*   items ["useSelection"] = {
+                    label: "use selection...",
+                    data: menuItemData,
+                    action: (function (menuItem) {
+                        self.graphSelection();
+                    })
+
+                }*/
+
+
+                return items;
             }
-            items ["clearSelection"] = {
-                label: "clear selection",
-                data: menuItemData,
-                action: (function (menuItem) {
-                    $(".jstree-anchor").css("color", "black");
-                    quantum.selection = [];
-                    self.selectionName = ""
-                    $("#graphSelectionButton").css("display", "none")
-                })
 
-            }
+            self.graphSelection = function () {
 
-            /*   items ["useSelection"] = {
-                label: "use selection...",
-                data: menuItemData,
-                action: (function (menuItem) {
-                    self.graphSelection();
-                })
-
-            }*/
+                var sel = self.selection;
 
 
-            return items;
-        }
-
-        self.graphSelection = function () {
-
-            var sel = self.selection;
-
-
-
-            context.queryObject = {};
-            var clauseText = self.selectionName;
-            context.queryObject.label = self.currentType;
-            context.queryObject.text = clauseText;
-            context.queryObject.type = "nodeSet-plugin-" + self.currentType;
-            context.queryObject.where = searchNodes.getWhereClauseFromArray("_id", self.selection, "n");
+                context.queryObject = {};
+                var clauseText = self.selectionName;
+                context.queryObject.label = self.currentType;
+                context.queryObject.text = clauseText;
+                context.queryObject.type = "nodeSet-plugin-" + self.currentType;
+                context.queryObject.where = searchNodes.getWhereClauseFromArray("_id", self.selection, "n");
 
 
                 context.queryObject.nodeSetIds = [];
-                self.selection.forEach(function(idStr){
+                self.selection.forEach(function (idStr) {
                     context.queryObject.nodeSetIds.push(parseInt(idStr))
                 })
                 $("#findTabs").tabs("option", "active", 0);
                 buildPaths.show("only")
 
 
+            }
 
-        }
+            self.clearSelection = function () {
+                $(".jstree-anchor").css("color", "black");
+                quantum.selection = [];
+                $("#graphSelectionButton").css("display", "block")
+            }
 
-        self.clearSelection = function () {
-            $(".jstree-anchor").css("color", "black");
-            quantum.selection = [];
-            $("#graphSelectionButton").css("display", "block")
-        }
+            self.selectAlldescendants = function (parentNodeId) {
+
+                var payload = {
+                    generateAllDescendantsTreeFromChildToParentRelType: 1,
+                    label: self.currentType,
+                    relType: "childOf",
+                    rootNeoId: parentNodeId,
+                    depth: 5
+
+                }
 
 
-        return self;
+                $.ajax({
+                    type: "POST",
+                    url: neoUrl,
+                    dataType: "json",
+                    data: payload,
+                    success: function (data, textStatus, jqXHR) {
+                        debugger
+
+                        var existingChildren = $('#treeDivquantum').jstree(true).get_json(parentNodeId, {'flat': true});
+                        var existingChildrenIds = [];
+                        existingChildren.forEach(function (existingChild) {
+                            existingChildrenIds.push(existingChild.id);
+
+                        })
+
+                        data.forEach(function (childNode, index) {
+                            childNode.id = "" + childNode.id
+                            childNode.parent = "" + childNode.parent;
+
+                            if (existingChildrenIds.indexOf(childNode.id) < 0) {
+                                existingChildrenIds.push(childNode.id);
+                                $('#treeDivquantum').jstree('create_node', childNode.parent, childNode, 'last', function (www) {
+
+                                });
+
+
+                            }
+
+                        })
+                        existingChildrenIds.forEach(function(id) {
+                            $("#" + id + "_anchor").css("color", "blue");
+                            quantum.selection.push(id)
+                        })
+
+                    },
+                    error: function (error) {
+                        return callback(error)
+                    }
+                })
+
+
+            }
+
+            return self;
         })
         ()
     </script>

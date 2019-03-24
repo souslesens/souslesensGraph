@@ -132,6 +132,8 @@ var eventsController = (function () {
 
 
 
+
+
 //*******************************************components**************************************
 //*****************************************************************************************
             self.initcomponentEvents = function () {
@@ -171,9 +173,11 @@ var eventsController = (function () {
                         active: 0,
                         collapsible: true,
                         activate: function (event, ui) {
-                            var panelId=ui.newPanel[0].id;
-                            if(panelId=="findDiv"){
-                                buildPaths.expandCollapse(true)
+                            if(Array.isArray(ui.newPanel)){
+                                var panelId = ui.newPanel[0].id;
+                                if (panelId == "findDiv") {
+                                    buildPaths.expandCollapse(true)
+                                }
                             }
 
                         }

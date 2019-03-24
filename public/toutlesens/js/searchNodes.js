@@ -737,7 +737,7 @@ var searchNodes = (function () {
 
 
             //if  no value consider that there is no property set
-            if (queryObject.value == "" && queryObject.operator.indexOf("xists")<0)
+            if (queryObject.value == "" && queryObject.operator.indexOf("xists") < 0)
                 queryObject.property = "";
 
             queryObject.subGraph = subGraph;
@@ -749,7 +749,7 @@ var searchNodes = (function () {
             var returnStr = " RETURN n";
             var cursorStr = "";
 
-          //  cursorStr += " ORDER BY n." + Gparams.defaultNodeNameProperty;
+            //  cursorStr += " ORDER BY n." + Gparams.defaultNodeNameProperty;
             if (queryObject.from)
                 cursorStr += " SKIP " + queryObject.from;
             if (queryObject.limit)
@@ -783,7 +783,7 @@ var searchNodes = (function () {
 
 
             }
-         //   var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN n" + cursorStr;
+            //   var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN n" + cursorStr;
             var cypher = "MATCH (n" + labelStr + ")  " + whereStr + " RETURN id(n) as n" + cursorStr;
             queryObject.cypher = cypher;
             return callback(null, queryObject);
@@ -799,7 +799,6 @@ var searchNodes = (function () {
             var value = queryObject.value;
 
 
-
             if (operator == "exists" || operator == "notExists") {
                 ;
             }
@@ -809,6 +808,8 @@ var searchNodes = (function () {
             var not = (operator == "notContains") ? "NOT " : "";
             if (operator == "!=") {
                 operator = "<>"
+                if (!(/^-?\d+\.?\d*$/).test(value))//not number
+                    value = "\"" + value + "\"";
             }
 
 
@@ -825,11 +826,11 @@ var searchNodes = (function () {
             var propStr = "";
 
             if (operator == "exists" || operator == "notExists") {
-                if(operator == "notExists")
-                    not=" NOT "
+                if (operator == "notExists")
+                    not = " NOT "
                 else
-                    not=" "
-                propStr = not +" EXISTS("+ nodeAlias + "." + property+ ")";
+                    not = " "
+                propStr = not + " EXISTS(" + nodeAlias + "." + property + ")";
             }
             else if (property == "any")
                 propStr = "(any(prop in keys(n) where n[prop]" + operator + value + "))";
@@ -929,6 +930,54 @@ var searchNodes = (function () {
                     return callback(err)
                 }
             });
+        }
+
+        self.listPropertyValuesUI = function () {
+            var property = $("#searchDialog_propertySelect").val();
+            var label = context.queryObject.label;
+            var select = "searchDialog_listPropertyValues";
+            var value = $("#searchDialog_valueInput").val();
+            var where = null;
+            if (value != "")
+                where = "n." + property + "=~'(?i).*" + value.trim() + ".*'";
+            self.listPropertyValues(label, property, where, function (err, result) {
+                var html = "";
+                if (err)
+                    html = err;
+                else if (result.length == 0)
+                    html = "no values"
+                else if (result.length > Gparams.listDisplayLimitMax)
+                    html = "...cannot display all values enter the beginning of word"
+                else {
+                    result.splice(0, 0, {value: ""})
+                    html = "<select style='width:150px' onchange=$('#searchDialog_valueInput').val($(this).val());$('#searchDialog_operatorSelect').val('=');$('#searchDialog_listPropertyResultSpan').html('')\n >"
+
+                    result.forEach(function (line) {
+                        html += "<option>" + line.value + "</option>"
+
+                    })
+                    html += "</select>";
+
+
+                }
+
+                $("#searchDialog_listPropertyResultSpan").html(html)
+
+            })
+
+        }
+        self.listPropertyValues = function (label, property, where, callback) {
+            var whereCypher = "";
+            if (where && where != "")
+                whereCypher = " where " + where;
+            var cypher = "Match (n:" + label + ") " + whereCypher + " return distinct n." + property + " as value order by value limit " + Gparams.maxResultSupported;
+            Cypher.executeCypher(cypher, function (err, result) {
+                return callback(err, result);
+
+
+            })
+
+
         }
 
         return self;
