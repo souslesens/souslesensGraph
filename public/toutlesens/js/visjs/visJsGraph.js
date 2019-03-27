@@ -5,9 +5,6 @@ var visjsGraph = (function () {
         var self = {};
 
 
-
-
-
         self.physicsOn = true;
         self.configure = true;
 
@@ -15,8 +12,6 @@ var visjsGraph = (function () {
         self.edges = [];
         self.network = null;
         self.currentScale;
-
-
 
 
         self.currentLayoutType = Gparams.visjs.defaultLayout;
@@ -38,7 +33,6 @@ var visjsGraph = (function () {
         var stopPhysicsTimeout = 5000;
         var lastClick = new Date();
         var dblClickDuration = 500;
-      
 
 
         var dragPosition = {};
@@ -85,7 +79,7 @@ var visjsGraph = (function () {
                 edges:
                     {
                         selectionWidth: 5,
-                       smooth:{enabled:false},
+                        smooth: {enabled: false},
                         font:
                             {
                                 size: 8
@@ -171,9 +165,8 @@ var visjsGraph = (function () {
             var options = self.getVisJsOptions(_options)
             self.physics = self.getDefaultPhysics();
 
-            options.physics.enabled=true;
+            options.physics.enabled = true;
             self.network = new vis.Network(container, data, options);
-
 
 
             window.setTimeout(function () {
@@ -217,10 +210,9 @@ var visjsGraph = (function () {
                         return;
 
                     self.physicsOn = !self.physicsOn;
-                    self.physics.enabled=self.physicsOn;
+                    self.physics.enabled = self.physicsOn;
                     self.network.setOptions(
-
-                        {physics: self.physics, edges:{smooth:{enabled:false}}}
+                        {physics: self.physics, edges: {smooth: {enabled: false}}}
                     );
 
                     if (_options.onFinishDraw) {
@@ -228,8 +220,8 @@ var visjsGraph = (function () {
                         fn();
                     }
                     else {
-                      //  self.network.fit();
-                      //  self.onScaleChange()
+                        //  self.network.fit();
+                        //  self.onScaleChange()
                     }
 
 
@@ -275,7 +267,7 @@ var visjsGraph = (function () {
             });
             self.network.on("configChange", function (params) {
 
-                self.physics.enabled=true;
+                self.physics.enabled = true;
                 Object.assign(self.physics, params.physics);
                 self.network.setOptions({physics: self.physics})
 
@@ -284,73 +276,71 @@ var visjsGraph = (function () {
             self.network.on("doubleClick", function (params) {
             })
 
-     /*       self.network.on("beforeDrawing", function (ctx) {
-                self.context = ctx;
-            });
-            self.network.on("afterDrawing", function (ctx) {
-                self.context = ctx;
-                if (callback)
-                    callback();
-            });
+            /*       self.network.on("beforeDrawing", function (ctx) {
+                       self.context = ctx;
+                   });
+                   self.network.on("afterDrawing", function (ctx) {
+                       self.context = ctx;
+                       if (callback)
+                           callback();
+                   });
 
-            self.network.on("dragStart", function (params) {
-                dragPosition = params.pointer.DOM;
+                   self.network.on("dragStart", function (params) {
+                       dragPosition = params.pointer.DOM;
 
-                //   self.dragRect("dragStart",dragPosition.x,dragPosition.y);
-            });
+                       //   self.dragRect("dragStart",dragPosition.x,dragPosition.y);
+                   });
 
-            self.network.on("drag", function (params) {
-                dragPosition = params.pointer.DOM;
-                //  self.dragRect("drag",dragPosition.x,dragPosition.y);
-            });
+                   self.network.on("drag", function (params) {
+                       dragPosition = params.pointer.DOM;
+                       //  self.dragRect("drag",dragPosition.x,dragPosition.y);
+                   });
 
-            self.network.on("dragEnd", function (params) {
-                return;
-                var dragEndPos = params.pointer.DOM;
-                self.dragRect("dragEnd", dragPosition.x, dragPosition.y);
-                if ((true || _options.dragConnectedNodes) && params.event.srcEvent.ctrlKey) {
-                    self.dragConnectedNodes(params.nodes[0], {
-                        x: dragEndPos.x - dragPosition.x,
-                        y: dragEndPos.y - dragPosition.y
-                    });
-                }
-                if (_options.onEndDrag) {
-
-
-                    var fn = _options["onEndDrag"];
-                    fn();
-                }
-                else {
-                    ;// network.fit()
-                }
+                   self.network.on("dragEnd", function (params) {
+                       return;
+                       var dragEndPos = params.pointer.DOM;
+                       self.dragRect("dragEnd", dragPosition.x, dragPosition.y);
+                       if ((true || _options.dragConnectedNodes) && params.event.srcEvent.ctrlKey) {
+                           self.dragConnectedNodes(params.nodes[0], {
+                               x: dragEndPos.x - dragPosition.x,
+                               y: dragEndPos.y - dragPosition.y
+                           });
+                       }
+                       if (_options.onEndDrag) {
 
 
-            });
-
-            self.network.on("hoverNode", function (params) {
-
-            });
-            self.network.on("selectNode", function (params) {
-
-
-            });
+                           var fn = _options["onEndDrag"];
+                           fn();
+                       }
+                       else {
+                           ;// network.fit()
+                       }
 
 
-            self.network.on("selectEdge", function (params) {
-                //  console.log('selectEdge Event:', params);
-            });
-            self.network.on("deselectNode", function (params) {
-                // console.log('deselectNode Event:', params);
-            });
-            self.network.on("deselectEdge", function (params) {
-                //  console.log('deselectEdge Event:', params);
-            });
-            self.network.on(" afterDrawing", function (params) {
-                onVisjsGraphReady();
-                //  console.log('graph loaded Event');
-            });*/
+                   });
+
+                   self.network.on("hoverNode", function (params) {
+
+                   });
+                   self.network.on("selectNode", function (params) {
 
 
+                   });
+
+
+                   self.network.on("selectEdge", function (params) {
+                       //  console.log('selectEdge Event:', params);
+                   });
+                   self.network.on("deselectNode", function (params) {
+                       // console.log('deselectNode Event:', params);
+                   });
+                   self.network.on("deselectEdge", function (params) {
+                       //  console.log('deselectEdge Event:', params);
+                   });
+                   self.network.on(" afterDrawing", function (params) {
+                       onVisjsGraphReady();
+                       //  console.log('graph loaded Event');
+                   });*/
 
 
         }
@@ -358,7 +348,7 @@ var visjsGraph = (function () {
             self.edges.setOption({width: 1})
 
 
-            var connectedEdges =  self.network.getConnectedEdges(nodeId);
+            var connectedEdges = self.network.getConnectedEdges(nodeId);
             var nodeEdges = [];
             for (var i = 0; i < connectedEdges.length; i++) {
                 var connectedEdgeId = connectedEdges[i];
@@ -457,7 +447,7 @@ var visjsGraph = (function () {
         }
 
         self.onScaleChange = function () {
-            var scale =  self.network.getScale();
+            var scale = self.network.getScale();
             if (scale == 1)
                 return;
             if (!self.currentScale || Math.abs(scale - self.currentScale) > .01) {
@@ -469,18 +459,23 @@ var visjsGraph = (function () {
                 var nodes = [];
                 var scaleCoef = scale >= 1 ? (scale * .9) : (scale * 2)
                 var size = Gparams.visjs.defaultNodeSize / scaleCoef;
-                var fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef ));
-                if(scale<1)
-                    fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef*0.8 ));
+                var fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef));
+                if (scale < 1)
+                    fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef * 0.8));
                 else
-                   fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef*1.3 ));
+                    fontSize = (Gparams.visjs.defaultTextSize / (scaleCoef * 1.3));
                 for (var key in self.nodes._data) {
 
                     if (scale > showNodesLabelMinScale) {
-                        self.labelsVisible=true;
-                        nodes.push({id: key, label: self.nodes._data[key].hiddenLabel, size: size, font: {size: fontSize}});
+                        self.labelsVisible = true;
+                        nodes.push({
+                            id: key,
+                            label: self.nodes._data[key].hiddenLabel,
+                            size: size,
+                            font: {size: fontSize}
+                        });
                     } else {
-                        self.labelsVisible=false;
+                        self.labelsVisible = false;
                         nodes.push({id: key, label: null, size: size, font: {size: fontSize}});
                     }
                 }
@@ -780,14 +775,14 @@ var visjsGraph = (function () {
             function addConnections(elem, index) {
                 // need to replace this with a tree of the network, then get child direct children of the element
 
-                elem.connections =  self.network.getConnectedNodes(elem.id);
+                elem.connections = self.network.getConnectedNodes(elem.id);
             }
 
             function destroyNetwork() {
                 self.network.destroy();
             }
 
-            var positions =  self.network.getPositions();
+            var positions = self.network.getPositions();
 
             var nodes = objectToArray(self.nodes._data, positions);
 
@@ -911,8 +906,8 @@ var visjsGraph = (function () {
                 edges: getEdgeData(allEdges)
             }
 
-           /* if (!options)
-                options = {smooth: true};*/
+            /* if (!options)
+                 options = {smooth: true};*/
             if (!options.history)
                 options.noHistory = true;
             options.fixed = true;
@@ -925,7 +920,7 @@ var visjsGraph = (function () {
 
         self.getConnectedNodes = function (nodeId) {
 
-            return  self.network.getConnectedNodes(nodeId);
+            return self.network.getConnectedNodes(nodeId);
 
         }
 
@@ -939,11 +934,11 @@ var visjsGraph = (function () {
 
         self.dragConnectedNodes = function (nodeId, offset) {
 
-            var connectedNodes =  self.network.getConnectedNodes(nodeId);
-            var connectedEdges =  self.network.getConnectedEdges(nodeId);
+            var connectedNodes = self.network.getConnectedNodes(nodeId);
+            var connectedEdges = self.network.getConnectedEdges(nodeId);
 
 
-            var positions =  self.network.getPositions()
+            var positions = self.network.getPositions()
             var nodes = [];
             var edges = []
             for (var i = 0; i < connectedNodes.length; i++) {
@@ -1061,7 +1056,7 @@ var visjsGraph = (function () {
 
         self.filterGraph = function (booleanOption, property, operator, value, type) {
             //  self.saveGraph();
-
+            var objectType = "node";
 
             if (objectType == "node") {
 
@@ -1075,7 +1070,7 @@ var visjsGraph = (function () {
                     if (context.currentNode && context.currentNode.id && context.currentNode.id == node.id)
                         ;
                     else {
-                        var connectedEdgesIds =  self.network.getConnectedEdges(key);
+                        var connectedEdgesIds = self.network.getConnectedEdges(key);
 
                         /* var nodeEdges = [];
                           for (var i = 0; i < connectedEdges.length; i++) {
@@ -1111,7 +1106,7 @@ var visjsGraph = (function () {
 
 
         self.removeNode = function (id) {
-            var connectedEdges =  self.network.getConnectedEdges(id);
+            var connectedEdges = self.network.getConnectedEdges(id);
             for (var i = 0; i < connectedEdges.length; i++) {
                 var connectedEdgeId = connectedEdges[i];
                 self.edges.remove({id: connectedEdgeId})
@@ -1224,22 +1219,24 @@ var visjsGraph = (function () {
             document.body.removeChild(dlLink);
         }
 
-        self.showHideLabels=function(){
+        self.showHideLabels = function () {
 
-            var visible= self.labelsVisible;
+            var visible = self.labelsVisible;
 
-                var nodes = [];
+            var nodes = [];
             for (var key in self.nodes._data) {
 
-                if(  visible==false) {
-                    nodes.push({id: key, label: self.nodes._data[key].hiddenLabel });
+                if (visible == false) {
+                    nodes.push({id: key, label: self.nodes._data[key].hiddenLabel});
                 } else {
                     nodes.push({id: key, label: null});
                 }
             }
 
             self.nodes.update(nodes);
-            setTimeout(function(){ self.labelsVisible=visible?false:true;},100)
+            setTimeout(function () {
+                self.labelsVisible = visible ? false : true;
+            }, 100)
 
 
         }
