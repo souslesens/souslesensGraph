@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../../common/js/jquery/jquery.min.js"></script>
+    <script src="../../common/js/jquery/jquery-ui.min.js"></script>
+
+    <script src="../../common/js/jsTree/jstree.min.js"></script>
+    <script src="../../common/js/jsTreeController.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css"/>
+    <script>
+
+        $(function () {
+
+         //   $("#treeDiv").width(300).height(600).css("visibility", "visible")
+
+
+
+                $.ajax({
+                    type: "GET",
+                    url: "/semanticWeb/eurovoc.json",
+                    dataType: "json",
+                    success: function (_data, textStatus, jqXHR) {
+                        var jsTreeData = _data;
+
+
+                        //console.log(JSON.stringify(jsTreeData,null,2))
+                        var plugins = [];
+                        plugins.push("search");
+                        plugins.push("sort");
+                        plugins.push("types");
+                        plugins.push("contextmenu");
+
+
+                        $('#treeDiv').jstree({
+                            'core': {
+                                'check_callback': true,
+                                'data': jsTreeData,
+
+
+                            }
+                            , 'contextmenu': {
+                                'items': null
+                            },
+                            'plugins': plugins,
+                        }).on("select_node.jstree",
+                            function (evt, obj) {
+                                var x=obj;
+                                $("#dataDiv").html(JSON.stringify(obj.node.data,null,2))
+                            })
+
+
+                    },
+                    error: function (xhr, err, msg) {
+                        $("#message").css("color", "red");
+                        $("#message").html(err);
+                        console.log(xhr);
+                        console.log(err);
+                        console.log(msg);
+                    }
+                });
+            })
+
+    </script>
+
+</head>
+<body>
+
+
+<br>
+<div style="display: flex;flex-direction: row">
+<div id="treeDiv" style="width:400px;height: 800px;overflow: auto"></div>
+    <div id="dataDiv" style="width:300px;height: 400px;"></div>
+</div>
+<script>
+
+</script>
+
+</body>
+</html>

@@ -732,7 +732,9 @@ var importDataIntoNeo4j = {
             }
         }
 
-        var allData = JSON.parse("" + str).data;
+        var allData = JSON.parse("" + str);
+       //if(allData.data)// cas des  l'import csv local mais pas upload csv
+           allData=allData.data
         var dataSubsets = [];
         var aSubset = [];
 

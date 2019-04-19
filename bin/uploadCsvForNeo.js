@@ -204,7 +204,8 @@ var uploadCsvForNeo = {
                     .on('done', function () {
                         var path = "./uploads/" + fileName + ".json";
                         header = header.sort();
-                        fs.writeFileSync(path, JSON.stringify(jsonArray));
+                        var data={headers:header,data:jsonArray}
+                        fs.writeFileSync(path, JSON.stringify(data));
                         var result = {message: "listCsvFields", remoteJsonPath: path, name: fileName, header: header};
                         socket.message(JSON.stringify(result));
                         callback(null, result);

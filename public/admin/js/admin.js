@@ -868,6 +868,7 @@ function addSubGraph() {
     }));
 
     $("#subGraphSelect").val(newSubGraph);
+    requests.init(newSubGraph);
     admin.drawVisjsGraph();
 }
 

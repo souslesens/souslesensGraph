@@ -38,6 +38,44 @@ var neoToJstree = {
 
         })
     },
+
+
+    generateTreeFromParentToChildrenRelType: function (label, relType, rootNeoId, callback) {
+
+        var match = "match(n:" + label + ")-[r:" + relType + "]-(m) where id(n)=" + rootNeoId + " return   n as parent ,m as child";
+        neoProxy.match(match, function (err, result) {
+
+            if (err)
+                return callback(err);
+
+
+            var parent = {}
+            result.forEach(function (line, index) {
+                var parentProps = line.parent.properties;
+                parentProps._id = line.parent._id
+                if (index == 0)
+                    parent=({text: parentProps.name, id: parentProps._id, data: parentProps, children:[]})
+
+                var childProps = line.child.properties;
+                childProps._id = line.child._id
+                parent.children.push({
+                    text: childProps.name,
+                    id: childProps._id,
+                    parent: parentProps._id,
+                    data: childProps,
+                    children: []
+                })
+
+
+            })
+
+
+            return callback(null, parent)
+
+
+        })
+    },
+
     generateAllDescendantsTreeFromChildToParentRelType: function (label, relType, rootNeoId, depth, callback) {
 
 if(!depth || depth==0)

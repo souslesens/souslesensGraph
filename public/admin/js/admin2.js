@@ -57,7 +57,7 @@ var admin = (function () {
             dataModel.getDBstats(subGraph, function (err, result) {
                 var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
 
-                visjsGraph.draw("graphDiv", data, {scale: 2});
+              //  visjsGraph.draw("graphDiv", data, {scale: 2});
             });
 
 

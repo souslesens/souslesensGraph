@@ -23,6 +23,7 @@
     "exif": "^0.6.0",
     "exiftool": "^0.0.3",
     "express": "^4.15.4",
+    "hex-to-rgba": "^1.0.2",
     "iconv-lite": "^0.4.24",
     "jade": "^1.11.0",
     "jsonfile": "^2.4.0",
@@ -42,6 +43,7 @@
     "socket.io": "^1.7.4",
     "unzip": "^0.1.11",
     "winston": "^3.2.1",
+    "xlsx": "^0.14.2",
     "xml2js": "^0.4.19",
     "xmlbuilder": "^9.0.4",
     "xmldom": "latest"

@@ -113,6 +113,8 @@ var requests = (function () {
             name += "Nodes_" + $("#subGraphSelect").val() + "." + $("#label").val() + "_" + sourceField;
         }
         json.source = source;
+        if(!allParams[subGraph][source])
+            allParams[subGraph][source]={}
         if (!allParams[subGraph][source].requests)
             allParams[subGraph][source].requests = [];
         if (!allParams[subGraph].requests)
