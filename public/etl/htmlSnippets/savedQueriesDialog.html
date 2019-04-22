@@ -1,0 +1,50 @@
+<div id="savedQueriesDiv">
+
+    <table>
+
+
+        <tr valign="top">
+            <td align="left">
+
+                <br>
+                Saved Requests <select size="15" multiple="multiple" id="requestsSelect" ondblclick="requests.loadRequest($(this).val()[0])">
+                    <option>----------</option>
+                </select>
+
+
+                <br>
+                <button onclick="requests.deleteRequest()">Delete request</button>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button onclick="requests.executeRequestsUI('node');">Refresh
+                    Neo4j Nodes
+                </button>
+                <button onclick="requests.executeRequestsUI('relation');">Refresh
+                    Neo4j Relations
+                </button>
+                <br>
+
+                <div id="exportNamesDiv"></div>
+
+
+                <button id="refreshNeoButton" onclick="refreshNeo()">Start Refresh</button>
+            </td>
+
+
+        </tr>
+        <td>
+
+        </td>
+
+
+
+
+
+    </table>
+    <br>
+    <div id="exportResultDiv"></div>
+
+</div>

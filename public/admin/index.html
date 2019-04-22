@@ -172,7 +172,7 @@
             height: 150px;
         }
 
-        #message {
+        #messageDiv {
             color: green;
             font-size: 18px;
             text-align: center;
@@ -258,8 +258,8 @@
 
                     if (message.toLowerCase().indexOf("error") > -1)
                         color = "red";
-                    $("#message").css("color", color);
-                    $("#message").html(message);
+                    $("#messageDiv").css("color", color);
+                    $("#messageDiv").html(message);
 
                 }
             })
@@ -385,6 +385,7 @@
                                     <option>sourceDB</option>
                                     <option>uploadCSV</option>
                                     <option>localCSV</option>
+                                    <option>localXLSX</option>
                                 </select>
                             </td>
                         </tr>
@@ -409,6 +410,15 @@
                                     <button onclick="admin.loadLocalCSV()"> load</button>
                                     <br>
                                     <select id="localCSVSelect" onclick="requests.loadFields($(this).val())" size="6">
+
+                                    </select>
+                                </div>
+                                <div id="localXLSXdiv" class="dataSourceDiv">
+                                    XLSX path<input id="localXLSXpath" size="40" value="D:\Total\quantum\avril2019\MDM_Quantum.xlsx">
+                                    <br>
+                                    <button onclick="admin.loadLocalXLSXsheetNames()"> load</button>
+                                    <br>
+                                    <select id="localXLSXsheetSelect" onclick="admin.loadXLSsheetFields($(this).val())" size="6">
 
                                     </select>
                                 </div>

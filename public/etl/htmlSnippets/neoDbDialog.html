@@ -1,0 +1,23 @@
+<table width="250">
+    <tr class=" neoTarget" align="center">
+        <td>
+            Neo4j subGraph&nbsp;
+
+            <br>
+            <select id="subGraphSelect" onchange="ui.onSubGraphSelect($(this).val(),false);"></select>
+            <button onclick="ui.addSubGraph()">New</button>
+            <br>
+            <button onclick="graph.deleteNeoSubgraph()">Delete subgraph</button>
+            <br>
+
+
+            </div>
+             Neo4J labels<br>
+              <select id="labelsSelect"
+                      size="10"></select>
+              <br>
+              <button onclick="mainContoller.loadLabels($('#subGraphSelect').val())">Reload labels</button>
+              <button onclick="graph.deleteLabel()">Delete label</button>
+        </td>
+    </tr>
+</table>

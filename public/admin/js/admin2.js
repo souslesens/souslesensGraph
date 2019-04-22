@@ -6,14 +6,14 @@ var admin = (function () {
 
 
     self.loadLocalCSV = function () {
-        var subGraph=$("#subGraphSelect").val();
+        var subGraph = $("#subGraphSelect").val();
         if (!subGraph || subGraph == "")
             return alert(" select or create a subGraph first")
         var localCSVpath = $("#localCSVpath").val();
         if (!localCSVpath || localCSVpath == "")
             return alert("Enter local CSV file path")
 
-        var payload = {filePath: localCSVpath,subGraph:subGraph}
+        var payload = {filePath: localCSVpath, subGraph: subGraph}
         $.ajax({
             type: "POST",
             url: self.serverUrl + "loadLocalCsvForNeo",
@@ -21,13 +21,93 @@ var admin = (function () {
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
                 setCsvImportFields(data);
-               // loadRequests();
+                // loadRequests();
                 $("#message").css("color", "green");
                 $("#message").html("file loaded " + data.name);
                 requests.saveCSVsource(data);
-                requests.list(subGraph,requestsSelect);
+                requests.list(subGraph, requestsSelect);
                 requests.loadSubGraphCSVsources()
             },
+            error: function (xhr, err, msg) {
+                $("#message").css("color", "red");
+                $("#message").html(err);
+                console.log(xhr);
+                console.log(err);
+                console.log(msg);
+            }
+        });
+
+
+    }
+
+    self.loadLocalXLSXsheetNames = function () {
+        var subGraph = $("#subGraphSelect").val();
+        if (!subGraph || subGraph == "")
+            return alert(" select or create a subGraph first")
+        var localXLSXpath = $("#localXLSXpath").val();
+        if (!localXLSXpath || localXLSXpath == "")
+            return alert("Enter local CSV file path")
+
+        var payload = {
+            filePath: localXLSXpath,
+            listSheets: 1
+        }
+        $.ajax({
+            type: "POST",
+            url: self.serverUrl + "loadLocalXLSXforNeo",
+            data: payload,
+            dataType: "json",
+            success: function (data, textStatus, jqXHR) {
+                common.fillSelectOptionsWithStringArray(localXLSXsheetSelect, data.sheetNames);
+                requests.init(subGraph);
+
+                requests.list(subGraph, requestsSelect);
+                // requests.loadSubGraphCSVsources()
+            },
+            error: function (xhr, err, msg) {
+                $("#message").css("color", "red");
+                $("#message").html(err);
+                console.log(xhr);
+                console.log(err);
+                console.log(msg);
+            }
+        });
+
+
+    }
+    self.loadXLSsheetFields = function (sheetName) {
+        var subGraph = $("#subGraphSelect").val();
+        if (!subGraph || subGraph == "")
+            return alert(" select or create a subGraph first")
+        var localXLSXpath = $("#localXLSXpath").val();
+        if (!localXLSXpath || localXLSXpath == "")
+            return alert("Enter local CSV file path")
+
+        var payload = {
+            filePath: localXLSXpath,
+            sheetName: sheetName,
+            listSheetColumns: 1
+        }
+        $.ajax({
+            type: "POST",
+            url: self.serverUrl + "loadLocalXLSXforNeo",
+            data: payload,
+            dataType: "json",
+            success: function (data, textStatus, jqXHR) {
+                var header = data.sheetColNames;
+
+                var obj={
+                    header:header,
+                    name:sheetName,
+                    subGraph:subGraph
+                }
+                setCsvImportFields(obj)
+                requests.saveCSVsource(obj);
+                requests.list(subGraph, requestsSelect);
+                requests.loadSubGraphCSVsources()
+                    // loadRequests();
+
+                    },
             error: function (xhr, err, msg) {
                 $("#message").css("color", "red");
                 $("#message").html(err);
@@ -47,7 +127,7 @@ var admin = (function () {
         if (subGraph == "") {
             return alert("select a Neo4j subGraph first")
         }
-        Schema.createSchema(subGraph,function (err, result) {
+        Schema.createSchema(subGraph, function (err, result) {
             Schema.save(subGraph);
             self.labels = Schema.getAllLabelNames().sort();
             self.labels.splice(0, 0, "");
@@ -57,7 +137,7 @@ var admin = (function () {
             dataModel.getDBstats(subGraph, function (err, result) {
                 var data = connectors.toutlesensSchemaToVisjs(Schema.schema);
 
-              //  visjsGraph.draw("graphDiv", data, {scale: 2});
+                //  visjsGraph.draw("graphDiv", data, {scale: 2});
             });
 
 
@@ -65,43 +145,13 @@ var admin = (function () {
     }
 
 
-    self.onPageLoaded = function () {
-        messageDivId = message;
-        $("#importNodesDiv").load("htmlSnippets/importNodesDialog.html", function () {
-
-        })
-        $("#importRelationsDiv").load("htmlSnippets/importRelationsDialog.html", function () {
-
-        })
-
-        $("#savedQueriesDiv").load("htmlSnippets/savedQueriesDialog.html", function () {
-
-        })
-
-        $("#neoDbDiv").load("htmlSnippets/neoDbDialog.html", function () {
-            loadSubgraphs();
-        })
-
-        $("#importGraphDbDiv").load("htmlSnippets/importGraphDbDialog.html", function () {
-
-        })
-        $("#exportGraphDbDiv").load("htmlSnippets/exportGraphDbDialog.html", function () {
-            loadSubgraphs();
-        })
-
-        $("#adminDiv").load("htmlSnippets/adminDialog.html", function () {
-
-        })
-
-
-    }
 
     self.initImportDialogSelects = function (_columnNames) {
-       var columnNames=[];
-        _columnNames.forEach(function(column){
-            if(column!="")
+        var columnNames = [];
+        _columnNames.forEach(function (column) {
+            if (column != "")
                 columnNames.push(column)
-            })
+        })
 
 
         columnNames.splice(0, 0, "");

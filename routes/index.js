@@ -23,6 +23,7 @@ var socket = require('./socket.js');
 var fileSystemProxy = require("../bin/fileSystemProxy..js")
 var authentication = require("../bin/authentication..js")
 var neoToJstree=require("../bin/transform/neoToJsTree..js")
+var xlsxToJson=require("../bin/transform/xlsxToJson..js")
 
 
 
@@ -416,6 +417,19 @@ router.post(serverParams.routesRootUrl + '/loadLocalCsvForNeo', function (req, r
     });
 
 });
+router.post(serverParams.routesRootUrl + '/loadLocalXLSXforNeo', function (req, response) {
+    if(req.body.listSheets)
+    xlsxToJson.listSheets(req.body.filePath, function (error, result) {
+        processResponse(response, error, result)
+    });
+    if(req.body.listSheetColumns)
+        xlsxToJson.listSheetColumns(req.body.filePath,req.body.sheetName, function (error, result) {
+            processResponse(response, error, result)
+        });
+
+});
+
+
 
 
 router.post(serverParams.routesRootUrl + '/rest', function (req, response) {

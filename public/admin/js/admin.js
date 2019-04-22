@@ -808,8 +808,16 @@ function onSubGraphSelect(select, showgraph) {
         return;
     var subGraph = $("#subGraphSelect").val();
     Schema.load(subGraph, function (err, result) {
-        loadLabels(subGraph);
         requests.init(value);
+
+        var labels=[];
+        for (var key in Schema.schema.labels){
+            labels.push(key);
+        }
+        labels.splice(0, 0, "");
+        common.fillSelectOptionsWithStringArray(labelsSelect, labels)
+        admin.labels = labels;
+
 
         if (showgraph) {
             admin.drawVisjsGraph()
@@ -916,7 +924,15 @@ function setImportSourceType() {
         $(".dbInfos").css("visibility", "visible");
 
 
-    } else if (type == "sourceDB") {
+    }  else if (type == "localXLSX") {
+
+    $("#localXLSXdiv").css("display", "inline");
+    $("#importCSVdiv").css("visibility", "hidden");
+    $("#importsourceDiv").css("visibility", "visible");
+    $(".dbInfos").css("visibility", "visible");
+
+
+} else if (type == "sourceDB") {
         initDBs();
         $('#dbSelect').empty();
         $('#collSelect').empty();

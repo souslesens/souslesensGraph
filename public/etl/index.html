@@ -1,0 +1,434 @@
+<!-- *******************************************************************************
+ * SOUSLESENS LICENSE************************
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016-2017 Claude Fauconnet claude.fauconnet@neuf.fr
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ ******************************************************************************-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" title="Design"
+          href="../common/js/jquery/jquery-ui.min.css"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="../common/js/others/jquery.datatables.min.css"/>
+
+
+    <script src="../common/js/jquery/jquery.min.js"></script>
+    <script src="../common/js/jquery/jquery-ui.min.js"></script>
+    <script src="../common/js/jquery/jquery.splitter.js"></script>
+    <script src="../common/js/common.js"></script>
+    <script src="../common/js/cypher.js"></script>
+
+    <script src="js/others/socket.io.js"></script>
+
+
+
+    <!-- script src="js/adminsource.js"></script>
+      <script src="../common/js/others/async.js"></script>
+        <script src="js/admin2.js"></script>
+         <script src="../common/js/neo4jDataModel.js"></script>
+    <script src="js/admin.js"></script>
+    <script src=js/graphD3.js></script>
+    <script src=js/params.js></script>
+ <script src="js/download.js"></script>
+    <script src="js/context.js"></script>
+    <script src="../common/js/d3/d3.js"></script>-->
+
+    <!--  <script src="../common/js/jsTree/jstree.min.js"></script>
+      <script src="../common/js/jsTreeController.js"></script>-->
+
+   <!-- <script src="../toutlesens/js/visjs/visjs.js"></script>
+    <script src="../toutlesens/js/visjs/visJsGraph.js"></script>
+    <script src="../common/js/connectors.js"></script>
+    <script src="../toutlesens/js/schema.js"></script>-->
+
+
+    <script src="js/mainController.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/context.js"></script>
+    <script src="js/requests.js"></script>
+    <script src="js/importNeo.js"></script>
+    <script src="js/graph.js"></script>
+
+
+
+
+    <style>
+        body {
+            font-family: verdana, sans-serif;
+            background-color: #f3edef;
+            background-color: #eee;
+            background-color: #eee;
+            overflow: auto;
+            font-size: 14px;
+            vertical-align: top;
+            height: 1000px;
+        }
+
+        td {
+            vertical-align: top;
+            padding: 2px;
+        }
+
+        textarea {
+            font-size: 12px !important;
+            font-family: verdana, sans-serif !important;
+        }
+
+        button {
+            color: #261803;
+            font-size: 12px;
+            font-family: verdana, sans-serif;
+        / / background-color: #ca842e;
+            margin: 4px;
+            padding: 4px;
+        }
+
+        select {
+            font-size: 14px;
+            font-family: verdana, sans-serif;
+            margin: 1px;
+            padding: 1px;
+        }
+
+        option {
+            margin: 3px;
+        }
+
+        input {
+            padding: 2px;
+        }
+
+        .help {
+            font-style: italic;
+            font-stretch: semi-condensed;
+        / / color: olive;
+        }
+
+        #tabs-left input {
+            width: 200px;
+        }
+
+        #tabs-left select {
+            width: 200px;
+        }
+
+        #tabs-center input {
+        / / width: 250 px;
+        }
+
+        #tabs-center select {
+            width: 450px;
+        }
+
+        .dataSourceDiv {
+            display: none;
+            width: 200px;
+
+        }
+
+        .dataSourceDiv {
+
+            width: 200px;
+
+        }
+
+        #labelsDiv0000 {
+            width: 250px;
+        }
+
+        .comment {
+            font-size: 10px;
+            font-family: sans-serif, verdana;
+        }
+
+        #tabs-center .exportNeo {
+            width: 100px;
+
+        }
+
+        .exportParams {
+            width: 400px;
+            height: 150px;
+        }
+
+        #messageDiv {
+            color: green;
+            font-size: 18px;
+            text-align: center;
+            min-height: 50px;
+            width: 400px;
+        }
+
+        #importsourceDiv, #importCSVdiv, .dbInfos {
+            visibility: hidden;
+        }
+
+        .source {
+        / / background-color: tan;
+            background-color: #CCCCCC;
+            opacity: 0.9;
+            color: black;
+            width: 250px;
+
+        }
+
+        .neoTarget {
+        / / background-color: #7f9f7f;
+            opacity: 0.9;
+            color: black;
+
+        }
+
+        #subGraphSelect, #labelsSelect {
+            width: 200px !important;
+        }
+
+        #sourceTable {
+            align-content: center !important;;
+            align-items: center !important;;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .jsTree {
+            overflow: auto;
+        }
+
+
+    </style>
+
+
+    <script>
+
+        $(function () {
+
+            mainController.init0();
+            var importNeoAccordion = $("#accordion").accordion(
+                {
+                    activate: function (event, ui) {
+
+                        var index = ui.newPanel.index();
+
+                    }
+                }
+            ).width(mainController.accordionWidth - 50);
+
+
+
+            $("input[type=file]").on('change', function () {
+                document.forms["uploadCsvForm"].submit();
+            });
+
+
+
+
+
+        });
+
+
+    </script>
+<body>
+
+<input type="hidden" id="exportParams">
+
+<div id="main">
+
+    <div id="graphPanel" style="position: absolute">
+        <img id="waitImg" src="images/waitAnimated.gif" width="20px" style="visibility: hidden;">
+        <div id="message"></div>
+
+     <!--   <button onclick="admin.drawVisjsGraph()">draw schema</button>
+        </button>
+        <div id="graphDiv" style="width:300px;height: 400px">
+            <div>
+                <textarea id="importJournalTA" cols="80" rows="5"></textarea>
+            </div>
+        </div>
+        <div id="popupMenu" style="z-index:20;visibility: hidden;position: absolute;background: #b3b6c2">
+            <table>
+                <tr>
+                    <td>source<input type='image' height='20px' width="20px" title='link source'
+                                     onclick='admin.dispatchAction("linkSource")'
+                                     src='../toutlesens/images/sourceLink.png'/></td>
+                    <td>target<input type='image' height='20px' width="20px" title='link target'
+                                     onclick='admin.dispatchAction("linkTarget")'
+                                     src='../toutlesens/images/targetLink.png'/></td>
+                </tr>
+            </table>
+            <div id="nodeInfos"></div>
+        </div>-->
+    </div>
+
+
+    <div id="accordionPanel" style="position: absolute">
+        <div id="accordion">
+            <h3>Neo4j</h3>
+            <div>
+                <div id="neoDbDiv" style="height:450px"></div>
+            </div>
+            <h3>
+                Data source
+            </h3>
+            <div>
+
+                <span id="radarTitle"></span>
+                <div id="stateDisplay"></div>
+                <div id="tabs-analyzePanel">
+                    <table align="center" id="sourceTable">
+
+
+                        <tr class="source" align="center">
+                            <td>Data to import
+                                <hr>
+                                Import type <br><select id="importSourceType" onchange="ui.setImportSourceType()">
+                                    <option selected="selected"></option>
+                                    <option>sourceDB</option>
+                                    <option>uploadCSV</option>
+                                    <option>localCSV</option>
+                                    <option>localXLSX</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr class="source" align="center">
+                            <td>
+
+                                <div id="uploadCSVdiv" class="dataSourceDiv">
+                                    ImportCSV<br>
+                                    <form name="uploadCsvForm" enctype="multipart/form-data" action="/uploadCsvForNeo"
+                                          method="post"
+                                          target="votar">
+                                        <input type="file" accept=".csv" name="csv" class='exportNeo'
+                                               value="choose file..."/>
+                                        <!--   <input type="submit" value="upload" name="submit" class='exportNeo'/>  voir script $function-->
+                                    </form>
+                                </div>
+
+                                <div id="localCSVdiv" class="dataSourceDiv">
+                                    CSV path<input id="localCSVpath" size="40">
+                                    <br>
+                                    <button onclick="ui.loadLocalCSV()"> load</button>
+                                    <br>
+                                    <select id="localCSVSelect" onclick="requests.loadFields($(this).val())" size="15">
+
+                                    </select>
+                                </div>
+                                <div id="localXLSXdiv" class="dataSourceDiv">
+                                    XLSX path<input id="localXLSXpath" size="40" value="D:\Total\quantum\avril2019\MDM_Quantum.xlsx">
+                                    <br>
+                                    <button onclick="ui.loadLocalXLSXsheetNames()"> load</button>
+                                    <br>
+                                    <select id="localXLSXsheetSelect" onclick="ui.loadXLSsheetFields($(this).val())" size="15">
+
+                                    </select>
+                                </div>
+
+
+                                <div id="sourceSourceDiv" class="dataSourceDiv">>
+                                    Source<br>
+                                    <select id="dbSelect" onchange="onDBselect()">
+                                        <option>-------------</option>
+
+
+                                    </select>
+
+                                    <br>
+                                    <div class="dbInfos">
+                                        collections<br>
+                                        <select size="5" id="collSelect"
+                                                onchange='onCollSelect()'>
+                                            <option>-------------</option>
+                                        </select>
+
+
+                                        <br> <input id="currentField">
+                                    </div>
+                                </div>
+
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr class="source" align="center">
+                            <td>
+
+                            </td>
+
+                        </tr>
+
+
+                    </table>
+
+
+                </div>
+
+            </div>
+
+            <h3>ImportNodes</h3>
+            <div>
+                <div id="importNodesDiv" style="height:450px"></div>
+            </div>
+            <h3>ImportRelations</h3>
+            <div>
+                <div id="importRelationsDiv" style="height:450px"></div>
+            </div>
+            <h3>saved Queries</h3>
+            <div>
+                <div id="savedQueriesDiv" style="height:450px"></div>
+            </div>
+            <h3>Export Neo database</h3>
+            <div>
+                <div id="exportGraphDbDiv" style="height:450px"></div>
+            </div>
+            <h3>Import Neo database</h3>
+            <div>
+                <div id="importGraphDbDiv" style="height:450px"></div>
+            </div>
+
+            <h3>admin</h3>
+            <div>
+                <div id="adminDiv" style="height:450px"></div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<iframe name="votar" style="display:none;"></iframe>
+</body>
+</html>

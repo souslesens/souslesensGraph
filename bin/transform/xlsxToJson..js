@@ -1,22 +1,27 @@
 const XLSX = require('xlsx');
 
 const async = require("async");
+const fs = require('fs');
+const importDataIntoNeo4j = require("../importDataIntoNeo4j");
 
 var sourcexlsxFile = 'D:\\Total\\quantum\\avril2019\\MDM_Quantum.xlsx';
 var sheetNames = [
-    "tblAttribute",
+    /*"tblAttribute",
     "tblAttributePickListValue",
     "tblAttribToAttribPickListValue",
-    "tblDiscipline",
-    "tblDocumentType",
+    "tblDocumentType",*/
     "tblDisciplineDocumentType",
+  /*  "tblDiscipline",
     "tblFunctionalClass",
-    "tblPhysicalClass",
+    "tblPhysicalClass",*/
     "tblFunctionalClToPhysicalCl",
-    "tblFunPhyDiscDocTyToAttribute",
+ //   "tblFunPhyDiscDocTyToAttribute",
     "tblFunPhyCLToDiscDocumentTy",
 
 ]
+
+var mappingRequestsPath = "D:\\Total\\quantum\\avril2019\\mappingRequests.json";
+
 
 var xlsxToJson = {
 
@@ -38,6 +43,40 @@ var xlsxToJson = {
 
 
     },
+
+
+    listSheets: function (file, callback) {
+        var workbook = XLSX.readFile(file);
+        var sheet_name_list = workbook.SheetNames;
+        var result = {
+            sheetNames: sheet_name_list
+        };
+
+        callback(null, result);
+
+    },
+
+    listSheetColumns: function (file, sheetName, callback) {
+
+        var workbook = XLSX.readFile(file);
+        var sheet = workbook.Sheets[sheetName];
+
+        var columns = []
+        for (var key in sheet) {
+            if (key.match(/[A-Z]+1$/))
+                columns.push(sheet[key].v)
+
+        }
+
+
+        var result = {
+            message: "listCsvFields",
+            sheetColNames: columns
+        };
+
+        callback(null, result);
+    },
+
 
     worksheetJsonToSouslesensJson: function (worksheet, callback) {
 
@@ -93,13 +132,93 @@ var xlsxToJson = {
 
             }
         }
+        var dataArray = [];
+        for (var key in data) {
+            dataArray.push(data[key]);
+        }
 
-        return callback(null, {headers: headers, data: data})
+        return callback(null, {headers: headers, data: dataArray})
 
 
     },
 
-    souslesensJsonToNeo: function (subGraph, worksheetName, worksheet, mappings, callback) {
+    souslesensJsonToNeo: function (subGraph, sheets, mappingRequestsPath, callbackOuter) {
+        var mappings;
+        async.series([
+                function (callback) {
+
+                    mappings = JSON.parse(fs.readFileSync("" + mappingRequestsPath)).requests;
+                    return callback();
+
+                },
+                function (callback) {
+                    var mappingKeys = Object.keys(mappings);
+                    mappingKeys = mappingKeys.sort();// nodes first
+                    async.eachSeries(mappingKeys, function (mappingKey, callbackEachSheet) {
+                        var params = mappings[mappingKey];
+                        var type;
+
+
+                        var sheetName = params.source;
+                        var json = sheets[sheetName];
+                        console.log("processing request " + mappingKey + " on sheet " + sheetName)
+
+                        if (json) {
+                            params.type = "json";
+                            params.data = json;
+                            params.subGraph = subGraph;
+
+                            if (mappingKey.indexOf("Nodes_") == 0) {
+
+                                importDataIntoNeo4j.importNodes(params, function (err, result) {
+                                    var xxx = result;
+                                    console.log(result);
+                                    callbackEachSheet(err);
+                                })
+                            }
+                            else if (mappingKey.indexOf("Rels_") == 0) {
+                                importDataIntoNeo4j.importRelations(params, function (err, result) {
+                                    var xxx = result;
+                                    console.log(result);
+                                    callbackEachSheet(err);
+                                })
+                            }
+                            else{
+
+                                callbackEachSheet();
+                            }
+
+
+                        }
+                        else {
+                            console.log(" no mappings for sheet" + sheetName)
+
+                            callbackEachSheet();
+                        }
+
+
+                    }, function (err) {
+
+                        if(err)
+                        console.log(err)
+                        return callback(err)
+                    })
+
+                },
+
+
+            ],
+
+            function (err) {
+                console.log("7", err)
+                if (err) {
+
+                    console.log(err);
+                }
+                callbackOuter(err);
+
+            }
+        )
 
 
     },
@@ -131,13 +250,11 @@ var xlsxToJson = {
 
 
             function (callback) {
-                return callback();
-                for (var key in sheets) {
-                    xlsxToJson.souslesensJsonToNeo(subGraph, worksheetName, worksheet, mappings, function (err, result) {
-                        sheets[key] = result;
-                    })
-                }
-                return callback();
+
+                xlsxToJson.souslesensJsonToNeo("quantum-04-22", sheets, mappingRequestsPath, function (err, result) {
+
+                    return callback();
+                })
 
 
             }
@@ -146,6 +263,7 @@ var xlsxToJson = {
         ], function (err) {
             if (err)
                 console.log(err);
+            console.log("done")
 
         })
 

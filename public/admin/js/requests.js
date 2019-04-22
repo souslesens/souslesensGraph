@@ -23,41 +23,43 @@ var requests = (function () {
         }
         self.loadSubGraphCSVsources()
         self.list(subGraph, requestsSelect);
-      //  $("#importSourceType").val("localCSV");
-        if(allParams[subGraph])
-        setCsvImportFields(allParams[subGraph]);
+        //  $("#importSourceType").val("localCSV");
+        if (allParams[subGraph])
+            setCsvImportFields(allParams[subGraph]);
+        else
+            allParams[subGraph] = {requests: {}};
+        self.setSchemaFromRequests()
     }
 
     self.clearLocalStorage = function () {
         if (confirm("clear all requests for subGraph" + subGraph))
             delete  allParams[subGraph]
-        localStorage.setItem(localStorageKey,  JSON.stringify(allParams, null, 2));
+        localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2));
         self.init(subGraph)
     }
 
 
-    self.importParams=function(){
-        if(!allParams)
+    self.importParams = function () {
+        if (!allParams)
             return alert("select a subGraph first")
-        var str=$("#savedQueries_importParamsTA").val()
-        var data=JSON.parse(str);
-        var subGraph=data.subGraph;
-        allParams[subGraph]=data;
+        var str = $("#savedQueries_importParamsTA").val()
+        var data = JSON.parse(str);
+        var subGraph = data.subGraph;
+        allParams[subGraph] = data;
 
-        localStorage.setItem(localStorageKey,  JSON.stringify(allParams, null, 2));
+        localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2));
         self.init(subGraph)
 
     }
     self.export = function (subGraph) {
         if (!allParams)
             self.init();
-        allParams[subGraph].subGraph=subGraph;
-      //  console.log(JSON.stringify(allParams[subGraph]));
-        $("#savedQueries_importParamsTA").val(JSON.stringify(allParams[subGraph]))
+        allParams[subGraph].subGraph = subGraph;
+        //  console.log(JSON.stringify(allParams[subGraph]));
+        $("#savedQueries_importParamsTA").val(JSON.stringify(allParams[subGraph], null, 2))
         return allParams[subGraph];
 
     }
-
 
 
     self.loadSubGraphCSVsources = function () {
@@ -79,16 +81,16 @@ var requests = (function () {
 
     self.saveCSVsource = function (data) {
         source = data.name;
-     if (!allParams[data.subGraph])
+        if (!allParams[data.subGraph])
             allParams[data.subGraph] = {};
         /*   if (!allParams[data.subGraph][data.name]) {
             allParams[data.subGraph][data.name] = data;
             allParams[data.subGraph][data.name].requests = [];*/
-        allParams[data.subGraph][data.name]=data
-            localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2))
-            self.loadSubGraphCSVsources();
+        allParams[data.subGraph][data.name] = data
+        localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2))
+        self.loadSubGraphCSVsources();
 
-       // }
+        // }
     }
 
 
@@ -113,8 +115,8 @@ var requests = (function () {
             name += "Nodes_" + $("#subGraphSelect").val() + "." + $("#label").val() + "_" + sourceField;
         }
         json.source = source;
-        if(!allParams[subGraph][source])
-            allParams[subGraph][source]={}
+        if (!allParams[subGraph][source])
+            allParams[subGraph][source] = {}
         if (!allParams[subGraph][source].requests)
             allParams[subGraph][source].requests = [];
         if (!allParams[subGraph].requests)
@@ -123,6 +125,9 @@ var requests = (function () {
         allParams[subGraph][source].requests.push(name);
         localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2));
         self.list(subGraph, requestsSelect);
+        if (json.label && admin.labels.indexOf(json.label) < 0)
+            admin.labels.push(json.label);
+
         return;
 
     }
@@ -130,21 +135,21 @@ var requests = (function () {
         if (!allParams)
             self.init();
         var requests = []
-        if(!allParams[subGraph])
+        if (!allParams[subGraph])
             return;
         for (var key in allParams[subGraph].requests) {
-            requests.push({value:key, label:key.replace(subGraph+".","")})
+            requests.push({value: key, label: key.replace(subGraph + ".", "")})
         }
 
-        requests.sort(function(a,b){
-            if(a.label>b.label)
+        requests.sort(function (a, b) {
+            if (a.label > b.label)
                 return 1;
-            if(a.label<b.label)
+            if (a.label < b.label)
                 return -1;
             return 0;
         });
         if (select)
-            common.fillSelectOptions(select, requests,"label","value", true)
+            common.fillSelectOptions(select, requests, "label", "value", true)
         return requests;
     }
 
@@ -162,14 +167,10 @@ var requests = (function () {
             }
             delete allParams[subGraph].requests[name];
             localStorage.setItem(localStorageKey, JSON.stringify(allParams, null, 2));
-            self.list (subGraph, requestsSelect) ;
+            self.list(subGraph, requestsSelect);
 
         }
     }
-
-
-
-
 
 
     self.loadRequest = function (name) {
@@ -177,7 +178,7 @@ var requests = (function () {
         var header = allParams[subGraph][request.source].header;
         var obj = request;
 
-        $("#exportMessageLinks").html("source : "+request.source)
+        $("#exportMessageLinks").html("source : " + request.source)
         $("#sourceNode").val(request.source)
         $("#sourceRel").val(request.source)
         admin.initImportDialogSelects(header)
@@ -195,11 +196,11 @@ var requests = (function () {
         $("#neoTargetKey").html("").append('<option>' + obj["neoTargetKey"] + '</option>');
         $("#neoSourceKey").html("").append('<option>' + obj["neoSourceKey"] + '</option>');
         var tab;
-        if(name.indexOf("Node")>-1)
-            tab=2
+        if (name.indexOf("Node") > -1)
+            tab = 2
         else
-            tab=3
-       importNeoAccordion.accordion("option", "active", tab);
+            tab = 3
+        importNeoAccordion.accordion("option", "active", tab);
 
 
     }
@@ -232,8 +233,46 @@ var requests = (function () {
         callExportToNeo(type, requestsArray, function (err, result) {
             loadLabels();
             admin.drawVisjsGraph();
+            admin.drawVisjsGraph();
         });
 
+
+    }
+
+
+    self.setSchemaFromRequests = function () {
+
+
+        var schema = {
+            defaultNodeNameProperty: "name",
+            labels: {},
+            properties: {},
+            relations: {
+                "hasConcept": {
+                    "startLabel": "document",
+                    "endLabel": "concept",
+                    "type": "hasConcept"
+                },
+            }
+        }
+
+        for (var key in allParams[subGraph]) {
+            var params = allParams[subGraph]
+            if (key != "requests") {
+                for (var requestName in params.requests) {
+                    var label=params.requests[requestName].label;
+                    schema.labels[label] = {
+                        "color": "#ccc"
+                    }
+                    schema.properties[label] = {}
+                    params[params.requests[requestName].source].header.forEach(function (colName) {
+                        if(colName!="")
+                        schema.properties[label][colName] = {"type": "text"}
+                    })
+                }
+            }
+            Schema.schema=schema;
+        }
 
     }
 
