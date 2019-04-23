@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>uploadXlsxToNeo</title>
+    <script src="../common/js/jquery/jquery.min.js"></script>
+    <script src="js/others/socket.io.js"></script>
+    <script>
+        var url = window.location.href;
+        var p = url.indexOf('/etl');
+        url = url.substring(0, p);
+        var socket = io.connect(url);
+        socket.on('connect', function (data) {
+            socket.emit('join', 'Hello World from client');
+        });
+        socket.on('messages', function (message) {
+if(message.result)
+    message=message.result
+                $("#message").append(message+"<br>");
+
+
+        })
+
+        function checkForm() {
+            var message = ""
+            var subGraph = $("#subGraph").val();
+            if (!subGraph || subGraph == "")
+                message += "le champ subGraph est obligatoire<br>"
+            var xlsx = $("#xlsx").val();
+            if (!xlsx || xlsx == "")
+                message += "le fichier xlsx est obligatoire<br>"
+
+            var mappings = $("#mappings").val();
+            if (!mappings || mappings == "")
+                message += "le fichier mappings est obligatoire<br>"
+
+            if (message != "") {
+                $("#message").html(message);
+
+                return false;
+            }
+            else{
+                $("#message").html("import en cours");
+                return true;
+            }
+
+
+        }
+
+
+    </script>
+    <style>
+body{
+    font-family: Verdana;
+    font-size: 14px;
+    margin :2px;
+}
+        #message{
+            border: #261803 solid 1px;
+            max-width:800px;
+            color: #0a6aa1;
+            font-size: 12px;
+        }
+
+    </style>
+</head>
+<body>
+<b>upload Xlsx to Neo4j</b><br><br><br><br><br>
+<form name="uploadXlsxForm" enctype="multipart/form-data" action="/xlsxToNeoLoader" method="post" onsubmit="return checkForm();" target="votar">
+    <input type="file" accept=".xlsx" name="xlsx" id="xlsx" class='exportNeo' value="select xlsx..."/><br><br>
+    <input type="file" accept=".json" name="mappings" id="mappings" class='exportNeo' value="select mappings files..."/><br><br>
+    subGraph<input name="subGraph" id="subGraph">&nbsp;
+    <button> importer</button>
+
+</form>
+<br>
+<div id="message"></div>
+<iframe name="votar" style="display:none;"></iframe>
+
+</body>
+</html>

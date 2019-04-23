@@ -132,7 +132,6 @@ var importDataIntoNeo4j = {
                                 callbackEach(null);
                             importDataIntoNeo4j.writeNodesToNeo(params, subset, function (err, result) {
                                     if (err) {
-                                        console.log("04",err)
                                         return callbackSeries(err);
                                     }
                                     totalImported += result.results.length;
@@ -149,7 +148,7 @@ var importDataIntoNeo4j = {
                             var message = "label :" + label + "import done : " + totalImported + "lines ";
                             journal += message + "<br>";
                             socket.message(message);
-                            console.log(message);
+                          //  console.log(message);
                             callbackSeries(null, message);
 
                         })

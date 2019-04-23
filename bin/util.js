@@ -116,13 +116,28 @@ Util = {
                     } else {
                         var value = "" + valueObj;
                         if (isNaN(valueObj)) {
-                            value = value.replace(/[\n|\r|\t]+/g, " ");
-                            value = value.replace(/&/g, " and ");
-                            value = value.replace(/"/g, "'");
-                            value = value.replace(/,/g, "\\,");
-                            // value = value.replace(/\//g, "%2F");
-                            value = value.replace(/\\/g, "")
-                            //  value = value.replace(/:/g, "")
+                            //escape non ascii
+                          /*  var str = "";
+                            for (var i = 0; i < value.length; i++) {
+                                var c = value.charCodeAt(i);
+                                var s=value.charAt(i)
+                                if (c < 48 || (c > 57 && c < 65) || c > 122) {
+                                    str += '\\' + s;
+                                }
+                                else
+                                    str += s;
+                            }
+                            value=str;*/
+
+
+                              value = value.replace(/[\n|\r|\t]+/g, " ");
+                              value = value.replace(/&/g, " and ");
+                              value = value.replace(/"/g, "'");
+                              value = value.replace(/,/g, "\\,");
+                              value = value.replace(/\[/g, "\\,");
+                              // value = value.replace(/\//g, "%2F");
+                              value = value.replace(/\\/g, "")
+                              //  value = value.replace(/:/g, "")
                         }
                         else if (value.indexOf(".") > -1)
                             value = parseFloat(value)
@@ -143,7 +158,7 @@ Util = {
     },
 
 
-    getCsvFileSeparator :function (file,callback) {
+    getCsvFileSeparator: function (file, callback) {
         var readStream = fs.createReadStream(file, {start: 0, end: 5000, encoding: 'utf8'});
         var separator = ",";
         readStream.on('data', function (chunk) {
@@ -175,7 +190,7 @@ Util = {
 
     },
 
-    normalizeHeader :function (headerArray, s) {
+    normalizeHeader: function (headerArray, s) {
         //   var   r = s.toLowerCase();
         var r = s;
         r = r.replace(/[\(\)'.]/g, "")
@@ -199,11 +214,11 @@ Util = {
         return r;
     }
 
-    }
-    /*var array=[128,1430,8324]
-    for(var i=0;i<array.length;i++){
-        var x=array[i]
-        console.log(x+"  "+Math.round(Math.log10(x)));
-    }*/
+}
+/*var array=[128,1430,8324]
+for(var i=0;i<array.length;i++){
+    var x=array[i]
+    console.log(x+"  "+Math.round(Math.log10(x)));
+}*/
 
-    module.exports = Util;
+module.exports = Util;
