@@ -5,7 +5,6 @@ const fs = require('fs');
 const importDataIntoNeo4j = require("../importDataIntoNeo4j");
 
 
-
 var xlsxToNeo = {
 
 
@@ -135,17 +134,22 @@ var xlsxToNeo = {
 
         async.series([
                 function (callback) {
-                    var message="parsing mappings file";
+                    var message = "parsing mappings file";
                     console.log(message)
                     socket.message(message);
 
                     var jsonStr;
-                    if(mappingJson.indexOf(".json")>-1 && mappingJson.indexOf(".json")<100 )
-                       jsonStr=""+fs.readFileSync("" + mappingRequestsPath);
+                    if (mappingJson.indexOf(".json") > -1 && mappingJson.indexOf(".json") < 100)
+                        jsonStr = "" + fs.readFileSync("" + mappingRequestsPath);
                     else
-                        jsonStr=mappingJson;
-
-                    mappings = JSON.parse(jsonStr)
+                        jsonStr = mappingJson;
+                    try {
+                        mappings = JSON.parse(jsonStr)
+                    }
+                    catch (err) {
+                        socket.message(err.message);
+                        return callback(err.message);
+                    }
 
                     return callback();
 
@@ -166,8 +170,7 @@ var xlsxToNeo = {
                         var json = sheets[sheetName];
 
 
-
-                        var message="processing request " + mappingKey + " on sheet " + sheetName;
+                        var message = "processing request " + mappingKey + " on sheet " + sheetName;
                         console.log(message)
                         socket.message(message);
 
@@ -195,15 +198,15 @@ var xlsxToNeo = {
 
                                 importDataIntoNeo4j.importNodes(params, function (err, result) {
 
-                                    var message=result;
-                                   // console.log(message)
-                                  //  socket.message(message);
+                                    var message = result;
+                                    // console.log(message)
+                                    //  socket.message(message);
                                     callbackEachSheet(err);
                                 })
                             }
                             else if (mappingKey.indexOf("Rels_") == 0) {
                                 importDataIntoNeo4j.importRelations(params, function (err, result) {
-                                    var message=result;
+                                    var message = result;
                                     console.log(message)
                                     socket.message(message);
                                     callbackEachSheet(err);
@@ -217,7 +220,7 @@ var xlsxToNeo = {
 
                         }
                         else {
-                            var message=" no mappings for sheet " + sheetName;
+                            var message = " no mappings for sheet " + sheetName;
                             console.log(message)
                             socket.message(message);
                             callbackEachSheet();
@@ -226,8 +229,8 @@ var xlsxToNeo = {
 
                     }, function (err) {
 
-                        if (err){
-                            var message=err;
+                        if (err) {
+                            var message = err;
                             console.log(message)
                             socket.message(message);
                         }
@@ -243,7 +246,7 @@ var xlsxToNeo = {
             function (err) {
 
                 if (err) {
-                    var message=err;
+                    var message = err;
                     console.log(message)
                     socket.message(message);
                 }
@@ -256,12 +259,12 @@ var xlsxToNeo = {
     },
 
 
-    toNeo: function (subGraph,sourceXlsx,mappingJson, sheetNames,callbackOuter) {
+    toNeo: function (subGraph, sourceXlsx, mappingJson, sheetNames, callbackOuter) {
         var sheets = {}
 
         async.series([
             function (callback) {
-                var message="parsing xls file";
+                var message = "parsing xls file";
                 console.log(message)
                 socket.message(message);
                 xlsxToNeo.extractWorkSheets(sourceXlsx, sheetNames, function (err, result) {
@@ -299,9 +302,9 @@ var xlsxToNeo = {
             if (err)
                 console.log(err);
             console.log("done");
-                if(callbackOuter){
-                    return callbackOuter(err,"All Done!")
-                }
+            if (callbackOuter) {
+                return callbackOuter(err, "All Done!")
+            }
 
 
         })
@@ -332,7 +335,7 @@ if (false) {
 
     var mappingRequestsPath = "D:\\Total\\quantum\\avril2019\\mappingRequests.json";
 
-    xlsxToNeo.toNeo("quantum-04-22",sourcexlsxFile,mappingRequestsPath, sheetNames);
+    xlsxToNeo.toNeo("quantum-04-22", sourcexlsxFile, mappingRequestsPath, sheetNames);
 
 
 }

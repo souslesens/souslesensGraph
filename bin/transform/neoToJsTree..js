@@ -49,7 +49,7 @@ var neoToJstree = {
                 return callback(err);
 
 
-            var parent = {}
+            var parent = {};
             result.forEach(function (line, index) {
                 var parentProps = line.parent.properties;
                 parentProps._id = line.parent._id
