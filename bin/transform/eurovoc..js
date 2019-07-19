@@ -197,7 +197,14 @@ var eurovoc = {
                 regex: new RegExp('<skos:broader rdf:resource="(.*)"\/>', "g"),
                 data: []
             },
-            related: {regex: new RegExp('<skos:related rdf:resource="(.*)"\/>', "g"), data: []},
+            related: {
+                regex: new RegExp('<skos:related rdf:resource="(.*)"\/>', "g"),
+                data: []
+            },
+            scheme: {
+                regex: new RegExp('<skos:inScheme rdf:resource="(.*)"/>', "g"),
+                data: []
+            },
         }
 
 
@@ -218,109 +225,143 @@ var eurovoc = {
                 var regex = obj.regex;
                 var array;
                 while ((array = regex.exec(str)) !== null) {
-                    var value = array[1];
-                    map[key].data.push({offset: chunkOffset + regex.lastIndex, value: value})
+                    var value = array[(array.length - 1)];//cf 2 schemes on prend le dernier
+
+                    map[key].data.push({offset: chunkOffset + array.index, value: value})
                 }
             }
             chunkOffset += data.length;
         });
         stream.on('close', () => {
 
-            callback(null,map)
+            callback(null, map)
         });
-        stream.on('error', function(error) {
+        stream.on('error', function (error) {
             console.log(error)
         });
 
 
     },
-    processMap:function(map){
-        var conceptsMap={};
-if(map.concept.data.length !=map.conceptEnd.data.length+1)
-    return console.log("error");
+    buildConceptMap: function (map, callback) {
+        var conceptsMap = {};
+        if (map.concept.data.length != map.conceptEnd.data.length + 1)
+            return console.log("error");
 
-        var arrayConcepts=map.concept;
-        map.concept.data.forEach(function(concept,indexConcept){
-            var startOffset=concept.offset;
+        var arrayConcepts = map.concept;
+        map.concept.data.forEach(function (concept, indexConcept) {
+            var startOffset = concept.offset;
+            if (concept.value == "http://eurovoc.europa.eu/3640")
+                var xx = 3;
 
-
-            if(indexConcept>=(map.conceptEnd.data.length-1))
+            if (indexConcept >= (map.conceptEnd.data.length - 1))
                 return;
 
 
 //console.log(indexConcept)
-            var endOffset= map.conceptEnd.data[indexConcept].offset;
+            var endOffset = map.conceptEnd.data[indexConcept].offset;
 
 
-           var obj={id:concept.value,prefLabel:[], broader:[],narrower:[],related:[],altLabel:[]};
+            var obj = {id: concept.value, prefLabel: [], broader: [], narrower: [], related: [], altLabel: []};
 
-            map.prefLabel.data.forEach(function(prefLabel){
-                if(prefLabel.offset>startOffset && prefLabel.offset<endOffset){
+            map.prefLabel.data.forEach(function (prefLabel) {
+                if (prefLabel.offset > startOffset && prefLabel.offset < endOffset) {
                     obj.prefLabel.push(prefLabel.value);
 
                 }
             })
 
 
-            map.broader.data.forEach(function(broader){
-               if(broader.offset>startOffset && broader.offset<endOffset){
-                   obj.broader.push({id:broader.value});
+            map.broader.data.forEach(function (broader) {
+                if (broader.offset > startOffset && broader.offset < endOffset) {
+                    obj.broader.push({id: broader.value});
 
-               }
+                }
             })
-
-            map.related.data.forEach(function(related){
-                if(related.offset>startOffset && related.offset<endOffset){
-                    obj.related.push({id:related.value});
+            map.scheme.data.forEach(function (scheme) {
+                if (scheme.offset > startOffset && scheme.offset < endOffset) {
+                    obj.broader.push({id: scheme.value});
 
                 }
             })
 
-            map.altLabel.data.forEach(function(altLabel){
-                if(altLabel.offset>startOffset && altLabel.offset<endOffset){
+
+            map.related.data.forEach(function (related) {
+                if (related.offset > startOffset && related.offset < endOffset) {
+                    obj.related.push({id: related.value});
+
+                }
+            })
+
+            map.altLabel.data.forEach(function (altLabel) {
+                if (altLabel.offset > startOffset && altLabel.offset < endOffset) {
                     obj.altLabel.push(altLabel.value);
 
                 }
             })
 
 
-
-            conceptsMap[obj.id]=obj;
+            conceptsMap[obj.id] = obj;
 
         })
 
 
-
-
-       for( var key in conceptsMap){
-            conceptsMap[key].broader.forEach(function(broader,index){
-                if(!conceptsMap[broader.id])
+        for (var key in conceptsMap) {
+            conceptsMap[key].broader.forEach(function (broader, index) {
+                if (!conceptsMap[broader.id])
                     return console.log(broader.id)
-                conceptsMap[key].broader[index].value= conceptsMap[broader.id].prefLabel[0]
+                conceptsMap[key].broader[index].value = conceptsMap[broader.id].prefLabel[0]
             })
 
-           conceptsMap[key].related.forEach(function(related,index){
-               if(!conceptsMap[related.id])
-                   return console.log(related.id)
-               conceptsMap[key].related[index].value= conceptsMap[related.id].prefLabel[0]
-           })
+            conceptsMap[key].related.forEach(function (related, index) {
+                if (!conceptsMap[related.id])
+                    return console.log(related.id)
+                conceptsMap[key].related[index].value = conceptsMap[related.id].prefLabel[0]
+            })
 
-       }
+        }
 
-       var xx= conceptsMap;
+        callback(null, conceptsMap);
 
     }
+    ,
+    conceptMapToJstree: function (map) {
+        var jstree = [];
+        for (var key in map) {
+            var obj = map[key];
+            var jstreeObj = {
+                id: key,
+                text: obj.prefLabel[0],
+                data: {related: obj.related, altlabel: obj.altLabel, broader: obj.broader}
+            }
+
+            var broaders = obj.broader;
+            if (broaders.length == 0)
+                jstreeObj.parent = "#"
+            else
+                jstreeObj.parent = broaders[0].id;
+
+            jstree.push(jstreeObj);
+
+        }
+
+        fs.writeFileSync("../../public/semanticWeb/eurovoc.json", JSON.stringify(jstree, null, 2));
+
+
+    }
+
 
 }
 
 
-
-
-
-if (true) {
+if (false) {
     //eurovoc.readBigBfile("C:\\Users\\claud\\Downloads\\eurovoc_skos.rdf", 100000);
-    eurovoc.parseRefFile("C:\\Users\\claud\\Downloads\\eurovoc_in_skos_core_concepts.rdf", "fr", 100000, function(err, result){
-eurovoc.processMap(result);
+    eurovoc.parseRefFile("C:\\Users\\claud\\Downloads\\eurovoc_in_skos_core_concepts.rdf", "fr", 100000, function (err, result) {
+
+        eurovoc.buildConceptMap(result, function (err, result) {
+            // return;
+            eurovoc.conceptMapToJstree(result)
+
+        });
 
 
     })
@@ -329,11 +370,259 @@ eurovoc.processMap(result);
 }
 if (false) {
     eurovoc.loadSkosToTree("eurovoc_in_skos_core_concepts", "en", function (err, result) {
-      if( err)
-         return console.log(err);
-      eurovoc.processMap(map)
+        if (err)
+            return console.log(err);
+        eurovoc.processMap(map)
 
     })
+}
+
+
+if (true) {
+
+    function processMap(conceptsMap) {
+
+        var treeMap = {};
+        var schemesMap = {};
+        var ancestorsMap = {};
+        for (var key in conceptsMap) {
+
+            var concept = conceptsMap[key];
+
+            var obj = {
+                text: concept.prefLabels["fr"],
+                id: concept.id,
+                data: {synonyms: ""},
+                parent: "#"
+
+            }
+
+
+            for (var key2 in concept.prefLabels) {
+                if (Array.isArray(concept.prefLabels[key2])) {
+                    concept.prefLabels[key2].forEach(function (str) {
+                        obj.data.synonyms += str + ";"
+                    })
+                }
+                else {
+                    obj.data.synonyms += concept.prefLabels[key2] + ";"
+                }
+
+            }
+
+            for (var key2 in concept.altLabels) {
+                if (Array.isArray(concept.altLabels[key2])) {
+                    concept.altLabels[key2].forEach(function (str) {
+                        obj.data.synonyms += str + ";"
+                    })
+                }
+                else {
+                    obj.data.synonyms += concept.altLabels[key2] + ";"
+                }
+
+            }
+
+
+            /*  if(concept.broaders.length>0){
+                  obj.parent=concept.broaders[0];
+
+
+              }*/
+            obj.ancestors=[];
+
+            if (concept.topConcepts.length > 0) {
+               obj.parent = concept.topConcepts[concept.topConcepts.length-1];
+                obj.ancestors=concept.topConcepts;
+            }
+
+            else if (concept.schemes.length > 0) {
+           obj.parent = concept.schemes[concept.schemes.length-1];
+                obj.ancestors=concept.schemes;
+            }
+            else {
+                if (concept.broaders.length > 0) {
+                  obj.parent = concept.broaders[concept.broaders.length-1];
+                    obj.ancestors=concept.broaders;
+                }
+            }
+
+            // console.log(concept.id)
+            treeMap[concept.id]=obj
+
+
+
+        }
+
+
+
+        for(var key in treeMap){
+            concept=treeMap[key];
+            if( concept.ancestors) {
+                concept.ancestors.forEach(function (ancestor, index) {
+                    if (index < concept.ancestors.length && treeMap[ancestor].parent=="#")
+                        treeMap[ancestor].parent = concept.ancestors[index + 1]
+                })
+            }else{
+                var xx=3
+            }
+
+
+
+        }
+        var conceptsArray=[]
+        for(var key in treeMap) {
+
+            if(!treeMap[key].parent)
+               treeMap[key].parent="#"
+            conceptsArray.push(treeMap[key])
+        }
+
+
+
+
+
+
+        var str = JSON.stringify(conceptsArray, null, 2);
+        fs.writeFileSync("./eurovocFr.json", str)
+        fs.writeFileSync("D:\\GitHub\\souslesensGraph\\souslesensGraph\\public\\semanticWeb\\eurovocFr.json", str)
+
+
+//console.log(JSON.stringify(schemesMap,null,2));
+
+
+    }
+
+
+    var conceptsMap = {}
+    var currentConcept = null;
+    var currentTagName = null;
+    var strict = true; // set to false for html-mode
+    var saxStream = require("sax").createStream(strict)
+    saxStream.on("error", function (e) {
+        // unhandled errors will throw, since this is a proper node
+        // event emitter.
+        console.error("error!", e)
+        // clear the error
+        this._parser.error = null
+        this._parser.resume()
+    })
+
+    saxStream.on("opentag", function (node) {
+        var x = node;
+
+        if (node.name == "rdf:Description") {
+            currentConcept = {}
+            var id = node.attributes["rdf:about"];
+            currentConcept.id = id;
+            currentConcept.prefLabels = {};
+            currentConcept.altLabels = {};
+
+            currentConcept.schemes = [];
+            currentConcept.relateds = [];
+            currentConcept.narrowers = [];
+            currentConcept.broaders = [];
+            currentConcept.topConcepts = [];
+
+        }
+        if (node.name == "skos:prefLabel") {
+
+            var lang = node.attributes["xml:lang"];
+            if (lang == "fr")
+                currentTagName = "prefLabelFr";
+            if (lang == "en")
+                currentTagName = "prefLabelEn";
+            if (lang == "es")
+                currentTagName = "prefLabelEs";
+
+        }
+        if (node.name == "skos:altLabel") {
+
+            var lang = node.attributes["xml:lang"];
+            if (lang == "fr")
+                currentTagName = "altLabelFr";
+            if (lang == "en")
+                currentTagName = "altLabelEn";
+            if (lang == "es")
+                currentTagName = "altLabelEs";
+
+        }
+
+
+        if (node.name == "skos:topConceptOf") {
+            var type = node.attributes["rdf:resource"]
+            currentConcept.topConcepts.push(type);
+        }
+
+        if (node.name == "rdf:type") {
+            var type = node.attributes["rdf:resource"]
+            if (type.indexOf("ConceptScheme") > -1) {
+                currentConcept.isConceptScheme = true;
+            }
+        }
+
+        if (node.name == "skos:inScheme") {
+
+            currentConcept.schemes.push(node.attributes["rdf:resource"]);
+
+        }
+        if (node.name == "skos:broader") {
+
+            currentConcept.broaders.push(node.attributes["rdf:resource"]);
+
+        }
+        if (node.name == "skos:narrower") {
+
+            currentConcept.narrowers.push(node.attributes["rdf:resource"]);
+
+        }
+        if (node.name == "skos:related") {
+
+            currentConcept.relateds.push(node.attributes["rdf:resource"]);
+
+        }
+    })
+
+    saxStream.on("text", function (text) {
+        if (currentTagName == "prefLabelFr")
+            currentConcept.prefLabels.fr = text;
+        if (currentTagName == "prefLabelEn")
+            currentConcept.prefLabels.en = text;
+        if (currentTagName == "prefLabelEs")
+            currentConcept.prefLabels.es = text;
+
+        if (currentTagName == "altLabelFr")
+            currentConcept.altLabels.fr = text;
+        if (currentTagName == "altLabelEn")
+            currentConcept.altLabels.en = text;
+        if (currentTagName == "altLabelEs")
+            currentConcept.altLabels.es = text;
+
+        currentTagName = null;
+    })
+
+
+    saxStream.on("closetag", function (node) {
+        if (node == "rdf:Description") {
+
+            conceptsMap[currentConcept.id] = currentConcept;
+        }
+    })
+    saxStream.on("end", function (node) {
+        var x = conceptsMap;
+
+        processMap(conceptsMap)
+
+
+    })
+
+
+// pipe is supported, and it's readable/writable
+// same chunks coming in also go out.
+    fs.createReadStream("C:\\Users\\claud\\Downloads\\eurovoc_in_skos_core_concepts.rdf")
+        .pipe(saxStream)
+    //   .pipe(fs.createWriteStream("file-copy.xml"))
+
+
 }
 
 module.exports = eurovoc;

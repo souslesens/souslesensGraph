@@ -1,4 +1,4 @@
-var searchNodes = (function () {
+var advancedSearch = (function () {
 
     self = {};
     self.userMappings = {};
@@ -10,7 +10,7 @@ var searchNodes = (function () {
         self.queryObject={};
         $("#searchInput").val("");
         $("#dialog").css("visibility", "visible");
-        $("#dialog").load("htmlSnippets/searchNodes.html", function () {
+        $("#dialog").load("htmlSnippets/advancedSearch.html", function () {
             $('#searchNodesDialog_fieldInput').attr('disabled', 'disabled');
             var data = [];
 

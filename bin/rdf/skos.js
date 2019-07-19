@@ -41,6 +41,7 @@ var skos = {
          })
 
      }
+
      ,
 
      treeDataToSkos: function (tree, identifier, date, description, creator, callback) {
@@ -166,8 +167,10 @@ var skos = {
 
     loadSkosToTree: function (thesaurus, callback) {
 
-
+if(thesaurus.indexOf("\\")<0)
         var file = path.resolve(__dirname, "../../config/thesaurii/" + thesaurus + ".rdf");
+else
+    file=thesaurus
         fs.readFile(file, function (err, data) {
             if (err) {
                 if (callback)
@@ -752,6 +755,16 @@ if(key=="COL007")
         console.log(str);
 
     }
+
+}
+if(false){
+
+    var path="D:\\Total\\graphNLP\\Thesaurus_CTG_Skos_V1.6_201905.xml"
+    skos.loadSkosToTree(path, function(err, result){
+      fs.writeFileSync(path+".json",JSON.stringify(result,null,2))
+    })
+
+
 
 }
 /*skos.generateSkosThesauru.prefLabelomWords("BNF", ["Bouddhisme"], function (err, result) {

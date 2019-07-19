@@ -186,7 +186,7 @@ function setExportLabels(subGraph) {
     Cypher.executeCypher(match, function (err,labels) {
         if(err)
 
-        str = "";
+       var  str = "";
         str += "<table><tr align='center' class='italicSpecial'><td ><span class='bigger'>Noeuds</span></td><td>Inclure<br><input type='checkbox' checked='checked' id='#comuteAllFiltersNodesInclude' onchange='comuteAllCBXs(this)'></td>" +
             "</tr>";
         for (var i = 0; i < labels.length; i++) {

@@ -48,15 +48,15 @@ var importDataIntoNeo4j = {
         neoMappings = [];
         countNodes = 0;
     },
-/**
- *
- *  import nodes using all params array each element contains one import directive
- *  params.type can be csv or json (parsed)
- *
- *
- *
- *
- */
+    /**
+     *
+     *  import nodes using all params array each element contains one import directive
+     *  params.type can be csv or json (parsed)
+     *
+     *
+     *
+     *
+     */
 
     importNodes: function (allParams, callback) {
         var journal = "";
@@ -109,10 +109,25 @@ var importDataIntoNeo4j = {
                             });
                         }
                         else if (params.type == "json") {
-                            var data = params.data;
-                            if (data.data)
-                                data = [data.data];
-                            dataSubsetsToImport = data;
+                            var data = [];
+
+                            if (params.fields) {
+                                params.data.data.forEach(function (line) {
+                                    var obj={}
+                                    for (var key in params.fields) {
+                                        if (line[key])
+                                            obj[key] = line[key];
+
+                                    }
+                                    data.push(obj);
+                                })
+                            } else {
+                                data = params.data.data;
+                            }
+
+
+
+                            dataSubsetsToImport = [data];
                             callbackSeries(null, dataSubsetsToImport);
                         }
 
@@ -148,7 +163,7 @@ var importDataIntoNeo4j = {
                             var message = "label :" + label + "import done : " + totalImported + "lines ";
                             journal += message + "<br>";
                             socket.message(message);
-                          //  console.log(message);
+                            //  console.log(message);
                             callbackSeries(null, message);
 
                         })
@@ -387,7 +402,7 @@ var importDataIntoNeo4j = {
 
 
         if (objs.length == 0) {
-            return callback(null,{results:[]})
+            return callback(null, {results: []})
         }
         var neo4jUrl = serverParams.neo4jUrl;
 
@@ -721,11 +736,11 @@ var importDataIntoNeo4j = {
     setLoadParams: function (params) {
 
         var loadParams = params;
-        if(params.type=="json"){
+        if (params.type == "json") {
             loadParams.fetchSize = 10000000;
         }
 
-       else if (params.source.toLowerCase().indexOf(".csv") > -1 || params.source.toLowerCase().indexOf(".txt") > -1) {//|| params.sourceDB.toLowerCase().indexOf(".txt") > -1) {
+        else if (params.source.toLowerCase().indexOf(".csv") > -1 || params.source.toLowerCase().indexOf(".txt") > -1) {//|| params.sourceDB.toLowerCase().indexOf(".txt") > -1) {
             loadParams.type = "csv";
             loadParams.filePath = "./uploads/" + params.source + ".json";
             loadParams.fetchSize = 500;

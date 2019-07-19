@@ -196,6 +196,8 @@ var admin = (function () {
                             return 1;
                         return 0;
                     });
+
+
                     if ($("#GoogleEntitiesFilterCBX").prop("checked")) {
                         self.getGoogleApiEntities(array)
                         $("#countExtractedEntities").html(array.length);

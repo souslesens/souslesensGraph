@@ -189,7 +189,6 @@ var xlsxToNeo = {
                                 params.exportedFields = str;
                             }
 
-
                             params.type = "json";
                             params.data = json;
                             params.subGraph = subGraph;
@@ -197,23 +196,21 @@ var xlsxToNeo = {
                             if (mappingKey.indexOf("Nodes_") == 0) {
 
                                 importDataIntoNeo4j.importNodes(params, function (err, result) {
-
+                                    if (err)
+                                        return callbackEachSheet(err.message);
                                     var message = result;
-                                    // console.log(message)
-                                    //  socket.message(message);
-                                    callbackEachSheet(err);
+                                    callbackEachSheet(null,message);
                                 })
                             }
                             else if (mappingKey.indexOf("Rels_") == 0) {
                                 importDataIntoNeo4j.importRelations(params, function (err, result) {
+                                    if (err)
+                                        return callbackEachSheet(err.message);
                                     var message = result;
-                                    console.log(message)
-                                    socket.message(message);
-                                    callbackEachSheet(err);
+                                    callbackEachSheet(null,message);
                                 })
                             }
                             else {
-
                                 callbackEachSheet();
                             }
 

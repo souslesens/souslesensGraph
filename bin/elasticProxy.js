@@ -42,7 +42,8 @@ var classifierManager = require("./rdf/classifierManager.js");
 var elasticCustom = require("./elasticCustom.js");
 var fileInfos = require('./fileInfos..js');
 var socket = require('../routes/socket.js');
-var csv = require('csvtojson');
+//var csv = require('csvtojson');
+const csv = require('csv-parser')
 
 
 var logger = require('logger').createLogger(path.resolve(__dirname, "../logs/elastic.log"));
@@ -1511,35 +1512,26 @@ var elasticProxy = {
                 .pipe(csv(
                     {
                         separator: separator,
-                        /*   mapHeaders: ({header, index}) =>
-                               util.normalizeHeader(headers, header)
-                           ,*/
+                        mapHeaders: ({header, index}) =>
+                            util.normalizeHeader(headers, header)
+                        ,
                         /*   mapValues: ({header, index, value}) =>
                                processValues(header, value),*/
 
 
                     })
-                    .on('header', (header) => {
-                        headers = header;
+                    .on('header', function (header){
+                        headers.push(header);
                     })
 
                     .on('data', function (data) {
 
-                        jsonData.push(JSON.parse("" + data));
-
-
-
-
-
-
-
-
-
-
-
+                        jsonData.push(data)
 
                     })
                     .on('end', function () {
+                     //   console.log(countLines)
+
                         var subsetIndexed = false;
                         var nIteration = 0;
 
@@ -2976,6 +2968,36 @@ if (false) {
     })
 }
 
+if (false){
+
+    elasticProxy.indexCsvFile("paragraphs", "paragraphs", "D:\\Total\\graphNLP\\17_06\\paragraphsElastic.csv", function (err, result) {
+        var xx = err;
+
+    })
+
+
+}
+
+
+
+if (false){
+
+    elasticProxy.indexCsvFile("questions", "questions", "D:\\Total\\graphNLP\\export_mec_question.csv", function (err, result) {
+        var xx = err;
+
+    })
+
+
+}
+if (false){
+
+    elasticProxy.indexCsvFile("thesaurus_ctg", "thesaurus_ctg", "D:\\Total\\graphNLP\\thesaurus.csv", function (err, result) {
+        var xx = err;
+
+    })
+
+
+}
 
 
 

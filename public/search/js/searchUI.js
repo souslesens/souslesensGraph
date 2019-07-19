@@ -57,7 +57,7 @@ var searchUI = (function () {
             data: payload,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
-                searchNodes.userMappings = data;
+                advancedSearch.userMappings = data;
                 self.userIndexes = []
                 for (var key in data) {
                     self.userIndexes.push(key);
@@ -166,7 +166,7 @@ var searchUI = (function () {
             }
         };
 
-        if (searchNodes.queryObject.query) {
+        if (advancedSearch.queryObject.query) {
             payload.options.queryObject =context.queryObject.query;
             payload.options.indexName =context.queryObject.indexName;
             payload.options.getAssociatedWords.indexName =context.queryObject.indexName;
@@ -311,6 +311,8 @@ var searchUI = (function () {
                 return 1;
             return 0
         })
+
+     //   console.log(JSON.stringify(data,null,2))
         for (var i = 0; i < data.length; i++) {
             if (data[i].key.length > 3)
                 html += "<li>" + "<a href='javascript:searchUI.addAssociatedWord(\"" + data[i].key + "\")'>" + data[i].key + " (" + data[i].count + ")</a></li>"
