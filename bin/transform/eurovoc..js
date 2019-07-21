@@ -16,25 +16,23 @@ var ndjson = require('ndjson')
 var eurovoc = {
 
 
-    indexCorpus: function (thesaurusPath, elasticIndex) {
+    indexCorpus: function (thesaurusPath, conceptIndex) {
 
-        var thesaurusArray = JSON.parse("" + fs.readFileSync(thesaurusPath));
-        var multiSearchQuery = "";
-        thesaurusArray.forEach(function (concept,conceptIndex) {
+        var thesaurusConcepts = JSON.parse("" + fs.readFileSync(thesaurusPath));
+        var conceptQueries = [];
+        thesaurusConcepts.forEach(function (concept,conceptIndex) {
             if(conceptIndex>5)
                 return;
-            var synonymsShould = ;
+            var synonymsShould =[] ;
             if( concept.data.synonyms) {
                 var synonyms=concept.data.synonyms.split(";")
                synonyms.forEach(function (synonym,indexSynonym) {
                    if(indexSynonym>0)
-                       synonymsShould += ","
-                    synonymsShould += "{\"match\": {\"content\": \"" + synonym + "\"}}"
+
+                    synonymsShould .push({match: {content: synonym}})
                 })
-                if (synonymsShould != "") {
-                    var conceptQuery = "{\"index\" : [ \"artotheque\",\"bordereaux\"]}\n" +
-                        "{\"query\": {\"bool\" : {\"should\": [" + synonymsShould + "]}},\"size\":200, \"_source\":\"titre\"}\n"
-                    multiSearchQuery += conceptQuery;
+                if (synonymsShould.length>0) {
+                    thesaurusConcepts[conceptIndex].elasticQuery=({query: {bool : {should: synonymsShould}},size:10000, _source:""});
 
                 }
 
@@ -42,24 +40,57 @@ var eurovoc = {
 
 
         })
-
-        var serialize = ndjson.serialize()
+ var ndjsonStr=""
+        var serialize = ndjson.serialize();
         serialize.on('data', function(line) {
-            // line is a line of stringified JSON with a newline delimiter at the end
+            ndjsonStr+=line; // line is a line of stringified JSON with a newline delimiter at the end
         })
-        serialize.write({"foo": "bar"})
-        serialize.end()
-      //  multiSearchQuery+="\n"
+
+        thesaurusConcepts.forEach(function(concept){
+            if(concept.elasticQuery) {
+
+                serialize.write({index: ["artotheque", "bordereaux"]})
+                serialize.write(concept.elasticQuery)
+            }
+
+        })
+
+
+        serialize.end();
+        var xx=ndjsonStr;
+
+
+      //  conceptQueries+="\n"
+
+
+
+
+    //  console.log(ndjsonStr);
         var options = {
             method: 'POST',
-            json: multiSearchQuery,
+            body: ndjsonStr,
+            headers: {
+                'content-type': 'application/json'
+            },
+
             url:"http://localhost:9200/_msearch"
         };
-
-      console.log(multiSearchQuery);
         request(options, function (error, response, body) {
+            var json=JSON.parse(response.body);
+            var responses=json.responses;
+            responses.forEach(function(response,responseIndex){
+                thesaurusConcepts[responseIndex].documents=[];
+                var hits=response.hits.hits;
+                hits.forEach(function(hit){
+                    var document={id:hit._id,index:hit._index};
 
-            var x=error;
+                    thesaurusConcepts[responseIndex].documents.push(document)
+
+                })
+
+            })
+
+            console.log(JSON.stringify(thesaurusConcepts,null,2))
         })
 
 
