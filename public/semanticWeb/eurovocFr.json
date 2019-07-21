@@ -71,7 +71,7 @@
     "data": {
       "synonyms": "2406 monetary relations;2406 relaciones monetarias;2406 relations monétaires;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -152,7 +152,7 @@
     "data": {
       "synonyms": "6026 foodstuff;6026 productos alimenticios;6026 produit alimentaire;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100157",
     "ancestors": []
   },
   {
@@ -197,7 +197,7 @@
     "data": {
       "synonyms": "7621 world organisations;7621 organizaciones mundiales;7621 organisations mondiales;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100162",
     "ancestors": []
   },
   {
@@ -254,7 +254,7 @@
     "data": {
       "synonyms": "1611 economic conditions;1611 situación económica;1611 situation économique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100146",
     "ancestors": []
   },
   {
@@ -299,7 +299,7 @@
     "data": {
       "synonyms": "7606 United Nations;7606 Naciones Unidas;7606 Nations unies;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100162",
     "ancestors": []
   },
   {
@@ -332,7 +332,7 @@
     "data": {
       "synonyms": "0436 executive power and public service;0436 poder ejecutivo y administración pública;0436 pouvoir exécutif et administration publique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100142",
     "ancestors": []
   },
   {
@@ -425,7 +425,7 @@
     "data": {
       "synonyms": "5211 natural environment;5211 milieu naturel;5211 medio natural;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100155",
     "ancestors": []
   },
   {
@@ -506,7 +506,7 @@
     "data": {
       "synonyms": "4416 organisation of work and working conditions;4416 condiciones y organización del trabajo;4416 conditions et organisation du travail;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100153",
     "ancestors": []
   },
   {
@@ -563,7 +563,7 @@
     "data": {
       "synonyms": "5636 monte;5636 forêt;5636 forestry;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -644,7 +644,7 @@
     "data": {
       "synonyms": "4406 employment;4406 empleo;4406 emploi;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100153",
     "ancestors": []
   },
   {
@@ -785,7 +785,7 @@
     "data": {
       "synonyms": "3221 documentation;3221 documentación;3221 documentation;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100150",
     "ancestors": []
   },
   {
@@ -842,7 +842,7 @@
     "data": {
       "synonyms": "6016 processed agricultural produce;6016 productos agrarios transformados;6016 produit agricole transformé;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100157",
     "ancestors": []
   },
   {
@@ -887,7 +887,7 @@
     "data": {
       "synonyms": "6006 plant product;6006 productos de origen vegetal;6006 produit végétal;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100157",
     "ancestors": []
   },
   {
@@ -968,7 +968,7 @@
     "data": {
       "synonyms": "2416 financial institutions and credit;2416 instituciones financieras y de crédito;2416 institutions financières et crédit;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -1049,7 +1049,7 @@
     "data": {
       "synonyms": "2826 social affairs;2826 vida social;2826 vie sociale;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -1106,7 +1106,7 @@
     "data": {
       "synonyms": "2026 consumption;2026 consumo;2026 consommation;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100147",
     "ancestors": []
   },
   {
@@ -1163,7 +1163,7 @@
     "data": {
       "synonyms": "5216 deterioration of the environment;5216 deterioro del medio ambiente;5216 détérioration de l'environnement;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100155",
     "ancestors": []
   },
   {
@@ -1256,7 +1256,7 @@
     "data": {
       "synonyms": "3606 natural and applied sciences;3606 ciencias naturales y aplicadas;3606 sciences naturelles et appliquées;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100151",
     "ancestors": []
   },
   {
@@ -1337,7 +1337,7 @@
     "data": {
       "synonyms": "2806 family;2806 familia;2806 famille;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -1382,7 +1382,7 @@
     "data": {
       "synonyms": "7216 America;7216 América;7216 Amérique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100161",
     "ancestors": []
   },
   {
@@ -1426,7 +1426,7 @@
     "data": {
       "synonyms": "7236 political geography;7236 geografía política;7236 géographie politique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100161",
     "ancestors": []
   },
   {
@@ -1519,7 +1519,7 @@
     "data": {
       "synonyms": "7611 European organisations;7611 organizaciones europeas;7611 organisations européennes;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100162",
     "ancestors": []
   },
   {
@@ -1588,7 +1588,7 @@
     "data": {
       "synonyms": "0816 seguridad internacional;0816 sécurité internationale;0816 international security;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100143",
     "ancestors": []
   },
   {
@@ -1634,7 +1634,7 @@
     "data": {
       "synonyms": "7241 países y territorios de ultramar;7241 pays et territoires d'outre-mer;7241 overseas countries and territories;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100161",
     "ancestors": []
   },
   {
@@ -1679,7 +1679,7 @@
     "data": {
       "synonyms": "6411 technology and technical regulations;6411 tecnología y reglamentación técnica;6411 technologie et réglementation technique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100158",
     "ancestors": []
   },
   {
@@ -1725,7 +1725,7 @@
     "data": {
       "synonyms": "7226 Asia and Oceania;7226 Asia-Oceanía;7226 Asie - Océanie;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100161",
     "ancestors": []
   },
   {
@@ -1770,7 +1770,7 @@
     "data": {
       "synonyms": "1226 organisation of the legal system;1226 organización de la justicia;1226 organisation de la justice;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100145",
     "ancestors": []
   },
   {
@@ -1803,7 +1803,7 @@
     "data": {
       "synonyms": "6616 oil industry;6616 industria petrolera;6616 industrie pétrolière;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100159",
     "ancestors": []
   },
   {
@@ -1884,7 +1884,7 @@
     "data": {
       "synonyms": "2446 taxation;2446 fiscalidad;2446 fiscalité;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -1978,7 +1978,7 @@
     "data": {
       "synonyms": "2836 social protection;2836 protección social;2836 protection sociale;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -2011,7 +2011,7 @@
     "data": {
       "synonyms": "6846 miscellaneous industries;6846 industrias diversas;6846 industries diverses;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -2080,7 +2080,7 @@
     "data": {
       "synonyms": "6606 energy policy;6606 política energética;6606 politique énergétique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100159",
     "ancestors": []
   },
   {
@@ -2113,7 +2113,7 @@
     "data": {
       "synonyms": "3236 information technology and data processing;3236 informática y tratamiento de datos;3236 informatique et traitement des données;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100150",
     "ancestors": []
   },
   {
@@ -2182,7 +2182,7 @@
     "data": {
       "synonyms": "0426 parliamentary proceedings;0426 trabajos parlamentarios;0426 travaux parlementaires;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100142",
     "ancestors": []
   },
   {
@@ -2287,7 +2287,7 @@
     "data": {
       "synonyms": "2831 culture and religion;2831 cultura y religión;2831 culture et religion;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -2320,7 +2320,7 @@
     "data": {
       "synonyms": "2811 migration;2811 movimientos migratorios;2811 migration;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -2413,7 +2413,7 @@
     "data": {
       "synonyms": "5606 agricultural policy;5606 política agraria;5606 politique agricole;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -2566,7 +2566,7 @@
     "data": {
       "synonyms": "6831 building and public works;6831 construcción y obras públicas;6831 bâtiment et travaux publics;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -2865,7 +2865,7 @@
     "data": {
       "synonyms": "1216 droit pénal;1216 criminal law;1216 Derecho penal;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100145",
     "ancestors": []
   },
   {
@@ -2972,7 +2972,7 @@
     "data": {
       "synonyms": "5621 cultivation of agricultural land;5621 explotación agrícola de la tierra;5621 exploitation de la terre agricole;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -3017,7 +3017,7 @@
     "data": {
       "synonyms": "1206 sources and branches of the law;1206 fuentes y ramas del Derecho;1206 sources et branches du droit;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100145",
     "ancestors": []
   },
   {
@@ -3062,7 +3062,7 @@
     "data": {
       "synonyms": "0406 political framework;0406 marco político;0406 cadre politique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100142",
     "ancestors": []
   },
   {
@@ -3229,7 +3229,7 @@
     "data": {
       "synonyms": "1236 rights and freedoms;1236 derechos y libertades;1236 droits et libertés;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100145",
     "ancestors": []
   },
   {
@@ -3322,7 +3322,7 @@
     "data": {
       "synonyms": "1231 international law;1231 Derecho internacional;1231 droit international;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100145",
     "ancestors": []
   },
   {
@@ -3511,7 +3511,7 @@
     "data": {
       "synonyms": "2011 tariff policy;2011 política arancelaria;2011 politique tarifaire;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100147",
     "ancestors": []
   },
   {
@@ -3642,7 +3642,7 @@
     "data": {
       "synonyms": "7221 Africa;7221 África;7221 Afrique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100161",
     "ancestors": []
   },
   {
@@ -3699,7 +3699,7 @@
     "data": {
       "synonyms": "2431 insurance;2431 seguros;2431 assurance;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -3744,7 +3744,7 @@
     "data": {
       "synonyms": "2411 monetary economics;2411 economía monetaria;2411 économie monétaire;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -3777,7 +3777,7 @@
     "data": {
       "synonyms": "0416 electoral procedure and voting;0416 procédure électorale et vote;0416 procedimiento electoral y sistema de votación;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100142",
     "ancestors": []
   },
   {
@@ -3810,7 +3810,7 @@
     "data": {
       "synonyms": "2846 construction and town planning;2846 urbanismo y construcción;2846 urbanisme et construction;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -3915,7 +3915,7 @@
     "data": {
       "synonyms": "5206 environmental policy;5206 política del medio ambiente;5206 politique de l'environnement;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100155",
     "ancestors": []
   },
   {
@@ -3959,7 +3959,7 @@
     "data": {
       "synonyms": "4806 transport policy;4806 política de transportes;4806 politique des transports;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100154",
     "ancestors": []
   },
   {
@@ -4040,7 +4040,7 @@
     "data": {
       "synonyms": "6821 mechanical engineering;6821 industria mecánica;6821 industrie mécanique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -4085,7 +4085,7 @@
     "data": {
       "synonyms": "4411 labour market;4411 mercado laboral;4411 marché du travail;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100153",
     "ancestors": []
   },
   {
@@ -4166,7 +4166,7 @@
     "data": {
       "synonyms": "2841 health;2841 sanidad;2841 santé;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -4380,7 +4380,7 @@
     "data": {
       "synonyms": "6621 electrical and nuclear industries;6621 industrias nuclear y eléctrica;6621 industries nucléaire et électrique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100159",
     "ancestors": []
   },
   {
@@ -4533,7 +4533,7 @@
     "data": {
       "synonyms": "1021 EU finance;1021 finanzas de la Unión Europea;1021 finances de l'Union européenne;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100144",
     "ancestors": []
   },
   {
@@ -4578,7 +4578,7 @@
     "data": {
       "synonyms": "6816 iron, steel and other metal industries;6816 metalurgia y siderurgia;6816 métallurgie et sidérurgie;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -4659,7 +4659,7 @@
     "data": {
       "synonyms": "6416 research and intellectual property;6416 investigación y propiedad intelectual;6416 recherche et propriété intellectuelle;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100158",
     "ancestors": []
   },
   {
@@ -4910,7 +4910,7 @@
     "data": {
       "synonyms": "4826 air and space transport;4826 transporte aéreo y espacial;4826 transports aérien et spatial;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100154",
     "ancestors": []
   },
   {
@@ -5015,7 +5015,7 @@
     "data": {
       "synonyms": "4031 competition;4031 competencia;4031 concurrence;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100152",
     "ancestors": []
   },
   {
@@ -5084,7 +5084,7 @@
     "data": {
       "synonyms": "2816 demography and population;2816 demografía y población;2816 démographie et population;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -5117,7 +5117,7 @@
     "data": {
       "synonyms": "2421 free movement of capital;2421 libre circulación de capitales;2421 libre circulation des capitaux;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -5210,7 +5210,7 @@
     "data": {
       "synonyms": "3226 communications;3226 comunicación;3226 communication;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100150",
     "ancestors": []
   },
   {
@@ -5267,7 +5267,7 @@
     "data": {
       "synonyms": "5626 means of agricultural production;5626 medio de producción agrícola;5626 moyen de production agricole;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -5337,7 +5337,7 @@
     "data": {
       "synonyms": "1606 economic policy;1606 política económica;1606 politique économique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100146",
     "ancestors": []
   },
   {
@@ -5406,7 +5406,7 @@
     "data": {
       "synonyms": "1211 civil law;1211 Derecho civil;1211 droit civil;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100145",
     "ancestors": []
   },
   {
@@ -5681,7 +5681,7 @@
     "data": {
       "synonyms": "0821 defence;0821 defensa;0821 défense;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100143",
     "ancestors": []
   },
   {
@@ -5846,7 +5846,7 @@
     "data": {
       "synonyms": "4006 business organisation;4006 organización de la empresa;4006 organisation de l'entreprise;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100152",
     "ancestors": []
   },
   {
@@ -5915,7 +5915,7 @@
     "data": {
       "synonyms": "0811 cooperation policy;0811 política de cooperación;0811 politique de coopération;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100143",
     "ancestors": []
   },
   {
@@ -6104,7 +6104,7 @@
     "data": {
       "synonyms": "6036 food technology;6036 tecnología alimentaria;6036 technologie alimentaire;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100157",
     "ancestors": []
   },
   {
@@ -6198,7 +6198,7 @@
     "data": {
       "synonyms": "6626 soft energy;6626 energía blanda;6626 énergie douce;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100159",
     "ancestors": []
   },
   {
@@ -6243,7 +6243,7 @@
     "data": {
       "synonyms": "4426 labour law and labour relations;4426 relaciones laborales y Derecho del trabajo;4426 relation et droit du travail;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100153",
     "ancestors": []
   },
   {
@@ -6372,7 +6372,7 @@
     "data": {
       "synonyms": "5641 fisheries;5641 pesca;5641 pêche;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -6937,7 +6937,7 @@
     "data": {
       "synonyms": "5611 agricultural structures and production;5611 producción y estructuras agrarias;5611 production et structures agricoles;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -7246,7 +7246,7 @@
     "data": {
       "synonyms": "2006 trade policy;2006 política comercial;2006 politique commerciale;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100147",
     "ancestors": []
   },
   {
@@ -7531,7 +7531,7 @@
     "data": {
       "synonyms": "2031 marketing;2031 comercialización;2031 commercialisation;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100147",
     "ancestors": []
   },
   {
@@ -7744,7 +7744,7 @@
     "data": {
       "synonyms": "2451 prices;2451 precios;2451 prix;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -7789,7 +7789,7 @@
     "data": {
       "synonyms": "6806 industrial structures and policy;6806 politique et structures industrielles;6806 política y estructura industriales;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -7846,7 +7846,7 @@
     "data": {
       "synonyms": "6406 production;6406 producción;6406 production;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100158",
     "ancestors": []
   },
   {
@@ -7939,7 +7939,7 @@
     "data": {
       "synonyms": "6811 chemistry;6811 química;6811 chimie;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -8140,7 +8140,7 @@
     "data": {
       "synonyms": "2021 comercio internacional;2021 international trade;2021 commerce international;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100147",
     "ancestors": []
   },
   {
@@ -8221,7 +8221,7 @@
     "data": {
       "synonyms": "6841 leather and textile industries;6841 industria del cuero e industria textil;6841 industries du cuir et du textile;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -8687,7 +8687,7 @@
     "data": {
       "synonyms": "3611 humanities;3611 humanidades;3611 sciences humaines;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100151",
     "ancestors": []
   },
   {
@@ -9044,7 +9044,7 @@
     "data": {
       "synonyms": "1621 economic structure;1621 estructura económica;1621 structure économique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100146",
     "ancestors": []
   },
   {
@@ -9149,7 +9149,7 @@
     "data": {
       "synonyms": "1631 economic analysis;1631 análisis económico;1631 analyse économique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100146",
     "ancestors": []
   },
   {
@@ -9254,7 +9254,7 @@
     "data": {
       "synonyms": "4811 organisation of transport;4811 organización de los transportes;4811 organisation des transports;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100154",
     "ancestors": []
   },
   {
@@ -9455,7 +9455,7 @@
     "data": {
       "synonyms": "0806 international affairs;0806 política internacional;0806 politique internationale;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100143",
     "ancestors": []
   },
   {
@@ -9680,7 +9680,7 @@
     "data": {
       "synonyms": "2436 public finance and budget policy;2436 hacienda pública y política presupuestaria;2436 finances publiques et politique budgétaire;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -9737,7 +9737,7 @@
     "data": {
       "synonyms": "0431 politics and public safety;0431 vida política y seguridad pública;0431 vie politique et sécurité publique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100142",
     "ancestors": []
   },
   {
@@ -10194,7 +10194,7 @@
     "data": {
       "synonyms": "3231 information and information processing;3231 información y tratamiento de la información;3231 information et traitement de l'information;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100150",
     "ancestors": []
   },
   {
@@ -10327,7 +10327,7 @@
     "data": {
       "synonyms": "4816 land transport;4816 transporte terrestre;4816 transport terrestre;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100154",
     "ancestors": []
   },
   {
@@ -10444,7 +10444,7 @@
     "data": {
       "synonyms": "4026 accounting;4026 gestión contable;4026 gestion comptable;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100152",
     "ancestors": []
   },
   {
@@ -10513,7 +10513,7 @@
     "data": {
       "synonyms": "1016 European construction;1016 construcción europea;1016 construction européenne;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100144",
     "ancestors": []
   },
   {
@@ -11086,7 +11086,7 @@
     "data": {
       "synonyms": "6611 coal and mining industries;6611 industrias carbonera y minera;6611 industries charbonnière et minière;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100159",
     "ancestors": []
   },
   {
@@ -11397,7 +11397,7 @@
     "data": {
       "synonyms": "1221 justice;1221 justicia;1221 justice;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100145",
     "ancestors": []
   },
   {
@@ -11442,7 +11442,7 @@
     "data": {
       "synonyms": "4421 personnel management and staff remuneration;4421 administración y remuneración del personal;4421 administration et rémunération du personnel;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100153",
     "ancestors": []
   },
   {
@@ -11487,7 +11487,7 @@
     "data": {
       "synonyms": "6826 electronics and electrical engineering;6826 electrónica y electrotécnica;6826 électronique et électrotechnique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -12507,7 +12507,7 @@
     "data": {
       "synonyms": "5616 farming systems;5616 sistema de explotación agraria;5616 système d'exploitation agricole;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -12590,7 +12590,7 @@
     "data": {
       "synonyms": "7206 Europe;7206 Europa;7206 Europe;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100161",
     "ancestors": []
   },
   {
@@ -12959,7 +12959,7 @@
     "data": {
       "synonyms": "1011 European Union law;1011 droit de l'Union européenne;1011 Derecho de la Unión Europea;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100144",
     "ancestors": []
   },
   {
@@ -13344,7 +13344,7 @@
     "data": {
       "synonyms": "7616 extra-European organisations;7616 organizaciones extraeuropeas;7616 organisations extra-européennes;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100162",
     "ancestors": []
   },
   {
@@ -13569,7 +13569,7 @@
     "data": {
       "synonyms": "6011 animal product;6011 productos de origen animal;6011 produit animal;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100157",
     "ancestors": []
   },
   {
@@ -14337,7 +14337,7 @@
     "data": {
       "synonyms": "6031 agri-foodstuffs;6031 industria agroalimentaria;6031 agro-alimentaire;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100157",
     "ancestors": []
   },
   {
@@ -14419,7 +14419,7 @@
     "data": {
       "synonyms": "3216 organisation of teaching;3216 organización de la enseñanza;3216 organisation de l'enseignement;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100150",
     "ancestors": []
   },
   {
@@ -14452,7 +14452,7 @@
     "data": {
       "synonyms": "4821 maritime and inland waterway transport;4821 transporte marítimo y fluvial;4821 transports maritime et fluvial;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100154",
     "ancestors": []
   },
   {
@@ -15402,7 +15402,7 @@
     "data": {
       "synonyms": "1006 EU institutions and European civil service;1006 instituciones de la Unión Europea y función pública europea;1006 institutions de l'Union européenne et fonction publique européenne;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100144",
     "ancestors": []
   },
   {
@@ -16518,7 +16518,7 @@
     "data": {
       "synonyms": "3206 education;3206 educación;3206 éducation;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100150",
     "ancestors": []
   },
   {
@@ -16950,7 +16950,7 @@
     "data": {
       "synonyms": "7211 regions of EU Member States;7211 regiones de los Estados miembros de la UE;7211 régions des États membres de l'Union européenne;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100161",
     "ancestors": []
   },
   {
@@ -17273,7 +17273,7 @@
     "data": {
       "synonyms": "3211 teaching;3211 enseñanza;3211 enseignement;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100150",
     "ancestors": []
   },
   {
@@ -18997,7 +18997,7 @@
     "data": {
       "synonyms": "2441 budget;2441 presupuesto;2441 budget;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100148",
     "ancestors": []
   },
   {
@@ -19127,7 +19127,7 @@
     "data": {
       "synonyms": "4021 management;4021 gestión administrativa;4021 gestion administrative;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100152",
     "ancestors": []
   },
   {
@@ -19679,7 +19679,7 @@
     "data": {
       "synonyms": "0421 parliament;0421 Parlamento;0421 Parlement;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100142",
     "ancestors": []
   },
   {
@@ -20156,7 +20156,7 @@
     "data": {
       "synonyms": "1616 regions and regional policy;1616 región y política regional;1616 région et politique régionale;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100146",
     "ancestors": []
   },
   {
@@ -20384,7 +20384,7 @@
     "data": {
       "synonyms": "7626 non-governmental organisations;7626 organizaciones no gubernamentales;7626 organisations non gouvernementales;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100162",
     "ancestors": []
   },
   {
@@ -20443,7 +20443,7 @@
     "data": {
       "synonyms": "2036 distributive trades;2036 distribución;2036 distribution commerciale;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100147",
     "ancestors": []
   },
   {
@@ -20560,7 +20560,7 @@
     "data": {
       "synonyms": "5631 agricultural activity;5631 actividad agropecuaria;5631 activité agricole;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100156",
     "ancestors": []
   },
   {
@@ -21256,7 +21256,7 @@
     "data": {
       "synonyms": "1626 national accounts;1626 contabilidad nacional;1626 comptabilité nationale;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100146",
     "ancestors": []
   },
   {
@@ -22157,7 +22157,7 @@
     "data": {
       "synonyms": "2821 social framework;2821 marco social;2821 cadre social;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100149",
     "ancestors": []
   },
   {
@@ -23006,7 +23006,7 @@
     "data": {
       "synonyms": "6836 industria de la madera;6836 industrie du bois;6836 wood industry;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100160",
     "ancestors": []
   },
   {
@@ -24759,7 +24759,7 @@
     "data": {
       "synonyms": "6021 beverages and sugar;6021 bebidas y azúcares;6021 boisson et sucre;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100157",
     "ancestors": []
   },
   {
@@ -26768,7 +26768,7 @@
     "data": {
       "synonyms": "4011 business classification;4011 tipos de empresa;4011 type d'entreprise;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100152",
     "ancestors": []
   },
   {
@@ -26909,7 +26909,7 @@
     "data": {
       "synonyms": "0411 political party;0411 partido político;0411 parti politique;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100142",
     "ancestors": []
   },
   {
@@ -28043,7 +28043,7 @@
     "data": {
       "synonyms": "4016 legal form of organisations;4016 forma jurídica de la sociedad;4016 forme juridique de société;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100152",
     "ancestors": []
   },
   {
@@ -35051,7 +35051,7 @@
     "data": {
       "synonyms": "2016 trade;2016 intercambios económicos;2016 échanges économiques;"
     },
-    "parent": "#",
+    "parent": "http://eurovoc.europa.eu/100147",
     "ancestors": []
   },
   {
@@ -57237,6 +57237,7 @@
     ]
   },
   {
+    "text": "CANDIDATS",
     "id": "http://eurovoc.europa.eu/candidates",
     "data": {
       "synonyms": "Candidates;"

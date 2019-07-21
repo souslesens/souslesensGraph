@@ -1,0 +1,12 @@
+{"size":5,
+  "query": {
+    "bool" : {
+      "should": [{
+        "match": {
+          "message": "pauvreté"
+        }
+      }]
+    }
+
+  }
+}
