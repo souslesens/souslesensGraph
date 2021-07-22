@@ -45,7 +45,7 @@
     "socket.io": "^1.7.4",
     "unzip": "^0.1.11",
     "winston": "^3.2.1",
-    "xlsx": "^0.14.2",
+    "xlsx": "^0.17.0",
     "xml2js": "^0.4.19",
     "xmlbuilder": "^9.0.4",
     "xmldom": "latest"
