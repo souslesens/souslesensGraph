@@ -42,7 +42,7 @@
     "pug": "^2.0.0-beta10",
     "sax": "^1.2.4",
     "serve-favicon": "^2.4.4",
-    "socket.io": "^1.7.4",
+    "socket.io": "^4.5.3",
     "unzip": "^0.1.11",
     "winston": "^3.2.1",
     "xlsx": "^0.14.2",
