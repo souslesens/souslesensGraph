@@ -22,7 +22,7 @@
     "elasticsearch": "^15.1.1",
     "exif": "^0.6.0",
     "exiftool": "^0.0.3",
-    "express": "^4.15.4",
+    "express": "^4.17.3",
     "hex-to-rgba": "^1.0.2",
     "iconv-lite": "^0.4.24",
     "jade": "^1.11.0",
